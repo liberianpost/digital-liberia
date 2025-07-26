@@ -1,10 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  content: ["./src/**/*.{js,jsx,ts,tsx}", "./index.html"],
   theme: {
     extend: {
       animation: {
-        background: "gradient 10s ease infinite",
+        background: "gradient 20s ease infinite",
       },
       keyframes: {
         gradient: {
@@ -13,10 +13,14 @@ module.exports = {
         },
       },
       backgroundImage: {
-        'gradient-blue': 'linear-gradient(270deg, #0ea5e9, #3b82f6, #60a5fa, #0ea5e9)',
+        'gradient-blue': 'linear-gradient(270deg, #1e3a8a, #0f172a, #1e3a8a)',
       },
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
+      },
+      colors: {
+        'deep-dark': '#0a0a0a',
+        'glass-dark': 'rgba(30, 41, 59, 0.6)',
       },
     },
   },
