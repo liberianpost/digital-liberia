@@ -1,10 +1,10 @@
 import React from "react";
-import Hero from "./components/Hero";
+import Home from "./Home";
 
 function App() {
   return (
     <div className="p-8 font-sans">
-      <Hero />
+      <Home />
     </div>
   );
 }
