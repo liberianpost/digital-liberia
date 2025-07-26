@@ -3,22 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-<<<<<<< HEAD
     "autoprefixer": "^10.4.17",
     "postcss": "^8.4.31",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "tailwindcss": "^3.3.3"
-=======
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.24",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^19.2.0-canary-19baee81-20250725",
+    "react-dom": "^19.2.0-canary-19baee81-20250725",
     "react-router-dom": "^7.7.1",
     "react-scripts": "^5.0.1",
     "tailwindcss": "^3.3.2"
->>>>>>> 2c0e2f7f (Save current work before pull)
   },
   "devDependencies": {
     "vite": "^4.4.9",
@@ -40,5 +37,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "vite": "^7.0.6"
   }
 }
