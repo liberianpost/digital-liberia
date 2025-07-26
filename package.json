@@ -1,7 +1,7 @@
 {
   "name": "digital-liberia-frontend",
   "version": "1.0.0",
-  "homepage": "https://liberianpost.github.io/digital-liberia",
+  "homepage": "https://digitalliberia.com",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build"
