@@ -1,4 +1,24 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+
+const navLinks = [
+  { label: "Home", to: "/" },
+  { label: "System", to: "/system" },
+  { label: "Digital Liberia", to: "/digital-liberia" },
+  { label: "LibPay", to: "/libpay" },
+  { label: "Liberian Post", to: "/liberian-post" },
+  { label: "About Us", to: "/about" },
+  { label: "Business Model", to: "/business-model" },
+  { label: "Company Structure", to: "/company-structure" }
+];
+
+const logos = [
+  "/logos/logo1.png",
+  "/logos/logo2.png",
+  "/logos/logo3.png",
+  "/logos/logo4.png",
+  "/logos/logo5.png"
+];
 
 const sections = [
   {
@@ -20,7 +40,6 @@ const sections = [
     title: "Ecosystem Components",
     content: (
       <div className="space-y-12 text-blue-100 text-left">
-        {/* You can keep each <article> like you originally had */}
         <article>
           <h3 className="text-2xl font-semibold text-white mb-2">1. National Database Management System (NDMS)</h3>
           <p>A secure, centralized, and intelligent national data backbone to:</p>
@@ -30,7 +49,6 @@ const sections = [
             <li>Provide real-time data and analytics dashboards</li>
           </ul>
         </article>
-        {/* Continue adding the rest of the sections similarly... */}
       </div>
     )
   },
@@ -60,11 +78,71 @@ const sections = [
 ];
 
 export default function Home() {
+  const [showMenu, setShowMenu] = useState(false);
+  const [logoIndex, setLogoIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLogoIndex(prev => (prev + 1) % logos.length);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="relative min-h-screen w-full bg-deep-dark text-white font-inter overflow-x-hidden">
+      {/* Background Animation */}
       <div className="absolute inset-0 bg-gradient-blue bg-[length:400%_400%] animate-background -z-10" />
 
-      {sections.map((section, index) => (
+      {/* Fixed Top Navigation */}
+      <header className="fixed top-0 left-0 w-full z-50 bg-black/60 backdrop-blur border-b border-white/10">
+        <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+          <Link to="/" className="text-2xl font-bold text-white">
+            Home
+          </Link>
+          <nav className="hidden md:flex space-x-6">
+            {navLinks.map(link => (
+              <Link key={link.to} to={link.to} className="hover:text-blue-300 transition">
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="md:hidden text-white focus:outline-none"
+          >
+            ☰
+          </button>
+        </div>
+        {/* Mobile Menu */}
+        {showMenu && (
+          <div className="md:hidden bg-black/80 backdrop-blur border-t border-white/10">
+            <div className="flex flex-col px-6 py-4 space-y-3">
+              {navLinks.map(link => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="hover:text-blue-300 transition"
+                  onClick={() => setShowMenu(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Logo Carousel */}
+      <div className="pt-24 pb-8 flex justify-center">
+        <img
+          src={logos[logoIndex]}
+          alt="Rotating Logo"
+          className="w-32 h-32 object-contain transition-opacity duration-500"
+        />
+      </div>
+
+      {/* Sections */}
+      {sections.map(section => (
         <section
           key={section.id}
           className="relative z-10 w-full py-20 px-6 md:px-12 max-w-6xl mx-auto"
