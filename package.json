@@ -1,17 +1,21 @@
 {
   "name": "digital-liberia-frontend",
   "version": "1.0.0",
-  "homepage": "https://digitalliberia.com",
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build"
-  },
+  "private": true,
+  "homepage": "https://liberianpost.github.io/digital-liberia",
   "dependencies": {
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.31",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3",
     "react-scripts": "5.0.1",
-    "tailwindcss": "^3.3.2",
-    "autoprefixer": "^10.4.14",
-    "postcss": "^8.4.24"
+    "tailwindcss": "^3.3.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   }
 }
