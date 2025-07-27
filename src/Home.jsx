@@ -92,18 +92,18 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full bg-black text-white font-inter overflow-x-hidden">
-      {/* Fixed Background */}
+      {/* Layer 1: Dark Background (base layer) */}
       <div className="fixed inset-0 bg-black -z-50" />
 
-      {/* Floating Logos Grid */}
-      <div className="fixed inset-0 flex items-center justify-center -z-40">
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-3xl" />
+      {/* Layer 2: Floating Logos (middle layer) */}
+      <div className="fixed inset-0 z-10 flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 to-black/30" />
         <div className="relative grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-8 w-full max-w-7xl">
           {logos.map((logo, index) => (
             <div 
               key={index}
-              className={`logo-container flex items-center justify-center ${
-                index === activeLogo ? "scale-110 bg-white/20" : "scale-100"
+              className={`flex items-center justify-center p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-500 ${
+                index === activeLogo ? "scale-110 bg-white/15" : "scale-100"
               }`}
             >
               <img
@@ -116,7 +116,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Navigation */}
+      {/* Layer 3: Navigation (top layer) */}
       <header className="fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-sm border-b border-white/10">
         <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
           <Link to="/" className="text-2xl font-bold text-white">
@@ -160,14 +160,18 @@ export default function Home() {
         )}
       </header>
 
-      {/* Content Sections */}
-      <main className="relative z-10 pt-32 pb-20 px-4 md:px-8">
-        {sections.map(section => (
+      {/* Layer 4: Content Sections (top layer) */}
+      <main className="relative z-20 pt-32 pb-20 px-4 md:px-8">
+        {sections.map((section, index) => (
           <section
             key={section.id}
             className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12"
+            style={{
+              animation: `fadeInUp 0.5s ease-out ${index * 0.1}s forwards`,
+              opacity: 0
+            }}
           >
-            <div className="bg-glass-dark p-6 md:p-8">
+            <div className="bg-black/30 backdrop-blur-lg rounded-xl border border-white/20 p-6 md:p-8 shadow-lg">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 border-b border-white/20 pb-2">
                 {section.title}
               </h2>
@@ -178,6 +182,20 @@ export default function Home() {
           </section>
         ))}
       </main>
+
+      {/* Global Styles (in JSX for simplicity) */}
+      <style jsx global>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }
