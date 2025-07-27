@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const navLinks = [
   { label: "Home", to: "/" },
@@ -124,13 +124,14 @@ const sections = [
 ];
 
 export default function Home() {
+  const location = useLocation();
   const [showMenu, setShowMenu] = useState(false);
   const [activeLogo, setActiveLogo] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveLogo(prev => (prev + 1) % logos.length);
-    }, 1000); // Changed to 1 second as requested
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -154,7 +155,7 @@ export default function Home() {
                 alt={`Logo ${index}`}
                 className="max-w-full max-h-full object-contain"
               />
-              <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
+              <div className="absolute inset-0 bg-black/5" />
             </div>
           ))}
         </div>
@@ -171,7 +172,11 @@ export default function Home() {
               <Link 
                 key={link.to} 
                 to={link.to} 
-                className="text-white/80 hover:text-blue-300 transition-colors duration-300"
+                className={`transition-colors duration-300 ${
+                  location.pathname === link.to 
+                    ? "text-red-500 font-medium" 
+                    : "text-white/80 hover:text-blue-300"
+                }`}
               >
                 {link.label}
               </Link>
@@ -185,6 +190,26 @@ export default function Home() {
           </button>
         </div>
         
+        {/* Logo Bar Below Navigation */}
+        <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
+          <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
+            {logos.map((logo, index) => (
+              <div 
+                key={index}
+                className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-500 ${
+                  index === activeLogo ? "scale-110 bg-black/30" : "scale-100 bg-black/10"
+                }`}
+              >
+                <img
+                  src={logo}
+                  alt={`Logo ${index}`}
+                  className="w-12 h-12 md:w-16 md:h-16 object-contain"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+        
         {/* Mobile Menu */}
         {showMenu && (
           <div className="md:hidden bg-black/90 backdrop-blur-lg border-t border-white/10">
@@ -193,7 +218,11 @@ export default function Home() {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="text-white/80 hover:text-blue-300 py-2 transition-colors duration-300"
+                  className={`py-2 transition-colors duration-300 ${
+                    location.pathname === link.to 
+                      ? "text-red-500 font-medium" 
+                      : "text-white/80 hover:text-blue-300"
+                  }`}
                   onClick={() => setShowMenu(false)}
                 >
                   {link.label}
@@ -205,7 +234,7 @@ export default function Home() {
       </header>
 
       {/* Layer 4: Content Sections with Semi-Black Background */}
-      <main className="relative z-30 pt-36 pb-20 px-4 md:px-8">
+      <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
         {sections.map((section, index) => (
           <section
             key={section.id}
@@ -215,7 +244,7 @@ export default function Home() {
               opacity: 0
             }}
           >
-            <div className="bg-black/70 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
               {/* Mirror Reflection Effect */}
               <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
               
@@ -241,6 +270,14 @@ export default function Home() {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        /* Hide scrollbar for logo container */
+        .overflow-x-auto {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .overflow-x-auto::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
     </div>
