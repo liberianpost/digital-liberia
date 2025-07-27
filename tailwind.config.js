@@ -1,28 +1,34 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx}", "./index.html"],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  darkMode: 'class',
   theme: {
     extend: {
-      animation: {
-        background: "gradient 20s ease infinite",
-      },
-      keyframes: {
-        gradient: {
-          "0%, 100%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-        },
-      },
-      backgroundImage: {
-        'gradient-blue': 'linear-gradient(270deg, #1e3a8a, #0f172a, #1e3a8a)',
-      },
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
       },
       colors: {
-        'deep-dark': '#0a0a0a',
-        'glass-dark': 'rgba(30, 41, 59, 0.6)',
+        'deep-dark': '#050505',
+        'glass-dark': 'rgba(10, 10, 10, 0.7)',
+      },
+      backgroundImage: {
+        'gradient-blue': 'linear-gradient(270deg, #1e3a8a, #0f172a, #1e3a8a)',
+      },
+      animation: {
+        'background-fade': 'backgroundFade 20s ease infinite',
+      },
+      keyframes: {
+        backgroundFade: {
+          '0%, 100%': { 'background-position': '0% 50%' },
+          '50%': { 'background-position': '100% 50%' },
+        },
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
 };
