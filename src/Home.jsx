@@ -125,7 +125,6 @@ const sections = [
 
 export default function Home() {
   const location = useLocation();
-  const [showMenu, setShowMenu] = useState(false);
   const [activeLogo, setActiveLogo] = useState(0);
 
   useEffect(() => {
@@ -162,43 +161,46 @@ export default function Home() {
       </div>
 
       {/* Layer 3: Navigation */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-sm">
-        {/* Navigation Bar - Always Visible */}
-        <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
-          <nav className="flex space-x-4 overflow-x-auto w-full justify-center">
-            {navLinks.map(link => (
-              <Link 
-                key={link.to} 
-                to={link.to} 
-                className={`flex-shrink-0 text-base md:text-lg font-bold transition-colors duration-300 ${
-                  location.pathname === link.to 
-                    ? "text-red-500" 
-                    : "text-white hover:text-blue-300"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
+      <header className="fixed top-0 left-0 w-full z-50">
+        {/* Navigation Container with Semi-Black Background */}
+        <div className="bg-black/60 backdrop-blur-md border-b border-gray-600/30">
+          {/* Navigation Bar - Always Visible */}
+          <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
+            <nav className="flex space-x-4 overflow-x-auto w-full justify-center">
+              {navLinks.map(link => (
+                <Link 
+                  key={link.to} 
+                  to={link.to} 
+                  className={`flex-shrink-0 text-base md:text-lg font-bold transition-colors duration-300 ${
+                    location.pathname === link.to 
+                      ? "text-red-500" 
+                      : "text-white hover:text-blue-300"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
 
-        {/* Logo Bar Below Navigation */}
-        <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
-          <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
-            {logos.map((logo, index) => (
-              <div 
-                key={index}
-                className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-500 ${
-                  index === activeLogo ? "scale-110 bg-black/30" : "scale-100 bg-black/10"
-                }`}
-              >
-                <img
-                  src={logo}
-                  alt={`Logo ${index}`}
-                  className="w-12 h-12 md:w-16 md:h-16 object-contain"
-                />
-              </div>
-            ))}
+          {/* Logo Bar Below Navigation */}
+          <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
+            <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
+              {logos.map((logo, index) => (
+                <div 
+                  key={index}
+                  className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-500 ${
+                    index === activeLogo ? "scale-110 bg-black/30" : "scale-100 bg-black/10"
+                  }`}
+                >
+                  <img
+                    src={logo}
+                    alt={`Logo ${index}`}
+                    className="w-12 h-12 md:w-16 md:h-16 object-contain"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         
