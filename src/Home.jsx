@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const navLinks = [
-  { label: "Home", to: "/" },
-  { label: "System", to: "/system" },
-  { label: "Digital Liberia", to: "/digital-liberia" },
-  { label: "LibPay", to: "/libpay" },
-  { label: "Liberian Post", to: "/liberian-post" },
-  { label: "About Us", to: "/about" },
-  { label: "Business Model", to: "/business-model" },
-  { label: "Company Structure", to: "/company-structure" }
+  { label: "Home", to: "/", color: "bg-blue-500/80" },
+  { label: "System", to: "/system", color: "bg-green-500/80" },
+  { label: "Digital Liberia", to: "/digital-liberia", color: "bg-purple-500/80" },
+  { label: "LibPay", to: "/libpay", color: "bg-yellow-500/80" },
+  { label: "Liberian Post", to: "/liberian-post", color: "bg-pink-500/80" },
+  { label: "About Us", to: "/about", color: "bg-indigo-500/80" },
+  { label: "Business Model", to: "/business-model", color: "bg-orange-500/80" },
+  { label: "Company Structure", to: "/company-structure", color: "bg-teal-500/80" }
 ];
 
 const logos = [
@@ -168,7 +168,7 @@ export default function Home() {
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
             <nav className="flex space-x-4 overflow-x-auto w-full justify-center">
               {navLinks.map(link => (
-                <div key={link.to} className="flex-shrink-0 bg-black/40 px-3 py-1 rounded-lg">
+                <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
                   <Link 
                     to={link.to} 
                     className={`text-base md:text-lg font-bold transition-colors duration-300 ${
