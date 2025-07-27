@@ -130,7 +130,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveLogo(prev => (prev + 1) % logos.length);
-    }, 3000);
+    }, 1000); // Changed to 1 second as requested
     return () => clearInterval(interval);
   }, []);
 
@@ -139,21 +139,22 @@ export default function Home() {
       {/* Layer 1: Dark Background */}
       <div className="fixed inset-0 bg-black -z-50" />
 
-      {/* Layer 2: Fixed Logos Below Navigation - Single Row for All Devices */}
-      <div className="fixed top-16 left-0 w-full z-40 pt-4 pb-4 bg-gradient-to-b from-black to-transparent overflow-x-auto">
-        <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto">
+      {/* Centered Image Slideshow - Fixed Position */}
+      <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
+        <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
           {logos.map((logo, index) => (
-            <div 
+            <div
               key={index}
-              className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-500 ${
-                index === activeLogo ? "scale-110" : "scale-100"
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
+                index === activeLogo ? "opacity-100" : "opacity-0"
               }`}
             >
               <img
                 src={logo}
                 alt={`Logo ${index}`}
-                className="w-12 h-12 md:w-16 md:h-16 object-contain"
+                className="max-w-full max-h-full object-contain"
               />
+              <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
             </div>
           ))}
         </div>
@@ -240,14 +241,6 @@ export default function Home() {
             opacity: 1;
             transform: translateY(0);
           }
-        }
-        /* Hide scrollbar for logo container */
-        .overflow-x-auto {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .overflow-x-auto::-webkit-scrollbar {
-          display: none;
         }
       `}</style>
     </div>
