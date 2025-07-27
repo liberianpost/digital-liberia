@@ -15,9 +15,11 @@ const navLinks = [
 const logos = [
   "/logos/liberianpost.png",
   "/logos/digital.png",
-  "/logos/libpay.png",
   "/logos/libmusic.png",
-  "/logos/libconnect.png"
+  "/logos/libconnectsit.png",
+  "/logos/libpaysit.png",
+  "/logos/seal of liberia.png",
+  "/logos/liberia.png"
 ];
 
 const sections = [
@@ -90,15 +92,13 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full bg-deep-dark text-white font-inter overflow-x-hidden">
-      {/* Background Animation */}
-      <div className="absolute inset-0 bg-gradient-blue bg-[length:400%_400%] animate-background -z-10" />
+      {/* Background Layer */}
+      <div className="absolute inset-0 bg-gradient-blue bg-[length:400%_400%] animate-background z-0" />
 
-      {/* Fixed Top Navigation */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-black/60 backdrop-blur border-b border-white/10">
+      {/* Navigation */}
+      <header className="fixed top-0 left-0 w-full z-40 bg-black/60 backdrop-blur border-b border-white/10">
         <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-          <Link to="/" className="text-2xl font-bold text-white">
-            Home
-          </Link>
+          <Link to="/" className="text-2xl font-bold text-white">Home</Link>
           <nav className="hidden md:flex space-x-6">
             {navLinks.map(link => (
               <Link key={link.to} to={link.to} className="hover:text-blue-300 transition">
@@ -113,7 +113,6 @@ export default function Home() {
             ☰
           </button>
         </div>
-        {/* Mobile Menu */}
         {showMenu && (
           <div className="md:hidden bg-black/80 backdrop-blur border-t border-white/10">
             <div className="flex flex-col px-6 py-4 space-y-3">
@@ -132,29 +131,36 @@ export default function Home() {
         )}
       </header>
 
-      {/* Logo Carousel */}
-      <div className="pt-24 pb-8 flex justify-center">
-        <img
-          src={logos[logoIndex]}
-          alt="Rotating Logo"
-          className="w-32 h-32 object-contain transition-opacity duration-500"
-        />
+      {/* Logos - Floating Glass Container */}
+      <div className="absolute top-24 left-0 w-full z-10 px-4 md:px-16">
+        <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-lg py-6 px-4 flex flex-wrap justify-center gap-6 max-w-7xl mx-auto glass-effect">
+          {logos.map((logo, idx) => (
+            <img
+              key={idx}
+              src={logo}
+              alt={`Logo ${idx}`}
+              className="w-20 h-20 object-contain opacity-90 hover:scale-105 transition"
+            />
+          ))}
+        </div>
       </div>
 
-      {/* Sections */}
-      {sections.map(section => (
-        <section
-          key={section.id}
-          className="relative z-10 w-full py-20 px-6 md:px-12 max-w-6xl mx-auto"
-        >
-          <div className="backdrop-blur-md bg-glass-dark rounded-xl border border-white/10 p-8 shadow-2xl">
-            <h2 className="text-3xl font-bold mb-6 border-b border-white/20 pb-2">
-              {section.title}
-            </h2>
-            {section.content}
-          </div>
-        </section>
-      ))}
+      {/* Section Content - Transparent Container */}
+      <main className="relative z-20 pt-[350px] pb-20">
+        {sections.map(section => (
+          <section
+            key={section.id}
+            className="w-full py-16 px-6 md:px-12 max-w-6xl mx-auto"
+          >
+            <div className="bg-black/50 backdrop-blur-lg rounded-xl border border-white/10 p-8 shadow-xl">
+              <h2 className="text-3xl font-bold mb-6 border-b border-white/20 pb-2">
+                {section.title}
+              </h2>
+              {section.content}
+            </div>
+          </section>
+        ))}
+      </main>
     </div>
   );
 }
