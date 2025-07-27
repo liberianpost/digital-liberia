@@ -86,30 +86,42 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setLogoIndex(prev => (prev + 1) % logos.length);
-    }, 1200);
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden text-white font-inter">
-      {/* Layer 1: Animated Background */}
-      <div className="absolute inset-0 animate-background -z-30" />
+    <div className="relative min-h-screen w-full bg-black text-white font-inter overflow-x-hidden">
+      {/* Background - Dark Screen */}
+      <div className="fixed inset-0 bg-black -z-50" />
 
-      {/* Layer 2: Floating Glass Logo Carousel */}
-      <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-        <div className="bg-glass p-6 rounded-xl shadow-lg">
-          <img
-            src={logos[logoIndex]}
-            alt="Logo"
-            className="w-40 h-40 object-contain transition-opacity duration-700"
-          />
+      {/* Glass Container with Logos */}
+      <div className="fixed inset-0 flex items-center justify-center -z-40">
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-3xl" />
+        <div className="relative grid grid-cols-3 gap-8 p-8 max-w-6xl mx-auto">
+          {logos.map((logo, index) => (
+            <div 
+              key={index}
+              className={`flex items-center justify-center p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 transition-all duration-500 ${
+                index === logoIndex ? "scale-110 bg-white/20" : "scale-90"
+              }`}
+            >
+              <img
+                src={logo}
+                alt={`Logo ${index}`}
+                className="w-24 h-24 object-contain"
+              />
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Navigation Bar */}
+      {/* Fixed Top Navigation */}
       <header className="fixed top-0 left-0 w-full z-50 bg-black/60 backdrop-blur border-b border-white/10">
         <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-          <Link to="/" className="text-2xl font-bold text-white">Home</Link>
+          <Link to="/" className="text-2xl font-bold text-white">
+            Home
+          </Link>
           <nav className="hidden md:flex space-x-6">
             {navLinks.map(link => (
               <Link key={link.to} to={link.to} className="hover:text-blue-300 transition">
@@ -124,6 +136,7 @@ export default function Home() {
             ☰
           </button>
         </div>
+        {/* Mobile Menu */}
         {showMenu && (
           <div className="md:hidden bg-black/80 backdrop-blur border-t border-white/10">
             <div className="flex flex-col px-6 py-4 space-y-3">
@@ -142,15 +155,24 @@ export default function Home() {
         )}
       </header>
 
-      {/* Layer 3: Content Over Glass */}
-      <main className="relative z-20 pt-40 pb-20 px-4 md:px-12 max-w-7xl mx-auto space-y-20">
+      {/* Content Sections with Transparent Containers */}
+      <div className="relative z-10 pt-32 pb-20 px-6">
         {sections.map(section => (
-          <section key={section.id} className="bg-black/40 backdrop-blur-md p-8 rounded-xl border border-white/10 shadow-xl">
-            <h2 className="text-3xl font-bold mb-4 border-b border-white/20 pb-2">{section.title}</h2>
-            {section.content}
+          <section
+            key={section.id}
+            className="w-full py-12 px-6 md:px-12 max-w-6xl mx-auto mb-12"
+          >
+            <div className="backdrop-blur-lg bg-black/30 rounded-xl border border-white/20 p-8 shadow-lg">
+              <h2 className="text-3xl font-bold mb-6 border-b border-white/20 pb-2">
+                {section.title}
+              </h2>
+              <div className="text-white/90">
+                {section.content}
+              </div>
+            </div>
           </section>
         ))}
-      </main>
+      </div>
     </div>
   );
 }
