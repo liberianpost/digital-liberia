@@ -28,10 +28,10 @@ const sections = [
     title: "Welcome to Digital Liberia",
     content: (
       <>
-        <p>
+        <p className="text-black">
           Digital Liberia is a <span className="font-semibold">bold, nation-scale digital ecosystem</span> that aims to digitally transform governance, commerce, and everyday life in Liberia.
         </p>
-        <p className="mt-4">
+        <p className="mt-4 text-black">
           By unifying services into a single mobile platform, Digital Liberia serves citizens, businesses, and institutions with tools to interact securely, efficiently, and transparently—laying the foundation for a digitally empowered economy.
         </p>
       </>
@@ -41,7 +41,7 @@ const sections = [
     id: "ecosystem",
     title: "Ecosystem Components",
     content: (
-      <div className="space-y-12 text-left">
+      <div className="space-y-12 text-black text-left">
         <article>
           <h3 className="text-2xl font-semibold mb-2">1. National Database Management System (NDMS)</h3>
           <p>A secure, centralized, and intelligent national data backbone to:</p>
@@ -59,10 +59,10 @@ const sections = [
     title: "Vision & Mission",
     content: (
       <>
-        <p className="mb-4 italic text-lg">
+        <p className="mb-4 italic text-black text-lg">
           <strong>Vision:</strong> To become the digital backbone of Liberia—empowering people and the economy.
         </p>
-        <p className="italic text-lg">
+        <p className="italic text-black text-lg">
           <strong>Mission:</strong> Deliver a secure platform for transparent governance and accessible services.
         </p>
       </>
@@ -72,7 +72,7 @@ const sections = [
     id: "problem",
     title: "Problem Statement",
     content: (
-      <p className="text-lg">
+      <p className="text-black text-lg">
         Liberia is facing significant gaps in digital transformation...
       </p>
     )
@@ -95,20 +95,20 @@ export default function Home() {
       {/* Layer 1: Dark Background */}
       <div className="fixed inset-0 bg-black -z-50" />
 
-      {/* Layer 2: Fixed Logos Below Navigation */}
-      <div className="fixed top-16 left-0 w-full z-40 pt-4 pb-8 bg-gradient-to-b from-black to-transparent">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 px-4 max-w-7xl mx-auto">
+      {/* Layer 2: Fixed Logos Below Navigation - Single Row for All Devices */}
+      <div className="fixed top-16 left-0 w-full z-40 pt-4 pb-4 bg-gradient-to-b from-black to-transparent overflow-x-auto">
+        <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto">
           {logos.map((logo, index) => (
             <div 
               key={index}
-              className={`flex items-center justify-center p-2 rounded-lg transition-all duration-500 ${
+              className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-500 ${
                 index === activeLogo ? "scale-110" : "scale-100"
               }`}
             >
               <img
                 src={logo}
                 alt={`Logo ${index}`}
-                className="w-16 h-16 object-contain"
+                className="w-12 h-12 md:w-16 md:h-16 object-contain"
               />
             </div>
           ))}
@@ -159,8 +159,8 @@ export default function Home() {
         )}
       </header>
 
-      {/* Layer 4: Content Sections with Diamond Blue Background */}
-      <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
+      {/* Layer 4: Content Sections with Transparent White Background */}
+      <main className="relative z-30 pt-36 pb-20 px-4 md:px-8">
         {sections.map((section, index) => (
           <section
             key={section.id}
@@ -170,14 +170,14 @@ export default function Home() {
               opacity: 0
             }}
           >
-            <div className="bg-blue-900/90 backdrop-blur-md rounded-xl border border-blue-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="bg-white/90 backdrop-blur-md rounded-xl border border-white/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
               {/* Mirror Reflection Effect */}
-              <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-blue-400/20 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-white/40 to-transparent"></div>
               
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-blue-400/30 pb-2">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-black border-b border-black/20 pb-2">
                 {section.title}
               </h2>
-              <div className="text-white relative">
+              <div className="text-black relative">
                 {section.content}
               </div>
             </div>
@@ -196,6 +196,14 @@ export default function Home() {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        /* Hide scrollbar for logo container */
+        .overflow-x-auto {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .overflow-x-auto::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
     </div>
