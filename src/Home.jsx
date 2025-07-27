@@ -86,17 +86,28 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setLogoIndex(prev => (prev + 1) % logos.length);
-    }, 1000);
+    }, 1200);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full bg-deep-dark text-white font-inter overflow-x-hidden">
-      {/* Background Layer */}
-      <div className="absolute inset-0 bg-gradient-blue bg-[length:400%_400%] animate-background z-0" />
+    <div className="relative min-h-screen w-full overflow-hidden text-white font-inter">
+      {/* Layer 1: Animated Background */}
+      <div className="absolute inset-0 animate-background -z-30" />
 
-      {/* Navigation */}
-      <header className="fixed top-0 left-0 w-full z-40 bg-black/60 backdrop-blur border-b border-white/10">
+      {/* Layer 2: Floating Glass Logo Carousel */}
+      <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+        <div className="bg-glass p-6 rounded-xl shadow-lg">
+          <img
+            src={logos[logoIndex]}
+            alt="Logo"
+            className="w-40 h-40 object-contain transition-opacity duration-700"
+          />
+        </div>
+      </div>
+
+      {/* Navigation Bar */}
+      <header className="fixed top-0 left-0 w-full z-50 bg-black/60 backdrop-blur border-b border-white/10">
         <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
           <Link to="/" className="text-2xl font-bold text-white">Home</Link>
           <nav className="hidden md:flex space-x-6">
@@ -131,33 +142,12 @@ export default function Home() {
         )}
       </header>
 
-      {/* Logos - Floating Glass Container */}
-      <div className="absolute top-24 left-0 w-full z-10 px-4 md:px-16">
-        <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-lg py-6 px-4 flex flex-wrap justify-center gap-6 max-w-7xl mx-auto glass-effect">
-          {logos.map((logo, idx) => (
-            <img
-              key={idx}
-              src={logo}
-              alt={`Logo ${idx}`}
-              className="w-20 h-20 object-contain opacity-90 hover:scale-105 transition"
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Section Content - Transparent Container */}
-      <main className="relative z-20 pt-[350px] pb-20">
+      {/* Layer 3: Content Over Glass */}
+      <main className="relative z-20 pt-40 pb-20 px-4 md:px-12 max-w-7xl mx-auto space-y-20">
         {sections.map(section => (
-          <section
-            key={section.id}
-            className="w-full py-16 px-6 md:px-12 max-w-6xl mx-auto"
-          >
-            <div className="bg-black/50 backdrop-blur-lg rounded-xl border border-white/10 p-8 shadow-xl">
-              <h2 className="text-3xl font-bold mb-6 border-b border-white/20 pb-2">
-                {section.title}
-              </h2>
-              {section.content}
-            </div>
+          <section key={section.id} className="bg-black/40 backdrop-blur-md p-8 rounded-xl border border-white/10 shadow-xl">
+            <h2 className="text-3xl font-bold mb-4 border-b border-white/20 pb-2">{section.title}</h2>
+            {section.content}
           </section>
         ))}
       </main>
