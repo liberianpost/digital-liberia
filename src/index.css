@@ -5,3 +5,13 @@
 body {
   @apply bg-deep-dark text-white font-inter;
 }
+
+/* Glassmorphism Utility Class */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.06); /* Very light transparency */
+  border-radius: 20px;                  /* Smooth edges */
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Soft glow */
+  backdrop-filter: blur(10px);          /* Blur behind the container */
+  -webkit-backdrop-filter: blur(10px);  /* Safari support */
+  border: 1px solid rgba(255, 255, 255, 0.18); /* Light inner border */
+}
