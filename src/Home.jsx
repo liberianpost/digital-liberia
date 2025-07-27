@@ -28,12 +28,17 @@ const sections = [
     title: "Welcome to Digital Liberia",
     content: (
       <>
-        <p className="text-black">
+        <p className="text-white">
           Digital Liberia is a <span className="font-semibold">bold, nation-scale digital ecosystem</span> that aims to digitally transform governance, commerce, and everyday life in Liberia.
         </p>
-        <p className="mt-4 text-black">
+        <p className="mt-4 text-white">
           By unifying services into a single mobile platform, Digital Liberia serves citizens, businesses, and institutions with tools to interact securely, efficiently, and transparently—laying the foundation for a digitally empowered economy.
         </p>
+        <div className="mt-6">
+          <Link to="/digital-liberia" className="text-blue-300 hover:text-blue-400 transition-colors">
+            To know more about Digital Liberia, click here →
+          </Link>
+        </div>
       </>
     )
   },
@@ -41,7 +46,7 @@ const sections = [
     id: "ecosystem",
     title: "Ecosystem Components",
     content: (
-      <div className="space-y-12 text-black text-left">
+      <div className="space-y-12 text-white text-left">
         <article>
           <h3 className="text-2xl font-semibold mb-2">1. National Database Management System (NDMS)</h3>
           <p>A secure, centralized, and intelligent national data backbone to:</p>
@@ -50,6 +55,21 @@ const sections = [
             <li>Enable access control across all government ministries</li>
             <li>Provide real-time data and analytics dashboards</li>
           </ul>
+          <div className="mt-4">
+            <Link to="/system" className="text-blue-300 hover:text-blue-400 transition-colors">
+              Learn more about the NDMS system →
+            </Link>
+          </div>
+        </article>
+
+        <article className="mt-8">
+          <h3 className="text-2xl font-semibold mb-2">2. LibPay</h3>
+          <p>A payment gateway solution that is fast, reliable, efficient and secure for all financial transactions in Liberia.</p>
+          <div className="mt-2">
+            <Link to="/libpay" className="text-blue-300 hover:text-blue-400 transition-colors">
+              Discover more about LibPay →
+            </Link>
+          </div>
         </article>
       </div>
     )
@@ -59,10 +79,10 @@ const sections = [
     title: "Vision & Mission",
     content: (
       <>
-        <p className="mb-4 italic text-black text-lg">
+        <p className="mb-4 italic text-white text-lg">
           <strong>Vision:</strong> To become the digital backbone of Liberia—empowering people and the economy.
         </p>
-        <p className="italic text-black text-lg">
+        <p className="italic text-white text-lg">
           <strong>Mission:</strong> Deliver a secure platform for transparent governance and accessible services.
         </p>
       </>
@@ -70,11 +90,23 @@ const sections = [
   },
   {
     id: "problem",
-    title: "Problem Statement",
+    title: "Problem Statement & Solution",
     content: (
-      <p className="text-black text-lg">
-        Liberia is facing significant gaps in digital transformation...
-      </p>
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-xl font-semibold mb-2">The Problem:</h3>
+          <p className="text-white">
+            For decades, Liberia has struggled with fragmented, paper-based records, weak identification systems and lack of centralized data. These limitations have impacted Government Services delivery, electoral credibility, healthcare access, educational tracking, social welfare distribution, and national security. This identity vacuum has made it nearly impossible to develop strong, inclusive digital or physical infrastructure.
+          </p>
+        </div>
+        
+        <div>
+          <h3 className="text-xl font-semibold mb-2">Digital Liberia is Here to Fix That:</h3>
+          <p className="text-white">
+            At the heart of our system lies a Digital Social Security Number (DSSN) - a unique, immutable identifier assigned to every individual within or outside Liberia's borders. Whether you are a Liberian citizen, resident or foreign national within Liberia, the DSSN is your digital identity - a gateway to services, recognition and inclusion.
+          </p>
+        </div>
+      </div>
     )
   }
 ];
@@ -159,7 +191,7 @@ export default function Home() {
         )}
       </header>
 
-      {/* Layer 4: Content Sections with Transparent White Background */}
+      {/* Layer 4: Content Sections with Semi-Black Background */}
       <main className="relative z-30 pt-36 pb-20 px-4 md:px-8">
         {sections.map((section, index) => (
           <section
@@ -170,14 +202,14 @@ export default function Home() {
               opacity: 0
             }}
           >
-            <div className="bg-white/90 backdrop-blur-md rounded-xl border border-white/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="bg-black/70 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
               {/* Mirror Reflection Effect */}
-              <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-white/40 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
               
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-black border-b border-black/20 pb-2">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
                 {section.title}
               </h2>
-              <div className="text-black relative">
+              <div className="text-white relative">
                 {section.content}
               </div>
             </div>
