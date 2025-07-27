@@ -162,29 +162,29 @@ export default function Home() {
 
       {/* Layer 3: Navigation */}
       <header className="fixed top-0 left-0 w-full z-50">
-        {/* Navigation Links Container */}
-        <div className="bg-black/60 backdrop-blur-md">
+        {/* Combined Navigation and Logo Container */}
+        <div className="bg-black/60 backdrop-blur-md border-b border-gray-600/30">
+          {/* Navigation Links */}
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
             <nav className="flex space-x-4 overflow-x-auto w-full justify-center">
               {navLinks.map(link => (
-                <Link 
-                  key={link.to} 
-                  to={link.to} 
-                  className={`flex-shrink-0 text-base md:text-lg font-bold transition-colors duration-300 ${
-                    location.pathname === link.to 
-                      ? "text-red-500" 
-                      : "text-white hover:text-blue-300"
-                  }`}
-                >
-                  {link.label}
-                </Link>
+                <div key={link.to} className="flex-shrink-0 bg-black/40 px-3 py-1 rounded-lg">
+                  <Link 
+                    to={link.to} 
+                    className={`text-base md:text-lg font-bold transition-colors duration-300 ${
+                      location.pathname === link.to 
+                        ? "text-red-500" 
+                        : "text-white hover:text-blue-300"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </div>
               ))}
             </nav>
           </div>
-        </div>
 
-        {/* Logo Bar Container */}
-        <div className="bg-black/60 backdrop-blur-md border-t border-gray-600/30">
+          {/* Logo Bar */}
           <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
             <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
               {logos.map((logo, index) => (
@@ -204,9 +204,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-        
-        {/* Divider Line Below Images */}
-        <div className="border-t border-gray-600/50 w-full"></div>
       </header>
 
       {/* Layer 4: Content Sections with Semi-Black Background */}
