@@ -162,20 +162,18 @@ export default function Home() {
       </div>
 
       {/* Layer 3: Navigation */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-sm border-b border-white/10">
-        <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-          <Link to="/" className="text-2xl font-bold text-white">
-            Digital Liberia
-          </Link>
-          <nav className="hidden md:flex space-x-6">
+      <header className="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-sm">
+        {/* Navigation Bar */}
+        <div className="flex items-center justify-center px-6 py-4 max-w-7xl mx-auto">
+          <nav className="hidden md:flex space-x-8">
             {navLinks.map(link => (
               <Link 
                 key={link.to} 
                 to={link.to} 
-                className={`transition-colors duration-300 ${
+                className={`text-lg font-bold transition-colors duration-300 ${
                   location.pathname === link.to 
-                    ? "text-red-500 font-medium" 
-                    : "text-white/80 hover:text-blue-300"
+                    ? "text-red-500" 
+                    : "text-white hover:text-blue-300"
                 }`}
               >
                 {link.label}
@@ -189,6 +187,9 @@ export default function Home() {
             ☰
           </button>
         </div>
+
+        {/* Divider Line */}
+        <div className="border-t border-gray-600/50 w-full"></div>
         
         {/* Logo Bar Below Navigation */}
         <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
@@ -213,15 +214,15 @@ export default function Home() {
         {/* Mobile Menu */}
         {showMenu && (
           <div className="md:hidden bg-black/90 backdrop-blur-lg border-t border-white/10">
-            <div className="flex flex-col px-6 py-4 space-y-3">
+            <div className="flex flex-col px-6 py-4 space-y-4">
               {navLinks.map(link => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className={`py-2 transition-colors duration-300 ${
+                  className={`text-lg font-bold py-2 transition-colors duration-300 ${
                     location.pathname === link.to 
-                      ? "text-red-500 font-medium" 
-                      : "text-white/80 hover:text-blue-300"
+                      ? "text-red-500" 
+                      : "text-white hover:text-blue-300"
                   }`}
                   onClick={() => setShowMenu(false)}
                 >
@@ -258,6 +259,13 @@ export default function Home() {
           </section>
         ))}
       </main>
+
+      {/* Footer with Copyright */}
+      <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
+        <div className="border-t border-gray-600/30 pt-6">
+          © {new Date().getFullYear()} Digital Liberia. All rights reserved.
+        </div>
+      </footer>
 
       {/* Global Styles */}
       <style jsx global>{`
