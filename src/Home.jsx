@@ -81,50 +81,54 @@ const sections = [
 
 export default function Home() {
   const [showMenu, setShowMenu] = useState(false);
-  const [logoIndex, setLogoIndex] = useState(0);
+  const [activeLogo, setActiveLogo] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setLogoIndex(prev => (prev + 1) % logos.length);
-    }, 1000);
+      setActiveLogo(prev => (prev + 1) % logos.length);
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="relative min-h-screen w-full bg-black text-white font-inter overflow-x-hidden">
-      {/* Background - Dark Screen */}
+      {/* Fixed Background */}
       <div className="fixed inset-0 bg-black -z-50" />
 
-      {/* Glass Container with Logos */}
+      {/* Floating Logos Grid */}
       <div className="fixed inset-0 flex items-center justify-center -z-40">
         <div className="absolute inset-0 bg-black/50 backdrop-blur-3xl" />
-        <div className="relative grid grid-cols-3 gap-8 p-8 max-w-6xl mx-auto">
+        <div className="relative grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-8 w-full max-w-7xl">
           {logos.map((logo, index) => (
             <div 
               key={index}
-              className={`flex items-center justify-center p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 transition-all duration-500 ${
-                index === logoIndex ? "scale-110 bg-white/20" : "scale-90"
+              className={`logo-container flex items-center justify-center ${
+                index === activeLogo ? "scale-110 bg-white/20" : "scale-100"
               }`}
             >
               <img
                 src={logo}
                 alt={`Logo ${index}`}
-                className="w-24 h-24 object-contain"
+                className="w-20 h-20 object-contain"
               />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Fixed Top Navigation */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-black/60 backdrop-blur border-b border-white/10">
+      {/* Navigation */}
+      <header className="fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-sm border-b border-white/10">
         <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
           <Link to="/" className="text-2xl font-bold text-white">
-            Home
+            Digital Liberia
           </Link>
           <nav className="hidden md:flex space-x-6">
             {navLinks.map(link => (
-              <Link key={link.to} to={link.to} className="hover:text-blue-300 transition">
+              <Link 
+                key={link.to} 
+                to={link.to} 
+                className="text-white/80 hover:text-blue-300 transition-colors duration-300"
+              >
                 {link.label}
               </Link>
             ))}
@@ -136,15 +140,16 @@ export default function Home() {
             ☰
           </button>
         </div>
+        
         {/* Mobile Menu */}
         {showMenu && (
-          <div className="md:hidden bg-black/80 backdrop-blur border-t border-white/10">
+          <div className="md:hidden bg-black/90 backdrop-blur-lg border-t border-white/10">
             <div className="flex flex-col px-6 py-4 space-y-3">
               {navLinks.map(link => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="hover:text-blue-300 transition"
+                  className="text-white/80 hover:text-blue-300 py-2 transition-colors duration-300"
                   onClick={() => setShowMenu(false)}
                 >
                   {link.label}
@@ -155,15 +160,15 @@ export default function Home() {
         )}
       </header>
 
-      {/* Content Sections with Transparent Containers */}
-      <div className="relative z-10 pt-32 pb-20 px-6">
+      {/* Content Sections */}
+      <main className="relative z-10 pt-32 pb-20 px-4 md:px-8">
         {sections.map(section => (
           <section
             key={section.id}
-            className="w-full py-12 px-6 md:px-12 max-w-6xl mx-auto mb-12"
+            className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12"
           >
-            <div className="backdrop-blur-lg bg-black/30 rounded-xl border border-white/20 p-8 shadow-lg">
-              <h2 className="text-3xl font-bold mb-6 border-b border-white/20 pb-2">
+            <div className="bg-glass-dark p-6 md:p-8">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 border-b border-white/20 pb-2">
                 {section.title}
               </h2>
               <div className="text-white/90">
@@ -172,7 +177,7 @@ export default function Home() {
             </div>
           </section>
         ))}
-      </div>
+      </main>
     </div>
   );
 }
