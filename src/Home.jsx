@@ -163,14 +163,14 @@ export default function Home() {
 
       {/* Layer 3: Navigation */}
       <header className="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-sm">
-        {/* Navigation Bar */}
-        <div className="flex items-center justify-center px-6 py-4 max-w-7xl mx-auto">
-          <nav className="hidden md:flex space-x-8">
+        {/* Navigation Bar - Always Visible */}
+        <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
+          <nav className="flex space-x-4 overflow-x-auto w-full justify-center">
             {navLinks.map(link => (
               <Link 
                 key={link.to} 
                 to={link.to} 
-                className={`text-lg font-bold transition-colors duration-300 ${
+                className={`flex-shrink-0 text-base md:text-lg font-bold transition-colors duration-300 ${
                   location.pathname === link.to 
                     ? "text-red-500" 
                     : "text-white hover:text-blue-300"
@@ -180,17 +180,8 @@ export default function Home() {
               </Link>
             ))}
           </nav>
-          <button
-            onClick={() => setShowMenu(!showMenu)}
-            className="md:hidden text-white focus:outline-none"
-          >
-            ☰
-          </button>
         </div>
 
-        {/* Divider Line */}
-        <div className="border-t border-gray-600/50 w-full"></div>
-        
         {/* Logo Bar Below Navigation */}
         <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
           <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
@@ -211,27 +202,8 @@ export default function Home() {
           </div>
         </div>
         
-        {/* Mobile Menu */}
-        {showMenu && (
-          <div className="md:hidden bg-black/90 backdrop-blur-lg border-t border-white/10">
-            <div className="flex flex-col px-6 py-4 space-y-4">
-              {navLinks.map(link => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={`text-lg font-bold py-2 transition-colors duration-300 ${
-                    location.pathname === link.to 
-                      ? "text-red-500" 
-                      : "text-white hover:text-blue-300"
-                  }`}
-                  onClick={() => setShowMenu(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Divider Line Below Images */}
+        <div className="border-t border-gray-600/50 w-full"></div>
       </header>
 
       {/* Layer 4: Content Sections with Semi-Black Background */}
@@ -279,7 +251,7 @@ export default function Home() {
             transform: translateY(0);
           }
         }
-        /* Hide scrollbar for logo container */
+        /* Hide scrollbar for containers */
         .overflow-x-auto {
           -ms-overflow-style: none;
           scrollbar-width: none;
