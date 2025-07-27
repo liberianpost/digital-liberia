@@ -162,9 +162,8 @@ export default function Home() {
 
       {/* Layer 3: Navigation */}
       <header className="fixed top-0 left-0 w-full z-50">
-        {/* Navigation Container with Semi-Black Background */}
-        <div className="bg-black/60 backdrop-blur-md border-b border-gray-600/30">
-          {/* Navigation Bar - Always Visible */}
+        {/* Navigation Links Container */}
+        <div className="bg-black/60 backdrop-blur-md">
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
             <nav className="flex space-x-4 overflow-x-auto w-full justify-center">
               {navLinks.map(link => (
@@ -182,8 +181,10 @@ export default function Home() {
               ))}
             </nav>
           </div>
+        </div>
 
-          {/* Logo Bar Below Navigation */}
+        {/* Logo Bar Container */}
+        <div className="bg-black/60 backdrop-blur-md border-t border-gray-600/30">
           <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
             <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
               {logos.map((logo, index) => (
