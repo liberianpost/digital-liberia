@@ -165,13 +165,32 @@ export default function Home() {
         {/* Combined Navigation and Logo Container */}
         <div className="bg-black/60 backdrop-blur-md border-b border-gray-600/30">
           {/* Navigation Links */}
-          <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
-            <nav className="flex space-x-4 overflow-x-auto w-full justify-center">
-              {navLinks.map(link => (
+          <div className="flex flex-col md:flex-row items-center justify-center px-4 py-4 max-w-7xl mx-auto">
+            {/* First row of navigation links (first 4 items) */}
+            <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center mb-2 md:mb-0">
+              {navLinks.slice(0, 4).map(link => (
                 <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
                   <Link 
                     to={link.to} 
-                    className={`text-base md:text-lg font-bold transition-colors duration-300 ${
+                    className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
+                      location.pathname === link.to 
+                        ? "text-red-500" 
+                        : "text-white hover:text-blue-300"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </div>
+              ))}
+            </nav>
+            
+            {/* Second row of navigation links (last 4 items) */}
+            <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
+              {navLinks.slice(4).map(link => (
+                <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
+                  <Link 
+                    to={link.to} 
+                    className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
                       location.pathname === link.to 
                         ? "text-red-500" 
                         : "text-white hover:text-blue-300"
