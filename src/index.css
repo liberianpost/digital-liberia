@@ -2,29 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-deep-dark text-white font-inter;
-}
-
-.bg-glass {
-  @apply bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl shadow-xl;
-}
-
-.bg-logos-layer {
-  background: linear-gradient(120deg, rgba(255,255,255,0.05) 10%, rgba(255,255,255,0.01) 90%);
-}
-
-@keyframes backgroundFade {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 100% 50%;
+@layer base {
+  body {
+    @apply bg-black text-white font-inter;
   }
 }
 
-.animate-background {
-  animation: backgroundFade 20s linear infinite;
-  background-size: 400% 400%;
-  background-image: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #000000);
+@layer components {
+  .bg-glass {
+    @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl shadow-lg;
+  }
+  
+  .bg-glass-dark {
+    @apply bg-black/30 backdrop-blur-md border border-white/10 rounded-xl shadow-xl;
+  }
+  
+  .logo-container {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 transition-all duration-300 hover:bg-white/20;
+  }
+}
+
+@layer utilities {
+  .animate-background {
+    animation: backgroundFade 20s ease infinite;
+    background-size: 400% 400%;
+  }
+  
+  @keyframes backgroundFade {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
 }
