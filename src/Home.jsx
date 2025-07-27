@@ -35,8 +35,7 @@ const sections = [
           By unifying services into a single mobile platform, Digital Liberia serves citizens, businesses, and institutions with tools to interact securely, efficiently, and transparently—laying the foundation for a digitally empowered economy.
         </p>
       </>
-    ),
-    logos: [0, 1] // Indexes of logos to show for this section
+    )
   },
   {
     id: "ecosystem",
@@ -53,8 +52,7 @@ const sections = [
           </ul>
         </article>
       </div>
-    ),
-    logos: [2, 3]
+    )
   },
   {
     id: "vision",
@@ -68,8 +66,7 @@ const sections = [
           <strong>Mission:</strong> Deliver a secure platform for transparent governance and accessible services.
         </p>
       </>
-    ),
-    logos: [4, 5]
+    )
   },
   {
     id: "problem",
@@ -78,8 +75,7 @@ const sections = [
       <p className="text-white text-lg">
         Liberia is facing significant gaps in digital transformation...
       </p>
-    ),
-    logos: [6]
+    )
   }
 ];
 
@@ -99,7 +95,28 @@ export default function Home() {
       {/* Layer 1: Dark Background (base layer) */}
       <div className="fixed inset-0 bg-black -z-50" />
 
-      {/* Navigation */}
+      {/* Layer 2: Floating Logos (middle layer) */}
+      <div className="fixed inset-0 z-10 flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 to-black/30" />
+        <div className="relative grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-8 w-full max-w-7xl">
+          {logos.map((logo, index) => (
+            <div 
+              key={index}
+              className={`flex items-center justify-center p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-500 ${
+                index === activeLogo ? "scale-110 bg-white/15" : "scale-100"
+              }`}
+            >
+              <img
+                src={logo}
+                alt={`Logo ${index}`}
+                className="w-20 h-20 object-contain"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Layer 3: Navigation (top layer) */}
       <header className="fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-sm border-b border-white/10">
         <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
           <Link to="/" className="text-2xl font-bold text-white">
@@ -143,40 +160,18 @@ export default function Home() {
         )}
       </header>
 
-      {/* Main Content */}
-      <main className="relative z-20 pt-32 pb-20">
+      {/* Layer 4: Content Sections (top layer - transparent) */}
+      <main className="relative z-20 pt-32 pb-20 px-4 md:px-8">
         {sections.map((section, index) => (
           <section
             key={section.id}
-            className="relative w-full py-16 px-4 md:px-8 max-w-6xl mx-auto"
+            className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12"
             style={{
               animation: `fadeInUp 0.5s ease-out ${index * 0.1}s forwards`,
               opacity: 0
             }}
           >
-            {/* Logo Background for this section */}
-            <div className="absolute inset-0 -z-10 flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/80" />
-              <div className="relative grid grid-cols-2 gap-4 w-full max-w-4xl">
-                {section.logos.map((logoIndex, i) => (
-                  <div 
-                    key={i}
-                    className={`flex items-center justify-center p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-500 ${
-                      logoIndex === activeLogo ? "scale-105 bg-white/15" : "scale-95"
-                    }`}
-                  >
-                    <img
-                      src={logos[logoIndex]}
-                      alt={`Logo ${logoIndex}`}
-                      className="w-16 h-16 md:w-20 md:h-20 object-contain"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Text Content */}
-            <div className="relative p-6 md:p-8">
+            <div className="p-6 md:p-8">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white">
                 {section.title}
               </h2>
@@ -188,7 +183,7 @@ export default function Home() {
         ))}
       </main>
 
-      {/* Global Styles */}
+      {/* Global Styles (in JSX for simplicity) */}
       <style jsx global>{`
         @keyframes fadeInUp {
           from {
