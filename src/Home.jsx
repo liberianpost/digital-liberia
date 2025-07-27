@@ -28,10 +28,10 @@ const sections = [
     title: "Welcome to Digital Liberia",
     content: (
       <>
-        <p className="text-blue-100">
+        <p className="text-white">
           Digital Liberia is a <span className="font-semibold text-white">bold, nation-scale digital ecosystem</span> that aims to digitally transform governance, commerce, and everyday life in Liberia.
         </p>
-        <p className="mt-4 text-blue-100">
+        <p className="mt-4 text-white">
           By unifying services into a single mobile platform, Digital Liberia serves citizens, businesses, and institutions with tools to interact securely, efficiently, and transparently—laying the foundation for a digitally empowered economy.
         </p>
       </>
@@ -41,7 +41,7 @@ const sections = [
     id: "ecosystem",
     title: "Ecosystem Components",
     content: (
-      <div className="space-y-12 text-blue-100 text-left">
+      <div className="space-y-12 text-white text-left">
         <article>
           <h3 className="text-2xl font-semibold text-white mb-2">1. National Database Management System (NDMS)</h3>
           <p>A secure, centralized, and intelligent national data backbone to:</p>
@@ -59,10 +59,10 @@ const sections = [
     title: "Vision & Mission",
     content: (
       <>
-        <p className="mb-4 italic text-blue-100 text-lg">
+        <p className="mb-4 italic text-white text-lg">
           <strong>Vision:</strong> To become the digital backbone of Liberia—empowering people and the economy.
         </p>
-        <p className="italic text-blue-100 text-lg">
+        <p className="italic text-white text-lg">
           <strong>Mission:</strong> Deliver a secure platform for transparent governance and accessible services.
         </p>
       </>
@@ -72,7 +72,7 @@ const sections = [
     id: "problem",
     title: "Problem Statement",
     content: (
-      <p className="text-blue-100 text-lg">
+      <p className="text-white text-lg">
         Liberia is facing significant gaps in digital transformation...
       </p>
     )
@@ -160,7 +160,7 @@ export default function Home() {
         )}
       </header>
 
-      {/* Layer 4: Content Sections (top layer) */}
+      {/* Layer 4: Content Sections (top layer - transparent) */}
       <main className="relative z-20 pt-32 pb-20 px-4 md:px-8">
         {sections.map((section, index) => (
           <section
@@ -171,11 +171,11 @@ export default function Home() {
               opacity: 0
             }}
           >
-            <div className="bg-black/30 backdrop-blur-lg rounded-xl border border-white/20 p-6 md:p-8 shadow-lg">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 border-b border-white/20 pb-2">
+            <div className="p-6 md:p-8">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white">
                 {section.title}
               </h2>
-              <div className="text-white/90">
+              <div className="text-white">
                 {section.content}
               </div>
             </div>
