@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-black text-white font-inter;
+    @apply bg-black text-white font-inter antialiased;
   }
 }
 
@@ -14,29 +14,62 @@
   }
   
   .bg-glass-dark {
-    @apply bg-black/30 backdrop-blur-md border border-white/10 rounded-xl shadow-xl;
+    @apply bg-black/40 backdrop-blur-lg border border-white/20 rounded-xl shadow-xl;
   }
   
   .logo-container {
-    @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 transition-all duration-300 hover:bg-white/20;
+    @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 transition-all duration-500;
   }
 }
 
 @layer utilities {
+  /* Animation utilities */
   .animate-background {
     animation: backgroundFade 20s ease infinite;
     background-size: 400% 400%;
   }
   
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+  
+  /* Keyframes */
   @keyframes backgroundFade {
-    0% {
+    0%, 100% {
       background-position: 0% 50%;
     }
     50% {
       background-position: 100% 50%;
     }
-    100% {
-      background-position: 0% 50%;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
     }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Backdrop blur utilities */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+  }
+  .backdrop-blur-md {
+    backdrop-filter: blur(8px);
+  }
+  .backdrop-blur-lg {
+    backdrop-filter: blur(16px);
+  }
+  .backdrop-blur-xl {
+    backdrop-filter: blur(24px);
+  }
+  
+  /* Glass morphism effect */
+  .glass-effect {
+    @apply bg-white/5 backdrop-blur-lg border border-white/10;
   }
 }
