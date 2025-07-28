@@ -202,6 +202,73 @@ export default function System() {
 
       {/* Layer 4: Content Sections with Semi-Black Background */}
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
+        {/* DSSN Card */}
+        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
+          <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
+            
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
+              Digital Social Security Number (DSSN)
+            </h2>
+            <div className="text-white relative space-y-4">
+              <p>
+                In the Digital Liberia project, the DSSN (Digital Social Security Number) is a unique digital identifier assigned to every Liberian citizen or legal resident within the system. It functions as a centralized digital identity that enables secure access to a wide range of services in the app and across government and private platforms.
+              </p>
+              
+              <h3 className="text-xl font-semibold mt-6">Key Characteristics of the DSSN:</h3>
+              
+              <h4 className="font-semibold">Uniqueness:</h4>
+              <p>
+                Each DSSN is unique to an individual — similar in concept to a traditional Social Security Number (SSN) but adapted for digital infrastructure and use across the entire Digital Liberia ecosystem.
+              </p>
+              
+              <h4 className="font-semibold">Digital Identity Anchor:</h4>
+              <p>
+                The DSSN serves as the anchor for identity verification, user authentication, and access to services such as:
+              </p>
+              <ul className="list-disc pl-6">
+                <li>Government services (e.g., postal, licensing, social programs)</li>
+                <li>Financial services (e.g., banking, mobile money, digital payments)</li>
+                <li>Private services (e.g., ride-hailing, food delivery, job applications)</li>
+              </ul>
+              
+              <h4 className="font-semibold">Format (subject to design decisions):</h4>
+              <p>
+                A typical DSSN might be a 15-digit alphanumeric code.
+              </p>
+              
+              <h4 className="font-semibold">Security & Privacy:</h4>
+              <p>
+                DSSNs are stored securely and are not meant to be shared publicly. They are cryptographically protected and can be used for:
+              </p>
+              <ul className="list-disc pl-6">
+                <li>QR-based scanning (e.g., for package tracking, ID verification)</li>
+                <li>Secure login</li>
+                <li>Backend validation during transactions or registrations</li>
+              </ul>
+              
+              <h4 className="font-semibold">Use in Apps (Example: Digital Liberia, Liberian Post):</h4>
+              <p>
+                In the Digital Liberia app, the DSSN is used by customers to login and use all the related Digital Liberia Services.
+                In the Liberian Post app, the DSSN is used by employees to:
+              </p>
+              <ul className="list-disc pl-6">
+                <li>Identify senders and receivers of packages</li>
+                <li>Validate users via backend APIs</li>
+                <li>Track ownership and delivery history</li>
+              </ul>
+              
+              <h4 className="font-semibold">Future Interoperability:</h4>
+              <p>
+                The DSSN is designed for interoperability across other modules in the Digital Liberia super app — supporting long-term plans for unified digital identity and records. 
+                <span className="inline-flex items-center bg-blue-500/80 backdrop-blur-sm rounded-lg px-3 py-1 ml-2 border border-blue-400/30 cursor-pointer hover:bg-blue-600/80 transition-colors">
+                  (click here to verify a DSSN)
+                </span>
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Welcome Card */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
           <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
