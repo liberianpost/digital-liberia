@@ -24,6 +24,8 @@ export default function Dssn() {
   const [activeLogo, setActiveLogo] = useState(0);
   const [dssn, setDssn] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [customerData, setCustomerData] = useState(null);
+  const [error, setError] = useState(null);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -32,15 +34,40 @@ export default function Dssn() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     setIsSearching(true);
-    // TODO: Connect to backend API when ready
-    console.log("Searching for DSSN:", dssn);
-    setTimeout(() => {
+    setError(null);
+    setCustomerData(null);
+
+    try {
+      const response = await fetch(`/get-system-info?dssn=${encodeURIComponent(dssn)}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch data');
+      }
+
+      if (!data.success) {
+        throw new Error(data.message || 'Customer not found');
+      }
+
+      setCustomerData(data.data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
       setIsSearching(false);
-      alert(`DSSN verification would be implemented here for: ${dssn}`);
-    }, 1500);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   return (
@@ -131,16 +158,6 @@ export default function Dssn() {
                 Enter the 15-digit alphanumeric DSSN in the field below.
               </p>
               
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold">Important Information:</h3>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>DSSN verification only shows public information</li>
-                  <li>Full records require authorized access</li>
-                  <li>Each verification is logged for security purposes</li>
-                  <li>Invalid DSSNs will return no results</li>
-                </ul>
-              </div>
-              
               <form onSubmit={handleSearch} className="space-y-4">
                 <div>
                   <label htmlFor="dssn" className="block text-sm font-medium mb-2">
@@ -181,6 +198,132 @@ export default function Dssn() {
                   )}
                 </button>
               </form>
+
+              {error && (
+                <div className="bg-red-900/40 border border-red-700/30 rounded-lg p-4">
+                  <p className="text-red-300">{error}</p>
+                </div>
+              )}
+
+              {customerData && (
+                <div className="mt-8 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Profile Card */}
+                    <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-gray-600/30 p-6">
+                      <div className="flex flex-col items-center space-y-4">
+                        {customerData.Image && (
+                          <img 
+                            src={`data:image/jpeg;base64,${customerData.Image}`} 
+                            alt="Profile" 
+                            className="w-32 h-32 rounded-full object-cover border-2 border-blue-500/50"
+                          />
+                        )}
+                        <h3 className="text-2xl font-bold">{customerData["Full Name"]}</h3>
+                        <div className="grid grid-cols-2 gap-4 w-full">
+                          <div>
+                            <p className="text-sm text-gray-400">Date of Birth</p>
+                            <p>{formatDate(customerData["Date of Birth"])}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-400">Sex</p>
+                            <p>{customerData.Sex || 'N/A'}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-400">Nationality</p>
+                            <p>{customerData.Nationality || 'N/A'}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-400">Marital Status</p>
+                            <p>{customerData["Marital Status"] || 'N/A'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Contact Card */}
+                    <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-gray-600/30 p-6">
+                      <h4 className="text-xl font-semibold mb-4">Contact Information</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-sm text-gray-400">Address</p>
+                          <p>{customerData.Address || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-400">Postal Address</p>
+                          <p>{customerData["Postal Address"] || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-400">Phone Number</p>
+                          <p>{customerData["Phone Number"] || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-400">Email</p>
+                          <p>{customerData.Email || 'N/A'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Documents Section */}
+                  <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-gray-600/30 p-6">
+                    <h4 className="text-xl font-semibold mb-4">Documents</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {customerData["Passport Number"] && (
+                        <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
+                          <h5 className="font-medium mb-2">Passport</h5>
+                          <p className="text-sm text-gray-400 mb-2">Number: {customerData["Passport Number"]}</p>
+                          {customerData["Passport Image"] && (
+                            <img 
+                              src={`data:image/jpeg;base64,${customerData["Passport Image"]}`} 
+                              alt="Passport" 
+                              className="w-full h-auto rounded border border-gray-600/30"
+                            />
+                          )}
+                        </div>
+                      )}
+
+                      {customerData["Birth Certificate"] && (
+                        <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
+                          <h5 className="font-medium mb-2">Birth Certificate</h5>
+                          <p className="text-sm text-gray-400 mb-2">Number: {customerData["Birth Certificate"]}</p>
+                          {customerData["Birth Certificate Image"] && (
+                            <img 
+                              src={`data:image/jpeg;base64,${customerData["Birth Certificate Image"]}`} 
+                              alt="Birth Certificate" 
+                              className="w-full h-auto rounded border border-gray-600/30"
+                            />
+                          )}
+                        </div>
+                      )}
+
+                      {customerData["Driver's License"] && (
+                        <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
+                          <h5 className="font-medium mb-2">Driver's License</h5>
+                          <p className="text-sm text-gray-400 mb-2">Number: {customerData["Driver's License"]}</p>
+                          {customerData["Drivers License Image"] && (
+                            <img 
+                              src={`data:image/jpeg;base64,${customerData["Drivers License Image"]}`} 
+                              alt="Driver's License" 
+                              className="w-full h-auto rounded border border-gray-600/30"
+                            />
+                          )}
+                        </div>
+                      )}
+
+                      {customerData["National Id Image"] && (
+                        <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
+                          <h5 className="font-medium mb-2">National ID</h5>
+                          <img 
+                            src={`data:image/jpeg;base64,${customerData["National Id Image"]}`} 
+                            alt="National ID" 
+                            className="w-full h-auto rounded border border-gray-600/30"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
               
               <div className="pt-4 border-t border-gray-600/30">
                 <h3 className="text-lg font-semibold mb-2">Need Help?</h3>
