@@ -27,6 +27,10 @@ const backgroundImages = [
   "/backgrounds/bg5.jpg"
 ];
 
+// Store credentials in environment variables for security
+const API_USERNAME = process.env.REACT_APP_API_USERNAME || 'admin';
+const API_PASSWORD = process.env.REACT_APP_API_PASSWORD || 'password';
+
 export default function Dssn() {
   const location = useLocation();
   const [activeLogo, setActiveLogo] = useState(0);
@@ -62,23 +66,26 @@ export default function Dssn() {
     setCustomerData(null);
 
     try {
-  const response = await fetch(
-    `/get-system-info?dssn=${encodeURIComponent(dssn)}`,
-    {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    }
-  );
-
-      const data = await response.json();
+      const authString = btoa(`${API_USERNAME}:${API_PASSWORD}`);
+      const response = await fetch(
+        `https://system.liberianpost.com/get-system-info?dssn=${encodeURIComponent(dssn)}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Authorization': `Basic ${authString}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(data.message || `HTTP error! Status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
       }
+
+      const data = await response.json();
 
       if (!data.success) {
         throw new Error(data.message || 'Customer not found');
