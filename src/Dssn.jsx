@@ -67,7 +67,9 @@ export default function Dssn() {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (!dssn.trim()) {
+    const cleanedDssn = dssn.trim();
+    
+    if (!cleanedDssn) {
       setError("Please enter a valid DSSN!");
       return;
     }
@@ -77,9 +79,7 @@ export default function Dssn() {
     setCustomerData(null);
 
     try {
-      const proxyUrl = `/api/dssn-proxy?dssn=${encodeURIComponent(dssn)}`;
-      
-      const response = await fetch(proxyUrl, {
+      const response = await fetch(`/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -87,18 +87,23 @@ export default function Dssn() {
         }
       });
 
-      const responseData = await response.json();
-      
       if (!response.ok) {
-        throw new Error(responseData.message || responseData.error || `Request failed with status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || 
+          errorData.error || 
+          `Request failed with status ${response.status}`
+        );
       }
 
-      if (responseData.success && responseData.data) {
-        setCustomerData(responseData.data);
-        setShowInfoModal(true);
-      } else {
-        throw new Error(responseData.message || 'No data found');
+      const data = await response.json();
+      
+      if (!data.success || !data.data) {
+        throw new Error(data.message || 'No customer data found');
       }
+
+      setCustomerData(data.data);
+      setShowInfoModal(true);
     } catch (err) {
       setError(err.message || "Failed to verify DSSN. Please try again.");
       console.error("Search error:", err);
@@ -201,7 +206,7 @@ export default function Dssn() {
       {/* Background Image Slideshow */}
       <div 
         className="fixed inset-0 -z-50 bg-cover bg-center transition-opacity duration-1000"
-        style={{ backgroundImage: `url('${backgroundImages[bgIndex]}')`, opacity: 0.7 }}
+        style={{ backgroundImage: `url(${backgroundImages[bgIndex]})`, opacity: 0.7 }}
       />
 
       {/* Centered Logo Slideshow */}
