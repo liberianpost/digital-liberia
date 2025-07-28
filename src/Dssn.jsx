@@ -62,17 +62,17 @@ export default function Dssn() {
     setCustomerData(null);
 
     try {
-      const response = await fetch(
-        `https://system.liberianpost.com/get-system-info?dssn=${encodeURIComponent(dssn)}`,
-        {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        }
-      );
+  const response = await fetch(
+    `/get-system-info?dssn=${encodeURIComponent(dssn)}`,
+    {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    }
+  );
 
       const data = await response.json();
 
