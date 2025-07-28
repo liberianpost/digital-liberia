@@ -129,9 +129,9 @@ export default function System() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-gray-900 text-white font-inter overflow-x-hidden">
-      {/* Layer 1: Dark Background */}
-      <div className="fixed inset-0 bg-gray-900 -z-50" />
+    <div className="relative min-h-screen w-full text-white font-inter overflow-x-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700">
+      {/* Layer 1: Gradient Background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 -z-50" />
 
       {/* Centered Image Slideshow */}
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -201,10 +201,10 @@ export default function System() {
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
         {/* Welcome Card */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-gray-800/90 backdrop-blur-md rounded-xl border border-gray-700/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-700/20 to-transparent"></div>
+          <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
             
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-700/30 pb-2">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
               Welcome to Digital Liberia System
             </h2>
             <div className="text-white relative">
@@ -217,10 +217,10 @@ export default function System() {
 
         {/* Government Ministries Section */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-gray-800/90 backdrop-blur-md rounded-xl border border-gray-700/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-700/20 to-transparent"></div>
+          <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
             
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-700/30 pb-2">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
               Government Ministries
             </h2>
             <div className="text-white relative">
@@ -229,7 +229,7 @@ export default function System() {
                   <div 
                     key={ministry.id}
                     onClick={() => handleMinistryClick(ministry.id)}
-                    className="cursor-pointer bg-gray-700/50 hover:bg-gray-700/60 transition-colors p-4 rounded-lg border border-gray-600/30"
+                    className="cursor-pointer bg-black/40 hover:bg-black/50 transition-colors p-4 rounded-lg border border-gray-600/30"
                   >
                     <div className="flex items-center space-x-4">
                       <img 
@@ -251,10 +251,10 @@ export default function System() {
 
         {/* Quick Access Services Section */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-gray-800/90 backdrop-blur-md rounded-xl border border-gray-700/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-700/20 to-transparent"></div>
+          <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
             
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-700/30 pb-2">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
               Quick Access Services
             </h2>
             <div className="text-white relative">
@@ -263,7 +263,7 @@ export default function System() {
                   <button
                     key={service.id}
                     onClick={() => handleServiceClick(service.id)}
-                    className="bg-gray-700/50 hover:bg-gray-700/60 transition-colors p-4 rounded-lg border border-gray-600/30 text-left"
+                    className="bg-black/40 hover:bg-black/50 transition-colors p-4 rounded-lg border border-gray-600/30 text-left"
                   >
                     <h3 className="font-bold text-lg">{service.name}</h3>
                   </button>
@@ -275,8 +275,8 @@ export default function System() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-30 py-6 text-center text-gray-400 text-sm">
-        <div className="border-t border-gray-700/30 pt-6">
+      <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
+        <div className="border-t border-gray-600/30 pt-6">
           © {new Date().getFullYear()} Digital Liberia. All rights reserved.
         </div>
       </footer>
