@@ -93,9 +93,8 @@ export default function Dssn() {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'Origin': 'https://digital-liberia.web.app'
-        },
-        credentials: 'include'
+          'Authorization': 'Basic ' + btoa('your_username:your_password') // Replace with actual credentials
+        }
       });
       
       const endTime = performance.now();
