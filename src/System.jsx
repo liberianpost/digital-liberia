@@ -261,9 +261,9 @@ export default function System() {
               <h4 className="font-semibold">Future Interoperability:</h4>
               <p>
                 The DSSN is designed for interoperability across other modules in the Digital Liberia super app — supporting long-term plans for unified digital identity and records. 
-                <span className="inline-flex items-center bg-blue-500/80 backdrop-blur-sm rounded-lg px-3 py-1 ml-2 border border-blue-400/30 cursor-pointer hover:bg-blue-600/80 transition-colors">
+                <Link to="/dssn" className="inline-flex items-center bg-blue-500/80 backdrop-blur-sm rounded-lg px-3 py-1 ml-2 border border-blue-400/30 cursor-pointer hover:bg-blue-600/80 transition-colors">
                   (click here to verify a DSSN)
-                </span>
+                </Link>
               </p>
             </div>
           </div>
