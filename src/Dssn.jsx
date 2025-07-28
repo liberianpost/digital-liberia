@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const navLinks = [
@@ -19,19 +19,40 @@ const logos = [
   "/logos/liberia.png"
 ];
 
+const backgroundImages = [
+  "/backgrounds/bg1.jpg",
+  "/backgrounds/bg2.jpg",
+  "/backgrounds/bg3.jpg",
+  "/backgrounds/bg4.jpg",
+  "/backgrounds/bg5.jpg"
+];
+
 export default function Dssn() {
   const location = useLocation();
   const [activeLogo, setActiveLogo] = useState(0);
+  const [bgIndex, setBgIndex] = useState(0);
   const [dssn, setDssn] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [customerData, setCustomerData] = useState(null);
   const [error, setError] = useState(null);
+  const [currentDocumentUrl, setCurrentDocumentUrl] = useState("");
+  const [showDocumentModal, setShowDocumentModal] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
 
-  React.useEffect(() => {
-    const interval = setInterval(() => {
+  // Background rotation effect
+  useEffect(() => {
+    const bgInterval = setInterval(() => {
+      setBgIndex(prev => (prev + 1) % backgroundImages.length);
+    }, 5000);
+    return () => clearInterval(bgInterval);
+  }, []);
+
+  // Logo rotation effect
+  useEffect(() => {
+    const logoInterval = setInterval(() => {
       setActiveLogo(prev => (prev + 1) % logos.length);
     }, 1000);
-    return () => clearInterval(interval);
+    return () => clearInterval(logoInterval);
   }, []);
 
   const handleSearch = async (e) => {
@@ -41,21 +62,22 @@ export default function Dssn() {
     setCustomerData(null);
 
     try {
-      // Use the full backend URL with proper CORS configuration
-      const backendUrl = 'https://system.liberianpost.com'; // Replace with your actual backend URL
-      const response = await fetch(`${backendUrl}/get-system-info?dssn=${encodeURIComponent(dssn)}`, {
-        method: 'GET',
-        credentials: 'include', // Important for cookies/sessions
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+      const response = await fetch(
+        `https://system.liberianpost.com/get-system-info?dssn=${encodeURIComponent(dssn)}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
         }
-      });
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to fetch data');
+        throw new Error(data.message || `HTTP error! Status: ${response.status}`);
       }
 
       if (!data.success) {
@@ -63,9 +85,10 @@ export default function Dssn() {
       }
 
       setCustomerData(data.data);
+      setShowInfoModal(true);
     } catch (err) {
-      console.error('Verification error:', err);
-      setError(err.message || 'Failed to verify DSSN. Please try again.');
+      console.error("Error:", err);
+      setError(err.message || "Failed to verify DSSN. Please try again.");
     } finally {
       setIsSearching(false);
     }
@@ -81,38 +104,104 @@ export default function Dssn() {
         day: 'numeric'
       });
     } catch (e) {
-      return dateString; // Return raw string if date parsing fails
+      return dateString;
     }
   };
 
-  // Helper function to handle image display
-  const renderImage = (base64Data, altText) => {
-    if (!base64Data) return null;
-    
-    // Check if the base64Data already has the prefix
-    const src = base64Data.startsWith('data:image') 
-      ? base64Data 
-      : `data:image/jpeg;base64,${base64Data}`;
-    
+  const openDocumentModal = (imgSrc) => {
+    setCurrentDocumentUrl(imgSrc);
+    setShowDocumentModal(true);
+  };
+
+  const closeDocumentModal = () => {
+    setShowDocumentModal(false);
+    setCurrentDocumentUrl("");
+  };
+
+  const downloadDocument = () => {
+    if (!currentDocumentUrl) return;
+
+    const link = document.createElement('a');
+    link.href = currentDocumentUrl;
+    const filename = currentDocumentUrl.split('/').pop() || 'document';
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const renderImage = (imgSrc, altText, clickable = true) => {
+    if (!imgSrc) return null;
+
+    const src = imgSrc.startsWith('data:image') 
+      ? imgSrc 
+      : imgSrc.startsWith('http')
+        ? imgSrc
+        : `data:image/jpeg;base64,${imgSrc}`;
+
     return (
-      <img 
-        src={src}
-        alt={altText}
-        className="w-full h-auto rounded border border-gray-600/30"
-        onError={(e) => {
-          e.target.onerror = null;
-          e.target.src = '/placeholder-image.png';
-        }}
-      />
+      <div className="relative group">
+        <img 
+          src={src}
+          alt={altText}
+          className={`w-full h-auto rounded border border-gray-600/30 ${
+            clickable ? "cursor-pointer hover:opacity-90" : ""
+          }`}
+          onClick={clickable ? () => openDocumentModal(src) : undefined}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = '/placeholder-image.png';
+          }}
+        />
+        {clickable && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="bg-black/50 rounded-full p-2">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+        )}
+      </div>
     );
   };
 
+  // Close modals when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showDocumentModal && event.target.id === 'documentModal') {
+        closeDocumentModal();
+      }
+      if (showInfoModal && event.target.id === 'dssnInfo') {
+        setShowInfoModal(false);
+      }
+    };
+
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape') {
+        closeDocumentModal();
+        setShowInfoModal(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [showDocumentModal, showInfoModal]);
+
   return (
     <div className="relative min-h-screen w-full bg-black text-white font-inter overflow-x-hidden">
-      {/* Layer 1: Dark Background */}
-      <div className="fixed inset-0 bg-black -z-50" />
+      {/* Background Image Slideshow */}
+      <div 
+        className="fixed inset-0 -z-50 bg-cover bg-center transition-opacity duration-1000"
+        style={{ backgroundImage: `url('${backgroundImages[bgIndex]}')`, opacity: 0.7 }}
+      />
 
-      {/* Centered Image Slideshow - Fixed Position */}
+      {/* Centered Logo Slideshow */}
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
         <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
           {logos.map((logo, index) => (
@@ -133,11 +222,9 @@ export default function Dssn() {
         </div>
       </div>
 
-      {/* Layer 3: Navigation */}
+      {/* Navigation */}
       <header className="fixed top-0 left-0 w-full z-50">
-        {/* Combined Navigation and Logo Container */}
         <div className="bg-black/60 backdrop-blur-md border-b border-gray-600/30">
-          {/* Navigation Links - Single Row */}
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
             <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
               {navLinks.map(link => (
@@ -157,7 +244,6 @@ export default function Dssn() {
             </nav>
           </div>
 
-          {/* Logo Bar */}
           <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
             <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
               {logos.map((logo, index) => (
@@ -179,7 +265,7 @@ export default function Dssn() {
         </div>
       </header>
 
-      {/* Layer 4: Content Sections with Semi-Black Background */}
+      {/* Main Content */}
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
         {/* DSSN Verification Card */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
@@ -241,111 +327,229 @@ export default function Dssn() {
                   <p className="text-red-300">{error}</p>
                 </div>
               )}
-
-              {customerData && (
-                <div className="mt-8 space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Profile Card */}
-                    <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-gray-600/30 p-6">
-                      <div className="flex flex-col items-center space-y-4">
-                        {renderImage(customerData.Image, "Profile")}
-                        <h3 className="text-2xl font-bold">{customerData["Full Name"]}</h3>
-                        <div className="grid grid-cols-2 gap-4 w-full">
-                          <div>
-                            <p className="text-sm text-gray-400">Date of Birth</p>
-                            <p>{formatDate(customerData["Date of Birth"])}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-400">Sex</p>
-                            <p>{customerData.Sex || 'N/A'}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-400">Nationality</p>
-                            <p>{customerData.Nationality || 'N/A'}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-400">Marital Status</p>
-                            <p>{customerData["Marital Status"] || 'N/A'}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Contact Card */}
-                    <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-gray-600/30 p-6">
-                      <h4 className="text-xl font-semibold mb-4">Contact Information</h4>
-                      <div className="space-y-3">
-                        <div>
-                          <p className="text-sm text-gray-400">Address</p>
-                          <p>{customerData.Address || 'N/A'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-400">Postal Address</p>
-                          <p>{customerData["Postal Address"] || 'N/A'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-400">Phone Number</p>
-                          <p>{customerData["Phone Number"] || 'N/A'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-400">Email</p>
-                          <p>{customerData.Email || 'N/A'}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Documents Section */}
-                  <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-gray-600/30 p-6">
-                    <h4 className="text-xl font-semibold mb-4">Documents</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {customerData["Passport Number"] && (
-                        <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
-                          <h5 className="font-medium mb-2">Passport</h5>
-                          <p className="text-sm text-gray-400 mb-2">Number: {customerData["Passport Number"]}</p>
-                          {renderImage(customerData["Passport Image"], "Passport")}
-                        </div>
-                      )}
-
-                      {customerData["Birth Certificate"] && (
-                        <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
-                          <h5 className="font-medium mb-2">Birth Certificate</h5>
-                          <p className="text-sm text-gray-400 mb-2">Number: {customerData["Birth Certificate"]}</p>
-                          {renderImage(customerData["Birth Certificate Image"], "Birth Certificate")}
-                        </div>
-                      )}
-
-                      {customerData["Driver's License"] && (
-                        <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
-                          <h5 className="font-medium mb-2">Driver's License</h5>
-                          <p className="text-sm text-gray-400 mb-2">Number: {customerData["Driver's License"]}</p>
-                          {renderImage(customerData["Drivers License Image"], "Driver's License")}
-                        </div>
-                      )}
-
-                      {customerData["National Id Image"] && (
-                        <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
-                          <h5 className="font-medium mb-2">National ID</h5>
-                          {renderImage(customerData["National Id Image"], "National ID")}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              <div className="pt-4 border-t border-gray-600/30">
-                <h3 className="text-lg font-semibold mb-2">Need Help?</h3>
-                <p className="text-sm text-gray-300">
-                  If you're having trouble with DSSN verification, please contact the Digital Liberia support team.
-                </p>
-              </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Footer with Copyright */}
+      {/* DSSN Info Modal */}
+      {showInfoModal && customerData && (
+        <div 
+          id="dssnInfo"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+        >
+          <div className="bg-black/80 border border-gray-600/30 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-2xl font-bold">
+                  Search Results for DSSN: {dssn}
+                </h3>
+                <button 
+                  onClick={() => setShowInfoModal(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-lg font-semibold mb-2">Personal Information</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-400">Full Name</p>
+                        <p>{customerData["Full Name"] || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-400">Date of Birth</p>
+                        <p>{formatDate(customerData["Date of Birth"])}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-400">Place of Birth</p>
+                        <p>{customerData["Place of Birth"] || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-400">Sex</p>
+                        <p>{customerData["Sex"] || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-400">Nationality</p>
+                        <p>{customerData["Nationality"] || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-400">Marital Status</p>
+                        <p>{customerData["Marital Status"] || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-400">Number of Children</p>
+                        <p>{customerData["Number of Children"] || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold mb-2">Contact Information</h4>
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-sm text-gray-400">Address</p>
+                        <p>{customerData["Address"] || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-400">Postal Address</p>
+                        <p>{customerData["Postal Address"] || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-400">Phone Number</p>
+                        <p>{customerData["Phone Number"] || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-400">Email</p>
+                        <p>{customerData["Email"] || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-lg font-semibold mb-2">Employment Status</h4>
+                    <p>{customerData["Employment Status"] || 'N/A'}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold mb-2">Identification Documents</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-400">Passport Number</p>
+                        <p>{customerData["Passport Number"] || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-400">Birth Certificate</p>
+                        <p>{customerData["Birth Certificate"] || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-400">Driver's License</p>
+                        <p>{customerData["Driver's License"] || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {customerData["Image"] && (
+                    <div>
+                      <h4 className="text-lg font-semibold mb-2">Profile Photo</h4>
+                      {renderImage(customerData["Image"], "Profile Photo")}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="border-t border-gray-600/30 pt-6">
+                <h4 className="text-xl font-semibold mb-4">Documents</h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {customerData["Passport Image"] && (
+                    <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
+                      <h5 className="font-medium mb-2">Passport</h5>
+                      {customerData["Passport Number"] && (
+                        <p className="text-sm text-gray-400 mb-2">
+                          Number: {customerData["Passport Number"]}
+                        </p>
+                      )}
+                      {renderImage(customerData["Passport Image"], "Passport")}
+                    </div>
+                  )}
+
+                  {customerData["Birth Certificate Image"] && (
+                    <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
+                      <h5 className="font-medium mb-2">Birth Certificate</h5>
+                      {customerData["Birth Certificate"] && (
+                        <p className="text-sm text-gray-400 mb-2">
+                          Number: {customerData["Birth Certificate"]}
+                        </p>
+                      )}
+                      {renderImage(customerData["Birth Certificate Image"], "Birth Certificate")}
+                    </div>
+                  )}
+
+                  {customerData["Drivers License Image"] && (
+                    <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
+                      <h5 className="font-medium mb-2">Driver's License</h5>
+                      {customerData["Driver's License"] && (
+                        <p className="text-sm text-gray-400 mb-2">
+                          Number: {customerData["Driver's License"]}
+                        </p>
+                      )}
+                      {renderImage(customerData["Drivers License Image"], "Driver's License")}
+                    </div>
+                  )}
+
+                  {customerData["National Id Image"] && (
+                    <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
+                      <h5 className="font-medium mb-2">National ID</h5>
+                      {renderImage(customerData["National Id Image"], "National ID")}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Document Modal */}
+      {showDocumentModal && (
+        <div 
+          id="documentModal"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+        >
+          <div className="relative max-w-6xl w-full max-h-[90vh]">
+            <button 
+              onClick={closeDocumentModal}
+              className="absolute -top-12 right-0 text-white hover:text-gray-300"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            <div className="bg-black/50 rounded-lg overflow-hidden border border-gray-600/30">
+              <img 
+                id="documentModalImg"
+                src={currentDocumentUrl}
+                alt="Document"
+                className="w-full h-auto max-h-[80vh] object-contain"
+              />
+              
+              <div className="flex justify-center space-x-4 p-4 bg-black/50">
+                <button 
+                  onClick={downloadDocument}
+                  className="flex items-center px-4 py-2 bg-blue-600/80 rounded-lg hover:bg-blue-700/80"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download
+                </button>
+                
+                <button 
+                  onClick={closeDocumentModal}
+                  className="flex items-center px-4 py-2 bg-gray-600/80 rounded-lg hover:bg-gray-700/80"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
       <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
         <div className="border-t border-gray-600/30 pt-6">
           © {new Date().getFullYear()} Digital Liberia. All rights reserved.
@@ -364,7 +568,6 @@ export default function Dssn() {
             transform: translateY(0);
           }
         }
-        /* Hide scrollbar for containers */
         .overflow-x-auto {
           -ms-overflow-style: none;
           scrollbar-width: none;
