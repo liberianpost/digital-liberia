@@ -27,7 +27,6 @@ const backgroundImages = [
   "/backgrounds/bg5.jpg"
 ];
 
-// HTML sanitization function
 const sanitizeHTML = (str) => {
   if (!str) return '';
   return str.toString()
@@ -78,85 +77,35 @@ export default function Dssn() {
     setCustomerData(null);
 
     try {
-      console.groupCollapsed(`[DEBUG] DSSN Search Initiated - ${new Date().toISOString()}`);
-      console.log("Searching for DSSN:", dssn);
-      
       const apiUrl = `https://system.liberianpost.com/get-system-info?dssn=${encodeURIComponent(dssn)}`;
-      console.log("API Endpoint:", apiUrl);
-
-      const startTime = performance.now();
-      console.log("Initiating fetch request...");
       
       const response = await fetch(apiUrl, {
         method: 'GET',
         mode: 'cors',
+        credentials: 'include',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Basic ' + btoa('your_username:your_password') // Replace with actual credentials
+          'Content-Type': 'application/json'
         }
       });
-      
-      const endTime = performance.now();
-      console.log(`Request completed in ${(endTime - startTime).toFixed(2)}ms`);
-      console.log("Response Status:", response.status, response.statusText);
 
       if (!response.ok) {
-        console.warn("Request failed with status:", response.status);
-        let errorResponse;
-        try {
-          errorResponse = await response.text();
-          console.log("Error response content:", errorResponse);
-        } catch (parseError) {
-          console.error("Failed to parse error response:", parseError);
-        }
-        
-        if (response.status === 401) {
-          throw new Error("Authentication required. Please ensure you have proper access.");
-        } else if (response.status === 403) {
-          throw new Error("Access forbidden. CORS policy may be blocking this request.");
-        } else {
-          throw new Error(`Server responded with status: ${response.status}`);
-        }
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Request failed with status: ${response.status}`);
       }
 
-      console.log("Parsing response JSON...");
       const data = await response.json();
-      console.log("API Response Data:", data);
-
+      
       if (data.success && data.data) {
-        console.log("Successfully retrieved customer data");
         setCustomerData(data.data);
         setShowInfoModal(true);
       } else {
-        console.warn("API returned unsuccessful response:", data.message || "No data found");
-        throw new Error(data.message || "No data found for the provided DSSN");
+        throw new Error(data.message || 'No data found');
       }
     } catch (err) {
-      console.groupCollapsed(`[ERROR] Search Failed - ${new Date().toISOString()}`);
-      console.error("Error Type:", err.name);
-      console.error("Error Message:", err.message);
-      console.error("Error Stack:", err.stack);
-      
-      if (err instanceof TypeError) {
-        if (err.message.includes('Failed to fetch')) {
-          console.error("Network Error - Possible CORS issue or failed connection");
-          setError("Connection failed. Please check your network or contact support if the problem persists.");
-        } else {
-          console.error("Type Error -", err.message);
-          setError("An unexpected error occurred. Please try again.");
-        }
-      } else if (err instanceof SyntaxError) {
-        console.error("JSON Parsing Error - Invalid response format");
-        setError("Invalid response from server. Please try again.");
-      } else {
-        console.error("Application Error -", err.message);
-        setError(err.message || "Failed to verify DSSN. Please try again.");
-      }
-      
-      console.groupEnd();
+      setError(err.message || "Failed to verify DSSN. Please try again.");
+      console.error("Search error:", err);
     } finally {
-      console.groupEnd();
       setIsSearching(false);
     }
   };
@@ -177,40 +126,30 @@ export default function Dssn() {
   };
 
   const openDocumentModal = (imgSrc) => {
-    console.log("Opening document modal for:", imgSrc);
     setCurrentDocumentUrl(imgSrc);
     setShowDocumentModal(true);
     document.body.style.overflow = "hidden";
   };
 
   const closeDocumentModal = () => {
-    console.log("Closing document modal");
     setShowDocumentModal(false);
     setCurrentDocumentUrl("");
     document.body.style.overflow = "auto";
   };
 
   const downloadDocument = () => {
-    if (!currentDocumentUrl) {
-      console.warn("Attempted to download but no document URL set");
-      return;
-    }
-
-    console.log("Downloading document:", currentDocumentUrl);
+    if (!currentDocumentUrl) return;
+    
     const link = document.createElement('a');
     link.href = currentDocumentUrl;
-    const filename = currentDocumentUrl.split('/').pop() || 'document';
-    link.download = filename;
+    link.download = currentDocumentUrl.split('/').pop() || 'document';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   const renderImage = (imgSrc, altText) => {
-    if (!imgSrc) {
-      console.log("No image source provided for:", altText);
-      return null;
-    }
+    if (!imgSrc) return null;
 
     const src = imgSrc.startsWith('data:image') 
       ? imgSrc 
@@ -219,16 +158,12 @@ export default function Dssn() {
         : `data:image/jpeg;base64,${imgSrc}`;
 
     return (
-      <div 
-        className="document-thumbnail cursor-pointer"
-        onClick={() => openDocumentModal(src)}
-      >
+      <div className="document-thumbnail cursor-pointer" onClick={() => openDocumentModal(src)}>
         <img
           src={src}
           alt={altText}
           className="w-full h-auto rounded border border-gray-600/30"
           onError={(e) => {
-            console.error("Failed to load image:", src);
             e.target.onerror = null;
             e.target.src = '/placeholder-image.png';
           }}
@@ -238,22 +173,18 @@ export default function Dssn() {
     );
   };
 
-  // Close modals when clicking outside or pressing Escape
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showInfoModal && event.target.id === 'dssnInfo') {
-        console.log("Closing info modal via outside click");
         setShowInfoModal(false);
       }
       if (showDocumentModal && event.target.id === 'documentModal') {
-        console.log("Closing document modal via outside click");
         closeDocumentModal();
       }
     };
 
     const handleEscapeKey = (event) => {
       if (event.key === 'Escape') {
-        console.log("Closing modals via Escape key");
         setShowInfoModal(false);
         closeDocumentModal();
       }
@@ -286,11 +217,7 @@ export default function Dssn() {
                 index === activeLogo ? "opacity-100" : "opacity-0"
               }`}
             >
-              <img
-                src={logo}
-                alt={`Logo ${index}`}
-                className="max-w-full max-h-full object-contain"
-              />
+              <img src={logo} alt={`Logo ${index}`} className="max-w-full max-h-full object-contain" />
               <div className="absolute inset-0 bg-black/5" />
             </div>
           ))}
@@ -328,11 +255,7 @@ export default function Dssn() {
                     index === activeLogo ? "scale-110 bg-black/30" : "scale-100 bg-black/10"
                   }`}
                 >
-                  <img
-                    src={logo}
-                    alt={`Logo ${index}`}
-                    className="w-12 h-12 md:w-16 md:h-16 object-contain"
-                  />
+                  <img src={logo} alt={`Logo ${index}`} className="w-12 h-12 md:w-16 md:h-16 object-contain" />
                 </div>
               ))}
             </div>
@@ -342,7 +265,6 @@ export default function Dssn() {
 
       {/* Main Content */}
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
-        {/* DSSN Verification Card */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
           <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
             <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
@@ -412,20 +334,14 @@ export default function Dssn() {
 
       {/* DSSN Info Modal */}
       {showInfoModal && customerData && (
-        <div 
-          id="dssnInfo"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-        >
+        <div id="dssnInfo" className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="bg-black/80 border border-gray-600/30 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-2xl font-bold">
                   Search Results for DSSN: {sanitizeHTML(dssn)}
                 </h3>
-                <button 
-                  onClick={() => setShowInfoModal(false)}
-                  className="text-gray-400 hover:text-white"
-                >
+                <button onClick={() => setShowInfoModal(false)} className="text-gray-400 hover:text-white">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -433,66 +349,33 @@ export default function Dssn() {
               </div>
 
               <div className="user-info-grid grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <p><strong>Full Name:</strong> {sanitizeHTML(customerData["Full Name"])}</p>
-                <p><strong>Place of Birth:</strong> {sanitizeHTML(customerData["Place of Birth"])}</p>
-                <p><strong>Date of Birth:</strong> {formatDate(customerData["Date of Birth"])}</p>
-                <p><strong>Sex:</strong> {sanitizeHTML(customerData["Sex"])}</p>
-                <p><strong>Nationality:</strong> {sanitizeHTML(customerData["Nationality"])}</p>
-                <p><strong>Address:</strong> {sanitizeHTML(customerData["Address"])}</p>
-                <p><strong>Postal Address:</strong> {sanitizeHTML(customerData["Postal Address"])}</p>
-                <p><strong>Phone Number:</strong> {sanitizeHTML(customerData["Phone Number"])}</p>
-                <p><strong>Email:</strong> {sanitizeHTML(customerData["Email"])}</p>
-                <p><strong>Employment Status:</strong> {sanitizeHTML(customerData["Employment Status"])}</p>
-                <p><strong>Marital Status:</strong> {sanitizeHTML(customerData["Marital Status"])}</p>
-                <p><strong>Number of Children:</strong> {sanitizeHTML(customerData["Number of Children"])}</p>
-                <p><strong>Passport Number:</strong> {sanitizeHTML(customerData["Passport Number"])}</p>
-                <p><strong>Birth Certificate:</strong> {sanitizeHTML(customerData["Birth Certificate"])}</p>
-                <p><strong>Driver's License:</strong> {sanitizeHTML(customerData["Driver's License"])}</p>
+                {Object.entries(customerData).map(([key, value]) => {
+                  if (typeof value === 'string' && !key.includes('Image')) {
+                    return (
+                      <p key={key}>
+                        <strong>{key}:</strong> {sanitizeHTML(value)}
+                      </p>
+                    );
+                  }
+                  return null;
+                })}
               </div>
 
-              {customerData["Image"] && (
-                <div className="documents-section mb-6">
-                  <div className="document-category">
-                    <h4 className="text-lg font-semibold mb-2">Profile Photo</h4>
-                    <div className="document-thumbnails flex">
-                      {renderImage(customerData["Image"], "Profile Photo")}
+              {['Image', 'Passport Image', 'Birth Certificate Image', 'Drivers License Image'].map((imageKey) => {
+                if (customerData[imageKey]) {
+                  return (
+                    <div key={imageKey} className="documents-section mb-6">
+                      <div className="document-category">
+                        <h4 className="text-lg font-semibold mb-2">{imageKey.replace(' Image', '')}</h4>
+                        <div className="document-thumbnails flex">
+                          {renderImage(customerData[imageKey], imageKey.replace(' Image', ''))}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
-
-              {customerData["Passport Image"] && (
-                <div className="documents-section mb-6">
-                  <div className="document-category">
-                    <h4 className="text-lg font-semibold mb-2">Passport</h4>
-                    <div className="document-thumbnails flex">
-                      {renderImage(customerData["Passport Image"], "Passport")}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {customerData["Birth Certificate Image"] && (
-                <div className="documents-section mb-6">
-                  <div className="document-category">
-                    <h4 className="text-lg font-semibold mb-2">Birth Certificate</h4>
-                    <div className="document-thumbnails flex">
-                      {renderImage(customerData["Birth Certificate Image"], "Birth Certificate")}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {customerData["Drivers License Image"] && (
-                <div className="documents-section mb-6">
-                  <div className="document-category">
-                    <h4 className="text-lg font-semibold mb-2">Driver's License</h4>
-                    <div className="document-thumbnails flex">
-                      {renderImage(customerData["Drivers License Image"], "Driver's License")}
-                    </div>
-                  </div>
-                </div>
-              )}
+                  );
+                }
+                return null;
+              })}
             </div>
           </div>
         </div>
@@ -500,15 +383,9 @@ export default function Dssn() {
 
       {/* Document Modal */}
       {showDocumentModal && (
-        <div 
-          id="documentModal"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
-        >
+        <div id="documentModal" className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
           <div className="relative max-w-6xl w-full max-h-[90vh]">
-            <button 
-              onClick={closeDocumentModal}
-              className="absolute -top-12 right-0 text-white hover:text-gray-300"
-            >
+            <button onClick={closeDocumentModal} className="absolute -top-12 right-0 text-white hover:text-gray-300">
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -516,7 +393,6 @@ export default function Dssn() {
             
             <div className="bg-black/50 rounded-lg overflow-hidden border border-gray-600/30">
               <img 
-                id="documentModalImg"
                 src={currentDocumentUrl}
                 alt="Document"
                 className="w-full h-auto max-h-[80vh] object-contain"
@@ -555,17 +431,10 @@ export default function Dssn() {
         </div>
       </footer>
 
-      {/* Global Styles */}
       <style jsx global>{`
         @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         .overflow-x-auto {
           -ms-overflow-style: none;
