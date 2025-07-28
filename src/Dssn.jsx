@@ -69,8 +69,16 @@ export default function Dssn() {
     e.preventDefault();
     const cleanedDssn = dssn.trim();
     
+    // JS RegExp to match 15-character alphanumeric DSSNs
+    const dssnRegex = /^[A-Za-z0-9]{15}$/;
+    
     if (!cleanedDssn) {
       setError("Please enter a valid DSSN!");
+      return;
+    }
+
+    if (!dssnRegex.test(cleanedDssn)) {
+      setError("Invalid DSSN format! It must be 15 alphanumeric characters.");
       return;
     }
 
@@ -79,16 +87,31 @@ export default function Dssn() {
     setCustomerData(null);
 
     try {
-      const response = await fetch(`/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}`, {
+      const url = `/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}`;
+      console.log("Requesting:", url); // Debugging: log the final URL
+
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Accept': 'application/json'
         }
       });
 
+      // First check if we got a response at all
+      if (!response) {
+        throw new Error('No response from server');
+      }
+
+      // Check if the response is OK (status 200-299)
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        // Try to parse the error response as JSON
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (jsonError) {
+          // If JSON parsing fails, use status text
+          throw new Error(response.statusText || `Request failed with status ${response.status}`);
+        }
         throw new Error(
           errorData.message || 
           errorData.error || 
@@ -96,8 +119,18 @@ export default function Dssn() {
         );
       }
 
+      // Parse the successful response
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Received non-JSON response from server');
+      }
+
       const data = await response.json();
       
+      if (!data) {
+        throw new Error('No data received from server');
+      }
+
       if (!data.success || !data.data) {
         throw new Error(data.message || 'No customer data found');
       }
@@ -112,6 +145,7 @@ export default function Dssn() {
     }
   };
 
+  // ... (keep all other existing functions exactly the same)
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -201,6 +235,7 @@ export default function Dssn() {
     };
   }, [showInfoModal, showDocumentModal]);
 
+  // ... (keep all the existing JSX return exactly the same)
   return (
     <div className="relative min-h-screen w-full bg-black text-white font-inter overflow-x-hidden">
       {/* Background Image Slideshow */}
