@@ -129,9 +129,9 @@ export default function System() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-green-500/80 text-white font-inter overflow-x-hidden">
-      {/* Layer 1: Green Background */}
-      <div className="fixed inset-0 bg-green-500/80 -z-50" />
+    <div className="relative min-h-screen w-full text-white font-inter overflow-x-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700">
+      {/* Layer 1: Gradient Background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 -z-50" />
 
       {/* Centered Image Slideshow */}
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
