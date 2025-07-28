@@ -77,7 +77,6 @@ export default function Dssn() {
     setCustomerData(null);
 
     try {
-      // Create a proxy endpoint in your backend that will forward the request
       const proxyUrl = `/api/dssn-proxy?dssn=${encodeURIComponent(dssn)}`;
       
       const response = await fetch(proxyUrl, {
@@ -88,18 +87,17 @@ export default function Dssn() {
         }
       });
 
+      const responseData = await response.json();
+      
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Request failed with status: ${response.status}`);
+        throw new Error(responseData.message || responseData.error || `Request failed with status: ${response.status}`);
       }
 
-      const data = await response.json();
-      
-      if (data.success && data.data) {
-        setCustomerData(data.data);
+      if (responseData.success && responseData.data) {
+        setCustomerData(responseData.data);
         setShowInfoModal(true);
       } else {
-        throw new Error(data.message || 'No data found');
+        throw new Error(responseData.message || 'No data found');
       }
     } catch (err) {
       setError(err.message || "Failed to verify DSSN. Please try again.");
