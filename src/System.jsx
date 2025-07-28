@@ -26,11 +26,83 @@ const ministries = [
     description: "School management, student records, and educational resources",
     icon: "/logos/moe.png"
   },
-  // ... (other ministries remain the same)
+  {
+    id: "health",
+    name: "Ministry of Health",
+    description: "Health records, vaccination data, and medical services",
+    icon: "/logos/moh.png"
+  },
+  {
+    id: "finance",
+    name: "Ministry of Finance",
+    description: "Tax records, financial services, and economic data",
+    icon: "/logos/mof.png"
+  },
+  {
+    id: "justice",
+    name: "Ministry of Justice",
+    description: "Legal documents, court records, and law enforcement",
+    icon: "/logos/moj.png"
+  },
+  {
+    id: "transport",
+    name: "Ministry of Transport",
+    description: "Driver licenses, vehicle registration, and transport permits",
+    icon: "/logos/mot.png"
+  },
+  {
+    id: "foreign",
+    name: "Ministry of Foreign Affairs",
+    description: "Passport services and international relations",
+    icon: "/logos/mofa.png"
+  },
+  {
+    id: "agriculture",
+    name: "Ministry of Agriculture",
+    description: "Farming permits, agricultural data, and food security",
+    icon: "/logos/moa.png"
+  },
+  {
+    id: "internal",
+    name: "Ministry of Internal Affairs",
+    description: "Citizen IDs, birth certificates, and local governance",
+    icon: "/logos/moia.png"
+  },
+  {
+    id: "lands",
+    name: "Ministry of Lands & Mines",
+    description: "Land deeds, mining permits, and property records",
+    icon: "/logos/mol.png"
+  },
+  {
+    id: "commerce",
+    name: "Ministry of Commerce",
+    description: "Business registration and trade licenses",
+    icon: "/logos/moc.png"
+  },
+  {
+    id: "labour",
+    name: "Ministry of Labour",
+    description: "Employment records and worker rights",
+    icon: "/logos/moll.png"
+  },
+  {
+    id: "youth",
+    name: "Ministry of Youth & Sports",
+    description: "Youth programs and sporting events",
+    icon: "/logos/moy.png"
+  }
 ];
 
 const quickAccessServices = [
-  // ... (quick access services remain the same)
+  { id: "passport", name: "Passport" },
+  { id: "birth-certificate", name: "Birth Certificate" },
+  { id: "drivers-license", name: "Driver's License" },
+  { id: "citizen-id", name: "Citizen ID" },
+  { id: "business-registration", name: "Business Registration" },
+  { id: "vehicle-registration", name: "Vehicle Registration" },
+  { id: "land-deed", name: "Land Deed" },
+  { id: "tax-services", name: "Tax Services" }
 ];
 
 export default function System() {
@@ -82,9 +154,47 @@ export default function System() {
         </div>
       </div>
 
-      {/* Navigation (same as before) */}
+      {/* Navigation */}
       <header className="fixed top-0 left-0 w-full z-50">
-        {/* ... (navigation code remains exactly the same) ... */}
+        <div className="bg-black/60 backdrop-blur-md border-b border-gray-600/30">
+          <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
+            <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
+              {navLinks.map(link => (
+                <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
+                  <Link 
+                    to={link.to} 
+                    className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
+                      location.pathname === link.to 
+                        ? "text-red-500" 
+                        : "text-white hover:text-blue-300"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </div>
+              ))}
+            </nav>
+          </div>
+
+          <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
+            <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
+              {logos.map((logo, index) => (
+                <div 
+                  key={index}
+                  className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-500 ${
+                    index === activeLogo ? "scale-110 bg-black/30" : "scale-100 bg-black/10"
+                  }`}
+                >
+                  <img
+                    src={logo}
+                    alt={`Logo ${index}`}
+                    className="w-12 h-12 md:w-16 md:h-16 object-contain"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </header>
 
       {/* Content Sections */}
@@ -99,13 +209,13 @@ export default function System() {
             </h2>
             <div className="text-white relative">
               <p className="text-white">
-                The National Database Management System (NDMS) is the secure, centralized, and intelligent national data backbone that powers Digital Liberia.
+                The National Database Management System (NDMS) is the secure, centralized, and intelligent national data backbone that powers Digital Liberia. Access government services and manage your data through the ministries below.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Government Ministries Section - Updated with black background */}
+        {/* Government Ministries Section */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
           <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
             <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
@@ -171,7 +281,26 @@ export default function System() {
         </div>
       </footer>
 
-      {/* Global Styles remain the same */}
+      {/* Global Styles */}
+      <style jsx global>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .overflow-x-auto {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .overflow-x-auto::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }
