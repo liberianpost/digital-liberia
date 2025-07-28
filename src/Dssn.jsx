@@ -88,9 +88,14 @@ export default function Dssn() {
       console.log("Initiating fetch request...");
       
       const response = await fetch(apiUrl, {
+        method: 'GET',
+        mode: 'cors',
         headers: {
-          'Accept': 'application/json'
-        }
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Origin': 'https://digital-liberia.web.app'
+        },
+        credentials: 'include'
       });
       
       const endTime = performance.now();
@@ -106,7 +111,14 @@ export default function Dssn() {
         } catch (parseError) {
           console.error("Failed to parse error response:", parseError);
         }
-        throw new Error(`Server responded with status: ${response.status}`);
+        
+        if (response.status === 401) {
+          throw new Error("Authentication required. Please ensure you have proper access.");
+        } else if (response.status === 403) {
+          throw new Error("Access forbidden. CORS policy may be blocking this request.");
+        } else {
+          throw new Error(`Server responded with status: ${response.status}`);
+        }
       }
 
       console.log("Parsing response JSON...");
@@ -128,16 +140,22 @@ export default function Dssn() {
       console.error("Error Stack:", err.stack);
       
       if (err instanceof TypeError) {
-        console.error("Network/Request Error - Possible CORS issue or failed connection");
+        if (err.message.includes('Failed to fetch')) {
+          console.error("Network Error - Possible CORS issue or failed connection");
+          setError("Connection failed. Please check your network or contact support if the problem persists.");
+        } else {
+          console.error("Type Error -", err.message);
+          setError("An unexpected error occurred. Please try again.");
+        }
       } else if (err instanceof SyntaxError) {
         console.error("JSON Parsing Error - Invalid response format");
+        setError("Invalid response from server. Please try again.");
       } else {
-        console.error("Application Error - Business logic failure");
+        console.error("Application Error -", err.message);
+        setError(err.message || "Failed to verify DSSN. Please try again.");
       }
       
       console.groupEnd();
-      
-      setError(err.message || "Failed to verify DSSN. Please check the console for details.");
     } finally {
       console.groupEnd();
       setIsSearching(false);
@@ -383,7 +401,9 @@ export default function Dssn() {
               {error && (
                 <div className="bg-red-900/40 border border-red-700/30 rounded-lg p-4">
                   <p className="text-red-300">{error}</p>
-                  <p className="text-sm text-red-200 mt-2">Check browser console for detailed error information</p>
+                  <p className="text-sm text-red-200 mt-2">
+                    If this persists, please contact support with details from your browser console
+                  </p>
                 </div>
               )}
             </div>
