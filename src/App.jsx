@@ -1,22 +1,20 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "./Home";
 import System from "./System";
 
 function App() {
   return (
-    <Router>
-      <div className="p-8 font-sans">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/system" element={<System />} />
-          {/* Add other routes for your navigation links */}
-          <Route path="/digital-liberia" element={<div>Digital Liberia Page (Coming Soon)</div>} />
-          <Route path="/libpay" element={<div>LibPay Page (Coming Soon)</div>} />
-          <Route path="/liberian-post" element={<div>Liberian Post Page (Coming Soon)</div>} />
-        </Routes>
-      </div>
-    </Router>
+    <div className="app-container">
+      <Routes>
+        <Route index element={<Home />} />
+        <Route path="system" element={<System />} />
+        <Route path="digital-liberia" element={<div>Coming Soon</div>} />
+        <Route path="libpay" element={<div>Coming Soon</div>} />
+        <Route path="liberian-post" element={<div>Coming Soon</div>} />
+        <Route path="*" element={<Home />} /> {/* Fallback */}
+      </Routes>
+    </div>
   );
 }
 
