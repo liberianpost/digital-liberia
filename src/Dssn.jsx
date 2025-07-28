@@ -41,7 +41,17 @@ export default function Dssn() {
     setCustomerData(null);
 
     try {
-      const response = await fetch(`/get-system-info?dssn=${encodeURIComponent(dssn)}`);
+      // Use the full backend URL with proper CORS configuration
+      const backendUrl = 'https://system.liberianpost.com'; // Replace with your actual backend URL
+      const response = await fetch(`${backendUrl}/get-system-info?dssn=${encodeURIComponent(dssn)}`, {
+        method: 'GET',
+        credentials: 'include', // Important for cookies/sessions
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
       const data = await response.json();
 
       if (!response.ok) {
@@ -54,7 +64,8 @@ export default function Dssn() {
 
       setCustomerData(data.data);
     } catch (err) {
-      setError(err.message);
+      console.error('Verification error:', err);
+      setError(err.message || 'Failed to verify DSSN. Please try again.');
     } finally {
       setIsSearching(false);
     }
@@ -62,12 +73,38 @@ export default function Dssn() {
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (e) {
+      return dateString; // Return raw string if date parsing fails
+    }
+  };
+
+  // Helper function to handle image display
+  const renderImage = (base64Data, altText) => {
+    if (!base64Data) return null;
+    
+    // Check if the base64Data already has the prefix
+    const src = base64Data.startsWith('data:image') 
+      ? base64Data 
+      : `data:image/jpeg;base64,${base64Data}`;
+    
+    return (
+      <img 
+        src={src}
+        alt={altText}
+        className="w-full h-auto rounded border border-gray-600/30"
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = '/placeholder-image.png';
+        }}
+      />
+    );
   };
 
   return (
@@ -211,13 +248,7 @@ export default function Dssn() {
                     {/* Profile Card */}
                     <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-gray-600/30 p-6">
                       <div className="flex flex-col items-center space-y-4">
-                        {customerData.Image && (
-                          <img 
-                            src={`data:image/jpeg;base64,${customerData.Image}`} 
-                            alt="Profile" 
-                            className="w-32 h-32 rounded-full object-cover border-2 border-blue-500/50"
-                          />
-                        )}
+                        {renderImage(customerData.Image, "Profile")}
                         <h3 className="text-2xl font-bold">{customerData["Full Name"]}</h3>
                         <div className="grid grid-cols-2 gap-4 w-full">
                           <div>
@@ -272,13 +303,7 @@ export default function Dssn() {
                         <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
                           <h5 className="font-medium mb-2">Passport</h5>
                           <p className="text-sm text-gray-400 mb-2">Number: {customerData["Passport Number"]}</p>
-                          {customerData["Passport Image"] && (
-                            <img 
-                              src={`data:image/jpeg;base64,${customerData["Passport Image"]}`} 
-                              alt="Passport" 
-                              className="w-full h-auto rounded border border-gray-600/30"
-                            />
-                          )}
+                          {renderImage(customerData["Passport Image"], "Passport")}
                         </div>
                       )}
 
@@ -286,13 +311,7 @@ export default function Dssn() {
                         <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
                           <h5 className="font-medium mb-2">Birth Certificate</h5>
                           <p className="text-sm text-gray-400 mb-2">Number: {customerData["Birth Certificate"]}</p>
-                          {customerData["Birth Certificate Image"] && (
-                            <img 
-                              src={`data:image/jpeg;base64,${customerData["Birth Certificate Image"]}`} 
-                              alt="Birth Certificate" 
-                              className="w-full h-auto rounded border border-gray-600/30"
-                            />
-                          )}
+                          {renderImage(customerData["Birth Certificate Image"], "Birth Certificate")}
                         </div>
                       )}
 
@@ -300,24 +319,14 @@ export default function Dssn() {
                         <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
                           <h5 className="font-medium mb-2">Driver's License</h5>
                           <p className="text-sm text-gray-400 mb-2">Number: {customerData["Driver's License"]}</p>
-                          {customerData["Drivers License Image"] && (
-                            <img 
-                              src={`data:image/jpeg;base64,${customerData["Drivers License Image"]}`} 
-                              alt="Driver's License" 
-                              className="w-full h-auto rounded border border-gray-600/30"
-                            />
-                          )}
+                          {renderImage(customerData["Drivers License Image"], "Driver's License")}
                         </div>
                       )}
 
                       {customerData["National Id Image"] && (
                         <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
                           <h5 className="font-medium mb-2">National ID</h5>
-                          <img 
-                            src={`data:image/jpeg;base64,${customerData["National Id Image"]}`} 
-                            alt="National ID" 
-                            className="w-full h-auto rounded border border-gray-600/30"
-                          />
+                          {renderImage(customerData["National Id Image"], "National ID")}
                         </div>
                       )}
                     </div>
