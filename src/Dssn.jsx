@@ -78,27 +78,68 @@ export default function Dssn() {
     setCustomerData(null);
 
     try {
-      const response = await fetch(
-        `https://system.liberianpost.com/get-system-info?dssn=${encodeURIComponent(dssn)}`
-      );
+      console.groupCollapsed(`[DEBUG] DSSN Search Initiated - ${new Date().toISOString()}`);
+      console.log("Searching for DSSN:", dssn);
+      
+      const apiUrl = `https://system.liberianpost.com/get-system-info?dssn=${encodeURIComponent(dssn)}`;
+      console.log("API Endpoint:", apiUrl);
+
+      const startTime = performance.now();
+      console.log("Initiating fetch request...");
+      
+      const response = await fetch(apiUrl, {
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      const endTime = performance.now();
+      console.log(`Request completed in ${(endTime - startTime).toFixed(2)}ms`);
+      console.log("Response Status:", response.status, response.statusText);
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        console.warn("Request failed with status:", response.status);
+        let errorResponse;
+        try {
+          errorResponse = await response.text();
+          console.log("Error response content:", errorResponse);
+        } catch (parseError) {
+          console.error("Failed to parse error response:", parseError);
+        }
+        throw new Error(`Server responded with status: ${response.status}`);
       }
 
+      console.log("Parsing response JSON...");
       const data = await response.json();
-      console.log("API Response:", data);
+      console.log("API Response Data:", data);
 
       if (data.success && data.data) {
+        console.log("Successfully retrieved customer data");
         setCustomerData(data.data);
         setShowInfoModal(true);
       } else {
-        throw new Error(data.message || "No data found for that DSSN.");
+        console.warn("API returned unsuccessful response:", data.message || "No data found");
+        throw new Error(data.message || "No data found for the provided DSSN");
       }
     } catch (err) {
-      console.error("Error:", err);
-      setError(err.message);
+      console.groupCollapsed(`[ERROR] Search Failed - ${new Date().toISOString()}`);
+      console.error("Error Type:", err.name);
+      console.error("Error Message:", err.message);
+      console.error("Error Stack:", err.stack);
+      
+      if (err instanceof TypeError) {
+        console.error("Network/Request Error - Possible CORS issue or failed connection");
+      } else if (err instanceof SyntaxError) {
+        console.error("JSON Parsing Error - Invalid response format");
+      } else {
+        console.error("Application Error - Business logic failure");
+      }
+      
+      console.groupEnd();
+      
+      setError(err.message || "Failed to verify DSSN. Please check the console for details.");
     } finally {
+      console.groupEnd();
       setIsSearching(false);
     }
   };
@@ -113,25 +154,32 @@ export default function Dssn() {
         day: 'numeric'
       });
     } catch (e) {
+      console.warn("Failed to parse date:", dateString);
       return dateString;
     }
   };
 
   const openDocumentModal = (imgSrc) => {
+    console.log("Opening document modal for:", imgSrc);
     setCurrentDocumentUrl(imgSrc);
     setShowDocumentModal(true);
     document.body.style.overflow = "hidden";
   };
 
   const closeDocumentModal = () => {
+    console.log("Closing document modal");
     setShowDocumentModal(false);
     setCurrentDocumentUrl("");
     document.body.style.overflow = "auto";
   };
 
   const downloadDocument = () => {
-    if (!currentDocumentUrl) return;
+    if (!currentDocumentUrl) {
+      console.warn("Attempted to download but no document URL set");
+      return;
+    }
 
+    console.log("Downloading document:", currentDocumentUrl);
     const link = document.createElement('a');
     link.href = currentDocumentUrl;
     const filename = currentDocumentUrl.split('/').pop() || 'document';
@@ -142,7 +190,10 @@ export default function Dssn() {
   };
 
   const renderImage = (imgSrc, altText) => {
-    if (!imgSrc) return null;
+    if (!imgSrc) {
+      console.log("No image source provided for:", altText);
+      return null;
+    }
 
     const src = imgSrc.startsWith('data:image') 
       ? imgSrc 
@@ -160,6 +211,7 @@ export default function Dssn() {
           alt={altText}
           className="w-full h-auto rounded border border-gray-600/30"
           onError={(e) => {
+            console.error("Failed to load image:", src);
             e.target.onerror = null;
             e.target.src = '/placeholder-image.png';
           }}
@@ -173,15 +225,18 @@ export default function Dssn() {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showInfoModal && event.target.id === 'dssnInfo') {
+        console.log("Closing info modal via outside click");
         setShowInfoModal(false);
       }
       if (showDocumentModal && event.target.id === 'documentModal') {
+        console.log("Closing document modal via outside click");
         closeDocumentModal();
       }
     };
 
     const handleEscapeKey = (event) => {
       if (event.key === 'Escape') {
+        console.log("Closing modals via Escape key");
         setShowInfoModal(false);
         closeDocumentModal();
       }
@@ -328,6 +383,7 @@ export default function Dssn() {
               {error && (
                 <div className="bg-red-900/40 border border-red-700/30 rounded-lg p-4">
                   <p className="text-red-300">{error}</p>
+                  <p className="text-sm text-red-200 mt-2">Check browser console for detailed error information</p>
                 </div>
               )}
             </div>
