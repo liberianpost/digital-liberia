@@ -129,11 +129,11 @@ export default function System() {
   };
 
   return (
-    <div className="relative min-h-screen w-full text-white font-inter overflow-x-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700">
-      {/* Layer 1: Gradient Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 -z-50" />
+    <div className="relative min-h-screen w-full bg-black text-white font-inter overflow-x-hidden">
+      {/* Layer 1: Dark Background */}
+      <div className="fixed inset-0 bg-black -z-50" />
 
-      {/* Centered Image Slideshow */}
+      {/* Centered Image Slideshow - Fixed Position */}
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
         <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
           {logos.map((logo, index) => (
@@ -154,9 +154,11 @@ export default function System() {
         </div>
       </div>
 
-      {/* Navigation */}
+      {/* Layer 3: Navigation */}
       <header className="fixed top-0 left-0 w-full z-50">
+        {/* Combined Navigation and Logo Container */}
         <div className="bg-black/60 backdrop-blur-md border-b border-gray-600/30">
+          {/* Navigation Links - Single Row */}
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
             <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
               {navLinks.map(link => (
@@ -176,6 +178,7 @@ export default function System() {
             </nav>
           </div>
 
+          {/* Logo Bar */}
           <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
             <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
               {logos.map((logo, index) => (
@@ -197,7 +200,7 @@ export default function System() {
         </div>
       </header>
 
-      {/* Content Sections */}
+      {/* Layer 4: Content Sections with Semi-Black Background */}
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
         {/* Welcome Card */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
@@ -205,7 +208,7 @@ export default function System() {
             <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
             
             <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
-              Welcome to Digital Liberia System
+              Digital Liberia System
             </h2>
             <div className="text-white relative">
               <p className="text-white">
@@ -274,7 +277,7 @@ export default function System() {
         </section>
       </main>
 
-      {/* Footer */}
+      {/* Footer with Copyright */}
       <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
         <div className="border-t border-gray-600/30 pt-6">
           © {new Date().getFullYear()} Digital Liberia. All rights reserved.
@@ -293,6 +296,7 @@ export default function System() {
             transform: translateY(0);
           }
         }
+        /* Hide scrollbar for containers */
         .overflow-x-auto {
           -ms-overflow-style: none;
           scrollbar-width: none;
