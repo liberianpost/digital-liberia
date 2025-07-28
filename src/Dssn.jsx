@@ -27,9 +27,16 @@ const backgroundImages = [
   "/backgrounds/bg5.jpg"
 ];
 
-// Store credentials in environment variables for security
-const API_USERNAME = process.env.REACT_APP_API_USERNAME || 'admin';
-const API_PASSWORD = process.env.REACT_APP_API_PASSWORD || 'password';
+// HTML sanitization function
+const sanitizeHTML = (str) => {
+  if (!str) return '';
+  return str.toString()
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
 
 export default function Dssn() {
   const location = useLocation();
@@ -61,41 +68,36 @@ export default function Dssn() {
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    if (!dssn.trim()) {
+      setError("Please enter a valid DSSN!");
+      return;
+    }
+
     setIsSearching(true);
     setError(null);
     setCustomerData(null);
 
     try {
-      const authString = btoa(`${API_USERNAME}:${API_PASSWORD}`);
       const response = await fetch(
-        `https://system.liberianpost.com/get-system-info?dssn=${encodeURIComponent(dssn)}`,
-        {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Authorization': `Basic ${authString}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        }
+        `https://system.liberianpost.com/get-system-info?dssn=${encodeURIComponent(dssn)}`
       );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log("API Response:", data);
 
-      if (!data.success) {
-        throw new Error(data.message || 'Customer not found');
+      if (data.success && data.data) {
+        setCustomerData(data.data);
+        setShowInfoModal(true);
+      } else {
+        throw new Error(data.message || "No data found for that DSSN.");
       }
-
-      setCustomerData(data.data);
-      setShowInfoModal(true);
     } catch (err) {
       console.error("Error:", err);
-      setError(err.message || "Failed to verify DSSN. Please try again.");
+      setError(err.message);
     } finally {
       setIsSearching(false);
     }
@@ -118,11 +120,13 @@ export default function Dssn() {
   const openDocumentModal = (imgSrc) => {
     setCurrentDocumentUrl(imgSrc);
     setShowDocumentModal(true);
+    document.body.style.overflow = "hidden";
   };
 
   const closeDocumentModal = () => {
     setShowDocumentModal(false);
     setCurrentDocumentUrl("");
+    document.body.style.overflow = "auto";
   };
 
   const downloadDocument = () => {
@@ -137,7 +141,7 @@ export default function Dssn() {
     document.body.removeChild(link);
   };
 
-  const renderImage = (imgSrc, altText, clickable = true) => {
+  const renderImage = (imgSrc, altText) => {
     if (!imgSrc) return null;
 
     const src = imgSrc.startsWith('data:image') 
@@ -147,47 +151,39 @@ export default function Dssn() {
         : `data:image/jpeg;base64,${imgSrc}`;
 
     return (
-      <div className="relative group">
-        <img 
+      <div 
+        className="document-thumbnail cursor-pointer"
+        onClick={() => openDocumentModal(src)}
+      >
+        <img
           src={src}
           alt={altText}
-          className={`w-full h-auto rounded border border-gray-600/30 ${
-            clickable ? "cursor-pointer hover:opacity-90" : ""
-          }`}
-          onClick={clickable ? () => openDocumentModal(src) : undefined}
+          className="w-full h-auto rounded border border-gray-600/30"
           onError={(e) => {
             e.target.onerror = null;
             e.target.src = '/placeholder-image.png';
           }}
         />
-        {clickable && (
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="bg-black/50 rounded-full p-2">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-        )}
+        <div className="document-label">{altText}</div>
       </div>
     );
   };
 
-  // Close modals when clicking outside
+  // Close modals when clicking outside or pressing Escape
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (showDocumentModal && event.target.id === 'documentModal') {
-        closeDocumentModal();
-      }
       if (showInfoModal && event.target.id === 'dssnInfo') {
         setShowInfoModal(false);
+      }
+      if (showDocumentModal && event.target.id === 'documentModal') {
+        closeDocumentModal();
       }
     };
 
     const handleEscapeKey = (event) => {
       if (event.key === 'Escape') {
-        closeDocumentModal();
         setShowInfoModal(false);
+        closeDocumentModal();
       }
     };
 
@@ -198,7 +194,7 @@ export default function Dssn() {
       document.removeEventListener('click', handleClickOutside);
       document.removeEventListener('keydown', handleEscapeKey);
     };
-  }, [showDocumentModal, showInfoModal]);
+  }, [showInfoModal, showDocumentModal]);
 
   return (
     <div className="relative min-h-screen w-full bg-black text-white font-inter overflow-x-hidden">
@@ -321,10 +317,10 @@ export default function Dssn() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Verifying...
+                      Searching...
                     </>
                   ) : (
-                    "Verify DSSN"
+                    "Search"
                   )}
                 </button>
               </form>
@@ -349,7 +345,7 @@ export default function Dssn() {
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-2xl font-bold">
-                  Search Results for DSSN: {dssn}
+                  Search Results for DSSN: {sanitizeHTML(dssn)}
                 </h3>
                 <button 
                   onClick={() => setShowInfoModal(false)}
@@ -361,146 +357,67 @@ export default function Dssn() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="text-lg font-semibold mb-2">Personal Information</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-gray-400">Full Name</p>
-                        <p>{customerData["Full Name"] || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-400">Date of Birth</p>
-                        <p>{formatDate(customerData["Date of Birth"])}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-400">Place of Birth</p>
-                        <p>{customerData["Place of Birth"] || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-400">Sex</p>
-                        <p>{customerData["Sex"] || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-400">Nationality</p>
-                        <p>{customerData["Nationality"] || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-400">Marital Status</p>
-                        <p>{customerData["Marital Status"] || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-400">Number of Children</p>
-                        <p>{customerData["Number of Children"] || 'N/A'}</p>
-                      </div>
-                    </div>
-                  </div>
+              <div className="user-info-grid grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <p><strong>Full Name:</strong> {sanitizeHTML(customerData["Full Name"])}</p>
+                <p><strong>Place of Birth:</strong> {sanitizeHTML(customerData["Place of Birth"])}</p>
+                <p><strong>Date of Birth:</strong> {formatDate(customerData["Date of Birth"])}</p>
+                <p><strong>Sex:</strong> {sanitizeHTML(customerData["Sex"])}</p>
+                <p><strong>Nationality:</strong> {sanitizeHTML(customerData["Nationality"])}</p>
+                <p><strong>Address:</strong> {sanitizeHTML(customerData["Address"])}</p>
+                <p><strong>Postal Address:</strong> {sanitizeHTML(customerData["Postal Address"])}</p>
+                <p><strong>Phone Number:</strong> {sanitizeHTML(customerData["Phone Number"])}</p>
+                <p><strong>Email:</strong> {sanitizeHTML(customerData["Email"])}</p>
+                <p><strong>Employment Status:</strong> {sanitizeHTML(customerData["Employment Status"])}</p>
+                <p><strong>Marital Status:</strong> {sanitizeHTML(customerData["Marital Status"])}</p>
+                <p><strong>Number of Children:</strong> {sanitizeHTML(customerData["Number of Children"])}</p>
+                <p><strong>Passport Number:</strong> {sanitizeHTML(customerData["Passport Number"])}</p>
+                <p><strong>Birth Certificate:</strong> {sanitizeHTML(customerData["Birth Certificate"])}</p>
+                <p><strong>Driver's License:</strong> {sanitizeHTML(customerData["Driver's License"])}</p>
+              </div>
 
-                  <div>
-                    <h4 className="text-lg font-semibold mb-2">Contact Information</h4>
-                    <div className="space-y-2">
-                      <div>
-                        <p className="text-sm text-gray-400">Address</p>
-                        <p>{customerData["Address"] || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-400">Postal Address</p>
-                        <p>{customerData["Postal Address"] || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-400">Phone Number</p>
-                        <p>{customerData["Phone Number"] || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-400">Email</p>
-                        <p>{customerData["Email"] || 'N/A'}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="text-lg font-semibold mb-2">Employment Status</h4>
-                    <p>{customerData["Employment Status"] || 'N/A'}</p>
-                  </div>
-
-                  <div>
-                    <h4 className="text-lg font-semibold mb-2">Identification Documents</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-gray-400">Passport Number</p>
-                        <p>{customerData["Passport Number"] || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-400">Birth Certificate</p>
-                        <p>{customerData["Birth Certificate"] || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-400">Driver's License</p>
-                        <p>{customerData["Driver's License"] || 'N/A'}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {customerData["Image"] && (
-                    <div>
-                      <h4 className="text-lg font-semibold mb-2">Profile Photo</h4>
+              {customerData["Image"] && (
+                <div className="documents-section mb-6">
+                  <div className="document-category">
+                    <h4 className="text-lg font-semibold mb-2">Profile Photo</h4>
+                    <div className="document-thumbnails flex">
                       {renderImage(customerData["Image"], "Profile Photo")}
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div className="border-t border-gray-600/30 pt-6">
-                <h4 className="text-xl font-semibold mb-4">Documents</h4>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {customerData["Passport Image"] && (
-                    <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
-                      <h5 className="font-medium mb-2">Passport</h5>
-                      {customerData["Passport Number"] && (
-                        <p className="text-sm text-gray-400 mb-2">
-                          Number: {customerData["Passport Number"]}
-                        </p>
-                      )}
+              {customerData["Passport Image"] && (
+                <div className="documents-section mb-6">
+                  <div className="document-category">
+                    <h4 className="text-lg font-semibold mb-2">Passport</h4>
+                    <div className="document-thumbnails flex">
                       {renderImage(customerData["Passport Image"], "Passport")}
                     </div>
-                  )}
+                  </div>
+                </div>
+              )}
 
-                  {customerData["Birth Certificate Image"] && (
-                    <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
-                      <h5 className="font-medium mb-2">Birth Certificate</h5>
-                      {customerData["Birth Certificate"] && (
-                        <p className="text-sm text-gray-400 mb-2">
-                          Number: {customerData["Birth Certificate"]}
-                        </p>
-                      )}
+              {customerData["Birth Certificate Image"] && (
+                <div className="documents-section mb-6">
+                  <div className="document-category">
+                    <h4 className="text-lg font-semibold mb-2">Birth Certificate</h4>
+                    <div className="document-thumbnails flex">
                       {renderImage(customerData["Birth Certificate Image"], "Birth Certificate")}
                     </div>
-                  )}
+                  </div>
+                </div>
+              )}
 
-                  {customerData["Drivers License Image"] && (
-                    <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
-                      <h5 className="font-medium mb-2">Driver's License</h5>
-                      {customerData["Driver's License"] && (
-                        <p className="text-sm text-gray-400 mb-2">
-                          Number: {customerData["Driver's License"]}
-                        </p>
-                      )}
+              {customerData["Drivers License Image"] && (
+                <div className="documents-section mb-6">
+                  <div className="document-category">
+                    <h4 className="text-lg font-semibold mb-2">Driver's License</h4>
+                    <div className="document-thumbnails flex">
                       {renderImage(customerData["Drivers License Image"], "Driver's License")}
                     </div>
-                  )}
-
-                  {customerData["National Id Image"] && (
-                    <div className="bg-black/60 rounded-lg p-4 border border-gray-600/30">
-                      <h5 className="font-medium mb-2">National ID</h5>
-                      {renderImage(customerData["National Id Image"], "National ID")}
-                    </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -581,6 +498,37 @@ export default function Dssn() {
         }
         .overflow-x-auto::-webkit-scrollbar {
           display: none;
+        }
+        .user-info-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: 1rem;
+        }
+        .documents-section {
+          margin-bottom: 2rem;
+        }
+        .document-category {
+          margin-bottom: 1rem;
+        }
+        .document-thumbnails {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+        }
+        .document-thumbnail {
+          position: relative;
+          width: 150px;
+          cursor: pointer;
+          transition: transform 0.2s;
+        }
+        .document-thumbnail:hover {
+          transform: scale(1.05);
+        }
+        .document-label {
+          text-align: center;
+          margin-top: 0.5rem;
+          font-size: 0.875rem;
+          color: #d1d5db;
         }
       `}</style>
     </div>
