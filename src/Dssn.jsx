@@ -77,16 +77,15 @@ export default function Dssn() {
     setCustomerData(null);
 
     try {
-      const apiUrl = `https://system.liberianpost.com/get-system-info?dssn=${encodeURIComponent(dssn)}`;
+      // Create a proxy endpoint in your backend that will forward the request
+      const proxyUrl = `/api/dssn-proxy?dssn=${encodeURIComponent(dssn)}`;
       
-      // Updated fetch request without credentials
-      const response = await fetch(apiUrl, {
+      const response = await fetch(proxyUrl, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         }
-        // Removed credentials: 'include' to fix CORS issue
       });
 
       if (!response.ok) {
