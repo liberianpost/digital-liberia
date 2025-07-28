@@ -79,18 +79,18 @@ export default function Dssn() {
     try {
       const apiUrl = `https://system.liberianpost.com/get-system-info?dssn=${encodeURIComponent(dssn)}`;
       
+      // Updated fetch request without credentials
       const response = await fetch(apiUrl, {
         method: 'GET',
-        mode: 'cors',
-        credentials: 'include',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         }
+        // Removed credentials: 'include' to fix CORS issue
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `Request failed with status: ${response.status}`);
       }
 
