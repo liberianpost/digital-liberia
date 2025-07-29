@@ -92,38 +92,33 @@ const handleSearch = async (e) => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
     });
 
     if (!response.ok) {
-      const contentType = response.headers.get('content-type') || '';
-      if (contentType.includes('application/json')) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || errorData.error || `Request failed with status ${response.status}`
-        );
-      } else {
-        const rawText = await response.text();
-        console.error("Non-JSON error body:", rawText);
-        throw new Error(`Server responded with non-JSON error (status ${response.status})`);
-      }
+      throw new Error(`Request failed with status ${response.status}`);
     }
 
-    const contentType = response.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
-      const rawText = await response.text();
-      console.error("Non-JSON response received:", rawText);
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
       throw new Error("Received non-JSON response from server");
     }
 
     const data = await response.json();
 
-    if (!data || !data.success || !data.data) {
+    if (!data || !data.success) {
       throw new Error(data.message || "No customer data found");
     }
 
-    setCustomerData(data.data);
+    // Handle both direct data and nested data structure
+    const customerData = data.data || data;
+    if (!customerData) {
+      throw new Error("No customer data in response");
+    }
+
+    setCustomerData(customerData);
     setShowInfoModal(true);
   } catch (err) {
     setError(err.message || "Failed to verify DSSN. Please try again.");
