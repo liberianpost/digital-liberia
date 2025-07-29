@@ -57,11 +57,11 @@ export default function Dssn() {
     return () => clearInterval(bgInterval);
   }, []);
 
-  // Logo rotation effect
+  // Logo rotation effect with faster heartbeat (600ms)
   useEffect(() => {
     const logoInterval = setInterval(() => {
       setActiveLogo(prev => (prev + 1) % logos.length);
-    }, 1000);
+    }, 600); // Changed from 1000ms to 600ms for faster heartbeat
     return () => clearInterval(logoInterval);
   }, []);
 
@@ -85,13 +85,11 @@ export default function Dssn() {
 
       const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
         signal: controller.signal,
-        credentials: 'include', // This is crucial for CORS with credentials
+        credentials: 'include',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          // REMOVED: 'Origin': 'https://digital-liberia.web.app' // The browser adds the correct Origin header automatically
-        },
-        mode: 'cors' // Explicitly enable CORS mode
+          'Content-Type': 'application/json'
+        }
       });
 
       clearTimeout(timeoutId);
@@ -203,7 +201,7 @@ export default function Dssn() {
       ? imgSrc
       : imgSrc.startsWith('http')
         ? imgSrc
-        : `data:image/jpeg;base64,${imgSrc}`; // Assuming base64 if not data: or http:
+        : `data:image/jpeg;base64,${imgSrc}`;
 
     return (
       <div className="document-thumbnail cursor-pointer" onClick={() => openDocumentModal(src)}>
@@ -213,7 +211,7 @@ export default function Dssn() {
           className="w-full h-auto rounded border border-gray-600/30"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = '/placeholder-image.png'; // Fallback image
+            e.target.src = '/placeholder-image.png';
           }}
         />
         <div className="document-label">{altText}</div>
@@ -223,7 +221,6 @@ export default function Dssn() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Check if the click is outside the modal content, but not on the toggle button
       if (showInfoModal && event.target.id === 'dssnInfo') {
         setShowInfoModal(false);
       }
@@ -242,14 +239,14 @@ export default function Dssn() {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside); // Use mousedown to capture clicks more broadly
+    document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleEscapeKey);
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscapeKey);
     };
-  }, [showInfoModal, showDocumentModal]); // Depend on modal states
+  }, [showInfoModal, showDocumentModal]);
 
   return (
     <div className="relative min-h-screen w-full bg-black text-white font-inter overflow-x-hidden">
@@ -303,11 +300,20 @@ export default function Dssn() {
               {logos.map((logo, index) => (
                 <div
                   key={index}
-                  className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-500 ${
-                    index === activeLogo ? "scale-110 bg-black/30" : "scale-100 bg-black/10"
+                  className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
+                    index === activeLogo 
+                      ? "scale-110 bg-white shadow-lg" // White background for active logo
+                      : "scale-100 bg-white/90" // White background for inactive logos
                   }`}
+                  style={{
+                    animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none'
+                  }}
                 >
-                  <img src={logo} alt={`Logo ${index}`} className="w-12 h-12 md:w-16 md:h-16 object-contain" />
+                  <img 
+                    src={logo} 
+                    alt={`Logo ${index}`} 
+                    className="w-12 h-12 md:w-16 md:h-16 object-contain" 
+                  />
                 </div>
               ))}
             </div>
@@ -518,6 +524,13 @@ export default function Dssn() {
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes heartbeat {
+          0% { transform: scale(1); }
+          25% { transform: scale(1.1); }
+          50% { transform: scale(1); }
+          75% { transform: scale(1.1); }
+          100% { transform: scale(1); }
         }
         .overflow-x-auto {
           -ms-overflow-style: none;
