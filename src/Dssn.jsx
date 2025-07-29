@@ -66,98 +66,98 @@ export default function Dssn() {
   }, []);
 
   const handleSearch = async (e) => {
-  e.preventDefault();
-  const cleanedDssn = dssn.trim().toUpperCase();
+    e.preventDefault();
+    const cleanedDssn = dssn.trim().toUpperCase();
 
-  // Strict DSSN validation
-  if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
-    setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
-    return;
-  }
-
-  setIsSearching(true);
-  setError(null);
-  setCustomerData(null);
-
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    // Updated fetch with proper CORS headers
-    const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
-      signal: controller.signal,
-      credentials: 'include', // This is crucial for CORS with credentials
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Origin': 'https://digital-liberia.web.app' // Explicitly set origin
-      },
-      mode: 'cors' // Explicitly enable CORS mode
-    });
-
-    clearTimeout(timeoutId);
-
-    // First verify content type
-    const contentType = response.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
-      const text = await response.text();
-      console.error('Non-JSON response:', text.slice(0, 200));
-      throw new Error('Server returned invalid content type');
+    // Strict DSSN validation
+    if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
+      setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
+      return;
     }
 
-    // Then check status
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || `Request failed with status ${response.status}`);
+    setIsSearching(true);
+    setError(null);
+    setCustomerData(null);
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
+        signal: controller.signal,
+        credentials: 'include', // This is crucial for CORS with credentials
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          // REMOVED: 'Origin': 'https://digital-liberia.web.app' // The browser adds the correct Origin header automatically
+        },
+        mode: 'cors' // Explicitly enable CORS mode
+      });
+
+      clearTimeout(timeoutId);
+
+      // First verify content type
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response:', text.slice(0, 200));
+        throw new Error('Server returned invalid content type');
+      }
+
+      // Then check status
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || `Request failed with status ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // Validate response structure against new backend format
+      if (!result || typeof result !== 'object' || result.success === undefined || !result.data) {
+        throw new Error(result.message || 'Invalid server response');
+      }
+
+      // Success case - map to expected frontend format
+      setCustomerData({
+        "Full Name": result.data.fullName,
+        "Place of Birth": result.data.placeOfBirth,
+        "Date of Birth": result.data.dateOfBirth,
+        "Sex": result.data.sex,
+        "Nationality": result.data.nationality,
+        "Address": result.data.address,
+        "Postal Address": result.data.postalAddress,
+        "Phone Number": result.data.phoneNumber,
+        "Email": result.data.email,
+        "Employment Status": result.data.employmentStatus,
+        "Marital Status": result.data.maritalStatus,
+        "Number of Children": result.data.numberOfChildren,
+        "Passport Number": result.data.passportNumber,
+        "Birth Certificate": result.data.birthCertificate,
+        "Driver's License": result.data.driverLicense,
+        "Image": result.data.images?.profile,
+        "Passport Image": result.data.images?.passport,
+        "Birth Certificate Image": result.data.images?.birthCertificate,
+        "Drivers License Image": result.data.images?.driverLicense,
+        "National Id Image": result.data.images?.nationalId
+      });
+
+      setShowInfoModal(true);
+
+    } catch (err) {
+      setError(err.name === 'AbortError'
+        ? 'Request timed out'
+        : err.message || 'Verification failed. Please try again.'
+      );
+      console.error("Search Error:", {
+        name: err.name,
+        message: err.message,
+        stack: err.stack
+      });
+    } finally {
+      setIsSearching(false);
     }
+  };
 
-    const result = await response.json();
-
-    // Validate response structure against new backend format
-    if (!result || typeof result !== 'object' || result.success === undefined || !result.data) {
-      throw new Error(result.message || 'Invalid server response');
-    }
-
-    // Success case - map to expected frontend format
-    setCustomerData({
-      "Full Name": result.data.fullName,
-      "Place of Birth": result.data.placeOfBirth,
-      "Date of Birth": result.data.dateOfBirth,
-      "Sex": result.data.sex,
-      "Nationality": result.data.nationality,
-      "Address": result.data.address,
-      "Postal Address": result.data.postalAddress,
-      "Phone Number": result.data.phoneNumber,
-      "Email": result.data.email,
-      "Employment Status": result.data.employmentStatus,
-      "Marital Status": result.data.maritalStatus,
-      "Number of Children": result.data.numberOfChildren,
-      "Passport Number": result.data.passportNumber,
-      "Birth Certificate": result.data.birthCertificate,
-      "Driver's License": result.data.driverLicense,
-      "Image": result.data.images?.profile,
-      "Passport Image": result.data.images?.passport,
-      "Birth Certificate Image": result.data.images?.birthCertificate,
-      "Drivers License Image": result.data.images?.driverLicense,
-      "National Id Image": result.data.images?.nationalId
-    });
-
-    setShowInfoModal(true);
-
-  } catch (err) {
-    setError(err.name === 'AbortError' 
-      ? 'Request timed out'
-      : err.message || 'Verification failed. Please try again.'
-    );
-    console.error("Search Error:", {
-      name: err.name,
-      message: err.message,
-      stack: err.stack
-    });
-  } finally {
-    setIsSearching(false);
-  }
-};
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -187,7 +187,7 @@ export default function Dssn() {
 
   const downloadDocument = () => {
     if (!currentDocumentUrl) return;
-    
+
     const link = document.createElement('a');
     link.href = currentDocumentUrl;
     link.download = currentDocumentUrl.split('/').pop() || 'document';
@@ -199,11 +199,11 @@ export default function Dssn() {
   const renderImage = (imgSrc, altText) => {
     if (!imgSrc) return null;
 
-    const src = imgSrc.startsWith('data:image') 
-      ? imgSrc 
+    const src = imgSrc.startsWith('data:image')
+      ? imgSrc
       : imgSrc.startsWith('http')
         ? imgSrc
-        : `data:image/jpeg;base64,${imgSrc}`;
+        : `data:image/jpeg;base64,${imgSrc}`; // Assuming base64 if not data: or http:
 
     return (
       <div className="document-thumbnail cursor-pointer" onClick={() => openDocumentModal(src)}>
@@ -213,7 +213,7 @@ export default function Dssn() {
           className="w-full h-auto rounded border border-gray-600/30"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = '/placeholder-image.png';
+            e.target.src = '/placeholder-image.png'; // Fallback image
           }}
         />
         <div className="document-label">{altText}</div>
@@ -223,6 +223,7 @@ export default function Dssn() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Check if the click is outside the modal content, but not on the toggle button
       if (showInfoModal && event.target.id === 'dssnInfo') {
         setShowInfoModal(false);
       }
@@ -233,24 +234,27 @@ export default function Dssn() {
 
     const handleEscapeKey = (event) => {
       if (event.key === 'Escape') {
-        setShowInfoModal(false);
-        closeDocumentModal();
+        if (showDocumentModal) {
+          closeDocumentModal();
+        } else if (showInfoModal) {
+          setShowInfoModal(false);
+        }
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside); // Use mousedown to capture clicks more broadly
     document.addEventListener('keydown', handleEscapeKey);
 
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscapeKey);
     };
-  }, [showInfoModal, showDocumentModal]);
+  }, [showInfoModal, showDocumentModal]); // Depend on modal states
 
   return (
     <div className="relative min-h-screen w-full bg-black text-white font-inter overflow-x-hidden">
       {/* Background Image Slideshow */}
-      <div 
+      <div
         className="fixed inset-0 -z-50 bg-cover bg-center transition-opacity duration-1000"
         style={{ backgroundImage: `url(${backgroundImages[bgIndex]})`, opacity: 0.7 }}
       />
@@ -279,11 +283,11 @@ export default function Dssn() {
             <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
               {navLinks.map(link => (
                 <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
-                  <Link 
-                    to={link.to} 
+                  <Link
+                    to={link.to}
                     className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
-                      location.pathname === link.to 
-                        ? "text-red-500" 
+                      location.pathname === link.to
+                        ? "text-red-500"
                         : "text-white hover:text-blue-300"
                     }`}
                   >
@@ -297,7 +301,7 @@ export default function Dssn() {
           <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
             <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
               {logos.map((logo, index) => (
-                <div 
+                <div
                   key={index}
                   className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-500 ${
                     index === activeLogo ? "scale-110 bg-black/30" : "scale-100 bg-black/10"
@@ -316,16 +320,16 @@ export default function Dssn() {
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
           <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
             <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
-            
+
             <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
               DSSN Verification
             </h2>
             <div className="text-white relative space-y-6">
               <p>
-                Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information. 
+                Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information.
                 Enter the 15-digit alphanumeric DSSN in the field below.
               </p>
-              
+
               <form onSubmit={handleSearch} className="space-y-4">
                 <div>
                   <label htmlFor="dssn" className="block text-sm font-medium mb-2">
@@ -343,7 +347,7 @@ export default function Dssn() {
                     title="15-character alphanumeric DSSN"
                   />
                 </div>
-                
+
                 <button
                   type="submit"
                   disabled={isSearching}
@@ -469,16 +473,16 @@ export default function Dssn() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            
+
             <div className="bg-black/50 rounded-lg overflow-hidden border border-gray-600/30">
-              <img 
+              <img
                 src={currentDocumentUrl}
                 alt="Document"
                 className="w-full h-auto max-h-[80vh] object-contain"
               />
-              
+
               <div className="flex justify-center space-x-4 p-4 bg-black/50">
-                <button 
+                <button
                   onClick={downloadDocument}
                   className="flex items-center px-4 py-2 bg-blue-600/80 rounded-lg hover:bg-blue-700/80"
                 >
@@ -487,8 +491,8 @@ export default function Dssn() {
                   </svg>
                   Download
                 </button>
-                
-                <button 
+
+                <button
                   onClick={closeDocumentModal}
                   className="flex items-center px-4 py-2 bg-gray-600/80 rounded-lg hover:bg-gray-700/80"
                 >
