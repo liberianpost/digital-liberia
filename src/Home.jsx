@@ -133,9 +133,9 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full bg-black text-white font-inter overflow-x-hidden">
-      {/* Layer 1: Dark Background */}
-      <div className="fixed inset-0 bg-black -z-50" />
+    <div className="relative min-h-screen w-full bg-blue-950 text-white font-inter overflow-x-hidden">
+      {/* Layer 1: Dark Blue Background */}
+      <div className="fixed inset-0 bg-blue-950 -z-50" />
 
       {/* Centered Image Slideshow - Fixed Position */}
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -161,7 +161,7 @@ export default function Home() {
       {/* Layer 3: Navigation */}
       <header className="fixed top-0 left-0 w-full z-50">
         {/* Combined Navigation and Logo Container */}
-        <div className="bg-black/60 backdrop-blur-md border-b border-gray-600/30">
+        <div className="bg-blue-950/80 backdrop-blur-md border-b border-blue-700/30">
           {/* Navigation Links - Single Row */}
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
             <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
@@ -183,7 +183,7 @@ export default function Home() {
           </div>
 
           {/* Logo Bar - Updated with white backgrounds and heartbeat animation */}
-          <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
+          <div className="w-full bg-gradient-to-b from-blue-950 to-transparent overflow-x-auto">
             <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
               {logos.map((logo, index) => (
                 <div 
@@ -220,11 +220,11 @@ export default function Home() {
               opacity: 0
             }}
           >
-            <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="bg-blue-950/80 backdrop-blur-md rounded-xl border border-blue-700/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
               {/* Mirror Reflection Effect */}
-              <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-blue-700/20 to-transparent"></div>
               
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-blue-700/30 pb-2">
                 {section.title}
               </h2>
               <div className="text-white relative">
@@ -237,7 +237,7 @@ export default function Home() {
 
       {/* Footer with Copyright */}
       <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
-        <div className="border-t border-gray-600/30 pt-6">
+        <div className="border-t border-blue-700/30 pt-6">
           © {new Date().getFullYear()} Digital Liberia. All rights reserved.
         </div>
       </footer>
