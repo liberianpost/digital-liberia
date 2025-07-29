@@ -65,85 +65,73 @@ export default function Dssn() {
     return () => clearInterval(logoInterval);
   }, []);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    const cleanedDssn = dssn.trim();
-    
-    // JS RegExp to match 15-character alphanumeric DSSNs
-    const dssnRegex = /^[A-Za-z0-9]{15}$/;
-    
-    if (!cleanedDssn) {
-      setError("Please enter a valid DSSN!");
-      return;
-    }
+const handleSearch = async (e) => {
+  e.preventDefault();
+  const cleanedDssn = dssn.trim();
 
-    if (!dssnRegex.test(cleanedDssn)) {
-      setError("Invalid DSSN format! It must be 15 alphanumeric characters.");
-      return;
-    }
+  const dssnRegex = /^[A-Za-z0-9]{15}$/;
 
-    setIsSearching(true);
-    setError(null);
-    setCustomerData(null);
+  if (!cleanedDssn) {
+    setError("Please enter a valid DSSN!");
+    return;
+  }
 
-    try {
-      const url = `/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}`;
-      console.log("Requesting:", url); // Debugging: log the final URL
+  if (!dssnRegex.test(cleanedDssn)) {
+    setError("Invalid DSSN format! It must be 15 alphanumeric characters.");
+    return;
+  }
 
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
+  setIsSearching(true);
+  setError(null);
+  setCustomerData(null);
 
-      // First check if we got a response at all
-      if (!response) {
-        throw new Error('No response from server');
+  try {
+    const url = `/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}`;
+    console.log("Requesting:", url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
       }
+    });
 
-      // Check if the response is OK (status 200-299)
-      if (!response.ok) {
-        // Try to parse the error response as JSON
-        let errorData;
-        try {
-          errorData = await response.json();
-        } catch (jsonError) {
-          // If JSON parsing fails, use status text
-          throw new Error(response.statusText || `Request failed with status ${response.status}`);
-        }
+    if (!response.ok) {
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const errorData = await response.json();
         throw new Error(
-          errorData.message || 
-          errorData.error || 
-          `Request failed with status ${response.status}`
+          errorData.message || errorData.error || `Request failed with status ${response.status}`
         );
+      } else {
+        const rawText = await response.text();
+        console.error("Non-JSON error body:", rawText);
+        throw new Error(`Server responded with non-JSON error (status ${response.status})`);
       }
-
-      // Parse the successful response
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Received non-JSON response from server');
-      }
-
-      const data = await response.json();
-      
-      if (!data) {
-        throw new Error('No data received from server');
-      }
-
-      if (!data.success || !data.data) {
-        throw new Error(data.message || 'No customer data found');
-      }
-
-      setCustomerData(data.data);
-      setShowInfoModal(true);
-    } catch (err) {
-      setError(err.message || "Failed to verify DSSN. Please try again.");
-      console.error("Search error:", err);
-    } finally {
-      setIsSearching(false);
     }
-  };
+
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const rawText = await response.text();
+      console.error("Non-JSON response received:", rawText);
+      throw new Error("Received non-JSON response from server");
+    }
+
+    const data = await response.json();
+
+    if (!data || !data.success || !data.data) {
+      throw new Error(data.message || "No customer data found");
+    }
+
+    setCustomerData(data.data);
+    setShowInfoModal(true);
+  } catch (err) {
+    setError(err.message || "Failed to verify DSSN. Please try again.");
+    console.error("Search error:", err);
+  } finally {
+    setIsSearching(false);
+  }
+};
 
   // ... (keep all other existing functions exactly the same)
   const formatDate = (dateString) => {
