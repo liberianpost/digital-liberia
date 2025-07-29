@@ -65,82 +65,77 @@ export default function Dssn() {
     return () => clearInterval(logoInterval);
   }, []);
 
-const handleSearch = async (e) => {
-  e.preventDefault();
-  const cleanedDssn = dssn.trim().toUpperCase();
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    const cleanedDssn = dssn.trim().toUpperCase();
 
-  // Strict DSSN validation
-  if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
-    setError("Invalid DSSN! Must be exactly 15 alphanumeric characters.");
-    return;
-  }
+    // Strict DSSN validation
+    if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
+      setError("Invalid DSSN! Must be exactly 15 alphanumeric characters.");
+      return;
+    }
 
-  setIsSearching(true);
-  setError(null);
-  setCustomerData(null);
+    setIsSearching(true);
+    setError(null);
+    setCustomerData(null);
 
-  try {
-    const response = await fetch(`/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}`, {
-      headers: {
-        'Accept': 'application/json',
-        'Cache-Control': 'no-cache'
+    try {
+      // Add cache-busting parameter
+      const url = `/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}&t=${Date.now()}`;
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin'
+      });
+
+      // First check if we got HTML instead of JSON
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('text/html')) {
+        const text = await response.text();
+        console.error('Received HTML instead of JSON:', text.slice(0, 200));
+        throw new Error('Server configuration error - contact support');
       }
-    });
 
-    // First check response status
-    if (!response.ok) {
-      const errorText = await response.text();
-      try {
-        // Try to parse as JSON if possible
-        const errorJson = JSON.parse(errorText);
-        throw new Error(errorJson.message || `Server error: ${response.status}`);
-      } catch {
-        // Fallback to text error
-        throw new Error(errorText || `Request failed with status ${response.status}`);
+      // Then check status
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Server error: ${response.status}`);
       }
+
+      // Parse JSON
+      const result = await response.json();
+
+      // Validate response structure
+      if (!result || typeof result !== 'object') {
+        throw new Error('Invalid server response');
+      }
+
+      if (!result.success) {
+        throw new Error(result.message || 'Verification failed');
+      }
+
+      if (!result.data) {
+        throw new Error('No customer data available');
+      }
+
+      // Success case
+      setCustomerData(result.data);
+      setShowInfoModal(true);
+
+    } catch (err) {
+      setError(err.message || "DSSN verification failed. Please try again.");
+      console.error("Search Error:", {
+        error: err,
+        message: err.message,
+        stack: err.stack
+      });
+    } finally {
+      setIsSearching(false);
     }
+  };
 
-    // Verify content type
-    const contentType = response.headers.get('content-type');
-    if (!contentType?.includes('application/json')) {
-      const textData = await response.text();
-      console.error('Non-JSON response:', textData);
-      throw new Error('Server returned invalid response format');
-    }
-
-    // Parse JSON safely
-    const result = await response.json();
-
-    // Validate response structure
-    if (!result || typeof result !== 'object') {
-      throw new Error('Invalid server response');
-    }
-
-    if (!result.success) {
-      throw new Error(result.message || 'Verification failed');
-    }
-
-    if (!result.data) {
-      throw new Error('No customer data available');
-    }
-
-    // Success case
-    setCustomerData(result.data);
-    setShowInfoModal(true);
-
-  } catch (err) {
-    setError(err.message || "DSSN verification failed. Please try again.");
-    console.error("Search Error Details:", {
-      error: err,
-      message: err.message,
-      stack: err.stack
-    });
-  } finally {
-    setIsSearching(false);
-  }
-};
-
-  // ... (keep all other existing functions exactly the same)
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -230,7 +225,6 @@ const handleSearch = async (e) => {
     };
   }, [showInfoModal, showDocumentModal]);
 
-  // ... (keep all the existing JSX return exactly the same)
   return (
     <div className="relative min-h-screen w-full bg-black text-white font-inter overflow-x-hidden">
       {/* Background Image Slideshow */}
