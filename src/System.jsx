@@ -130,9 +130,9 @@ export default function System() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-black text-white font-inter overflow-x-hidden">
-      {/* Layer 1: Dark Background */}
-      <div className="fixed inset-0 bg-black -z-50" />
+    <div className="relative min-h-screen w-full bg-blue-950 text-white font-inter overflow-x-hidden">
+      {/* Layer 1: Dark Blue Background */}
+      <div className="fixed inset-0 bg-blue-950 -z-50" />
 
       {/* Centered Image Slideshow - Fixed Position */}
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -158,7 +158,7 @@ export default function System() {
       {/* Layer 3: Navigation */}
       <header className="fixed top-0 left-0 w-full z-50">
         {/* Combined Navigation and Logo Container */}
-        <div className="bg-black/60 backdrop-blur-md border-b border-gray-600/30">
+        <div className="bg-blue-950/80 backdrop-blur-md border-b border-blue-700/30">
           {/* Navigation Links - Single Row */}
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
             <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
@@ -180,7 +180,7 @@ export default function System() {
           </div>
 
           {/* Logo Bar - Updated with white backgrounds and heartbeat animation */}
-          <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
+          <div className="w-full bg-gradient-to-b from-blue-950 to-transparent overflow-x-auto">
             <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
               {logos.map((logo, index) => (
                 <div 
@@ -206,106 +206,107 @@ export default function System() {
         </div>
       </header>
 
-      {/* Layer 4: Content Sections with Semi-Black Background */}
+      {/* Layer 4: Content Sections with Glass-like Backgrounds */}
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
-        {/* DSSN Card */}
+        {/* DSSN Card - Rose/red/orange gradient */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
-            
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
-              Digital Social Security Number (DSSN)
-            </h2>
-            <div className="text-white relative space-y-4">
-              <p>
-                In the Digital Liberia project, the DSSN (Digital Social Security Number) is a unique digital identifier assigned to every Liberian citizen or legal resident within the system. It functions as a centralized digital identity that enables secure access to a wide range of services in the app and across government and private platforms.
-              </p>
-              
-              <h3 className="text-xl font-semibold mt-6">Key Characteristics of the DSSN:</h3>
-              
-              <h4 className="font-semibold">Uniqueness:</h4>
-              <p>
-                Each DSSN is unique to an individual — similar in concept to a traditional Social Security Number (SSN) but adapted for digital infrastructure and use across the entire Digital Liberia ecosystem.
-              </p>
-              
-              <h4 className="font-semibold">Digital Identity Anchor:</h4>
-              <p>
-                The DSSN serves as the anchor for identity verification, user authentication, and access to services such as:
-              </p>
-              <ul className="list-disc pl-6">
-                <li>Government services (e.g., postal, licensing, social programs)</li>
-                <li>Financial services (e.g., banking, mobile money, digital payments)</li>
-                <li>Private services (e.g., ride-hailing, food delivery, job applications)</li>
-              </ul>
-              
-              <h4 className="font-semibold">Format (subject to design decisions):</h4>
-              <p>
-                A typical DSSN might be a 15-digit alphanumeric code.
-              </p>
-              
-              <h4 className="font-semibold">Security & Privacy:</h4>
-              <p>
-                DSSNs are stored securely and are not meant to be shared publicly. They are cryptographically protected and can be used for:
-              </p>
-              <ul className="list-disc pl-6">
-                <li>QR-based scanning (e.g., for package tracking, ID verification)</li>
-                <li>Secure login</li>
-                <li>Backend validation during transactions or registrations</li>
-              </ul>
-              
-              <h4 className="font-semibold">Use in Apps (Example: Digital Liberia, Liberian Post):</h4>
-              <p>
-                In the Digital Liberia app, the DSSN is used by customers to login and use all the related Digital Liberia Services.
-                In the Liberian Post app, the DSSN is used by employees to:
-              </p>
-              <ul className="list-disc pl-6">
-                <li>Identify senders and receivers of packages</li>
-                <li>Validate users via backend APIs</li>
-                <li>Track ownership and delivery history</li>
-              </ul>
-              
-              <h4 className="font-semibold">Future Interoperability:</h4>
-              <p>
-                The DSSN is designed for interoperability across other modules in the Digital Liberia super app — supporting long-term plans for unified digital identity and records. 
-                <Link to="/dssn" className="inline-flex items-center bg-blue-500/80 backdrop-blur-sm rounded-lg px-3 py-1 ml-2 border border-blue-400/30 cursor-pointer hover:bg-blue-600/80 transition-colors">
-                  (click here to verify a DSSN)
-                </Link>
-              </p>
+          <div className="bg-gradient-to-br from-rose-500/10 via-red-500/10 to-orange-600/10 backdrop-blur-lg rounded-xl border border-rose-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                Digital Social Security Number (DSSN)
+              </h2>
+              <div className="text-white space-y-4">
+                <p>
+                  In the Digital Liberia project, the DSSN (Digital Social Security Number) is a unique digital identifier assigned to every Liberian citizen or legal resident within the system. It functions as a centralized digital identity that enables secure access to a wide range of services in the app and across government and private platforms.
+                </p>
+                
+                <h3 className="text-xl font-semibold mt-6">Key Characteristics of the DSSN:</h3>
+                
+                <h4 className="font-semibold">Uniqueness:</h4>
+                <p>
+                  Each DSSN is unique to an individual — similar in concept to a traditional Social Security Number (SSN) but adapted for digital infrastructure and use across the entire Digital Liberia ecosystem.
+                </p>
+                
+                <h4 className="font-semibold">Digital Identity Anchor:</h4>
+                <p>
+                  The DSSN serves as the anchor for identity verification, user authentication, and access to services such as:
+                </p>
+                <ul className="list-disc pl-6">
+                  <li>Government services (e.g., postal, licensing, social programs)</li>
+                  <li>Financial services (e.g., banking, mobile money, digital payments)</li>
+                  <li>Private services (e.g., ride-hailing, food delivery, job applications)</li>
+                </ul>
+                
+                <h4 className="font-semibold">Format (subject to design decisions):</h4>
+                <p>
+                  A typical DSSN might be a 15-digit alphanumeric code.
+                </p>
+                
+                <h4 className="font-semibold">Security & Privacy:</h4>
+                <p>
+                  DSSNs are stored securely and are not meant to be shared publicly. They are cryptographically protected and can be used for:
+                </p>
+                <ul className="list-disc pl-6">
+                  <li>QR-based scanning (e.g., for package tracking, ID verification)</li>
+                  <li>Secure login</li>
+                  <li>Backend validation during transactions or registrations</li>
+                </ul>
+                
+                <h4 className="font-semibold">Use in Apps (Example: Digital Liberia, Liberian Post):</h4>
+                <p>
+                  In the Digital Liberia app, the DSSN is used by customers to login and use all the related Digital Liberia Services.
+                  In the Liberian Post app, the DSSN is used by employees to:
+                </p>
+                <ul className="list-disc pl-6">
+                  <li>Identify senders and receivers of packages</li>
+                  <li>Validate users via backend APIs</li>
+                  <li>Track ownership and delivery history</li>
+                </ul>
+                
+                <h4 className="font-semibold">Future Interoperability:</h4>
+                <p>
+                  The DSSN is designed for interoperability across other modules in the Digital Liberia super app — supporting long-term plans for unified digital identity and records. 
+                  <Link to="/dssn" className="inline-flex items-center bg-blue-500/80 backdrop-blur-sm rounded-lg px-3 py-1 ml-2 border border-blue-400/30 cursor-pointer hover:bg-blue-600/80 transition-colors">
+                    (click here to verify a DSSN)
+                  </Link>
+                </p>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Welcome Card */}
+        {/* Digital Liberia System Card - Green/teal gradient */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
-            
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
-              Digital Liberia System
-            </h2>
-            <div className="text-white relative">
-              <p className="text-white">
-                The National Database Management System (NDMS) is the secure, centralized, and intelligent national data backbone that powers Digital Liberia. Access government services and manage your data through the ministries below.
-              </p>
+          <div className="bg-gradient-to-br from-green-500/10 via-teal-500/10 to-emerald-600/10 backdrop-blur-lg rounded-xl border border-green-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                Digital Liberia System
+              </h2>
+              <div className="text-white">
+                <p>
+                  The National Database Management System (NDMS) is the secure, centralized, and intelligent national data backbone that powers Digital Liberia. Access government services and manage your data through the ministries below.
+                </p>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Government Ministries Section */}
+        {/* Government Ministries Section - Purple/indigo gradient */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
-            
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
-              Government Ministries
-            </h2>
-            <div className="text-white relative">
+          <div className="bg-gradient-to-br from-purple-500/10 via-indigo-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-purple-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                Government Ministries
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {ministries.map(ministry => (
                   <div 
                     key={ministry.id}
                     onClick={() => handleMinistryClick(ministry.id)}
-                    className="cursor-pointer bg-black/40 hover:bg-black/50 transition-colors p-4 rounded-lg border border-gray-600/30"
+                    className="cursor-pointer bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm"
                   >
                     <div className="flex items-center space-x-4">
                       <img 
@@ -315,7 +316,7 @@ export default function System() {
                       />
                       <div>
                         <h3 className="font-bold text-lg">{ministry.name}</h3>
-                        <p className="text-sm text-gray-300">{ministry.description}</p>
+                        <p className="text-sm text-white/80">{ministry.description}</p>
                       </div>
                     </div>
                   </div>
@@ -325,21 +326,20 @@ export default function System() {
           </div>
         </section>
 
-        {/* Quick Access Services Section */}
+        {/* Quick Access Services Section - Blue/purple gradient */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
-            
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
-              Quick Access Services
-            </h2>
-            <div className="text-white relative">
+          <div className="bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-blue-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                Quick Access Services
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {quickAccessServices.map(service => (
                   <button
                     key={service.id}
                     onClick={() => handleServiceClick(service.id)}
-                    className="bg-black/40 hover:bg-black/50 transition-colors p-4 rounded-lg border border-gray-600/30 text-left"
+                    className="bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm text-left"
                   >
                     <h3 className="font-bold text-lg">{service.name}</h3>
                   </button>
@@ -352,7 +352,7 @@ export default function System() {
 
       {/* Footer with Copyright */}
       <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
-        <div className="border-t border-gray-600/30 pt-6">
+        <div className="border-t border-blue-700/30 pt-6">
           © {new Date().getFullYear()} Digital Liberia. All rights reserved.
         </div>
       </footer>
