@@ -4,6 +4,7 @@ import Home from "./Home";
 import System from "./System";
 import Dssn from "./Dssn";
 import Digitalliberia from "./Digitalliberia";
+import Libpay from "./Libpay";
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
         <Route path="system" element={<System />} />
         <Route path="dssn" element={<Dssn />} />
         <Route path="digital-liberia" element={<Digitalliberia />} />
-        <Route path="libpay" element={<div>Coming Soon</div>} />
+        <Route path="libpay" element={<Libpay />} />
         <Route path="liberian-post" element={<div>Coming Soon</div>} />
         <Route path="*" element={<Home />} /> {/* Fallback */}
       </Routes>
