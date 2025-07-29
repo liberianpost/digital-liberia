@@ -69,15 +69,9 @@ const handleSearch = async (e) => {
   e.preventDefault();
   const cleanedDssn = dssn.trim();
 
-  const dssnRegex = /^[A-Za-z0-9]{15}$/;
-
-  if (!cleanedDssn) {
-    setError("Please enter a valid DSSN!");
-    return;
-  }
-
-  if (!dssnRegex.test(cleanedDssn)) {
-    setError("Invalid DSSN format! It must be 15 alphanumeric characters.");
+  // Validate DSSN format
+  if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
+    setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
     return;
   }
 
@@ -86,40 +80,26 @@ const handleSearch = async (e) => {
   setCustomerData(null);
 
   try {
-    const url = `/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}`;
-    console.log("Requesting:", url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    });
-
+    const response = await fetch(`/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}`);
+    
+    // Check if response is OK (status 200-299)
     if (!response.ok) {
-      throw new Error(`Request failed with status ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(errorText || `Server error: ${response.status}`);
     }
 
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      throw new Error("Received non-JSON response from server");
+    // Parse JSON
+    const result = await response.json();
+
+    // Check if successful
+    if (!result.success) {
+      throw new Error(result.message || "Verification failed");
     }
 
-    const data = await response.json();
-
-    if (!data || !data.success) {
-      throw new Error(data.message || "No customer data found");
-    }
-
-    // Handle both direct data and nested data structure
-    const customerData = data.data || data;
-    if (!customerData) {
-      throw new Error("No customer data in response");
-    }
-
-    setCustomerData(customerData);
+    // Set the data
+    setCustomerData(result.data);
     setShowInfoModal(true);
+
   } catch (err) {
     setError(err.message || "Failed to verify DSSN. Please try again.");
     console.error("Search error:", err);
