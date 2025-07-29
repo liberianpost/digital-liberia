@@ -65,14 +65,14 @@ export default function Dssn() {
     return () => clearInterval(logoInterval);
   }, []);
 
-const handleSearch = async (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     const cleanedDssn = dssn.trim().toUpperCase();
 
     // Strict DSSN validation
     if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
-        setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
-        return;
+      setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
+      return;
     }
 
     setIsSearching(true);
@@ -80,59 +80,81 @@ const handleSearch = async (e) => {
     setCustomerData(null);
 
     try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-        const response = await fetch(`/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}&_=${Date.now()}`, {
-            signal: controller.signal,
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'include'
-        });
-
-        clearTimeout(timeoutId);
-
-        // First verify content type
-        const contentType = response.headers.get('content-type') || '';
-        if (!contentType.includes('application/json')) {
-            const text = await response.text();
-            console.error('Non-JSON response:', text.slice(0, 200));
-            throw new Error('Server returned invalid content type');
+      // Updated endpoint to match new backend
+      const response = await fetch(`https://digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         }
+      });
 
-        // Then check status
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            throw new Error(error.message || `Request failed with status ${response.status}`);
-        }
+      clearTimeout(timeoutId);
 
-        const result = await response.json();
+      // First verify content type
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response:', text.slice(0, 200));
+        throw new Error('Server returned invalid content type');
+      }
 
-        // Validate response structure
-        if (!result || typeof result !== 'object' || !result.success || !result.data) {
-            throw new Error(result.message || 'Invalid server response');
-        }
+      // Then check status
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || `Request failed with status ${response.status}`);
+      }
 
-        // Success case
-        setCustomerData(result.data);
-        setShowInfoModal(true);
+      const result = await response.json();
+
+      // Validate response structure against new backend format
+      if (!result || typeof result !== 'object' || result.success === undefined || !result.data) {
+        throw new Error(result.message || 'Invalid server response');
+      }
+
+      // Success case - map to expected frontend format
+      setCustomerData({
+        "Full Name": result.data.fullName,
+        "Place of Birth": result.data.placeOfBirth,
+        "Date of Birth": result.data.dateOfBirth,
+        "Sex": result.data.sex,
+        "Nationality": result.data.nationality,
+        "Address": result.data.address,
+        "Postal Address": result.data.postalAddress,
+        "Phone Number": result.data.phoneNumber,
+        "Email": result.data.email,
+        "Employment Status": result.data.employmentStatus,
+        "Marital Status": result.data.maritalStatus,
+        "Number of Children": result.data.numberOfChildren,
+        "Passport Number": result.data.passportNumber,
+        "Birth Certificate": result.data.birthCertificate,
+        "Driver's License": result.data.driverLicense,
+        "Image": result.data.images?.profile,
+        "Passport Image": result.data.images?.passport,
+        "Birth Certificate Image": result.data.images?.birthCertificate,
+        "Drivers License Image": result.data.images?.driverLicense,
+        "National Id Image": result.data.images?.nationalId
+      });
+
+      setShowInfoModal(true);
 
     } catch (err) {
-        setError(err.name === 'AbortError' 
-            ? 'Request timed out'
-            : err.message || 'Verification failed. Please try again.'
-        );
-        console.error("Search Error:", {
-            name: err.name,
-            message: err.message,
-            stack: err.stack
-        });
+      setError(err.name === 'AbortError' 
+        ? 'Request timed out'
+        : err.message || 'Verification failed. Please try again.'
+      );
+      console.error("Search Error:", {
+        name: err.name,
+        message: err.message,
+        stack: err.stack
+      });
     } finally {
-        setIsSearching(false);
+      setIsSearching(false);
     }
-};
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -385,21 +407,52 @@ const handleSearch = async (e) => {
                 })}
               </div>
 
-              {['Image', 'Passport Image', 'Birth Certificate Image', 'Drivers License Image'].map((imageKey) => {
-                if (customerData[imageKey]) {
-                  return (
-                    <div key={imageKey} className="documents-section mb-6">
-                      <div className="document-category">
-                        <h4 className="text-lg font-semibold mb-2">{imageKey.replace(' Image', '')}</h4>
-                        <div className="document-thumbnails flex">
-                          {renderImage(customerData[imageKey], imageKey.replace(' Image', ''))}
-                        </div>
-                      </div>
+              <div className="documents-section mb-6">
+                {customerData["Image"] && (
+                  <div className="document-category mb-4">
+                    <h4 className="text-lg font-semibold mb-2">Profile Photo</h4>
+                    <div className="document-thumbnails flex">
+                      {renderImage(customerData["Image"], "Profile Photo")}
                     </div>
-                  );
-                }
-                return null;
-              })}
+                  </div>
+                )}
+
+                {customerData["Passport Image"] && (
+                  <div className="document-category mb-4">
+                    <h4 className="text-lg font-semibold mb-2">Passport</h4>
+                    <div className="document-thumbnails flex">
+                      {renderImage(customerData["Passport Image"], "Passport")}
+                    </div>
+                  </div>
+                )}
+
+                {customerData["Birth Certificate Image"] && (
+                  <div className="document-category mb-4">
+                    <h4 className="text-lg font-semibold mb-2">Birth Certificate</h4>
+                    <div className="document-thumbnails flex">
+                      {renderImage(customerData["Birth Certificate Image"], "Birth Certificate")}
+                    </div>
+                  </div>
+                )}
+
+                {customerData["Drivers License Image"] && (
+                  <div className="document-category mb-4">
+                    <h4 className="text-lg font-semibold mb-2">Driver's License</h4>
+                    <div className="document-thumbnails flex">
+                      {renderImage(customerData["Drivers License Image"], "Driver's License")}
+                    </div>
+                  </div>
+                )}
+
+                {customerData["National Id Image"] && (
+                  <div className="document-category mb-4">
+                    <h4 className="text-lg font-semibold mb-2">National ID</h4>
+                    <div className="document-thumbnails flex">
+                      {renderImage(customerData["National Id Image"], "National ID")}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
