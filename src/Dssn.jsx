@@ -84,7 +84,7 @@ export default function Dssn() {
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       // Updated endpoint to match new backend
-      const response = await fetch(`https://digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
+      const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
         signal: controller.signal,
         headers: {
           'Accept': 'application/json',
