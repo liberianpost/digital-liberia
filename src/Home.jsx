@@ -23,6 +23,8 @@ const sections = [
   {
     id: "intro",
     title: "Welcome to Digital Liberia",
+    bgColor: "bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-600/10",
+    borderColor: "border-blue-400/30",
     content: (
       <>
         <p className="text-white">
@@ -46,6 +48,8 @@ const sections = [
   {
     id: "ecosystem",
     title: "Ecosystem Components",
+    bgColor: "bg-gradient-to-br from-green-500/10 via-teal-500/10 to-emerald-600/10",
+    borderColor: "border-green-400/30",
     content: (
       <div className="space-y-12 text-white text-left">
         <article>
@@ -86,6 +90,8 @@ const sections = [
   {
     id: "vision",
     title: "Vision & Mission",
+    bgColor: "bg-gradient-to-br from-purple-500/10 via-indigo-500/10 to-blue-600/10",
+    borderColor: "border-purple-400/30",
     content: (
       <>
         <p className="mb-4 italic text-white text-lg">
@@ -100,6 +106,8 @@ const sections = [
   {
     id: "problem",
     title: "Problem Statement & Solution",
+    bgColor: "bg-gradient-to-br from-rose-500/10 via-red-500/10 to-orange-600/10",
+    borderColor: "border-rose-400/30",
     content: (
       <div className="space-y-6">
         <div>
@@ -209,7 +217,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Layer 4: Content Sections with Semi-Black Background */}
+      {/* Layer 4: Content Sections with Glass-like Backgrounds */}
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
         {sections.map((section, index) => (
           <section
@@ -220,15 +228,18 @@ export default function Home() {
               opacity: 0
             }}
           >
-            <div className="bg-blue-950/80 backdrop-blur-md rounded-xl border border-blue-700/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-              {/* Mirror Reflection Effect */}
-              <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-blue-700/20 to-transparent"></div>
+            <div className={`${section.bgColor} backdrop-blur-lg rounded-xl border ${section.borderColor} p-6 md:p-8 shadow-lg relative overflow-hidden`}>
+              {/* Glass reflection effect */}
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
               
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-blue-700/30 pb-2">
-                {section.title}
-              </h2>
-              <div className="text-white relative">
-                {section.content}
+              {/* Content container */}
+              <div className="relative">
+                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                  {section.title}
+                </h2>
+                <div className="text-white">
+                  {section.content}
+                </div>
               </div>
             </div>
           </section>
