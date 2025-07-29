@@ -109,10 +109,11 @@ export default function System() {
   const location = useLocation();
   const [activeLogo, setActiveLogo] = React.useState(0);
 
+  // Faster logo heartbeat (600ms instead of 1000ms)
   React.useEffect(() => {
     const interval = setInterval(() => {
       setActiveLogo(prev => (prev + 1) % logos.length);
-    }, 1000);
+    }, 600); // Changed from 1000ms to 600ms
     return () => clearInterval(interval);
   }, []);
 
@@ -178,15 +179,20 @@ export default function System() {
             </nav>
           </div>
 
-          {/* Logo Bar */}
+          {/* Logo Bar - Updated with white backgrounds and heartbeat animation */}
           <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
             <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
               {logos.map((logo, index) => (
                 <div 
                   key={index}
-                  className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-500 ${
-                    index === activeLogo ? "scale-110 bg-black/30" : "scale-100 bg-black/10"
+                  className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
+                    index === activeLogo 
+                      ? "scale-110 bg-white shadow-lg" // White background for active logo
+                      : "scale-100 bg-white/90" // White background for inactive logos
                   }`}
+                  style={{
+                    animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none'
+                  }}
                 >
                   <img
                     src={logo}
@@ -351,7 +357,7 @@ export default function System() {
         </div>
       </footer>
 
-      {/* Global Styles */}
+      {/* Global Styles - Updated with heartbeat animation */}
       <style jsx global>{`
         @keyframes fadeInUp {
           from {
@@ -363,6 +369,15 @@ export default function System() {
             transform: translateY(0);
           }
         }
+        
+        @keyframes heartbeat {
+          0% { transform: scale(1); }
+          25% { transform: scale(1.1); }
+          50% { transform: scale(1); }
+          75% { transform: scale(1.1); }
+          100% { transform: scale(1); }
+        }
+        
         /* Hide scrollbar for containers */
         .overflow-x-auto {
           -ms-overflow-style: none;
