@@ -8,29 +8,65 @@
     ],
     "headers": [
       {
-        "source": "**/*.@(js|css)",
+        "source": "**/*.@(js|css|jpg|jpeg|png|gif|ico|svg|woff2|woff|ttf|eot)",
         "headers": [
           {
             "key": "Cache-Control",
             "value": "public, max-age=31536000, immutable"
+          },
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
           }
         ]
       },
       {
-        "source": "**",
+        "source": "/**",
         "headers": [
           {
+            "key": "Access-Control-Allow-Origin",
+            "value": "https://digital-liberia.web.app"
+          },
+          {
+            "key": "Access-Control-Allow-Methods",
+            "value": "GET, POST, PUT, DELETE, OPTIONS"
+          },
+          {
+            "key": "Access-Control-Allow-Headers",
+            "value": "Content-Type, Authorization, X-Requested-With"
+          },
+          {
+            "key": "Access-Control-Allow-Credentials",
+            "value": "true"
+          },
+          {
             "key": "Cache-Control",
-            "value": "no-cache"
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
           }
         ]
       }
     ],
     "rewrites": [
       {
+        "source": "/api/**",
+        "destination": "https://api.digitalliberia.com/api/**",
+        "type": "proxy",
+        "headers": {
+          "X-Forwarded-Host": "digital-liberia.web.app",
+          "X-Forwarded-Proto": "https"
+        }
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
-    ]
+    ],
+    "frameworksBackend": {
+      "region": "us-central1"
+    }
   }
 }
