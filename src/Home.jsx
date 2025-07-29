@@ -34,12 +34,12 @@ const sections = [
           By unifying services into a single mobile platform, Digital Liberia serves citizens, businesses, and institutions with tools to interact securely, efficiently, and transparently—laying the foundation for a digitally empowered economy.
         </p>
         <div className="mt-6">
-          <div className="inline-flex items-center bg-blue-900/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-blue-400/30">
-            <Link to="/digital-liberia" className="text-blue-300 hover:text-blue-400 transition-colors">
+          <div className="inline-flex items-center bg-yellow-500/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-yellow-400/30 hover:bg-yellow-500/50 transition-colors">
+            <Link to="/digital-liberia" className="text-yellow-100 hover:text-white transition-colors">
               To know more about 
               <span className="font-semibold ml-1">Digital Liberia</span>
             </Link>
-            <span className="ml-2">→</span>
+            <span className="ml-2 text-yellow-100">→</span>
           </div>
         </div>
       </>
@@ -61,12 +61,12 @@ const sections = [
             <li>Provide real-time data and analytics dashboards</li>
           </ul>
           <div className="mt-4">
-            <div className="inline-flex items-center bg-blue-900/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-blue-400/30">
-              <Link to="/system" className="text-blue-300 hover:text-blue-400 transition-colors">
+            <div className="inline-flex items-center bg-yellow-500/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-yellow-400/30 hover:bg-yellow-500/50 transition-colors">
+              <Link to="/system" className="text-yellow-100 hover:text-white transition-colors">
                 Learn more about the 
                 <span className="font-semibold ml-1">NDMS system</span>
               </Link>
-              <span className="ml-2">→</span>
+              <span className="ml-2 text-yellow-100">→</span>
             </div>
           </div>
         </article>
@@ -75,12 +75,12 @@ const sections = [
           <h3 className="text-2xl font-semibold mb-2">2. LibPay</h3>
           <p>A payment gateway solution that is fast, reliable, efficient and secure for all financial transactions in Liberia.</p>
           <div className="mt-2">
-            <div className="inline-flex items-center bg-blue-900/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-blue-400/30">
-              <Link to="/libpay" className="text-blue-300 hover:text-blue-400 transition-colors">
+            <div className="inline-flex items-center bg-yellow-500/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-yellow-400/30 hover:bg-yellow-500/50 transition-colors">
+              <Link to="/libpay" className="text-yellow-100 hover:text-white transition-colors">
                 Discover more about 
                 <span className="font-semibold ml-1">LibPay</span>
               </Link>
-              <span className="ml-2">→</span>
+              <span className="ml-2 text-yellow-100">→</span>
             </div>
           </div>
         </article>
