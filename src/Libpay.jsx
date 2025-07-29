@@ -19,27 +19,6 @@ const logos = [
   "/logos/liberia.png"
 ];
 
-// Xcode-style syntax highlighting components
-const Keyword = ({ children }) => (
-  <span className="text-purple-400 font-mono bg-black/70 px-1 rounded">{children}</span>
-);
-
-const Type = ({ children }) => (
-  <span className="text-teal-300 font-mono bg-black/70 px-1 rounded">{children}</span>
-);
-
-const String = ({ children }) => (
-  <span className="text-green-400 font-mono bg-black/70 px-1 rounded">"{children}"</span>
-);
-
-const Numeric = ({ children }) => (
-  <span className="text-amber-400 font-mono bg-black/70 px-1 rounded">{children}</span>
-);
-
-const Comment = ({ children }) => (
-  <span className="text-gray-400 italic font-mono bg-black/70 px-1 rounded">// {children}</span>
-);
-
 const sections = [
   {
     id: "overview",
@@ -49,17 +28,17 @@ const sections = [
     content: (
       <>
         <p className="text-white mb-4">
-          <Keyword>LibPay</Keyword> is a <Type>multi-rail</Type> payment gateway and wallet powering the <String>Digital Liberia Super App</String> and third‑party merchants. It enables <Type>fast</Type>, <Type>reliable</Type>, <Type>efficient</Type>, and <Type>secure</Type> payments across:
+          LibPay is a multi-rail payment gateway and wallet powering the Digital Liberia Super App and third‑party merchants. It enables fast, reliable, efficient, and secure payments across:
         </p>
         <ul className="list-disc pl-6 space-y-2 text-white">
-          <li><Keyword>P2P</Keyword>: <Type>Person‑to‑Person</Type> transfers</li>
-          <li><Keyword>B2C</Keyword>: <Type>Business‑to‑Consumer</Type> payouts <Comment>e.g., disbursements, refunds, salaries</Comment></li>
-          <li><Keyword>B2B</Keyword>: <Type>Business‑to‑Business</Type> payments <Comment>e.g., supplier settlements</Comment></li>
-          <li><Type>In‑person</Type> payments via <Keyword>LibPay POS</Keyword> <Comment>USD & LRD, as low as 1 USD and 1 LRD</Comment></li>
+          <li>P2P: Person‑to‑Person transfers</li>
+          <li>B2C: Business‑to‑Consumer payouts (e.g., disbursements, refunds, salaries)</li>
+          <li>B2B: Business‑to‑Business payments (e.g., supplier settlements)</li>
+          <li>In‑person payments via LibPay POS (USD & LRD, as low as 1 USD and 1 LRD)</li>
         </ul>
         <div className="mt-6 bg-black/50 p-4 rounded-lg border border-cyan-400/30">
-          <p className="text-cyan-100 font-mono">
-            <Comment>Core value:</Comment> one <Keyword>integration</Keyword> for <Type>wallet</Type>, <Type>card</Type>, <Type>bank/mobile money</Type>, <Type>QR/NFC</Type>, and <Type>in‑person acceptance</Type>—plus unified <Keyword>reporting</Keyword>, <Keyword>settlement</Keyword>, and <Keyword>risk controls</Keyword>.
+          <p className="text-white">
+            Core value: one integration for wallet, card, bank/mobile money, QR/NFC, and in‑person acceptance—plus unified reporting, settlement, and risk controls.
           </p>
         </div>
       </>
@@ -73,31 +52,31 @@ const sections = [
     content: (
       <div className="space-y-8">
         <div>
-          <h3 className="text-xl font-semibold mb-2 text-white"><Keyword>LibPay Wallet</Keyword></h3>
+          <h3 className="text-xl font-semibold mb-2 text-white">LibPay Wallet</h3>
           <ul className="list-disc pl-6 space-y-2 text-white">
-            <li><Type>Balances</Type>: USD and LRD sub‑wallets per user/business</li>
-            <li><Type>Funding methods</Type>: card top‑ups, bank transfers, mobile money, cash-in at agents, B2C payouts</li>
-            <li><Type>Transfers</Type>: instant internal ledger moves; low fees; strong identity checks</li>
-            <li><Type>Controls</Type>: limits, velocity rules, geofencing, 2FA</li>
+            <li>Balances: USD and LRD sub‑wallets per user/business</li>
+            <li>Funding methods: card top‑ups, bank transfers, mobile money, cash-in at agents, B2C payouts</li>
+            <li>Transfers: instant internal ledger moves; low fees; strong identity checks</li>
+            <li>Controls: limits, velocity rules, geofencing, 2FA</li>
           </ul>
         </div>
 
         <div>
-          <h3 className="text-xl font-semibold mb-2 text-white"><Keyword>Payment Gateway</Keyword> <Comment>(Online)</Comment></h3>
+          <h3 className="text-xl font-semibold mb-2 text-white">Payment Gateway (Online)</h3>
           <ul className="list-disc pl-6 space-y-2 text-white">
-            <li><Type>Checkout</Type>: hosted page or SDK <Comment>(web/iOS/Android)</Comment> for cards, wallet, QR, mobile money</li>
-            <li><Type>APIs</Type>: charges, refunds, payouts, mandates, webhooks</li>
-            <li><Type>FX handling</Type>: auto-choose payer currency <Comment>(USD/LRD)</Comment>; optional DCC; regulated rate source</li>
+            <li>Checkout: hosted page or SDK (web/iOS/Android) for cards, wallet, QR, mobile money</li>
+            <li>APIs: charges, refunds, payouts, mandates, webhooks</li>
+            <li>FX handling: auto-choose payer currency (USD/LRD); optional DCC; regulated rate source</li>
           </ul>
         </div>
 
         <div>
-          <h3 className="text-xl font-semibold mb-2 text-white"><Keyword>LibPay POS</Keyword> <Comment>(In‑Person)</Comment></h3>
+          <h3 className="text-xl font-semibold mb-2 text-white">LibPay POS (In‑Person)</h3>
           <ul className="list-disc pl-6 space-y-2 text-white">
-            <li><Type>Acceptance</Type>: contactless, chip+PIN, QR, LibPay Wallet tap/scan</li>
-            <li><Type>Currencies</Type>: USD & LRD with min transaction <Numeric>1</Numeric> USD / <Numeric>1</Numeric> LRD</li>
-            <li><Type>Connectivity</Type>: Wi‑Fi/4G; offline queue with risk caps; store-&-forward with encrypted vault</li>
-            <li><Type>Security</Type>: PCI PTS‑grade device; PAN never leaves secure element; remote key loading</li>
+            <li>Acceptance: contactless, chip+PIN, QR, LibPay Wallet tap/scan</li>
+            <li>Currencies: USD & LRD with min transaction 1 USD / 1 LRD</li>
+            <li>Connectivity: Wi‑Fi/4G; offline queue with risk caps; store-&-forward with encrypted vault</li>
+            <li>Security: PCI PTS‑grade device; PAN never leaves secure element; remote key loading</li>
           </ul>
         </div>
       </div>
@@ -111,31 +90,31 @@ const sections = [
     content: (
       <div className="space-y-8">
         <div className="bg-black/50 p-4 rounded-lg border border-amber-400/30">
-          <h3 className="text-lg font-semibold mb-2 text-amber-200"><Keyword>P2P</Keyword> <Comment>(Person‑to‑Person)</Comment></h3>
+          <h3 className="text-lg font-semibold mb-2 text-white">P2P (Person‑to‑Person)</h3>
           <ul className="list-disc pl-6 space-y-2 text-white">
-            <li><Type>Use cases</Type>: send to friends/family, split bills, remittances</li>
-            <li><Type>Flow</Type>: Sender → Recipient <Comment>(phone/email/username/QR)</Comment></li>
-            <li><Type>Amount</Type>: ≥ <Numeric>1</Numeric> USD/LRD</li>
-            <li><Type>Settlement</Type>: T+0 internal ledger</li>
+            <li>Use cases: send to friends/family, split bills, remittances</li>
+            <li>Flow: Sender → Recipient (phone/email/username/QR)</li>
+            <li>Amount: ≥ 1 USD/LRD</li>
+            <li>Settlement: T+0 internal ledger</li>
           </ul>
         </div>
 
         <div className="bg-black/50 p-4 rounded-lg border border-amber-400/30">
-          <h3 className="text-lg font-semibold mb-2 text-amber-200"><Keyword>B2C</Keyword> <Comment>(Business‑to‑Consumer)</Comment></h3>
+          <h3 className="text-lg font-semibold mb-2 text-white">B2C (Business‑to‑Consumer)</h3>
           <ul className="list-disc pl-6 space-y-2 text-white">
-            <li><Type>Use cases</Type>: salary disbursements, refunds, cashback</li>
-            <li><Type>Flow</Type>: Batch CSV/API → Consumer wallets</li>
-            <li><Type>Amount</Type>: ≥ <Numeric>1</Numeric> USD/LRD</li>
-            <li><Type>Compliance</Type>: KYC checks, AML rules</li>
+            <li>Use cases: salary disbursements, refunds, cashback</li>
+            <li>Flow: Batch CSV/API → Consumer wallets</li>
+            <li>Amount: ≥ 1 USD/LRD</li>
+            <li>Compliance: KYC checks, AML rules</li>
           </ul>
         </div>
 
         <div className="bg-black/50 p-4 rounded-lg border border-amber-400/30">
-          <h3 className="text-lg font-semibold mb-2 text-amber-200"><Keyword>B2B</Keyword> <Comment>(Business‑to‑Business)</Comment></h3>
+          <h3 className="text-lg font-semibold mb-2 text-white">B2B (Business‑to‑Business)</h3>
           <ul className="list-disc pl-6 space-y-2 text-white">
-            <li><Type>Use cases</Type>: supplier payments, marketplace settlements</li>
-            <li><Type>Flow</Type>: Invoice → Risk checks → T+0/T+2 settlement</li>
-            <li><Type>Advanced</Type>: Escrow, split settlements, FX netting</li>
+            <li>Use cases: supplier payments, marketplace settlements</li>
+            <li>Flow: Invoice → Risk checks → T+0/T+2 settlement</li>
+            <li>Advanced: Escrow, split settlements, FX netting</li>
           </ul>
         </div>
       </div>
@@ -149,22 +128,22 @@ const sections = [
     content: (
       <div className="space-y-6">
         <div className="bg-black/50 p-4 rounded-lg border border-emerald-400/30">
-          <h3 className="text-lg font-semibold mb-2 text-emerald-200"><Keyword>Security Posture</Keyword></h3>
+          <h3 className="text-lg font-semibold mb-2 text-white">Security Posture</h3>
           <ul className="list-disc pl-6 space-y-2 text-white">
-            <li><Type>End‑to‑end encryption</Type> <Comment>(TLS 1.2+)</Comment></li>
-            <li><Type>HSM‑backed keys</Type> and <Type>tokenization</Type></li>
-            <li><Type>PCI DSS</Type> compliant gateway & storage</li>
-            <li><Type>PCI PTS</Type> certified POS hardware</li>
+            <li>End‑to‑end encryption (TLS 1.2+)</li>
+            <li>HSM‑backed keys and tokenization</li>
+            <li>PCI DSS compliant gateway & storage</li>
+            <li>PCI PTS certified POS hardware</li>
           </ul>
         </div>
 
         <div className="bg-black/50 p-4 rounded-lg border border-emerald-400/30">
-          <h3 className="text-lg font-semibold mb-2 text-emerald-200"><Keyword>Compliance Framework</Keyword></h3>
+          <h3 className="text-lg font-semibold mb-2 text-white">Compliance Framework</h3>
           <ul className="list-disc pl-6 space-y-2 text-white">
-            <li><Type>KYC/KYB</Type>: NIN/passport, business registration</li>
-            <li><Type>AML/CFT</Type>: sanctions screening, PEP checks</li>
-            <li><Type>Fraud prevention</Type>: device fingerprinting, behavior scoring</li>
-            <li><Type>Data protection</Type>: PII minimization, audit logging</li>
+            <li>KYC/KYB: NIN/passport, business registration</li>
+            <li>AML/CFT: sanctions screening, PEP checks</li>
+            <li>Fraud prevention: device fingerprinting, behavior scoring</li>
+            <li>Data protection: PII minimization, audit logging</li>
           </ul>
         </div>
       </div>
