@@ -65,14 +65,14 @@ export default function Dssn() {
     return () => clearInterval(logoInterval);
   }, []);
 
-  const handleSearch = async (e) => {
+const handleSearch = async (e) => {
     e.preventDefault();
     const cleanedDssn = dssn.trim().toUpperCase();
 
     // Strict DSSN validation
     if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
-      setError("Invalid DSSN! Must be exactly 15 alphanumeric characters.");
-      return;
+        setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
+        return;
     }
 
     setIsSearching(true);
@@ -80,61 +80,59 @@ export default function Dssn() {
     setCustomerData(null);
 
     try {
-      // Add cache-busting parameter
-      const url = `/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}&t=${Date.now()}`;
-      const response = await fetch(url, {
-        headers: {
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        credentials: 'same-origin'
-      });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-      // First check if we got HTML instead of JSON
-      const contentType = response.headers.get('content-type') || '';
-      if (contentType.includes('text/html')) {
-        const text = await response.text();
-        console.error('Received HTML instead of JSON:', text.slice(0, 200));
-        throw new Error('Server configuration error - contact support');
-      }
+        const response = await fetch(`/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}&_=${Date.now()}`, {
+            signal: controller.signal,
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'include'
+        });
 
-      // Then check status
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Server error: ${response.status}`);
-      }
+        clearTimeout(timeoutId);
 
-      // Parse JSON
-      const result = await response.json();
+        // First verify content type
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('Non-JSON response:', text.slice(0, 200));
+            throw new Error('Server returned invalid content type');
+        }
 
-      // Validate response structure
-      if (!result || typeof result !== 'object') {
-        throw new Error('Invalid server response');
-      }
+        // Then check status
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.message || `Request failed with status ${response.status}`);
+        }
 
-      if (!result.success) {
-        throw new Error(result.message || 'Verification failed');
-      }
+        const result = await response.json();
 
-      if (!result.data) {
-        throw new Error('No customer data available');
-      }
+        // Validate response structure
+        if (!result || typeof result !== 'object' || !result.success || !result.data) {
+            throw new Error(result.message || 'Invalid server response');
+        }
 
-      // Success case
-      setCustomerData(result.data);
-      setShowInfoModal(true);
+        // Success case
+        setCustomerData(result.data);
+        setShowInfoModal(true);
 
     } catch (err) {
-      setError(err.message || "DSSN verification failed. Please try again.");
-      console.error("Search Error:", {
-        error: err,
-        message: err.message,
-        stack: err.stack
-      });
+        setError(err.name === 'AbortError' 
+            ? 'Request timed out'
+            : err.message || 'Verification failed. Please try again.'
+        );
+        console.error("Search Error:", {
+            name: err.name,
+            message: err.message,
+            stack: err.stack
+        });
     } finally {
-      setIsSearching(false);
+        setIsSearching(false);
     }
-  };
+};
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
