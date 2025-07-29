@@ -67,11 +67,11 @@ export default function Dssn() {
 
 const handleSearch = async (e) => {
   e.preventDefault();
-  const cleanedDssn = dssn.trim();
+  const cleanedDssn = dssn.trim().toUpperCase();
 
-  // Validate DSSN format
+  // Strict DSSN validation
   if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
-    setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
+    setError("Invalid DSSN! Must be exactly 15 alphanumeric characters.");
     return;
   }
 
@@ -80,29 +80,61 @@ const handleSearch = async (e) => {
   setCustomerData(null);
 
   try {
-    const response = await fetch(`/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}`);
-    
-    // Check if response is OK (status 200-299)
+    const response = await fetch(`/api/dssn-proxy?dssn=${encodeURIComponent(cleanedDssn)}`, {
+      headers: {
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
+
+    // First check response status
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(errorText || `Server error: ${response.status}`);
+      try {
+        // Try to parse as JSON if possible
+        const errorJson = JSON.parse(errorText);
+        throw new Error(errorJson.message || `Server error: ${response.status}`);
+      } catch {
+        // Fallback to text error
+        throw new Error(errorText || `Request failed with status ${response.status}`);
+      }
     }
 
-    // Parse JSON
+    // Verify content type
+    const contentType = response.headers.get('content-type');
+    if (!contentType?.includes('application/json')) {
+      const textData = await response.text();
+      console.error('Non-JSON response:', textData);
+      throw new Error('Server returned invalid response format');
+    }
+
+    // Parse JSON safely
     const result = await response.json();
 
-    // Check if successful
-    if (!result.success) {
-      throw new Error(result.message || "Verification failed");
+    // Validate response structure
+    if (!result || typeof result !== 'object') {
+      throw new Error('Invalid server response');
     }
 
-    // Set the data
+    if (!result.success) {
+      throw new Error(result.message || 'Verification failed');
+    }
+
+    if (!result.data) {
+      throw new Error('No customer data available');
+    }
+
+    // Success case
     setCustomerData(result.data);
     setShowInfoModal(true);
 
   } catch (err) {
-    setError(err.message || "Failed to verify DSSN. Please try again.");
-    console.error("Search error:", err);
+    setError(err.message || "DSSN verification failed. Please try again.");
+    console.error("Search Error Details:", {
+      error: err,
+      message: err.message,
+      stack: err.stack
+    });
   } finally {
     setIsSearching(false);
   }
