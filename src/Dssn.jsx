@@ -65,80 +65,77 @@ export default function Dssn() {
     return () => clearInterval(logoInterval);
   }, []);
 
- const handleSearch = async (e) => {
-  e.preventDefault();
-  const cleanedDssn = dssn.trim().toUpperCase();
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    const cleanedDssn = dssn.trim().toUpperCase();
 
-  // Validate DSSN format
-  if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
-    setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
-    return;
-  }
+    if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
+      setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
+      return;
+    }
 
-  setIsSearching(true);
-  setError(null);
-  setCustomerData(null);
+    setIsSearching(true);
+    setError(null);
+    setCustomerData(null);
 
-  try {
-    const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+    try {
+      const response = await fetch(
+        `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`,
+        {
+          method: 'GET',
+          credentials: 'include',                    // keep if you rely on cookies
+          headers: { Accept: 'application/json' }    // CHANGED: removed Content-Type to avoid preflight
+        }
+      );
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response:', text);
+        throw new Error('Server is currently unavailable. Please try again later.');
       }
-    });
 
-    // First check if response is JSON
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      const text = await response.text();
-      console.error('Non-JSON response:', text);
-      throw new Error('Server is currently unavailable. Please try again later.');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || `Server error: ${response.status}`);
+      }
+
+      if (!data.success) {
+        throw new Error(data.message || 'Invalid response from server');
+      }
+
+      setCustomerData({
+        "Full Name": data.data.fullName || 'Not available',
+        "Place of Birth": data.data.placeOfBirth || 'Not available',
+        "Date of Birth": data.data.dateOfBirth || 'Not available',
+        "Sex": data.data.sex || 'Not available',
+        "Nationality": data.data.nationality || 'Not available',
+        "Address": data.data.address || 'Not available',
+        "Postal Address": data.data.postalAddress || 'Not available',
+        "Phone Number": data.data.phoneNumber || 'Not available',
+        "Email": data.data.email || 'Not available',
+        "Employment Status": data.data.employmentStatus || 'Not available',
+        "Marital Status": data.data.maritalStatus || 'Not available',
+        "Number of Children": data.data.numberOfChildren || 'Not available',
+        "Passport Number": data.data.passportNumber || 'Not available',
+        "Birth Certificate": data.data.birthCertificate || 'Not available',
+        "Driver's License": data.data.driverLicense || 'Not available',
+        "Image": data.data.images?.profile || null,
+        "Passport Image": data.data.images?.passport || null,
+        "Birth Certificate Image": data.data.images?.birthCertificate || null,
+        "Drivers License Image": data.data.images?.driverLicense || null,
+        "National Id Image": data.data.images?.nationalId || null
+      });
+
+      setShowInfoModal(true);
+    } catch (err) {
+      setError(err.message || 'Failed to verify DSSN. Please try again later.');
+      console.error("Search Error:", err);
+    } finally {
+      setIsSearching(false);
     }
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || `Server error: ${response.status}`);
-    }
-
-    if (!data.success) {
-      throw new Error(data.message || 'Invalid response from server');
-    }
-
-    // Map response data to state
-    setCustomerData({
-      "Full Name": data.data.fullName || 'Not available',
-      "Place of Birth": data.data.placeOfBirth || 'Not available',
-      "Date of Birth": data.data.dateOfBirth || 'Not available',
-      "Sex": data.data.sex || 'Not available',
-      "Nationality": data.data.nationality || 'Not available',
-      "Address": data.data.address || 'Not available',
-      "Postal Address": data.data.postalAddress || 'Not available',
-      "Phone Number": data.data.phoneNumber || 'Not available',
-      "Email": data.data.email || 'Not available',
-      "Employment Status": data.data.employmentStatus || 'Not available',
-      "Marital Status": data.data.maritalStatus || 'Not available',
-      "Number of Children": data.data.numberOfChildren || 'Not available',
-      "Passport Number": data.data.passportNumber || 'Not available',
-      "Birth Certificate": data.data.birthCertificate || 'Not available',
-      "Driver's License": data.data.driverLicense || 'Not available',
-      "Image": data.data.images?.profile || null,
-      "Passport Image": data.data.images?.passport || null,
-      "Birth Certificate Image": data.data.images?.birthCertificate || null,
-      "Drivers License Image": data.data.images?.driverLicense || null,
-      "National Id Image": data.data.images?.nationalId || null
-    });
-
-    setShowInfoModal(true);
-  } catch (err) {
-    setError(err.message || 'Failed to verify DSSN. Please try again later.');
-    console.error("Search Error:", err);
-  } finally {
-    setIsSearching(false);
-  }
-};
+  };
   
   // ... (keep all other existing functions unchanged: formatDate, openDocumentModal, closeDocumentModal, downloadDocument, renderImage, useEffect for event listeners)
 
