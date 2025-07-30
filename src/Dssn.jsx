@@ -65,100 +65,100 @@ export default function Dssn() {
     return () => clearInterval(logoInterval);
   }, []);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    const cleanedDssn = dssn.trim().toUpperCase();
+ const handleSearch = async (e) => {
+  e.preventDefault();
+  const cleanedDssn = dssn.trim().toUpperCase();
 
-    // Strict DSSN validation
-    if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
-      setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
-      return;
+  // Strict DSSN validation
+  if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
+    setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
+    return;
+  }
+
+  setIsSearching(true);
+  setError(null);
+  setCustomerData(null);
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    // Updated fetch request with proper CORS handling
+    const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
+      signal: controller.signal,
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'include', // Changed back to 'include' for credentials
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Origin': window.location.origin // Explicitly set origin header
+      }
+    });
+
+    clearTimeout(timeoutId);
+
+    // First verify content type
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('Non-JSON response:', text.slice(0, 200));
+      throw new Error('Server returned invalid content type');
     }
 
-    setIsSearching(true);
-    setError(null);
-    setCustomerData(null);
-
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-      // Modified fetch request to handle CORS properly
-      const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
-        signal: controller.signal,
-        method: 'GET',
-        mode: 'cors',
-        credentials: 'same-origin', // Changed from 'include' to 'same-origin'
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        }
-      });
-
-      clearTimeout(timeoutId);
-
-      // First verify content type
-      const contentType = response.headers.get('content-type') || '';
-      if (!contentType.includes('application/json')) {
-        const text = await response.text();
-        console.error('Non-JSON response:', text.slice(0, 200));
-        throw new Error('Server returned invalid content type');
-      }
-
-      // Then check status
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || `Request failed with status ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      // Validate response structure
-      if (!result || typeof result !== 'object' || result.success === undefined || !result.data) {
-        throw new Error(result.message || 'Invalid server response');
-      }
-
-      // Success case - map to expected frontend format
-      setCustomerData({
-        "Full Name": result.data.fullName,
-        "Place of Birth": result.data.placeOfBirth,
-        "Date of Birth": result.data.dateOfBirth,
-        "Sex": result.data.sex,
-        "Nationality": result.data.nationality,
-        "Address": result.data.address,
-        "Postal Address": result.data.postalAddress,
-        "Phone Number": result.data.phoneNumber,
-        "Email": result.data.email,
-        "Employment Status": result.data.employmentStatus,
-        "Marital Status": result.data.maritalStatus,
-        "Number of Children": result.data.numberOfChildren,
-        "Passport Number": result.data.passportNumber,
-        "Birth Certificate": result.data.birthCertificate,
-        "Driver's License": result.data.driverLicense,
-        "Image": result.data.images?.profile,
-        "Passport Image": result.data.images?.passport,
-        "Birth Certificate Image": result.data.images?.birthCertificate,
-        "Drivers License Image": result.data.images?.driverLicense,
-        "National Id Image": result.data.images?.nationalId
-      });
-
-      setShowInfoModal(true);
-
-    } catch (err) {
-      setError(err.name === 'AbortError'
-        ? 'Request timed out'
-        : err.message || 'Verification failed. Please try again.'
-      );
-      console.error("Search Error:", {
-        name: err.name,
-        message: err.message,
-        stack: err.stack
-      });
-    } finally {
-      setIsSearching(false);
+    // Then check status
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.message || `Request failed with status ${response.status}`);
     }
-  };
 
+    const result = await response.json();
+
+    // Validate response structure
+    if (!result || typeof result !== 'object' || result.success === undefined || !result.data) {
+      throw new Error(result.message || 'Invalid server response');
+    }
+
+    // Success case - map to expected frontend format
+    setCustomerData({
+      "Full Name": result.data.fullName,
+      "Place of Birth": result.data.placeOfBirth,
+      "Date of Birth": result.data.dateOfBirth,
+      "Sex": result.data.sex,
+      "Nationality": result.data.nationality,
+      "Address": result.data.address,
+      "Postal Address": result.data.postalAddress,
+      "Phone Number": result.data.phoneNumber,
+      "Email": result.data.email,
+      "Employment Status": result.data.employmentStatus,
+      "Marital Status": result.data.maritalStatus,
+      "Number of Children": result.data.numberOfChildren,
+      "Passport Number": result.data.passportNumber,
+      "Birth Certificate": result.data.birthCertificate,
+      "Driver's License": result.data.driverLicense,
+      "Image": result.data.images?.profile,
+      "Passport Image": result.data.images?.passport,
+      "Birth Certificate Image": result.data.images?.birthCertificate,
+      "Drivers License Image": result.data.images?.driverLicense,
+      "National Id Image": result.data.images?.nationalId
+    });
+
+    setShowInfoModal(true);
+
+  } catch (err) {
+    setError(err.name === 'AbortError'
+      ? 'Request timed out'
+      : err.message || 'Verification failed. Please try again.'
+    );
+    console.error("Search Error:", {
+      name: err.name,
+      message: err.message,
+      stack: err.stack
+    });
+  } finally {
+    setIsSearching(false);
+  }
+};
   // ... (keep all other existing functions unchanged: formatDate, openDocumentModal, closeDocumentModal, downloadDocument, renderImage, useEffect for event listeners)
 
   return (
