@@ -244,6 +244,71 @@ export default function Home() {
             </div>
           </section>
         ))}
+
+        {/* New Contact Us Section with Unique Styling */}
+        <section
+          className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12"
+          style={{
+            animation: `fadeInUp 0.5s ease-out ${sections.length * 0.1}s forwards`,
+            opacity: 0
+          }}
+        >
+          <div className="bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-yellow-600/10 backdrop-blur-lg rounded-xl border border-amber-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            {/* Unique glass reflection effect with diagonal gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/10 backdrop-blur-sm"></div>
+            
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                Contact Us
+              </h2>
+              <div className="text-white space-y-4">
+                <p className="text-lg">
+                  Have questions or need support? Reach out to us through any of these channels:
+                </p>
+                
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <h3 className="text-xl font-semibold mb-2 text-amber-200">Email:</h3>
+                  <ul className="space-y-2">
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      <a href="mailto:info@digitalliberia.com" className="hover:text-amber-300 transition-colors">info@digitalliberia.com</a>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      <a href="mailto:inf@liberianpost.com" className="hover:text-amber-300 transition-colors">inf@liberianpost.com</a>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <h3 className="text-xl font-semibold mb-2 text-amber-200">Phone:</h3>
+                  <ul className="space-y-2">
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      <span>WhatsApp: <a href="https://wa.me/231888001077" className="hover:text-amber-300 transition-colors">+231 888 001 077</a></span>
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      <span>Call: <a href="tel:+231775055817" className="hover:text-amber-300 transition-colors">+231 775 055 817</a></span>
+                    </li>
+                  </ul>
+                </div>
+
+                <p className="text-sm text-white/70 mt-4">
+                  Our team is available to assist you Monday through Friday, 8:00 AM to 5:00 PM GMT.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* Footer with Copyright */}
