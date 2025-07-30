@@ -69,7 +69,6 @@ export default function Dssn() {
   e.preventDefault();
   const cleanedDssn = dssn.trim().toUpperCase();
 
-  // Strict DSSN validation
   if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
     setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
     return;
@@ -80,46 +79,25 @@ export default function Dssn() {
   setCustomerData(null);
 
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    // Updated fetch request with proper CORS handling
     const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
-      signal: controller.signal,
       method: 'GET',
-      mode: 'cors',
-      credentials: 'include', // Changed back to 'include' for credentials
+      credentials: 'include',
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Origin': window.location.origin // Explicitly set origin header
+        'Accept': 'application/json'
       }
     });
 
-    clearTimeout(timeoutId);
-
-    // First verify content type
-    const contentType = response.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
-      const text = await response.text();
-      console.error('Non-JSON response:', text.slice(0, 200));
-      throw new Error('Server returned invalid content type');
-    }
-
-    // Then check status
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || `Request failed with status ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Server responded with status ${response.status}`);
     }
 
     const result = await response.json();
 
-    // Validate response structure
-    if (!result || typeof result !== 'object' || result.success === undefined || !result.data) {
-      throw new Error(result.message || 'Invalid server response');
+    if (!result?.success) {
+      throw new Error(result.message || 'Invalid response format');
     }
 
-    // Success case - map to expected frontend format
     setCustomerData({
       "Full Name": result.data.fullName,
       "Place of Birth": result.data.placeOfBirth,
@@ -144,21 +122,14 @@ export default function Dssn() {
     });
 
     setShowInfoModal(true);
-
   } catch (err) {
-    setError(err.name === 'AbortError'
-      ? 'Request timed out'
-      : err.message || 'Verification failed. Please try again.'
-    );
-    console.error("Search Error:", {
-      name: err.name,
-      message: err.message,
-      stack: err.stack
-    });
+    setError(err.message || 'Failed to verify DSSN. Please try again.');
+    console.error("Search Error:", err);
   } finally {
     setIsSearching(false);
   }
 };
+  
   // ... (keep all other existing functions unchanged: formatDate, openDocumentModal, closeDocumentModal, downloadDocument, renderImage, useEffect for event listeners)
 
   return (
