@@ -83,8 +83,24 @@ export default function Dssn() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
+      // First make an OPTIONS preflight request
+      const preflightResponse = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
+        method: 'OPTIONS',
+        headers: {
+          'Origin': window.location.origin,
+          'Access-Control-Request-Method': 'GET',
+          'Access-Control-Request-Headers': 'Content-Type,Authorization'
+        }
+      });
+
+      if (!preflightResponse.ok) {
+        throw new Error(`Preflight failed with status ${preflightResponse.status}`);
+      }
+
+      // Then make the actual GET request
       const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
         signal: controller.signal,
+        method: 'GET',
         mode: 'cors',
         credentials: 'include',
         headers: {
@@ -255,15 +271,17 @@ export default function Dssn() {
   }, [showInfoModal, showDocumentModal]);
 
   return (
-    <div className="relative min-h-screen w-full bg-black text-white font-inter overflow-x-hidden">
+    <div className="relative min-h-screen w-full bg-yellow-50 text-gray-900 font-inter overflow-x-hidden">
+      {/* Yellow Glass Background */}
+      <div className="fixed inset-0 -z-50 bg-gradient-to-br from-yellow-200 to-yellow-400" />
+      <div className="fixed inset-0 -z-40 bg-white/20 backdrop-blur-[2px] pointer-events-none" />
+      <div className="fixed inset-0 -z-30 bg-[url('/noise.png')] opacity-10 pointer-events-none" />
+
       {/* Background Image Slideshow */}
       <div
-        className="fixed inset-0 -z-50 bg-cover bg-center transition-opacity duration-1000"
-        style={{ backgroundImage: `url(${backgroundImages[bgIndex]})`, opacity: 0.7 }}
+        className="fixed inset-0 -z-20 bg-cover bg-center transition-opacity duration-1000 mix-blend-overlay"
+        style={{ backgroundImage: `url(${backgroundImages[bgIndex]})`, opacity: 0.3 }}
       />
-
-      {/* Glass Reflection Overlay */}
-      <div className="fixed inset-0 -z-40 bg-gradient-to-br from-blue-900/10 via-purple-900/10 to-transparent backdrop-blur-[1px] pointer-events-none" />
 
       {/* Centered Logo Slideshow */}
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -284,7 +302,7 @@ export default function Dssn() {
 
       {/* Navigation */}
       <header className="fixed top-0 left-0 w-full z-50">
-        <div className="bg-black/60 backdrop-blur-md border-b border-gray-600/30">
+        <div className="bg-yellow-600/60 backdrop-blur-md border-b border-yellow-700/30">
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
             <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
               {navLinks.map(link => (
@@ -294,7 +312,7 @@ export default function Dssn() {
                     className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
                       location.pathname === link.to
                         ? "text-red-500"
-                        : "text-white hover:text-blue-300"
+                        : "text-white hover:text-yellow-200"
                     }`}
                   >
                     {link.label}
@@ -304,7 +322,7 @@ export default function Dssn() {
             </nav>
           </div>
 
-          <div className="w-full bg-gradient-to-b from-black to-transparent overflow-x-auto">
+          <div className="w-full bg-gradient-to-b from-yellow-700/50 to-transparent overflow-x-auto">
             <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
               {logos.map((logo, index) => (
                 <div
@@ -334,25 +352,25 @@ export default function Dssn() {
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
           {/* Glass Reflection Container */}
-          <div className="relative bg-black/40 backdrop-blur-lg rounded-xl border border-gray-600/30 shadow-2xl overflow-hidden">
+          <div className="relative bg-yellow-100/80 backdrop-blur-lg rounded-xl border border-yellow-300/50 shadow-2xl overflow-hidden">
             {/* Glass reflection effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-transparent pointer-events-none" />
-            <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-radial from-blue-400/20 via-transparent to-transparent opacity-30 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/20 via-yellow-200/10 to-transparent pointer-events-none" />
+            <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-radial from-yellow-400/20 via-transparent to-transparent opacity-30 pointer-events-none" />
             
             {/* Content */}
             <div className="relative p-6 md:p-8">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-yellow-900 border-b border-yellow-300/50 pb-2">
                 DSSN Verification
               </h2>
-              <div className="text-white relative space-y-6">
-                <p className="text-white/80">
+              <div className="text-yellow-900 relative space-y-6">
+                <p className="text-yellow-800/90">
                   Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information.
                   Enter the 15-digit alphanumeric DSSN in the field below.
                 </p>
 
                 <form onSubmit={handleSearch} className="space-y-4">
                   <div>
-                    <label htmlFor="dssn" className="block text-sm font-medium mb-2">
+                    <label htmlFor="dssn" className="block text-sm font-medium mb-2 text-yellow-800">
                       Enter DSSN to Verify:
                     </label>
                     <input
@@ -360,7 +378,7 @@ export default function Dssn() {
                       id="dssn"
                       value={dssn}
                       onChange={(e) => setDssn(e.target.value)}
-                      className="w-full bg-black/40 border border-gray-600/30 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 backdrop-blur-sm"
+                      className="w-full bg-yellow-50/70 border border-yellow-300/50 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 backdrop-blur-sm text-yellow-900 placeholder-yellow-700/50"
                       placeholder="e.g. LIB123456789ABCD"
                       required
                       pattern="[A-Za-z0-9]{15}"
@@ -373,8 +391,8 @@ export default function Dssn() {
                     disabled={isSearching}
                     className={`flex items-center justify-center px-6 py-3 rounded-lg border transition-all ${
                       isSearching
-                        ? "bg-blue-700/50 border-blue-600/30 cursor-not-allowed"
-                        : "bg-gradient-to-r from-blue-500/80 to-purple-500/80 border-blue-400/30 hover:from-blue-600/80 hover:to-purple-600/80 hover:shadow-lg"
+                        ? "bg-yellow-700/50 border-yellow-600/30 cursor-not-allowed"
+                        : "bg-gradient-to-r from-yellow-500/80 to-yellow-600/80 border-yellow-400/30 hover:from-yellow-600/80 hover:to-yellow-700/80 hover:shadow-lg text-white"
                     }`}
                   >
                     {isSearching ? (
@@ -408,13 +426,13 @@ export default function Dssn() {
       {/* DSSN Info Modal */}
       {showInfoModal && customerData && (
         <div id="dssnInfo" className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="bg-gradient-to-br from-gray-900/90 to-black/90 border border-gray-600/30 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div className="bg-gradient-to-br from-yellow-100/90 to-yellow-200/90 border border-yellow-300/50 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-800 bg-clip-text text-transparent">
                   Search Results for DSSN: {sanitizeHTML(dssn)}
                 </h3>
-                <button onClick={() => setShowInfoModal(false)} className="text-gray-400 hover:text-white transition-colors">
+                <button onClick={() => setShowInfoModal(false)} className="text-yellow-700 hover:text-yellow-900 transition-colors">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -425,9 +443,9 @@ export default function Dssn() {
                 {Object.entries(customerData).map(([key, value]) => {
                   if (typeof value === 'string' && !key.includes('Image')) {
                     return (
-                      <div key={key} className="bg-black/30 p-3 rounded-lg border border-gray-600/30 backdrop-blur-sm">
-                        <strong className="text-blue-300">{key}:</strong> 
-                        <span className="ml-2 text-white/90">{sanitizeHTML(value)}</span>
+                      <div key={key} className="bg-yellow-50/70 p-3 rounded-lg border border-yellow-300/50 backdrop-blur-sm">
+                        <strong className="text-yellow-700">{key}:</strong> 
+                        <span className="ml-2 text-yellow-900/90">{sanitizeHTML(value)}</span>
                       </div>
                     );
                   }
@@ -438,7 +456,7 @@ export default function Dssn() {
               <div className="mb-6">
                 {customerData["Image"] && (
                   <div className="mb-6">
-                    <h4 className="text-lg font-semibold mb-4 text-white/90 border-b border-gray-600/30 pb-2">Profile Photo</h4>
+                    <h4 className="text-lg font-semibold mb-4 text-yellow-800/90 border-b border-yellow-300/50 pb-2">Profile Photo</h4>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {renderImage(customerData["Image"], "Profile Photo")}
                     </div>
@@ -447,7 +465,7 @@ export default function Dssn() {
 
                 {customerData["Passport Image"] && (
                   <div className="mb-6">
-                    <h4 className="text-lg font-semibold mb-4 text-white/90 border-b border-gray-600/30 pb-2">Passport</h4>
+                    <h4 className="text-lg font-semibold mb-4 text-yellow-800/90 border-b border-yellow-300/50 pb-2">Passport</h4>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {renderImage(customerData["Passport Image"], "Passport")}
                     </div>
@@ -456,7 +474,7 @@ export default function Dssn() {
 
                 {customerData["Birth Certificate Image"] && (
                   <div className="mb-6">
-                    <h4 className="text-lg font-semibold mb-4 text-white/90 border-b border-gray-600/30 pb-2">Birth Certificate</h4>
+                    <h4 className="text-lg font-semibold mb-4 text-yellow-800/90 border-b border-yellow-300/50 pb-2">Birth Certificate</h4>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {renderImage(customerData["Birth Certificate Image"], "Birth Certificate")}
                     </div>
@@ -465,7 +483,7 @@ export default function Dssn() {
 
                 {customerData["Drivers License Image"] && (
                   <div className="mb-6">
-                    <h4 className="text-lg font-semibold mb-4 text-white/90 border-b border-gray-600/30 pb-2">Driver's License</h4>
+                    <h4 className="text-lg font-semibold mb-4 text-yellow-800/90 border-b border-yellow-300/50 pb-2">Driver's License</h4>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {renderImage(customerData["Drivers License Image"], "Driver's License")}
                     </div>
@@ -474,7 +492,7 @@ export default function Dssn() {
 
                 {customerData["National Id Image"] && (
                   <div className="mb-6">
-                    <h4 className="text-lg font-semibold mb-4 text-white/90 border-b border-gray-600/30 pb-2">National ID</h4>
+                    <h4 className="text-lg font-semibold mb-4 text-yellow-800/90 border-b border-yellow-300/50 pb-2">National ID</h4>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {renderImage(customerData["National Id Image"], "National ID")}
                     </div>
@@ -506,7 +524,7 @@ export default function Dssn() {
               <div className="flex justify-center space-x-4 p-4 bg-black/50 backdrop-blur-sm">
                 <button
                   onClick={downloadDocument}
-                  className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-600/80 to-purple-600/80 rounded-lg hover:from-blue-700/80 hover:to-purple-700/80 transition-all"
+                  className="flex items-center px-4 py-2 bg-gradient-to-r from-yellow-600/80 to-yellow-700/80 rounded-lg hover:from-yellow-700/80 hover:to-yellow-800/80 transition-all"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -530,8 +548,8 @@ export default function Dssn() {
       )}
 
       {/* Footer */}
-      <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
-        <div className="border-t border-gray-600/30 pt-6">
+      <footer className="relative z-30 py-6 text-center text-yellow-900/60 text-sm">
+        <div className="border-t border-yellow-300/30 pt-6">
           © {new Date().getFullYear()} Digital Liberia. All rights reserved.
         </div>
       </footer>
