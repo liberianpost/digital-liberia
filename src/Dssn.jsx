@@ -80,7 +80,6 @@ export default function Dssn() {
   setCustomerData(null);
 
   try {
-    console.log('Making request for DSSN:', cleanedDssn);
     const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
       method: 'GET',
       credentials: 'include',
@@ -89,18 +88,15 @@ export default function Dssn() {
       }
     });
 
-    console.log('Response status:', response.status);
-    
     // First check if response is JSON
     const contentType = response.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
       const text = await response.text();
       console.error('Non-JSON response:', text);
-      throw new Error('Server returned unexpected response format');
+      throw new Error('Server is currently unavailable. Please try again later.');
     }
 
     const data = await response.json();
-    console.log('Response data:', data);
 
     if (!response.ok) {
       throw new Error(data.message || `Server error: ${response.status}`);
@@ -110,35 +106,34 @@ export default function Dssn() {
       throw new Error(data.message || 'Invalid response from server');
     }
 
-    // Map response data to customer data
-    const mappedData = {
-      "Full Name": data.data.fullName,
-      "Place of Birth": data.data.placeOfBirth,
-      "Date of Birth": data.data.dateOfBirth,
-      "Sex": data.data.sex,
-      "Nationality": data.data.nationality,
-      "Address": data.data.address,
-      "Postal Address": data.data.postalAddress,
-      "Phone Number": data.data.phoneNumber,
-      "Email": data.data.email,
-      "Employment Status": data.data.employmentStatus,
-      "Marital Status": data.data.maritalStatus,
-      "Number of Children": data.data.numberOfChildren,
-      "Passport Number": data.data.passportNumber,
-      "Birth Certificate": data.data.birthCertificate,
-      "Driver's License": data.data.driverLicense,
-      "Image": data.data.images?.profile,
-      "Passport Image": data.data.images?.passport,
-      "Birth Certificate Image": data.data.images?.birthCertificate,
-      "Drivers License Image": data.data.images?.driverLicense,
-      "National Id Image": data.data.images?.nationalId
-    };
+    // Map response data to state
+    setCustomerData({
+      "Full Name": data.data.fullName || 'Not available',
+      "Place of Birth": data.data.placeOfBirth || 'Not available',
+      "Date of Birth": data.data.dateOfBirth || 'Not available',
+      "Sex": data.data.sex || 'Not available',
+      "Nationality": data.data.nationality || 'Not available',
+      "Address": data.data.address || 'Not available',
+      "Postal Address": data.data.postalAddress || 'Not available',
+      "Phone Number": data.data.phoneNumber || 'Not available',
+      "Email": data.data.email || 'Not available',
+      "Employment Status": data.data.employmentStatus || 'Not available',
+      "Marital Status": data.data.maritalStatus || 'Not available',
+      "Number of Children": data.data.numberOfChildren || 'Not available',
+      "Passport Number": data.data.passportNumber || 'Not available',
+      "Birth Certificate": data.data.birthCertificate || 'Not available',
+      "Driver's License": data.data.driverLicense || 'Not available',
+      "Image": data.data.images?.profile || null,
+      "Passport Image": data.data.images?.passport || null,
+      "Birth Certificate Image": data.data.images?.birthCertificate || null,
+      "Drivers License Image": data.data.images?.driverLicense || null,
+      "National Id Image": data.data.images?.nationalId || null
+    });
 
-    setCustomerData(mappedData);
     setShowInfoModal(true);
   } catch (err) {
-    console.error('Search Error:', err);
-    setError(err.message || 'Failed to verify DSSN. Please try again.');
+    setError(err.message || 'Failed to verify DSSN. Please try again later.');
+    console.error("Search Error:", err);
   } finally {
     setIsSearching(false);
   }
