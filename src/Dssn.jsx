@@ -87,38 +87,37 @@ export default function Dssn() {
       }
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Server responded with status ${response.status}`);
+      throw new Error(data.message || `Server responded with status ${response.status}`);
     }
 
-    const result = await response.json();
-
-    if (!result?.success) {
-      throw new Error(result.message || 'Invalid response format');
+    if (!data.success) {
+      throw new Error(data.message || 'Invalid response from server');
     }
 
     setCustomerData({
-      "Full Name": result.data.fullName,
-      "Place of Birth": result.data.placeOfBirth,
-      "Date of Birth": result.data.dateOfBirth,
-      "Sex": result.data.sex,
-      "Nationality": result.data.nationality,
-      "Address": result.data.address,
-      "Postal Address": result.data.postalAddress,
-      "Phone Number": result.data.phoneNumber,
-      "Email": result.data.email,
-      "Employment Status": result.data.employmentStatus,
-      "Marital Status": result.data.maritalStatus,
-      "Number of Children": result.data.numberOfChildren,
-      "Passport Number": result.data.passportNumber,
-      "Birth Certificate": result.data.birthCertificate,
-      "Driver's License": result.data.driverLicense,
-      "Image": result.data.images?.profile,
-      "Passport Image": result.data.images?.passport,
-      "Birth Certificate Image": result.data.images?.birthCertificate,
-      "Drivers License Image": result.data.images?.driverLicense,
-      "National Id Image": result.data.images?.nationalId
+      "Full Name": data.data.fullName,
+      "Place of Birth": data.data.placeOfBirth,
+      "Date of Birth": data.data.dateOfBirth,
+      "Sex": data.data.sex,
+      "Nationality": data.data.nationality,
+      "Address": data.data.address,
+      "Postal Address": data.data.postalAddress,
+      "Phone Number": data.data.phoneNumber,
+      "Email": data.data.email,
+      "Employment Status": data.data.employmentStatus,
+      "Marital Status": data.data.maritalStatus,
+      "Number of Children": data.data.numberOfChildren,
+      "Passport Number": data.data.passportNumber,
+      "Birth Certificate": data.data.birthCertificate,
+      "Driver's License": data.data.driverLicense,
+      "Image": data.data.images?.profile,
+      "Passport Image": data.data.images?.passport,
+      "Birth Certificate Image": data.data.images?.birthCertificate,
+      "Drivers License Image": data.data.images?.driverLicense,
+      "National Id Image": data.data.images?.nationalId
     });
 
     setShowInfoModal(true);
