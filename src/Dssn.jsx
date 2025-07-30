@@ -69,6 +69,7 @@ export default function Dssn() {
   e.preventDefault();
   const cleanedDssn = dssn.trim().toUpperCase();
 
+  // Validate DSSN format
   if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
     setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
     return;
@@ -79,6 +80,7 @@ export default function Dssn() {
   setCustomerData(null);
 
   try {
+    console.log('Making request for DSSN:', cleanedDssn);
     const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
       method: 'GET',
       credentials: 'include',
@@ -87,17 +89,29 @@ export default function Dssn() {
       }
     });
 
+    console.log('Response status:', response.status);
+    
+    // First check if response is JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('Non-JSON response:', text);
+      throw new Error('Server returned unexpected response format');
+    }
+
     const data = await response.json();
+    console.log('Response data:', data);
 
     if (!response.ok) {
-      throw new Error(data.message || `Server responded with status ${response.status}`);
+      throw new Error(data.message || `Server error: ${response.status}`);
     }
 
     if (!data.success) {
       throw new Error(data.message || 'Invalid response from server');
     }
 
-    setCustomerData({
+    // Map response data to customer data
+    const mappedData = {
       "Full Name": data.data.fullName,
       "Place of Birth": data.data.placeOfBirth,
       "Date of Birth": data.data.dateOfBirth,
@@ -118,12 +132,13 @@ export default function Dssn() {
       "Birth Certificate Image": data.data.images?.birthCertificate,
       "Drivers License Image": data.data.images?.driverLicense,
       "National Id Image": data.data.images?.nationalId
-    });
+    };
 
+    setCustomerData(mappedData);
     setShowInfoModal(true);
   } catch (err) {
+    console.error('Search Error:', err);
     setError(err.message || 'Failed to verify DSSN. Please try again.');
-    console.error("Search Error:", err);
   } finally {
     setIsSearching(false);
   }
