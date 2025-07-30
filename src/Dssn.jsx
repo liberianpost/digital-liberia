@@ -61,7 +61,7 @@ export default function Dssn() {
   useEffect(() => {
     const logoInterval = setInterval(() => {
       setActiveLogo(prev => (prev + 1) % logos.length);
-    }, 600); // Changed from 1000ms to 600ms for faster heartbeat
+    }, 600);
     return () => clearInterval(logoInterval);
   }, []);
 
@@ -85,10 +85,12 @@ export default function Dssn() {
 
       const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
         signal: controller.signal,
+        mode: 'cors',
         credentials: 'include',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Origin': window.location.origin
         }
       });
 
@@ -204,17 +206,21 @@ export default function Dssn() {
         : `data:image/jpeg;base64,${imgSrc}`;
 
     return (
-      <div className="document-thumbnail cursor-pointer" onClick={() => openDocumentModal(src)}>
-        <img
-          src={src}
-          alt={altText}
-          className="w-full h-auto rounded border border-gray-600/30"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = '/placeholder-image.png';
-          }}
-        />
-        <div className="document-label">{altText}</div>
+      <div className="document-thumbnail cursor-pointer group" onClick={() => openDocumentModal(src)}>
+        <div className="relative overflow-hidden rounded-lg border border-gray-600/30 transition-all duration-300 group-hover:border-blue-400/50">
+          <img
+            src={src}
+            alt={altText}
+            className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = '/placeholder-image.png';
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+            <span className="text-white text-sm font-medium">{altText}</span>
+          </div>
+        </div>
       </div>
     );
   };
@@ -255,6 +261,9 @@ export default function Dssn() {
         className="fixed inset-0 -z-50 bg-cover bg-center transition-opacity duration-1000"
         style={{ backgroundImage: `url(${backgroundImages[bgIndex]})`, opacity: 0.7 }}
       />
+
+      {/* Glass Reflection Overlay */}
+      <div className="fixed inset-0 -z-40 bg-gradient-to-br from-blue-900/10 via-purple-900/10 to-transparent backdrop-blur-[1px] pointer-events-none" />
 
       {/* Centered Logo Slideshow */}
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -302,8 +311,8 @@ export default function Dssn() {
                   key={index}
                   className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
                     index === activeLogo 
-                      ? "scale-110 bg-white shadow-lg" // White background for active logo
-                      : "scale-100 bg-white/90" // White background for inactive logos
+                      ? "scale-110 bg-white shadow-lg"
+                      : "scale-100 bg-white/90"
                   }`}
                   style={{
                     animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none'
@@ -324,67 +333,73 @@ export default function Dssn() {
       {/* Main Content */}
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-black/60 backdrop-blur-md rounded-xl border border-gray-600/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-600/20 to-transparent"></div>
+          {/* Glass Reflection Container */}
+          <div className="relative bg-black/40 backdrop-blur-lg rounded-xl border border-gray-600/30 shadow-2xl overflow-hidden">
+            {/* Glass reflection effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-transparent pointer-events-none" />
+            <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-radial from-blue-400/20 via-transparent to-transparent opacity-30 pointer-events-none" />
+            
+            {/* Content */}
+            <div className="relative p-6 md:p-8">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
+                DSSN Verification
+              </h2>
+              <div className="text-white relative space-y-6">
+                <p className="text-white/80">
+                  Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information.
+                  Enter the 15-digit alphanumeric DSSN in the field below.
+                </p>
 
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-gray-600/30 pb-2">
-              DSSN Verification
-            </h2>
-            <div className="text-white relative space-y-6">
-              <p>
-                Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information.
-                Enter the 15-digit alphanumeric DSSN in the field below.
-              </p>
+                <form onSubmit={handleSearch} className="space-y-4">
+                  <div>
+                    <label htmlFor="dssn" className="block text-sm font-medium mb-2">
+                      Enter DSSN to Verify:
+                    </label>
+                    <input
+                      type="text"
+                      id="dssn"
+                      value={dssn}
+                      onChange={(e) => setDssn(e.target.value)}
+                      className="w-full bg-black/40 border border-gray-600/30 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 backdrop-blur-sm"
+                      placeholder="e.g. LIB123456789ABCD"
+                      required
+                      pattern="[A-Za-z0-9]{15}"
+                      title="15-character alphanumeric DSSN"
+                    />
+                  </div>
 
-              <form onSubmit={handleSearch} className="space-y-4">
-                <div>
-                  <label htmlFor="dssn" className="block text-sm font-medium mb-2">
-                    Enter DSSN to Verify:
-                  </label>
-                  <input
-                    type="text"
-                    id="dssn"
-                    value={dssn}
-                    onChange={(e) => setDssn(e.target.value)}
-                    className="w-full bg-black/40 border border-gray-600/30 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                    placeholder="e.g. LIB123456789ABCD"
-                    required
-                    pattern="[A-Za-z0-9]{15}"
-                    title="15-character alphanumeric DSSN"
-                  />
-                </div>
+                  <button
+                    type="submit"
+                    disabled={isSearching}
+                    className={`flex items-center justify-center px-6 py-3 rounded-lg border transition-all ${
+                      isSearching
+                        ? "bg-blue-700/50 border-blue-600/30 cursor-not-allowed"
+                        : "bg-gradient-to-r from-blue-500/80 to-purple-500/80 border-blue-400/30 hover:from-blue-600/80 hover:to-purple-600/80 hover:shadow-lg"
+                    }`}
+                  >
+                    {isSearching ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Searching...
+                      </>
+                    ) : (
+                      "Search"
+                    )}
+                  </button>
+                </form>
 
-                <button
-                  type="submit"
-                  disabled={isSearching}
-                  className={`flex items-center justify-center px-6 py-3 rounded-lg border transition-colors ${
-                    isSearching
-                      ? "bg-blue-700/50 border-blue-600/30 cursor-not-allowed"
-                      : "bg-blue-500/80 border-blue-400/30 hover:bg-blue-600/80"
-                  }`}
-                >
-                  {isSearching ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Searching...
-                    </>
-                  ) : (
-                    "Search"
-                  )}
-                </button>
-              </form>
-
-              {error && (
-                <div className="bg-red-900/40 border border-red-700/30 rounded-lg p-4">
-                  <p className="text-red-300">{error}</p>
-                  <p className="text-sm text-red-200 mt-2">
-                    If this persists, please contact support with details from your browser console
-                  </p>
-                </div>
-              )}
+                {error && (
+                  <div className="bg-red-900/40 border border-red-700/30 rounded-lg p-4 backdrop-blur-sm">
+                    <p className="text-red-300">{error}</p>
+                    <p className="text-sm text-red-200 mt-2">
+                      If this persists, please contact support with details from your browser console
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>
@@ -393,73 +408,74 @@ export default function Dssn() {
       {/* DSSN Info Modal */}
       {showInfoModal && customerData && (
         <div id="dssnInfo" className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="bg-black/80 border border-gray-600/30 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-gradient-to-br from-gray-900/90 to-black/90 border border-gray-600/30 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-2xl font-bold">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                   Search Results for DSSN: {sanitizeHTML(dssn)}
                 </h3>
-                <button onClick={() => setShowInfoModal(false)} className="text-gray-400 hover:text-white">
+                <button onClick={() => setShowInfoModal(false)} className="text-gray-400 hover:text-white transition-colors">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
 
-              <div className="user-info-grid grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {Object.entries(customerData).map(([key, value]) => {
                   if (typeof value === 'string' && !key.includes('Image')) {
                     return (
-                      <p key={key}>
-                        <strong>{key}:</strong> {sanitizeHTML(value)}
-                      </p>
+                      <div key={key} className="bg-black/30 p-3 rounded-lg border border-gray-600/30 backdrop-blur-sm">
+                        <strong className="text-blue-300">{key}:</strong> 
+                        <span className="ml-2 text-white/90">{sanitizeHTML(value)}</span>
+                      </div>
                     );
                   }
                   return null;
                 })}
               </div>
 
-              <div className="documents-section mb-6">
+              <div className="mb-6">
                 {customerData["Image"] && (
-                  <div className="document-category mb-4">
-                    <h4 className="text-lg font-semibold mb-2">Profile Photo</h4>
-                    <div className="document-thumbnails flex">
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold mb-4 text-white/90 border-b border-gray-600/30 pb-2">Profile Photo</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {renderImage(customerData["Image"], "Profile Photo")}
                     </div>
                   </div>
                 )}
 
                 {customerData["Passport Image"] && (
-                  <div className="document-category mb-4">
-                    <h4 className="text-lg font-semibold mb-2">Passport</h4>
-                    <div className="document-thumbnails flex">
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold mb-4 text-white/90 border-b border-gray-600/30 pb-2">Passport</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {renderImage(customerData["Passport Image"], "Passport")}
                     </div>
                   </div>
                 )}
 
                 {customerData["Birth Certificate Image"] && (
-                  <div className="document-category mb-4">
-                    <h4 className="text-lg font-semibold mb-2">Birth Certificate</h4>
-                    <div className="document-thumbnails flex">
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold mb-4 text-white/90 border-b border-gray-600/30 pb-2">Birth Certificate</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {renderImage(customerData["Birth Certificate Image"], "Birth Certificate")}
                     </div>
                   </div>
                 )}
 
                 {customerData["Drivers License Image"] && (
-                  <div className="document-category mb-4">
-                    <h4 className="text-lg font-semibold mb-2">Driver's License</h4>
-                    <div className="document-thumbnails flex">
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold mb-4 text-white/90 border-b border-gray-600/30 pb-2">Driver's License</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {renderImage(customerData["Drivers License Image"], "Driver's License")}
                     </div>
                   </div>
                 )}
 
                 {customerData["National Id Image"] && (
-                  <div className="document-category mb-4">
-                    <h4 className="text-lg font-semibold mb-2">National ID</h4>
-                    <div className="document-thumbnails flex">
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold mb-4 text-white/90 border-b border-gray-600/30 pb-2">National ID</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {renderImage(customerData["National Id Image"], "National ID")}
                     </div>
                   </div>
@@ -474,23 +490,23 @@ export default function Dssn() {
       {showDocumentModal && (
         <div id="documentModal" className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
           <div className="relative max-w-6xl w-full max-h-[90vh]">
-            <button onClick={closeDocumentModal} className="absolute -top-12 right-0 text-white hover:text-gray-300">
+            <button onClick={closeDocumentModal} className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors">
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            <div className="bg-black/50 rounded-lg overflow-hidden border border-gray-600/30">
+            <div className="bg-black/50 rounded-lg overflow-hidden border border-gray-600/30 shadow-xl">
               <img
                 src={currentDocumentUrl}
                 alt="Document"
                 className="w-full h-auto max-h-[80vh] object-contain"
               />
 
-              <div className="flex justify-center space-x-4 p-4 bg-black/50">
+              <div className="flex justify-center space-x-4 p-4 bg-black/50 backdrop-blur-sm">
                 <button
                   onClick={downloadDocument}
-                  className="flex items-center px-4 py-2 bg-blue-600/80 rounded-lg hover:bg-blue-700/80"
+                  className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-600/80 to-purple-600/80 rounded-lg hover:from-blue-700/80 hover:to-purple-700/80 transition-all"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -500,7 +516,7 @@ export default function Dssn() {
 
                 <button
                   onClick={closeDocumentModal}
-                  className="flex items-center px-4 py-2 bg-gray-600/80 rounded-lg hover:bg-gray-700/80"
+                  className="flex items-center px-4 py-2 bg-gray-600/80 rounded-lg hover:bg-gray-700/80 transition-colors"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -539,36 +555,11 @@ export default function Dssn() {
         .overflow-x-auto::-webkit-scrollbar {
           display: none;
         }
-        .user-info-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-          gap: 1rem;
-        }
-        .documents-section {
-          margin-bottom: 2rem;
-        }
-        .document-category {
-          margin-bottom: 1rem;
-        }
-        .document-thumbnails {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 1rem;
-        }
         .document-thumbnail {
-          position: relative;
-          width: 150px;
-          cursor: pointer;
-          transition: transform 0.2s;
+          transition: all 0.3s ease;
         }
         .document-thumbnail:hover {
-          transform: scale(1.05);
-        }
-        .document-label {
-          text-align: center;
-          margin-top: 0.5rem;
-          font-size: 0.875rem;
-          color: #d1d5db;
+          transform: translateY(-5px);
         }
       `}</style>
     </div>
