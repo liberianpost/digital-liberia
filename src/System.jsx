@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const navLinks = [
@@ -105,21 +105,117 @@ const quickAccessServices = [
   { id: "tax-services", name: "Tax Services" }
 ];
 
+const MoeLoginModal = ({ onClose, onLoginSuccess }) => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    if (!username.trim() || !password.trim()) {
+      setError("Username and password are required");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock successful login
+      localStorage.setItem("moeAuth", JSON.stringify({
+        userId: "12345",
+        username: username,
+        securityLevel: 3,
+        loggedIn: true
+      }));
+
+      onLoginSuccess();
+    } catch (err) {
+      setError("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg w-full max-w-md overflow-hidden">
+        <div className="bg-blue-600 p-4 flex justify-between items-center">
+          <h2 className="text-xl font-bold text-white">Ministry of Education Login</h2>
+          <button onClick={onClose} className="text-white hover:text-gray-200">
+            &times;
+          </button>
+        </div>
+        
+        <div className="p-6">
+          <div className="flex justify-center mb-6">
+            <img src="/logos/moe.png" alt="MOE Logo" className="w-24 h-24 object-contain" />
+          </div>
+          
+          <form onSubmit={handleLogin}>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Username</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter your username"
+              />
+            </div>
+            
+            <div className="mb-6">
+              <label className="block text-gray-700 mb-2">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter your password"
+              />
+            </div>
+            
+            {error && <div className="mb-4 text-red-500 text-sm">{error}</div>}
+            
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-2 px-4 rounded-md text-white font-medium ${loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'}`}
+            >
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function System() {
   const location = useLocation();
-  const [activeLogo, setActiveLogo] = React.useState(0);
+  const [activeLogo, setActiveLogo] = useState(0);
+  const [showMoeLogin, setShowMoeLogin] = useState(false);
 
-  // Faster logo heartbeat (600ms instead of 1000ms)
   React.useEffect(() => {
     const interval = setInterval(() => {
       setActiveLogo(prev => (prev + 1) % logos.length);
-    }, 600); // Changed from 1000ms to 600ms
+    }, 600);
     return () => clearInterval(interval);
   }, []);
 
   const handleMinistryClick = (ministryId) => {
     if (ministryId === "education") {
-      alert("Redirecting to Ministry of Education portal...");
+      const isLoggedIn = localStorage.getItem("moeAuth") !== null;
+      if (isLoggedIn) {
+        window.location.href = "/moe-dashboard";
+      } else {
+        setShowMoeLogin(true);
+      }
     } else {
       alert(`Services for this ministry are coming soon`);
     }
@@ -129,12 +225,15 @@ export default function System() {
     alert(`${serviceId} service will be available soon`);
   };
 
+  const handleMoeLoginSuccess = () => {
+    setShowMoeLogin(false);
+    window.location.href = "/moe-dashboard";
+  };
+
   return (
     <div className="relative min-h-screen w-full bg-blue-950 text-white font-inter overflow-x-hidden">
-      {/* Layer 1: Dark Blue Background */}
       <div className="fixed inset-0 bg-blue-950 -z-50" />
 
-      {/* Centered Image Slideshow - Fixed Position */}
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
         <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
           {logos.map((logo, index) => (
@@ -155,11 +254,8 @@ export default function System() {
         </div>
       </div>
 
-      {/* Layer 3: Navigation */}
       <header className="fixed top-0 left-0 w-full z-50">
-        {/* Combined Navigation and Logo Container */}
         <div className="bg-blue-950/80 backdrop-blur-md border-b border-blue-700/30">
-          {/* Navigation Links - Single Row */}
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
             <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
               {navLinks.map(link => (
@@ -179,7 +275,6 @@ export default function System() {
             </nav>
           </div>
 
-          {/* Logo Bar - Updated with white backgrounds and heartbeat animation */}
           <div className="w-full bg-gradient-to-b from-blue-950 to-transparent overflow-x-auto">
             <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
               {logos.map((logo, index) => (
@@ -187,8 +282,8 @@ export default function System() {
                   key={index}
                   className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
                     index === activeLogo 
-                      ? "scale-110 bg-white shadow-lg" // White background for active logo
-                      : "scale-100 bg-white/90" // White background for inactive logos
+                      ? "scale-110 bg-white shadow-lg"
+                      : "scale-100 bg-white/90"
                   }`}
                   style={{
                     animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none'
@@ -206,9 +301,7 @@ export default function System() {
         </div>
       </header>
 
-      {/* Layer 4: Content Sections with Glass-like Backgrounds */}
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
-        {/* DSSN Card - Rose/red/orange gradient */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
           <div className="bg-gradient-to-br from-rose-500/10 via-red-500/10 to-orange-600/10 backdrop-blur-lg rounded-xl border border-rose-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
             <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
@@ -218,65 +311,16 @@ export default function System() {
               </h2>
               <div className="text-white space-y-4">
                 <p>
-                  In the Digital Liberia project, the DSSN (Digital Social Security Number) is a unique digital identifier assigned to every Liberian citizen or legal resident within the system. It functions as a centralized digital identity that enables secure access to a wide range of services in the app and across government and private platforms.
+                  In the Digital Liberia project, the DSSN (Digital Social Security Number) is a unique digital identifier assigned to every Liberian citizen or legal resident within the system.
                 </p>
-                
-                <h3 className="text-xl font-semibold mt-6">Key Characteristics of the DSSN:</h3>
-                
-                <h4 className="font-semibold">Uniqueness:</h4>
-                <p>
-                  Each DSSN is unique to an individual — similar in concept to a traditional Social Security Number (SSN) but adapted for digital infrastructure and use across the entire Digital Liberia ecosystem.
-                </p>
-                
-                <h4 className="font-semibold">Digital Identity Anchor:</h4>
-                <p>
-                  The DSSN serves as the anchor for identity verification, user authentication, and access to services such as:
-                </p>
-                <ul className="list-disc pl-6">
-                  <li>Government services (e.g., postal, licensing, social programs)</li>
-                  <li>Financial services (e.g., banking, mobile money, digital payments)</li>
-                  <li>Private services (e.g., ride-hailing, food delivery, job applications)</li>
-                </ul>
-                
-                <h4 className="font-semibold">Format (subject to design decisions):</h4>
-                <p>
-                  A typical DSSN might be a 15-digit alphanumeric code.
-                </p>
-                
-                <h4 className="font-semibold">Security & Privacy:</h4>
-                <p>
-                  DSSNs are stored securely and are not meant to be shared publicly. They are cryptographically protected and can be used for:
-                </p>
-                <ul className="list-disc pl-6">
-                  <li>QR-based scanning (e.g., for package tracking, ID verification)</li>
-                  <li>Secure login</li>
-                  <li>Backend validation during transactions or registrations</li>
-                </ul>
-                
-                <h4 className="font-semibold">Use in Apps (Example: Digital Liberia, Liberian Post):</h4>
-                <p>
-                  In the Digital Liberia app, the DSSN is used by customers to login and use all the related Digital Liberia Services.
-                  In the Liberian Post app, the DSSN is used by employees to:
-                </p>
-                <ul className="list-disc pl-6">
-                  <li>Identify senders and receivers of packages</li>
-                  <li>Validate users via backend APIs</li>
-                  <li>Track ownership and delivery history</li>
-                </ul>
-                
-                <h4 className="font-semibold">Future Interoperability:</h4>
-                <p>
-                  The DSSN is designed for interoperability across other modules in the Digital Liberia super app — supporting long-term plans for unified digital identity and records. 
-                  <Link to="/dssn" className="inline-flex items-center bg-blue-500/80 backdrop-blur-sm rounded-lg px-3 py-1 ml-2 border border-blue-400/30 cursor-pointer hover:bg-blue-600/80 transition-colors">
-                    (click here to verify a DSSN)
-                  </Link>
-                </p>
+                <Link to="/dssn" className="inline-flex items-center bg-blue-500/80 backdrop-blur-sm rounded-lg px-3 py-1 ml-2 border border-blue-400/30 cursor-pointer hover:bg-blue-600/80 transition-colors">
+                  (click here to verify a DSSN)
+                </Link>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Digital Liberia System Card - Green/teal gradient */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
           <div className="bg-gradient-to-br from-green-500/10 via-teal-500/10 to-emerald-600/10 backdrop-blur-lg rounded-xl border border-green-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
             <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
@@ -286,14 +330,13 @@ export default function System() {
               </h2>
               <div className="text-white">
                 <p>
-                  The National Database Management System (NDMS) is the secure, centralized, and intelligent national data backbone that powers Digital Liberia. Access government services and manage your data through the ministries below.
+                  The National Database Management System (NDMS) is the secure, centralized, and intelligent national data backbone that powers Digital Liberia.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Government Ministries Section - Purple/indigo gradient */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
           <div className="bg-gradient-to-br from-purple-500/10 via-indigo-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-purple-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
             <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
@@ -326,7 +369,6 @@ export default function System() {
           </div>
         </section>
 
-        {/* Quick Access Services Section - Blue/purple gradient */}
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
           <div className="bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-blue-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
             <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
@@ -350,26 +392,20 @@ export default function System() {
         </section>
       </main>
 
-      {/* Footer with Copyright */}
       <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
         <div className="border-t border-blue-700/30 pt-6">
           © {new Date().getFullYear()} Digital Liberia. All rights reserved.
         </div>
       </footer>
 
-      {/* Global Styles - Updated with heartbeat animation */}
+      {showMoeLogin && (
+        <MoeLoginModal 
+          onClose={() => setShowMoeLogin(false)}
+          onLoginSuccess={handleMoeLoginSuccess}
+        />
+      )}
+
       <style jsx global>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
         @keyframes heartbeat {
           0% { transform: scale(1); }
           25% { transform: scale(1.1); }
@@ -377,8 +413,6 @@ export default function System() {
           75% { transform: scale(1.1); }
           100% { transform: scale(1); }
         }
-        
-        /* Hide scrollbar for containers */
         .overflow-x-auto {
           -ms-overflow-style: none;
           scrollbar-width: none;
