@@ -25,7 +25,7 @@
         "headers": [
           {
             "key": "Access-Control-Allow-Origin",
-            "value": "https://tracking.liberianpost.com"
+            "value": "https://digitalliberia.com"
           },
           {
             "key": "Access-Control-Allow-Methods",
@@ -53,10 +53,10 @@
     "rewrites": [
       {
         "source": "/api/**",
-        "destination": "https://tracking.liberianpost.com/api/**",
+        "destination": "https://api.digitalliberia.com/api/**",
         "type": "proxy",
         "headers": {
-          "X-Forwarded-Host": "tracking.liberianpost.com",
+          "X-Forwarded-Host": "api.digitalliberia.com",
           "X-Forwarded-Proto": "https"
         }
       },
