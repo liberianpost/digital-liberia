@@ -1,5 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import axios from 'axios';
+
+// API Configuration
+const api = axios.create({
+  baseURL: 'https://your-api-base.com/api', // CHANGE THIS TO YOUR API URL
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Data Models
+class MoeLoginRequest {
+  constructor(username, password) {
+    this.username = username;
+    this.password = password;
+  }
+}
 
 const navLinks = [
   { label: "Home", to: "/", color: "bg-blue-500/80" },
@@ -106,66 +124,106 @@ const quickAccessServices = [
 ];
 
 const MoeLoginModal = ({ onClose, onLoginSuccess }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    username: "",
+    password: ""
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
-
-    if (!username.trim() || !password.trim()) {
+    
+    if (!formData.username || !formData.password) {
       setError("Username and password are required");
-      setLoading(false);
       return;
     }
 
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock successful login
-      localStorage.setItem("moeAuth", JSON.stringify({
-        userId: "12345",
-        username: username,
-        securityLevel: 3,
-        loggedIn: true
-      }));
+    setLoading(true);
 
-      onLoginSuccess();
+    try {
+      const response = await api.post("/auth/moe_login", new MoeLoginRequest(
+        formData.username,
+        formData.password
+      ));
+
+      if (response.data.success && response.data.data) {
+        localStorage.setItem("moeAuth", JSON.stringify({
+          userId: response.data.data.userId,
+          username: response.data.data.username,
+          securityLevel: response.data.data.securityLevel,
+          loggedIn: true
+        }));
+        onLoginSuccess();
+      } else {
+        setError(response.data.message || "Login failed");
+      }
     } catch (err) {
-      setError("Login failed. Please try again.");
+      if (err.response) {
+        if (err.response.status === 401) {
+          setError("Invalid username or password");
+        } else if (err.response.status === 500) {
+          setError("Server error. Please try again later.");
+        } else {
+          setError(`Error: ${err.response.status}`);
+        }
+      } else if (err.request) {
+        setError("Network error. Please check your connection.");
+      } else {
+        setError("An unexpected error occurred");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg w-full max-w-md overflow-hidden">
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg w-full max-w-md overflow-hidden shadow-xl">
         <div className="bg-blue-600 p-4 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-white">Ministry of Education Login</h2>
-          <button onClick={onClose} className="text-white hover:text-gray-200">
+          <h2 className="text-xl font-bold text-white">Ministry of Education</h2>
+          <button 
+            onClick={onClose}
+            className="text-white text-2xl hover:text-gray-200"
+          >
             &times;
           </button>
         </div>
         
         <div className="p-6">
           <div className="flex justify-center mb-6">
-            <img src="/logos/moe.png" alt="MOE Logo" className="w-24 h-24 object-contain" />
+            <img 
+              src="/logos/moe.png" 
+              alt="MOE Logo" 
+              className="w-20 h-20 object-contain"
+            />
           </div>
           
-          <form onSubmit={handleLogin}>
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+          
+          <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Username</label>
               <input
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter your username"
+                required
               />
             </div>
             
@@ -173,22 +231,47 @@ const MoeLoginModal = ({ onClose, onLoginSuccess }) => {
               <label className="block text-gray-700 mb-2">Password</label>
               <input
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter your password"
+                required
               />
             </div>
-            
-            {error && <div className="mb-4 text-red-500 text-sm">{error}</div>}
             
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 px-4 rounded-md text-white font-medium ${loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'}`}
+              className={`w-full py-3 px-4 rounded-md text-white font-semibold ${loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} transition-colors`}
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </span>
+              ) : 'Login'}
             </button>
+            
+            <div className="mt-4 flex justify-between text-sm">
+              <button
+                type="button"
+                onClick={() => alert("Forgot password feature coming soon")}
+                className="text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                Forgot Password?
+              </button>
+              <button
+                type="button"
+                onClick={() => alert("Registration feature coming soon")}
+                className="text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                Create Account
+              </button>
+            </div>
           </form>
         </div>
       </div>
@@ -201,7 +284,7 @@ export default function System() {
   const [activeLogo, setActiveLogo] = useState(0);
   const [showMoeLogin, setShowMoeLogin] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setActiveLogo(prev => (prev + 1) % logos.length);
     }, 600);
@@ -210,19 +293,19 @@ export default function System() {
 
   const handleMinistryClick = (ministryId) => {
     if (ministryId === "education") {
-      const isLoggedIn = localStorage.getItem("moeAuth") !== null;
-      if (isLoggedIn) {
+      const auth = localStorage.getItem("moeAuth");
+      if (auth) {
         window.location.href = "/moe-dashboard";
       } else {
         setShowMoeLogin(true);
       }
     } else {
-      alert(`Services for this ministry are coming soon`);
+      alert(`Services for ${ministries.find(m => m.id === ministryId)?.name} are coming soon`);
     }
   };
 
   const handleServiceClick = (serviceId) => {
-    alert(`${serviceId} service will be available soon`);
+    alert(`${serviceId.replace('-', ' ')} service will be available soon`);
   };
 
   const handleMoeLoginSuccess = () => {
