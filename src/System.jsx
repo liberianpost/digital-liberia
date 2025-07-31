@@ -2,16 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import axios from 'axios';
 
-// API Configuration
+// API Configuration with proper CORS handling
 const api = axios.create({
-  baseURL: 'https://libpayapp.liberianpost.com:8081/api/auth/moe_login', // CHANGE THIS TO YOUR API URL
+  baseURL: 'https://libpayapp.liberianpost.com:8081/api',
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  },
+  withCredentials: true
 });
 
-// Data Models
+// Data Model for Login Request
 class MoeLoginRequest {
   constructor(username, password) {
     this.username = username;
@@ -19,6 +21,7 @@ class MoeLoginRequest {
   }
 }
 
+// Navigation Links
 const navLinks = [
   { label: "Home", to: "/", color: "bg-blue-500/80" },
   { label: "System", to: "/system", color: "bg-green-500/80" },
@@ -27,6 +30,7 @@ const navLinks = [
   { label: "Liberian Post", to: "/liberian-post", color: "bg-pink-500/80" }
 ];
 
+// Logo Assets
 const logos = [
   "/logos/liberianpost.png",
   "/logos/digital.png",
@@ -37,6 +41,7 @@ const logos = [
   "/logos/liberia.png"
 ];
 
+// Government Ministries
 const ministries = [
   {
     id: "education",
@@ -112,6 +117,7 @@ const ministries = [
   }
 ];
 
+// Quick Access Services
 const quickAccessServices = [
   { id: "passport", name: "Passport" },
   { id: "birth-certificate", name: "Birth Certificate" },
@@ -123,6 +129,7 @@ const quickAccessServices = [
   { id: "tax-services", name: "Tax Services" }
 ];
 
+// MOE Login Modal Component
 const MoeLoginModal = ({ onClose, onLoginSuccess }) => {
   const [formData, setFormData] = useState({
     username: "",
@@ -215,26 +222,26 @@ const MoeLoginModal = ({ onClose, onLoginSuccess }) => {
           
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Username</label>
+              <label className="block text-gray-900 mb-2 font-medium">Username</label>
               <input
                 type="text"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                 placeholder="Enter your username"
                 required
               />
             </div>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-2">Password</label>
+              <label className="block text-gray-900 mb-2 font-medium">Password</label>
               <input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                 placeholder="Enter your password"
                 required
               />
@@ -279,6 +286,7 @@ const MoeLoginModal = ({ onClose, onLoginSuccess }) => {
   );
 };
 
+// Main System Component
 export default function System() {
   const location = useLocation();
   const [activeLogo, setActiveLogo] = useState(0);
