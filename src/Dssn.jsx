@@ -83,47 +83,69 @@ const handleSearch = async (e) => {
 
     const response = await fetch(url, {
       method: 'GET',
-      credentials: 'include',
+      credentials: 'include', // Important for cookies/session
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+        'Origin': 'https://digitalliberia.com' // Explicitly set origin
+      },
+      mode: 'cors' // Ensure CORS mode is set
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || `HTTP ${response.status}`);
+      // Try to parse error response
+      let errorData = {};
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        console.error('Error parsing error response:', e);
+      }
+      
+      // Check for CORS error specifically
+      if (response.status === 0) {
+        throw new Error('CORS policy blocked the request. Please check server configuration.');
+      }
+      
+      throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
     }
 
     const { data } = await response.json();
 
     setCustomerData({
-      "Full Name": data.data.fullName || 'Not available',
-      "Place of Birth": data.data.placeOfBirth || 'Not available',
-      "Date of Birth": data.data.dateOfBirth || 'Not available',
-      "Sex": data.data.sex || 'Not available',
-      "Nationality": data.data.nationality || 'Not available',
-      "Address": data.data.address || 'Not available',
-      "Postal Address": data.data.postalAddress || 'Not available',
-      "Phone Number": data.data.phoneNumber || 'Not available',
-      "Email": data.data.email || 'Not available',
-      "Employment Status": data.data.employmentStatus || 'Not available',
-      "Marital Status": data.data.maritalStatus || 'Not available',
-      "Number of Children": data.data.numberOfChildren || 'Not available',
-      "Passport Number": data.data.passportNumber || 'Not available',
-      "Birth Certificate": data.data.birthCertificate || 'Not available',
-      "Driver's License": data.data.driverLicense || 'Not available',
-      "Image": data.data.images?.profile || null,
-      "Passport Image": data.data.images?.passport || null,
-      "Birth Certificate Image": data.data.images?.birthCertificate || null,
-      "Drivers License Image": data.data.images?.driverLicense || null,
-      "National Id Image": data.data.images?.nationalId || null
+      "Full Name": data.fullName || 'Not available',
+      "Place of Birth": data.placeOfBirth || 'Not available',
+      "Date of Birth": data.dateOfBirth || 'Not available',
+      "Sex": data.sex || 'Not available',
+      "Nationality": data.nationality || 'Not available',
+      "Address": data.address || 'Not available',
+      "Postal Address": data.postalAddress || 'Not available',
+      "Phone Number": data.phoneNumber || 'Not available',
+      "Email": data.email || 'Not available',
+      "Employment Status": data.employmentStatus || 'Not available',
+      "Marital Status": data.maritalStatus || 'Not available',
+      "Number of Children": data.numberOfChildren || 'Not available',
+      "Passport Number": data.passportNumber || 'Not available',
+      "Birth Certificate": data.birthCertificate || 'Not available',
+      "Driver's License": data.driverLicense || 'Not available',
+      "Image": data.images?.profile || null,
+      "Passport Image": data.images?.passport || null,
+      "Birth Certificate Image": data.images?.birthCertificate || null,
+      "Drivers License Image": data.images?.driverLicense || null,
+      "National Id Image": data.images?.nationalId || null
     });
 
     setShowInfoModal(true);
   } catch (err) {
     setError(err.message || 'Failed to verify DSSN. Please try again later.');
     console.error("Search Error:", err);
+    
+    // Additional error logging
+    if (err.message.includes('CORS')) {
+      console.error('CORS-related error detected. Check:');
+      console.error('1. Server CORS configuration');
+      console.error('2. NGINX proxy headers');
+      console.error('3. That the frontend is served from the exact domain in allowed origins');
+    }
   } finally {
     setIsSearching(false);
   }
