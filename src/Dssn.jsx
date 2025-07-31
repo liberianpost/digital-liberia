@@ -78,7 +78,7 @@ const handleSearch = async (e) => {
   setError(null);
 
   try {
-    const url = new URL('https://tracking.liberianpost.com/api/get-dssn');
+    const url = new URL('https://api.digitalliberia.com/api/get-dssn');
     url.searchParams.set('dssn', cleanedDssn);
 
     const response = await fetch(url, {
