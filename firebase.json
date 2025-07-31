@@ -56,7 +56,7 @@
         "destination": "https://api.digitalliberia.com/api/**",
         "type": "proxy",
         "headers": {
-          "X-Forwarded-Host": "api.digitalliberia.com",
+          "X-Forwarded-Host": "digitalliberia.com",
           "X-Forwarded-Proto": "https"
         }
       },
