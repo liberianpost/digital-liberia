@@ -53,7 +53,7 @@
     "rewrites": [
       {
         "source": "/api/**",
-        "destination": "https://api.digitalliberia.com/api/**",
+        "destination": "https://system.liberianpost.com/api/**",
         "type": "proxy",
         "headers": {
           "X-Forwarded-Host": "system.liberianpost.com",
