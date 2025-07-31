@@ -4,7 +4,7 @@ import axios from 'axios';
 
 // API Configuration
 const api = axios.create({
-  baseURL: 'https://your-api-base.com/api', // CHANGE THIS TO YOUR API URL
+  baseURL: 'https://libpayapp.liberianpost.com:8081/api/auth/moe_login', // CHANGE THIS TO YOUR API URL
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
