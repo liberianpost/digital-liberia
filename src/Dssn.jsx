@@ -65,50 +65,37 @@ export default function Dssn() {
     return () => clearInterval(logoInterval);
   }, []);
 
- const handleSearch = async (e) => {
+const handleSearch = async (e) => {
   e.preventDefault();
   const cleanedDssn = dssn.trim().toUpperCase();
 
   if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
-    setError("Invalid DSSN format! Must be 15 alphanumeric characters.");
+    setError("Invalid DSSN format");
     return;
   }
 
   setIsSearching(true);
   setError(null);
-  setCustomerData(null);
 
   try {
-    const response = await fetch(
-      `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`,
-      {
-        method: 'GET',
-        mode: 'cors',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
+    const url = new URL('https://api.digitalliberia.com/api/get-dssn');
+    url.searchParams.set('dssn', cleanedDssn);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
-    );
+    });
 
-    // First check if response is OK (status 200-299)
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Server returned status ${response.status}`);
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.message || `HTTP ${response.status}`);
     }
 
-    // Then check if response is JSON
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      throw new Error('Received non-JSON response from server');
-    }
-
-    const data = await response.json();
-
-    if (!data.success) {
-      throw new Error(data.message || 'Invalid response format from server');
-    }
+    const { data } = await response.json();
 
     setCustomerData({
       "Full Name": data.data.fullName || 'Not available',
