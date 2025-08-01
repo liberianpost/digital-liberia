@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 cat > src/context/AuthContext.js << 'EOL'
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api';
@@ -70,3 +71,5 @@ export const useAuth = () => {
   return context;
 };
 EOL
+=======
+>>>>>>> Stashed changes
