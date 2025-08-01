@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.js";
+import { useAuth } from "../context/AuthContext";
 import { SecurityLevels, getRoleName } from "../utils/auth.js";
 import { DashboardItems } from "../config/dashboardItems";
 
