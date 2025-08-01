@@ -1,5 +1,6 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 // src/context/AuthContext.js
 
 import { createContext, useContext, useState, useEffect } from 'react';
@@ -72,6 +73,8 @@ export const useAuth = () => {
   }
   return context;
 };
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
