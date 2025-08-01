@@ -18,7 +18,12 @@ export default defineConfig({
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
       }
-    },
+    }
+  },
+  esbuild: {
+    loader: 'jsx', // 👈 This line treats .js files as if they contain JSX
+    include: /src\/.*\.js$/, // 👈 Only apply to .js files in src/
+    exclude: [],             // 👈 Optional: exclude nothing
   },
   server: {
     port: 3000,
