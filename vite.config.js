@@ -21,9 +21,9 @@ export default defineConfig({
     }
   },
   esbuild: {
-    loader: 'jsx', // 👈 This line treats .js files as if they contain JSX
-    include: /src\/.*\.js$/, // 👈 Only apply to .js files in src/
-    exclude: [],             // 👈 Optional: exclude nothing
+    loader: 'jsx',
+    include: /src\/.*\.(js|jsx)$/, // 🛠️ Apply to both .js and .jsx in src/
+    exclude: [],
   },
   server: {
     port: 3000,
