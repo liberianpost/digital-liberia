@@ -334,7 +334,7 @@ const UnauthorizedPage = () => {
 };
 
 // Main System Component
-export default function System() {
+const System = () => {
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -556,6 +556,7 @@ export default function System() {
       `}</style>
     </div>
   );
-}
+};
 
+export default System;
 export { MoeDashboard, UnauthorizedPage };
