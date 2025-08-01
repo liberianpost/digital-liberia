@@ -1,10 +1,10 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { SecurityLevels } from '../utils/auth';
+import { SecurityLevels, hasPermission } from '../utils/auth';
 
 const SystemSettings = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -12,7 +12,7 @@ const SystemSettings = () => {
   const securityLevel = location.state?.securityLevel || user?.securityLevel || SecurityLevels.STUDENT;
 
   const checkAdminAccess = (action) => {
-    if (securityLevel >= SecurityLevels.SYSTEM_ADMIN) {
+    if (hasPermission(SecurityLevels.SYSTEM_ADMIN)) {
       action();
     } else {
       showAccessDenied();
@@ -20,12 +20,11 @@ const SystemSettings = () => {
   };
 
   const showAccessDenied = () => {
-    alert("Access denied. Requires SUPER ADMIN privileges.");
+    alert("Access denied. Requires SYSTEM ADMIN privileges.");
   };
 
   const handleAppSettings = () => {
-    // Handle app settings click
-    console.log("App settings clicked");
+    navigate("/app-settings");
   };
 
   const handleUserManagement = () => {
@@ -46,31 +45,44 @@ const SystemSettings = () => {
     });
   };
 
-  const isAdminFeatureDisabled = securityLevel < SecurityLevels.SYSTEM_ADMIN;
+  const isAdminFeatureDisabled = !hasPermission(SecurityLevels.SYSTEM_ADMIN);
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Toolbar */}
       <div className="bg-blue-600 text-white p-4 shadow-md">
-        <div className="flex items-center">
-          <button 
-            onClick={() => navigate(-1)}
-            className="mr-4 text-white"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-          </button>
-          <div>
-            <h1 className="text-xl font-bold">System Settings</h1>
-            <p className="text-sm opacity-80">Security Level: {securityLevel}</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <button 
+              onClick={() => navigate(-1)}
+              className="mr-4 text-white"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </button>
+            <div>
+              <h1 className="text-xl font-bold">System Settings</h1>
+              <p className="text-sm opacity-80">
+                {user?.username} ({SecurityLevels[securityLevel] || 'Unknown Role'})
+              </p>
+            </div>
           </div>
+          <button 
+            onClick={logout}
+            className="text-white text-sm flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Logout
+          </button>
         </div>
       </div>
 
       {/* Settings Cards */}
       <div className="p-4 max-w-3xl mx-auto">
-        {/* App Settings Card */}
+        {/* App Settings Card - Available to all */}
         <div 
           onClick={handleAppSettings}
           className="bg-white rounded-lg shadow-md p-4 mb-4 cursor-pointer hover:shadow-lg transition-shadow"
@@ -78,7 +90,7 @@ const SystemSettings = () => {
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-blue-100 text-blue-600">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c-.94 1.543.826 3.31 2.37 2.37a1.724 1.724 0 002.572 1.065c1.756-.426 1.756-2.924 0-3.35a1.724 1.724 0 00-1.065-2.572c-1.543-.94-3.31.826-2.37 2.37a1.724 1.724 0 001.066 2.573c.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c.94-1.543-.826-3.31-2.37-2.37a1.724 1.724 0 00-2.572 1.065z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
@@ -89,6 +101,7 @@ const SystemSettings = () => {
           </div>
         </div>
 
+        {/* Admin-only Cards */}
         {/* User Management Card */}
         <div 
           onClick={handleUserManagement}
@@ -108,7 +121,7 @@ const SystemSettings = () => {
               <h2 className="text-lg font-bold">User Management</h2>
               <p className="text-gray-600 text-sm">Manage system users and permissions</p>
               {isAdminFeatureDisabled && (
-                <p className="text-red-500 text-xs mt-1">Admin access required</p>
+                <p className="text-red-500 text-xs mt-1">Requires SYSTEM ADMIN access</p>
               )}
             </div>
           </div>
@@ -133,7 +146,7 @@ const SystemSettings = () => {
               <h2 className="text-lg font-bold">Database Management</h2>
               <p className="text-gray-600 text-sm">Manage database settings</p>
               {isAdminFeatureDisabled && (
-                <p className="text-red-500 text-xs mt-1">Admin access required</p>
+                <p className="text-red-500 text-xs mt-1">Requires SYSTEM ADMIN access</p>
               )}
             </div>
           </div>
@@ -158,7 +171,7 @@ const SystemSettings = () => {
               <h2 className="text-lg font-bold">Backup & Restore</h2>
               <p className="text-gray-600 text-sm">Configure backup settings</p>
               {isAdminFeatureDisabled && (
-                <p className="text-red-500 text-xs mt-1">Admin access required</p>
+                <p className="text-red-500 text-xs mt-1">Requires SYSTEM ADMIN access</p>
               )}
             </div>
           </div>
