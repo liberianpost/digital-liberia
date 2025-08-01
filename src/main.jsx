@@ -4,14 +4,16 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
 
-// Ensure the root element exists before rendering
+// ✅ Safely render JSX outside render()
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');
 
-ReactDOM.createRoot(rootElement).render(
+const AppTree = (
   <React.StrictMode>
     <BrowserRouter>
       <App />
     </BrowserRouter>
   </React.StrictMode>
 );
+
+ReactDOM.createRoot(rootElement).render(AppTree);
