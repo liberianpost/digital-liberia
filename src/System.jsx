@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.js";
-import { SecurityLevels } from "../utils/auth.js";
+import { SecurityLevels, getRoleName } from "../utils/auth.js";
 import { DashboardItems } from "../config/dashboardItems";
 
 // Navigation Links
@@ -289,11 +289,7 @@ const MoeDashboard = () => {
                   <h2 className="font-bold text-lg">{item.title}</h2>
                   {item.requiredLevel >= SecurityLevels.SCHOOL_ADMIN && (
                     <span className="text-xs px-2 py-1 bg-blue-600 text-white rounded-full">
-                      {item.requiredLevel === SecurityLevels.SYSTEM_ADMIN 
-                        ? "ADMIN" 
-                        : item.requiredLevel === SecurityLevels.MINISTRY_OFFICIAL 
-                          ? "MINISTRY" 
-                          : "STAFF"}
+                      {getRoleName(item.requiredLevel).toUpperCase()}
                     </span>
                   )}
                 </div>
