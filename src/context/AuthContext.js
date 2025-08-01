@@ -1,97 +1,77 @@
 // src/context/AuthContext.js
 import { createContext, useContext, useState, useEffect } from 'react';
-import api from '../api'; // Using your configured axios instance
+import api from '../api';
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Initialize auth state from localStorage
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const storedAuth = localStorage.getItem("moeAuth");
-        if (storedAuth) {
+    const initializeAuth = () => {
+      const storedAuth = localStorage.getItem("moeAuth");
+      if (storedAuth) {
+        try {
           setUser(JSON.parse(storedAuth));
-          
-          // Optional: Validate token with backend
-          try {
-            await api.get('/auth/validate');
-          } catch (validationError) {
-            console.warn("Session validation failed:", validationError);
-            logout();
-          }
+        } catch (e) {
+          console.error("Failed to parse user data:", e);
+          localStorage.removeItem("moeAuth");
         }
-      } catch (err) {
-        console.error("Auth initialization error:", err);
-        setError("Failed to initialize authentication");
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     };
-
     initializeAuth();
   }, []);
 
   const login = async (credentials) => {
-    setLoading(true);
-    setError(null);
-    
     try {
       const response = await api.post("/auth/moe_login", credentials);
-      
       if (response.data?.success && response.data?.data) {
         const userData = {
           userId: response.data.data.userId,
           username: response.data.data.username,
-          securityLevel: response.data.data.securityLevel,
-          token: response.data.data.token // If using JWT
+          securityLevel: response.data.data.securityLevel
         };
-        
         localStorage.setItem("moeAuth", JSON.stringify(userData));
         setUser(userData);
         return { success: true };
       }
       return { 
         success: false, 
-        error: response.data?.message || "Login failed: Invalid credentials" 
+        error: response.data?.message || "Login failed" 
       };
     } catch (error) {
       console.error("Login error:", error);
-      const errorMsg = error.response?.data?.message || 
-                      error.message || 
-                      "Network error occurred";
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
-    } finally {
-      setLoading(false);
+      return {
+        success: false,
+        error: error.response?.data?.message || 
+              error.message || 
+              "Network error occurred"
+      };
     }
   };
 
-  const logout = async () => {
+  const logout = () => {
+    localStorage.removeItem("moeAuth");
+    setUser(null);
     try {
-      await api.post("/auth/logout");
+      api.post("/auth/logout");
     } catch (error) {
       console.error("Logout error:", error);
-    } finally {
-      localStorage.removeItem("moeAuth");
-      setUser(null);
-      setError(null);
     }
+  };
+
+  const value = {
+    user,
+    loading,
+    login,
+    logout,
+    isAuthenticated: !!user
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      loading,
-      error,
-      login, 
-      logout,
-      isAuthenticated: !!user
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
