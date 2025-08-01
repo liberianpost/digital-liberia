@@ -1,25 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import axios from 'axios';
-
-// API Configuration with proper CORS handling
-const api = axios.create({
-  baseURL: 'https://libpayapp.liberianpost.com:8081/api',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  },
-  withCredentials: true
-});
-
-// Data Model for Login Request
-class MoeLoginRequest {
-  constructor(username, password) {
-    this.username = username;
-    this.password = password;
-  }
-}
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { SecurityLevels } from "../utils/auth";
+import { DashboardItems } from "../config/dashboardItems";
 
 // Navigation Links
 const navLinks = [
@@ -130,7 +113,8 @@ const quickAccessServices = [
 ];
 
 // MOE Login Modal Component
-const MoeLoginModal = ({ onClose, onLoginSuccess }) => {
+const MoeLoginModal = ({ onClose }) => {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
     password: ""
@@ -155,40 +139,13 @@ const MoeLoginModal = ({ onClose, onLoginSuccess }) => {
     }
 
     setLoading(true);
+    const result = await login(formData);
+    setLoading(false);
 
-    try {
-      const response = await api.post("/auth/moe_login", new MoeLoginRequest(
-        formData.username,
-        formData.password
-      ));
-
-      if (response.data.success && response.data.data) {
-        localStorage.setItem("moeAuth", JSON.stringify({
-          userId: response.data.data.userId,
-          username: response.data.data.username,
-          securityLevel: response.data.data.securityLevel,
-          loggedIn: true
-        }));
-        onLoginSuccess();
-      } else {
-        setError(response.data.message || "Login failed");
-      }
-    } catch (err) {
-      if (err.response) {
-        if (err.response.status === 401) {
-          setError("Invalid username or password");
-        } else if (err.response.status === 500) {
-          setError("Server error. Please try again later.");
-        } else {
-          setError(`Error: ${err.response.status}`);
-        }
-      } else if (err.request) {
-        setError("Network error. Please check your connection.");
-      } else {
-        setError("An unexpected error occurred");
-      }
-    } finally {
-      setLoading(false);
+    if (result.success) {
+      onClose();
+    } else {
+      setError(result.error);
     }
   };
 
@@ -286,9 +243,101 @@ const MoeLoginModal = ({ onClose, onLoginSuccess }) => {
   );
 };
 
+// MOE Dashboard Component
+const MoeDashboard = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  if (!user) {
+    navigate('/system');
+    return null;
+  }
+
+  const availableItems = DashboardItems.filter(item => 
+    item.requiredLevel <= user.securityLevel
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">
+            Welcome, {user.username}
+          </h1>
+          <p className="text-gray-600">
+            {new Date().toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {availableItems.map(item => (
+            <div 
+              key={item.id}
+              onClick={() => navigate(item.path)}
+              className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow"
+            >
+              <div className="flex items-center space-x-4">
+                <div className={`p-3 rounded-full bg-blue-100 text-blue-600`}>
+                  <span className="text-xl">{item.icon}</span>
+                </div>
+                <div>
+                  <h2 className="font-bold text-lg">{item.title}</h2>
+                  {item.requiredLevel >= SecurityLevels.SCHOOL_ADMIN && (
+                    <span className="text-xs px-2 py-1 bg-blue-600 text-white rounded-full">
+                      {item.requiredLevel === SecurityLevels.SYSTEM_ADMIN 
+                        ? "ADMIN" 
+                        : item.requiredLevel === SecurityLevels.MINISTRY_OFFICIAL 
+                          ? "MINISTRY" 
+                          : "STAFF"}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Unauthorized Access Page
+const UnauthorizedPage = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+        <div className="text-red-500 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Access Denied</h1>
+        <p className="text-gray-600 mb-6">
+          You don't have permission to access this page. Please contact your administrator if you believe this is an error.
+        </p>
+        <button
+          onClick={() => navigate(-1)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+        >
+          Go Back
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // Main System Component
 export default function System() {
+  const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeLogo, setActiveLogo] = useState(0);
   const [showMoeLogin, setShowMoeLogin] = useState(false);
 
@@ -301,9 +350,8 @@ export default function System() {
 
   const handleMinistryClick = (ministryId) => {
     if (ministryId === "education") {
-      const auth = localStorage.getItem("moeAuth");
-      if (auth) {
-        window.location.href = "/moe-dashboard";
+      if (user) {
+        navigate("/moe-dashboard");
       } else {
         setShowMoeLogin(true);
       }
@@ -314,11 +362,6 @@ export default function System() {
 
   const handleServiceClick = (serviceId) => {
     alert(`${serviceId.replace('-', ' ')} service will be available soon`);
-  };
-
-  const handleMoeLoginSuccess = () => {
-    setShowMoeLogin(false);
-    window.location.href = "/moe-dashboard";
   };
 
   return (
@@ -492,7 +535,6 @@ export default function System() {
       {showMoeLogin && (
         <MoeLoginModal 
           onClose={() => setShowMoeLogin(false)}
-          onLoginSuccess={handleMoeLoginSuccess}
         />
       )}
 
@@ -515,3 +557,5 @@ export default function System() {
     </div>
   );
 }
+
+export { MoeDashboard, UnauthorizedPage };
