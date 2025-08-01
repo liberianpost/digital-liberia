@@ -3,11 +3,25 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      jsxRuntime: 'classic', // Add this line
+      jsxImportSource: 'react',
+      include: '**/*.{jsx,tsx}'
+    })
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  esbuild: {
+    jsx: 'transform',
+    jsxFactory: 'React.createElement',
+    jsxFragment: 'React.Fragment',
+    loader: 'jsx',
+    include: /src\/.*\.jsx?$/,
+    exclude: [],
   },
   build: {
     outDir: 'dist',
@@ -19,11 +33,6 @@ export default defineConfig({
         entryFileNames: 'assets/[name]-[hash].js',
       }
     }
-  },
-  esbuild: {
-    loader: 'jsx',
-    include: /src\/.*\.(js|jsx)$/, // 🛠️ Apply to both .js and .jsx in src/
-    exclude: [],
   },
   server: {
     port: 3000,
