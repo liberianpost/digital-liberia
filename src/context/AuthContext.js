@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 
 // src/context/AuthContext.js
 import { createContext, useContext, useState, useEffect } from 'react';
@@ -66,3 +67,5 @@ export function useAuth() {
   }
   return context;
 }
+=======
+>>>>>>> Stashed changes
