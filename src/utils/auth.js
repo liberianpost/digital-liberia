@@ -9,16 +9,28 @@ export const SecurityLevels = {
   SYSTEM_ADMIN: 7
 };
 
-export function hasRequiredLevel(requiredLevel) {
-  const user = JSON.parse(localStorage.getItem("moeAuth"));
-  return user?.securityLevel >= requiredLevel;
+// Get current user's security level
+export function getCurrentSecurityLevel() {
+  const user = JSON.parse(localStorage.getItem("moeAuth") || "null");
+  return user?.securityLevel || SecurityLevels.STUDENT;
 }
 
-export function getAvailableItems() {
-  const user = JSON.parse(localStorage.getItem("moeAuth"));
-  if (!user) return [];
-  
-  return DashboardItems.filter(item => 
-    item.requiredLevel <= user.securityLevel
-  );
+// Check if user has required permission
+export function hasPermission(requiredLevel) {
+  const currentLevel = getCurrentSecurityLevel();
+  return currentLevel >= requiredLevel;
+}
+
+// Get role name for display
+export function getRoleName(level) {
+  const roles = {
+    [SecurityLevels.STUDENT]: "Student",
+    [SecurityLevels.PARENT]: "Parent",
+    [SecurityLevels.TEACHER]: "Teacher",
+    [SecurityLevels.SCHOOL_ADMIN]: "School Admin",
+    [SecurityLevels.MINISTRY_OFFICIAL]: "Ministry Official",
+    [SecurityLevels.DATABASE_ADMIN]: "Database Admin",
+    [SecurityLevels.SYSTEM_ADMIN]: "System Admin"
+  };
+  return roles[level] || "Unknown Role";
 }
