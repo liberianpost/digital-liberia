@@ -1,6 +1,5 @@
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-cat > src/context/AuthContext.js << 'EOL'
+// src/context/AuthContext.js
+
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api';
 
@@ -67,12 +66,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
-EOL
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
