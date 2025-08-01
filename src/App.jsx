@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext.jsx";
+import { AuthProvider } from "./context/AuthContext.js";
 import Home from "./Home";
 import System from "./System";
 import Dssn from "./Dssn";
