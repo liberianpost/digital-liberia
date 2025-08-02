@@ -5,91 +5,36 @@ import path from 'path';
 export default defineConfig({
   plugins: [
     react({
-      jsxRuntime: 'automatic', // Recommended for React 18+
-      jsxImportSource: 'react',
-      include: ['**/*.{jsx,tsx}', '**/*.js'], // Include both JSX and JS files
+      jsxRuntime: 'automatic',
       babel: {
         plugins: [
-          ['@babel/plugin-transform-react-jsx', {
-            runtime: 'automatic'
-          }]
+          ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
         ]
       }
     })
   ],
   resolve: {
-    alias: [
-      {
-        find: '@',
-        replacement: path.resolve(__dirname, 'src')
-      },
-      {
-        find: '@context',
-        replacement: path.resolve(__dirname, 'src/context')
-      }
-    ],
-    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'] // All supported extensions
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-      loader: {
-        '.js': 'jsx' // Treat .js files as JSX
-      },
-      plugins: [
-        {
-          name: 'react-jsx',
-          setup(build) {
-            build.onLoad({ filter: /\.(js|jsx)$/ }, async (args) => {
-              return {
-                loader: 'jsx',
-                contents: (await fs.promises.readFile(args.path)).toString()
-              };
-            });
-          }
-        }
-      ]
-    }
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+      '@context': path.resolve(__dirname, 'src/context')
+    },
+    extensions: ['.js', '.jsx'] // Prioritize these extensions
   },
   esbuild: {
-    logOverride: { 'this-is-undefined-in-esm': 'silent' },
-    jsx: 'automatic',
-    jsxDev: false,
-    jsxImportSource: 'react',
     loader: 'jsx',
-    include: /src\/.*\.(jsx?|tsx?)$/,
+    include: /src\/.*\.jsx?$/, // Apply to both .js and .jsx files
     exclude: [],
-    keepNames: true
+    jsx: 'automatic'
   },
   build: {
-    outDir: 'dist',
-    emptyOutDir: true,
-    sourcemap: true,
-    minify: 'terser',
     rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, 'index.html')
-      },
       output: {
         assetFileNames: 'assets/[name]-[hash][extname]',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return 'vendor';
-          }
-        }
+        chunkFileNames: 'assets/[name]-[hash].js'
       }
     }
   },
   server: {
-    port: 3000,
-    open: true,
-    fs: {
-      strict: true,
-      allow: ['..']
-    },
-    hmr: {
-      overlay: true
-    }
+    port: 3000
   }
 });
