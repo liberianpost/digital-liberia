@@ -13,7 +13,11 @@
     "tailwindcss": "^3.3.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.0",
+    "@babel/plugin-transform-react-jsx": "^7.27.1",
+    "@babel/preset-react": "^7.27.1",
     "@vitejs/plugin-react": "^4.0.0",
+    "terser": "^5.43.1",
     "vite": "^4.4.9"
   },
   "scripts": {
