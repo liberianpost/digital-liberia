@@ -1,104 +1,72 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '@/api';
+import { SecurityLevels } from '@/utils/auth';
 
-// Create Auth Context
 const AuthContext = createContext();
 
-// Auth Provider Component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Initialize auth state from localStorage
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const storedAuth = localStorage.getItem('moeAuth');
-        if (storedAuth) {
+    const initializeAuth = () => {
+      const storedAuth = localStorage.getItem("moeAuth");
+      if (storedAuth) {
+        try {
           setUser(JSON.parse(storedAuth));
+        } catch (e) {
+          localStorage.removeItem("moeAuth");
         }
-      } catch (e) {
-        localStorage.removeItem('moeAuth');
-        setError('Failed to parse stored authentication');
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     };
-
     initializeAuth();
   }, []);
 
-  // Login function
   const login = async (credentials) => {
     try {
       setLoading(true);
-      const response = await api.post('/auth/moe_login', credentials);
+      const response = await api.post("/auth/moe_login", credentials);
       
       if (response.data?.success) {
         const userData = {
-          userId: response.data.data.userId,
-          username: response.data.data.username,
-          securityLevel: response.data.data.securityLevel
+          ...response.data.data,
+          securityLevel: response.data.data.securityLevel || SecurityLevels.STUDENT
         };
         
-        localStorage.setItem('moeAuth', JSON.stringify(userData));
+        localStorage.setItem("moeAuth", JSON.stringify(userData));
         setUser(userData);
-        setError(null);
         return { success: true };
       }
       
-      const errorMsg = response.data?.message || 'Login failed';
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
-      
+      return { success: false, error: response.data?.message || "Login failed" };
     } catch (error) {
-      const errorMsg = error.response?.data?.message || error.message;
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message
+      };
     } finally {
       setLoading(false);
     }
   };
 
-  // Logout function
-  const logout = async () => {
-    try {
-      await api.post('/auth/logout');
-    } catch (e) {
-      console.error('Logout API error:', e);
-    } finally {
-      localStorage.removeItem('moeAuth');
-      setUser(null);
-      setError(null);
-    }
-  };
-
-  // Context value
-  const value = {
-    user,
-    loading,
-    error,
-    login,
-    logout,
-    isAuthenticated: !!user
+  const logout = () => {
+    localStorage.removeItem("moeAuth");
+    setUser(null);
+    api.post("/auth/logout");
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook for consuming auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 };
-
-// Export the context itself for rare cases where it's needed directly
-export default AuthContext;
