@@ -16,13 +16,14 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
-      '@context': path.resolve(__dirname, 'src/context')
-    },
-    extensions: ['.js', '.jsx'] // Prioritize these extensions
+      '@context': path.resolve(__dirname, 'src/context'),
+      '@components': path.resolve(__dirname, 'src/components'),
+      '@utils': path.resolve(__dirname, 'src/utils')
+    }
   },
   esbuild: {
     loader: 'jsx',
-    include: /src\/.*\.jsx?$/, // Apply to both .js and .jsx files
+    include: /src\/.*\.(jsx?|tsx?)$/,
     exclude: [],
     jsx: 'automatic'
   },
@@ -30,11 +31,29 @@ export default defineConfig({
     rollupOptions: {
       output: {
         assetFileNames: 'assets/[name]-[hash][extname]',
-        chunkFileNames: 'assets/[name]-[hash].js'
+        chunkFileNames: 'assets/[name]-[hash].js',
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        }
       }
-    }
+    },
+    chunkSizeWarningLimit: 1600
   },
   server: {
-    port: 3000
+    port: 3000,
+    strictPort: true,
+    open: true,
+    hmr: {
+      overlay: false
+    }
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom'
+    ]
   }
 });
