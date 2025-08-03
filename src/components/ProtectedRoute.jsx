@@ -1,32 +1,18 @@
-// src/components/ProtectedRoute.jsx
-import { useAuth } from '../context/AuthContext';
-import { Navigate, useLocation } from 'react-router-dom';
-import { hasPermission } from '../utils/auth';
+import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
-export default function ProtectedRoute({ 
-  children, 
-  requiredLevel = 1,
-  redirectTo = "/login"
-}) {
+const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
-  const location = useLocation();
+  const navigate = useNavigate();
 
-  if (!user) {
-    return <Navigate to={redirectTo} state={{ from: location }} replace />;
-  }
+  useEffect(() => {
+    if (!user) {
+      navigate('/system');
+    }
+  }, [user, navigate]);
 
-  if (!hasPermission(requiredLevel)) {
-    return (
-      <Navigate 
-        to="/unauthorized" 
-        state={{ 
-          from: location,
-          requiredLevel 
-        }} 
-        replace 
-      />
-    );
-  }
+  return user ? children : null;
+};
 
-  return children;
-}
+export default ProtectedRoute;
