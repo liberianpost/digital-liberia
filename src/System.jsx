@@ -135,14 +135,18 @@ const MoeLoginModal = ({ onClose }) => {
     }
 
     setLoading(true);
-    const result = await login(formData);
-    setLoading(false);
-
-    if (result.success) {
-      onClose();
-      navigate("/moe-dashboard");
-    } else {
-      setError(result.error);
+    try {
+      const result = await login(formData);
+      if (result.success) {
+        onClose();
+        navigate("/moe-dashboard");
+      } else {
+        setError(result.error || "Login failed. Please try again.");
+      }
+    } catch (err) {
+      setError("An error occurred during login");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -185,6 +189,7 @@ const MoeLoginModal = ({ onClose }) => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                 placeholder="Enter your username"
                 required
+                autoFocus
               />
             </div>
             
@@ -216,23 +221,6 @@ const MoeLoginModal = ({ onClose }) => {
                 </span>
               ) : 'Login'}
             </button>
-            
-            <div className="mt-4 flex justify-between text-sm">
-              <button
-                type="button"
-                onClick={() => alert("Forgot password feature coming soon")}
-                className="text-blue-600 hover:text-blue-800 hover:underline"
-              >
-                Forgot Password?
-              </button>
-              <button
-                type="button"
-                onClick={() => alert("Registration feature coming soon")}
-                className="text-blue-600 hover:text-blue-800 hover:underline"
-              >
-                Create Account
-              </button>
-            </div>
           </form>
         </div>
       </div>
@@ -343,7 +331,7 @@ const System = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeLogo, setActiveLogo] = useState(0);
-  const [showMoeLogin, setShowMoeLogin] = useState(false);
+  const [showMoeLogin, setShowMoeLogin] = useState(true);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -352,13 +340,15 @@ const System = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      navigate("/moe-dashboard");
+    }
+  }, [user, navigate]);
+
   const handleMinistryClick = (ministryId) => {
     if (ministryId === "education") {
-      if (user) {
-        navigate("/moe-dashboard");
-      } else {
-        setShowMoeLogin(true);
-      }
+      setShowMoeLogin(true);
     } else {
       alert(`Services for ${ministries.find(m => m.id === ministryId)?.name} are coming soon`);
     }
@@ -536,7 +526,7 @@ const System = () => {
         </div>
       </footer>
 
-      {showMoeLogin && (
+      {showMoeLogin && !user && (
         <MoeLoginModal 
           onClose={() => setShowMoeLogin(false)}
         />
