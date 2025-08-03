@@ -1,4 +1,4 @@
-import { SecurityLevels } from './auth';
+import { SecurityLevels } from '@/utils/auth';
 
 export const DashboardItems = [
   {
