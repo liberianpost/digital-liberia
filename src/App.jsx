@@ -6,8 +6,7 @@ import System from "./System";
 import Dssn from "./Dssn";
 import Digitalliberia from "./Digitalliberia";
 import Libpay from "./Libpay";
-import MoeDashboard from "./System"; // Import your dashboard component
-import UnauthorizedPage from "./System"; // Import your unauthorized component
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -19,8 +18,15 @@ function App() {
           <Route path="dssn" element={<Dssn />} />
           <Route path="digital-liberia" element={<Digitalliberia />} />
           <Route path="libpay" element={<Libpay />} />
-          <Route path="moe-dashboard" element={<MoeDashboard />} />
-          <Route path="unauthorized" element={<UnauthorizedPage />} />
+          <Route 
+            path="moe-dashboard" 
+            element={
+              <ProtectedRoute>
+                <System />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="unauthorized" element={<System />} />
           <Route path="liberian-post" element={<div>Coming Soon</div>} />
           <Route path="*" element={<Home />} /> {/* Fallback */}
         </Routes>
