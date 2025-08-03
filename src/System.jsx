@@ -115,36 +115,70 @@ const MoeLoginModal = ({ onClose }) => {
     username: "",
     password: ""
   });
+  const [errors, setErrors] = useState({
+    username: "",
+    password: ""
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ""
+      }));
+    }
+  };
+
+  const validateInputs = () => {
+    let valid = true;
+    const newErrors = {
+      username: "",
+      password: ""
+    };
+
+    if (!formData.username.trim()) {
+      newErrors.username = "Username is required";
+      valid = false;
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     
-    if (!formData.username || !formData.password) {
-      setError("Username and password are required");
-      return;
-    }
+    if (!validateInputs()) return;
 
     setLoading(true);
+
     try {
       const result = await login(formData);
+      
       if (result.success) {
+        localStorage.setItem("MOE_LOGGED_IN", "true");
+        localStorage.setItem("MOE_USERNAME", formData.username);
         onClose();
         navigate("/moe-dashboard");
       } else {
-        setError(result.error || "Login failed. Please try again.");
+        setError(result.error || "Invalid username or password");
       }
     } catch (err) {
-      setError("An error occurred during login");
+      console.error("Login error:", err);
+      setError("Network error. Please check your connection.");
     } finally {
       setLoading(false);
     }
@@ -186,11 +220,16 @@ const MoeLoginModal = ({ onClose }) => {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 ${
+                  errors.username ? "border-red-500" : "border-gray-300"
+                }`}
                 placeholder="Enter your username"
                 required
                 autoFocus
               />
+              {errors.username && (
+                <p className="mt-1 text-sm text-red-600">{errors.username}</p>
+              )}
             </div>
             
             <div className="mb-6">
@@ -200,28 +239,53 @@ const MoeLoginModal = ({ onClose }) => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                }`}
                 placeholder="Enter your password"
                 required
               />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+              )}
             </div>
             
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 px-4 rounded-md text-white font-semibold ${loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} transition-colors`}
+              className={`w-full py-3 px-4 rounded-md text-white font-semibold ${
+                loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+              } transition-colors flex items-center justify-center`}
             >
               {loading ? (
-                <span className="flex items-center justify-center">
+                <>
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Processing...
-                </span>
+                </>
               ) : 'Login'}
             </button>
           </form>
+
+          <div className="mt-4 flex justify-center space-x-4 text-sm border-t border-gray-200 pt-4">
+            <button
+              type="button"
+              onClick={() => alert("Forgot password feature coming soon")}
+              className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+            >
+              Forgot Password?
+            </button>
+            <span className="text-gray-400">|</span>
+            <button
+              type="button"
+              onClick={() => alert("Registration feature coming soon")}
+              className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+            >
+              Create Account
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -331,7 +395,7 @@ const System = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeLogo, setActiveLogo] = useState(0);
-  const [showMoeLogin, setShowMoeLogin] = useState(true);
+  const [showMoeLogin, setShowMoeLogin] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -341,7 +405,13 @@ const System = () => {
   }, []);
 
   useEffect(() => {
-    if (user) {
+    const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
+    if (isLoggedIn && !user) {
+      const username = localStorage.getItem("MOE_USERNAME");
+      if (username) {
+        navigate("/moe-dashboard");
+      }
+    } else if (user) {
       navigate("/moe-dashboard");
     }
   }, [user, navigate]);
@@ -526,7 +596,7 @@ const System = () => {
         </div>
       </footer>
 
-      {showMoeLogin && !user && (
+      {showMoeLogin && (
         <MoeLoginModal 
           onClose={() => setShowMoeLogin(false)}
         />
