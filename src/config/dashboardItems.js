@@ -1,25 +1,46 @@
-// src/config/dashboardItems.js
-import { SecurityLevels } from '../utils/auth';
+import { SecurityLevels } from './auth';
 
 export const DashboardItems = [
   {
-    id: 1,
+    id: 'student-profile',
     title: "My Profile",
-    icon: "user",
-    path: "/student-profile",
+    icon: "👤",
+    path: "/moe/student-profile",
     requiredLevel: SecurityLevels.STUDENT
   },
   {
-    id: 2,
+    id: 'student-reports',
     title: "Student Reports",
-    icon: "file-text",
-    path: "/student-reports",
+    icon: "📊",
+    path: "/moe/student-reports",
     requiredLevel: SecurityLevels.PARENT
   },
-  // ... Add all other items following the same pattern
+  {
+    id: 'class-management',
+    title: "Class Management",
+    icon: "🏫",
+    path: "/moe/class-management",
+    requiredLevel: SecurityLevels.TEACHER
+  },
+  {
+    id: 'school-management',
+    title: "School Management",
+    icon: "🏢",
+    path: "/moe/school-management",
+    requiredLevel: SecurityLevels.SCHOOL_ADMIN
+  },
+  {
+    id: 'district-reports',
+    title: "District Reports",
+    icon: "📑",
+    path: "/moe/district-reports",
+    requiredLevel: SecurityLevels.MINISTRY_OFFICIAL
+  },
+  {
+    id: 'system-settings',
+    title: "System Settings",
+    icon: "⚙️",
+    path: "/moe/system-settings",
+    requiredLevel: SecurityLevels.SYSTEM_ADMIN
+  }
 ];
-
-export function getAvailableItems() {
-  const currentLevel = getCurrentSecurityLevel();
-  return DashboardItems.filter(item => item.requiredLevel <= currentLevel);
-}
