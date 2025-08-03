@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@context/AuthContext";  // Use named import and alias
-import { SecurityLevels, getRoleName } from "../utils/auth.js";
-import { DashboardItems } from "../config/dashboardItems";
+import { useAuth } from "@context/AuthContext";
+import { SecurityLevels, getRoleName } from "@/utils/auth";
+import { DashboardItems } from "@/config/dashboardItems";
 
-// Navigation Links
 const navLinks = [
   { label: "Home", to: "/", color: "bg-blue-500/80" },
   { label: "System", to: "/system", color: "bg-green-500/80" },
@@ -13,7 +12,6 @@ const navLinks = [
   { label: "Liberian Post", to: "/liberian-post", color: "bg-pink-500/80" }
 ];
 
-// Logo Assets
 const logos = [
   "/logos/liberianpost.png",
   "/logos/digital.png",
@@ -24,7 +22,6 @@ const logos = [
   "/logos/liberia.png"
 ];
 
-// Government Ministries
 const ministries = [
   {
     id: "education",
@@ -100,7 +97,6 @@ const ministries = [
   }
 ];
 
-// Quick Access Services
 const quickAccessServices = [
   { id: "passport", name: "Passport" },
   { id: "birth-certificate", name: "Birth Certificate" },
@@ -112,9 +108,9 @@ const quickAccessServices = [
   { id: "tax-services", name: "Tax Services" }
 ];
 
-// MOE Login Modal Component
 const MoeLoginModal = ({ onClose }) => {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     password: ""
@@ -144,6 +140,7 @@ const MoeLoginModal = ({ onClose }) => {
 
     if (result.success) {
       onClose();
+      navigate("/moe-dashboard");
     } else {
       setError(result.error);
     }
@@ -243,35 +240,48 @@ const MoeLoginModal = ({ onClose }) => {
   );
 };
 
-// MOE Dashboard Component
 const MoeDashboard = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [currentDate] = useState(new Date());
 
-  if (!user) {
-    navigate('/system');
-    return null;
-  }
+  useEffect(() => {
+    if (!user) {
+      navigate('/system');
+    }
+  }, [user, navigate]);
+
+  if (!user) return null;
 
   const availableItems = DashboardItems.filter(item => 
     item.requiredLevel <= user.securityLevel
   );
 
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">
-            Welcome, {user.username}
-          </h1>
-          <p className="text-gray-600">
-            {new Date().toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </p>
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">
+              Welcome, {user.username}
+            </h1>
+            <p className="text-gray-600">{formatDate(currentDate)}</p>
+          </div>
+          <button
+            onClick={logout}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+          >
+            Logout
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -302,7 +312,6 @@ const MoeDashboard = () => {
   );
 };
 
-// Unauthorized Access Page
 const UnauthorizedPage = () => {
   const navigate = useNavigate();
 
@@ -329,7 +338,6 @@ const UnauthorizedPage = () => {
   );
 };
 
-// Main System Component
 const System = () => {
   const { user } = useAuth();
   const location = useLocation();
