@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import AuthContext from "../context/AuthContext";  // Default import
 import { SecurityLevels, getRoleName } from "../utils/auth.js";
 import { DashboardItems } from "../config/dashboardItems";
+
+// Then access useAuth from the default export
+const { useAuth } = AuthContext;
 
 // Navigation Links
 const navLinks = [
