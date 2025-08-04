@@ -416,7 +416,8 @@ const System = () => {
     }
   }, [user, navigate]);
 
-  const handleMinistryClick = (ministryId) => {
+  const handleMinistryClick = (ministryId, e) => {
+    e.stopPropagation();
     if (ministryId === "education") {
       setShowMoeLogin(true);
     } else {
@@ -424,7 +425,8 @@ const System = () => {
     }
   };
 
-  const handleServiceClick = (serviceId) => {
+  const handleServiceClick = (serviceId, e) => {
+    e.stopPropagation();
     alert(`${serviceId.replace('-', ' ')} service will be available soon`);
   };
 
@@ -546,8 +548,8 @@ const System = () => {
                 {ministries.map(ministry => (
                   <div 
                     key={ministry.id}
-                    onClick={() => handleMinistryClick(ministry.id)}
-                    className="cursor-pointer bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm"
+                    onClick={(e) => handleMinistryClick(ministry.id, e)}
+                    className="cursor-pointer bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm relative z-20"
                   >
                     <div className="flex items-center space-x-4">
                       <img 
@@ -578,7 +580,7 @@ const System = () => {
                 {quickAccessServices.map(service => (
                   <button
                     key={service.id}
-                    onClick={() => handleServiceClick(service.id)}
+                    onClick={(e) => handleServiceClick(service.id, e)}
                     className="bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm text-left"
                   >
                     <h3 className="font-bold text-lg">{service.name}</h3>
@@ -597,9 +599,11 @@ const System = () => {
       </footer>
 
       {showMoeLogin && (
-        <MoeLoginModal 
-          onClose={() => setShowMoeLogin(false)}
-        />
+        <div className="fixed inset-0 z-50">
+          <MoeLoginModal 
+            onClose={() => setShowMoeLogin(false)}
+          />
+        </div>
       )}
 
       <style jsx global>{`
