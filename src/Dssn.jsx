@@ -40,30 +40,57 @@ const sanitizeHTML = (str) => {
 const GoogleStorageImage = ({ src, alt, className, onClick }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
     if (!src) {
       setLoading(false);
+      setError(true);
       return;
     }
 
     setLoading(true);
     setError(false);
-    
+
+    // Check if the URL is already a complete Google Storage URL
+    if (src.startsWith('https://storage.googleapis.com/')) {
+      setImageUrl(src);
+      return;
+    }
+
+    // Construct proper Google Storage URL
+    const constructImageUrl = (path) => {
+      if (!path) return null;
+      
+      // Remove any existing domain or protocol
+      const cleanPath = path.replace(/^(https?:\/\/[^\/]+)?\//, '');
+      
+      // Handle URL-encoded characters (like spaces)
+      const encodedPath = encodeURIComponent(cleanPath).replace(/%2F/g, '/');
+      
+      return `https://storage.googleapis.com/${encodedPath}`;
+    };
+
+    const url = constructImageUrl(src);
+    setImageUrl(url);
+  }, [src]);
+
+  useEffect(() => {
+    if (!imageUrl) return;
+
     const img = new Image();
-    img.crossOrigin = "anonymous"; // Important for cross-origin images
-    img.src = src;
+    img.src = imageUrl;
     
     img.onload = () => {
       setLoading(false);
     };
     
     img.onerror = () => {
-      console.error('Failed to load image:', src);
+      console.error('Failed to load image:', imageUrl);
       setError(true);
       setLoading(false);
     };
-  }, [src]);
+  }, [imageUrl]);
 
   if (!src) {
     return (
@@ -91,11 +118,12 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
 
   return (
     <img
-      src={src}
+      src={imageUrl}
       alt={alt}
       className={className}
       onClick={onClick}
-      crossOrigin="anonymous" // Add this attribute to allow cross-origin requests
+      crossOrigin="anonymous"
+      onError={() => setError(true)}
     />
   );
 };
@@ -168,12 +196,6 @@ export default function Dssn() {
         throw errorDetails;
       }
 
-      // Add cache-buster to image URLs
-      const addCacheBuster = (url) => {
-        if (!url) return null;
-        return `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
-      };
-
       const transformedData = {
         "Full Name": result.data.fullName || 'Not available',
         "Place of Birth": result.data.placeOfBirth || 'Not available',
@@ -191,11 +213,11 @@ export default function Dssn() {
         "Birth Certificate": result.data.birthCertificate || 'Not available',
         "Driver's License": result.data.driverLicense || 'Not available',
         "Images": {
-          profile: addCacheBuster(result.data.images?.profile),
-          passport: addCacheBuster(result.data.images?.passport),
-          birthCertificate: addCacheBuster(result.data.images?.birthCertificate),
-          driverLicense: addCacheBuster(result.data.images?.driverLicense),
-          nationalId: addCacheBuster(result.data.images?.nationalId)
+          profile: result.data.images?.profile || null,
+          passport: result.data.images?.passport || null,
+          birthCertificate: result.data.images?.birthCertificate || null,
+          driverLicense: result.data.images?.driverLicense || null,
+          nationalId: result.data.images?.nationalId || null
         },
         "Search Metadata": result.metadata ? 
           `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}` 
@@ -519,14 +541,11 @@ export default function Dssn() {
                   title="Document Viewer"
                 />
               ) : (
-                currentDocumentUrl && (
-                  <img 
-                    src={currentDocumentUrl} 
-                    alt="Document Full View"
-                    className="w-full h-auto max-h-[80vh] object-contain mx-auto"
-                    crossOrigin="anonymous" // Added to the image in the modal
-                  />
-                )
+                <GoogleStorageImage 
+                  src={currentDocumentUrl}
+                  alt="Document Full View"
+                  className="w-full h-auto max-h-[80vh] object-contain mx-auto"
+                />
               )}
             </div>
           </div>
