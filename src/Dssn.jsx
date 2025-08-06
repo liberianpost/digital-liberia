@@ -70,7 +70,11 @@ const handleSearch = async (e) => {
   const cleanedDssn = dssn.trim().toUpperCase();
 
   if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
-    setError("Invalid DSSN format");
+    setError({
+      title: "Invalid DSSN Format",
+      message: "DSSN must be exactly 15 alphanumeric characters",
+      details: `You entered: ${cleanedDssn} (${cleanedDssn.length} characters)`
+    });
     return;
   }
 
@@ -78,74 +82,78 @@ const handleSearch = async (e) => {
   setError(null);
 
   try {
-    const url = new URL('https://api.digitalliberia.com/api/get-dssn');
-    url.searchParams.set('dssn', cleanedDssn);
+    const apiUrl = `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`;
+    console.log('Making request to:', apiUrl);  // Debugging
 
-    const response = await fetch(url, {
+    const response = await fetch(apiUrl, {
       method: 'GET',
-      credentials: 'include', // Important for cookies/session
+      credentials: 'include',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Origin': 'https://digitalliberia.com' // Explicitly set origin
-      },
-      mode: 'cors' // Ensure CORS mode is set
+        'Content-Type': 'application/json'
+      }
     });
+
+    console.log('Response status:', response.status);  // Debugging
 
     if (!response.ok) {
-      // Try to parse error response
-      let errorData = {};
-      try {
-        errorData = await response.json();
-      } catch (e) {
-        console.error('Error parsing error response:', e);
-      }
+      const errorData = await response.json().catch(() => ({}));
+      console.error('API Error:', errorData);  // Debugging
       
-      // Check for CORS error specifically
-      if (response.status === 0) {
-        throw new Error('CORS policy blocked the request. Please check server configuration.');
-      }
-      
-      throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+      throw {
+        title: errorData.error || 'API Request Failed',
+        message: errorData.message || `Server responded with status ${response.status}`,
+        details: errorData.details || `DSSN: ${cleanedDssn}`
+      };
     }
 
-    const { data } = await response.json();
+    const result = await response.json();
+    console.log('API Response:', result);  // Debugging
 
-    setCustomerData({
-      "Full Name": data.fullName || 'Not available',
-      "Place of Birth": data.placeOfBirth || 'Not available',
-      "Date of Birth": data.dateOfBirth || 'Not available',
-      "Sex": data.sex || 'Not available',
-      "Nationality": data.nationality || 'Not available',
-      "Address": data.address || 'Not available',
-      "Postal Address": data.postalAddress || 'Not available',
-      "Phone Number": data.phoneNumber || 'Not available',
-      "Email": data.email || 'Not available',
-      "Employment Status": data.employmentStatus || 'Not available',
-      "Marital Status": data.maritalStatus || 'Not available',
-      "Number of Children": data.numberOfChildren || 'Not available',
-      "Passport Number": data.passportNumber || 'Not available',
-      "Birth Certificate": data.birthCertificate || 'Not available',
-      "Driver's License": data.driverLicense || 'Not available',
-      "Image": data.images?.profile || null,
-      "Passport Image": data.images?.passport || null,
-      "Birth Certificate Image": data.images?.birthCertificate || null,
-      "Drivers License Image": data.images?.driverLicense || null,
-      "National Id Image": data.images?.nationalId || null
-    });
+    if (!result.success) {
+      throw {
+        title: result.error || 'Operation Failed',
+        message: result.message || 'The request was unsuccessful',
+        details: `Reference: ${result.metadata?.responseId || 'N/A'}`
+      };
+    }
 
+    // Transform the data to match your frontend structure
+    const transformedData = {
+      "Full Name": result.data.fullName,
+      "Place of Birth": result.data.placeOfBirth,
+      "Date of Birth": result.data.dateOfBirth,
+      "Sex": result.data.sex,
+      "Nationality": result.data.nationality,
+      "Address": result.data.address,
+      "Postal Address": result.data.postalAddress,
+      "Phone Number": result.data.phoneNumber,
+      "Email": result.data.email,
+      "Employment Status": result.data.employmentStatus,
+      "Marital Status": result.data.maritalStatus,
+      "Number of Children": result.data.numberOfChildren,
+      "Passport Number": result.data.passportNumber,
+      "Birth Certificate": result.data.birthCertificate,
+      "Driver's License": result.data.driverLicense,
+      "Image": result.data.images?.profile,
+      "Passport Image": result.data.images?.passport,
+      "Birth Certificate Image": result.data.images?.birthCertificate,
+      "Drivers License Image": result.data.images?.driverLicense,
+      "National Id Image": result.data.images?.nationalId,
+      // Add metadata if needed
+      "Search Timestamp": result.metadata?.timestamp
+    };
+
+    setCustomerData(transformedData);
     setShowInfoModal(true);
+
   } catch (err) {
-    setError(err.message || 'Failed to verify DSSN. Please try again later.');
     console.error("Search Error:", err);
-    
-    // Additional error logging
-    if (err.message.includes('CORS')) {
-      console.error('CORS-related error detected. Check:');
-      console.error('1. Server CORS configuration');
-      console.error('2. NGINX proxy headers');
-      console.error('3. That the frontend is served from the exact domain in allowed origins');
-    }
+    setError({
+      title: err.title || 'Search Failed',
+      message: err.message || 'An unexpected error occurred',
+      details: err.details || 'Please try again later'
+    });
   } finally {
     setIsSearching(false);
   }
