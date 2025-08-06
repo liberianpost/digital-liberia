@@ -41,11 +41,9 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     if (!src) {
-      console.log('No image source provided');
       setLoading(false);
       setError(true);
       return;
@@ -54,22 +52,19 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
     setLoading(true);
     setError(false);
 
-    const fixImageUrl = (url) => {
+    const fixUrl = (url) => {
       if (!url) return null;
-      
-      // Fix double-encoded spaces (%2520 -> %20)
-      let fixedUrl = url.replace(/%2520/g, '%20');
-      
-      // Ensure it's a complete URL
-      if (!fixedUrl.startsWith('http')) {
-        fixedUrl = `https://storage.googleapis.com/${fixedUrl}`;
-      }
-      
-      return fixedUrl;
+      // Fix double-encoded spaces and other encoding issues
+      let fixedUrl = decodeURIComponent(url);
+      // Ensure proper encoding of special characters while preserving slashes
+      fixedUrl = encodeURI(fixedUrl)
+        .replace(/%3A/g, ':')
+        .replace(/%2F/g, '/');
+      // Add cache busting
+      return `${fixedUrl}?t=${Date.now()}`;
     };
 
-    const finalUrl = fixImageUrl(src);
-    console.log('Final image URL:', finalUrl);
+    const finalUrl = fixUrl(src);
     setImageUrl(finalUrl);
   }, [src]);
 
@@ -80,24 +75,16 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
     img.src = imageUrl;
     
     img.onload = () => {
-      console.log('Image loaded successfully:', imageUrl);
-      setDimensions({
-        width: img.naturalWidth,
-        height: img.naturalHeight
-      });
       setLoading(false);
     };
     
     img.onerror = () => {
-      console.error('Failed to load image:', imageUrl);
       setError(true);
       setLoading(false);
     };
 
-    // Add timeout for very large images
     const timeout = setTimeout(() => {
       if (loading) {
-        console.warn('Image loading timed out:', imageUrl);
         setError(true);
         setLoading(false);
       }
@@ -117,54 +104,28 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
   if (loading) {
     return (
       <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <span className="text-xs mt-2 text-blue-300">Loading image...</span>
-        </div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={`${className} bg-gray-800/50 flex flex-col items-center justify-center rounded-lg p-4`}>
-        <svg className="w-8 h-8 text-red-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-        <span className="text-red-400 text-sm text-center">Failed to load image</span>
-        <span className="text-xs text-gray-400 mt-1 text-center truncate w-full">{src}</span>
+      <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
+        <span className="text-red-400 text-sm">Failed to load image</span>
       </div>
     );
   }
 
-  // If image is too large (>10MB), show warning but still display
-  const isLargeImage = dimensions.width * dimensions.height > 10000000;
-  const fileSizeWarning = isLargeImage ? (
-    <div className="absolute top-2 left-2 bg-yellow-500/90 text-black text-xs px-2 py-1 rounded">
-      Large Image
-    </div>
-  ) : null;
-
   return (
-    <div className="relative">
-      {fileSizeWarning}
-      <img
-        src={imageUrl}
-        alt={alt}
-        className={className}
-        onClick={onClick}
-        crossOrigin="anonymous"
-        onError={() => {
-          console.error('Image render error:', imageUrl);
-          setError(true);
-        }}
-        style={{
-          maxWidth: '100%',
-          height: 'auto',
-          objectFit: 'contain'
-        }}
-      />
-    </div>
+    <img
+      src={imageUrl}
+      alt={alt}
+      className={className}
+      onClick={onClick}
+      crossOrigin="anonymous"
+      onError={() => setError(true)}
+    />
   );
 };
 
@@ -180,7 +141,6 @@ export default function Dssn() {
   const [showDocumentModal, setShowDocumentModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
 
-  // Background rotation effect
   useEffect(() => {
     const bgInterval = setInterval(() => {
       setBgIndex(prev => (prev + 1) % backgroundImages.length);
@@ -188,7 +148,6 @@ export default function Dssn() {
     return () => clearInterval(bgInterval);
   }, []);
 
-  // Logo rotation effect with faster heartbeat (600ms)
   useEffect(() => {
     const logoInterval = setInterval(() => {
       setActiveLogo(prev => (prev + 1) % logos.length);
@@ -274,7 +233,6 @@ export default function Dssn() {
         details: err.details || `DSSN: ${cleanedDssn}`,
         technical: `Status: ${err.status || 'Unknown'} | ${err.timestamp || new Date().toISOString()}`
       });
-      console.error("Search Error:", err);
     } finally {
       setIsSearching(false);
     }
@@ -292,18 +250,15 @@ export default function Dssn() {
 
   return (
     <div className="relative min-h-screen w-full bg-gray-900 text-white font-inter overflow-x-hidden">
-      {/* Deep Blue Glass Background */}
       <div className="fixed inset-0 -z-50 bg-gradient-to-br from-blue-900/90 to-indigo-900/90" />
       <div className="fixed inset-0 -z-40 bg-white/10 backdrop-blur-[3px] pointer-events-none" />
       <div className="fixed inset-0 -z-30 bg-[url('/noise.png')] opacity-10 pointer-events-none" />
 
-      {/* Background Image Slideshow with reduced opacity */}
       <div
         className="fixed inset-0 -z-20 bg-cover bg-center transition-opacity duration-1000 mix-blend-soft-light"
         style={{ backgroundImage: `url(${backgroundImages[bgIndex]})`, opacity: 0.15 }}
       />
 
-      {/* Centered Logo Slideshow */}
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
         <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
           {logos.map((logo, index) => (
@@ -320,7 +275,6 @@ export default function Dssn() {
         </div>
       </div>
 
-      {/* Navigation */}
       <header className="fixed top-0 left-0 w-full z-50">
         <div className="bg-indigo-900/70 backdrop-blur-md border-b border-indigo-700/30">
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
@@ -368,7 +322,6 @@ export default function Dssn() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
           <div className="relative bg-indigo-900/50 backdrop-blur-lg rounded-xl border border-indigo-700/30 shadow-2xl overflow-hidden">
@@ -454,7 +407,6 @@ export default function Dssn() {
         </section>
       </main>
 
-      {/* DSSN Info Modal */}
       {showInfoModal && customerData && (
         <div id="dssnInfo" className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="bg-gradient-to-br from-indigo-900/90 to-blue-900/90 border border-indigo-700/30 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
@@ -478,7 +430,6 @@ export default function Dssn() {
               </div>
 
               <div className="flex flex-col md:flex-row gap-6 mb-6">
-                {/* Profile Image */}
                 <div className="w-full md:w-1/3">
                   <h4 className="text-blue-300 mb-2">Profile Image</h4>
                   <GoogleStorageImage 
@@ -489,7 +440,6 @@ export default function Dssn() {
                   />
                 </div>
 
-                {/* Customer Details */}
                 <div className="w-full md:w-2/3 grid grid-cols-1 gap-4">
                   {Object.entries(customerData).map(([key, value]) => {
                     if (typeof value === 'string' && !key.includes('Image') && !key.includes('Metadata')) {
@@ -505,7 +455,6 @@ export default function Dssn() {
                 </div>
               </div>
 
-              {/* Document Images */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {customerData.Images?.passport && (
                   <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
@@ -560,7 +509,6 @@ export default function Dssn() {
         </div>
       )}
 
-      {/* Document Modal */}
       {showDocumentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
           <div className="relative bg-gray-900 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-auto">
@@ -593,7 +541,6 @@ export default function Dssn() {
         </div>
       )}
 
-      {/* Footer */}
       <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
         <div className="border-t border-indigo-700/30 pt-6">
           © {new Date().getFullYear()} Digital Liberia. All rights reserved.
