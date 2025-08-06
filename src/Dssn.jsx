@@ -43,24 +43,6 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
   const [imageUrl, setImageUrl] = useState('');
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  const constructImageUrl = (path) => {
-    if (!path) return null;
-    
-    // If it's already a full URL, return it
-    if (path.startsWith('http')) return path;
-    
-    // Remove any existing domain or protocol
-    const cleanPath = path.replace(/^(https?:\/\/[^\/]+)?\//, '');
-    
-    // Handle URL-encoded characters (like spaces)
-    const encodedPath = encodeURIComponent(cleanPath)
-      .replace(/%2F/g, '/')
-      .replace(/%3A/g, ':')
-      .replace(/%20/g, ' ');
-    
-    return `https://storage.googleapis.com/${encodedPath}`;
-  };
-
   useEffect(() => {
     if (!src) {
       console.log('No image source provided');
@@ -72,15 +54,23 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
     setLoading(true);
     setError(false);
 
-    try {
-      const url = constructImageUrl(src);
-      console.log('Constructed image URL:', url);
-      setImageUrl(url);
-    } catch (err) {
-      console.error('Error constructing image URL:', err);
-      setError(true);
-      setLoading(false);
-    }
+    const fixImageUrl = (url) => {
+      if (!url) return null;
+      
+      // Fix double-encoded spaces (%2520 -> %20)
+      let fixedUrl = url.replace(/%2520/g, '%20');
+      
+      // Ensure it's a complete URL
+      if (!fixedUrl.startsWith('http')) {
+        fixedUrl = `https://storage.googleapis.com/${fixedUrl}`;
+      }
+      
+      return fixedUrl;
+    };
+
+    const finalUrl = fixImageUrl(src);
+    console.log('Final image URL:', finalUrl);
+    setImageUrl(finalUrl);
   }, [src]);
 
   useEffect(() => {
@@ -111,7 +101,7 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         setError(true);
         setLoading(false);
       }
-    }, 10000); // 10 second timeout
+    }, 10000);
 
     return () => clearTimeout(timeout);
   }, [imageUrl]);
@@ -148,7 +138,7 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
   }
 
   // If image is too large (>10MB), show warning but still display
-  const isLargeImage = dimensions.width * dimensions.height > 10000000; // ~10MP
+  const isLargeImage = dimensions.width * dimensions.height > 10000000;
   const fileSizeWarning = isLargeImage ? (
     <div className="absolute top-2 left-2 bg-yellow-500/90 text-black text-xs px-2 py-1 rounded">
       Large Image
