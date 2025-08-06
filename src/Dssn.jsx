@@ -69,11 +69,12 @@ const handleSearch = async (e) => {
   e.preventDefault();
   const cleanedDssn = dssn.trim().toUpperCase();
 
+  // Input validation
   if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
     setError({
       title: "Invalid DSSN Format",
-      message: "DSSN must be exactly 15 alphanumeric characters",
-      details: `You entered: ${cleanedDssn} (${cleanedDssn.length} characters)`
+      message: "Must be exactly 15 alphanumeric characters",
+      details: `Received: ${cleanedDssn} (${cleanedDssn.length} characters)`
     });
     return;
   }
@@ -83,8 +84,7 @@ const handleSearch = async (e) => {
 
   try {
     const apiUrl = `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`;
-    console.log('Making request to:', apiUrl);  // Debugging
-
+    
     const response = await fetch(apiUrl, {
       method: 'GET',
       credentials: 'include',
@@ -94,65 +94,62 @@ const handleSearch = async (e) => {
       }
     });
 
-    console.log('Response status:', response.status);  // Debugging
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('API Error:', errorData);  // Debugging
-      
-      throw {
-        title: errorData.error || 'API Request Failed',
-        message: errorData.message || `Server responded with status ${response.status}`,
-        details: errorData.details || `DSSN: ${cleanedDssn}`
-      };
-    }
-
     const result = await response.json();
-    console.log('API Response:', result);  // Debugging
 
-    if (!result.success) {
-      throw {
-        title: result.error || 'Operation Failed',
-        message: result.message || 'The request was unsuccessful',
-        details: `Reference: ${result.metadata?.responseId || 'N/A'}`
+    // Handle all error cases
+    if (!response.ok || !result.success) {
+      const errorDetails = {
+        title: result.error || `HTTP ${response.status}`,
+        message: result.message || 'Request failed',
+        details: `Reference: ${result.metadata?.requestId || 'N/A'}`,
+        dssn: cleanedDssn,
+        timestamp: result.metadata?.timestamp || new Date().toISOString()
       };
+      console.error('API Error:', errorDetails);
+      throw errorDetails;
     }
 
-    // Transform the data to match your frontend structure
+    // Transform data for frontend display
     const transformedData = {
-      "Full Name": result.data.fullName,
-      "Place of Birth": result.data.placeOfBirth,
-      "Date of Birth": result.data.dateOfBirth,
-      "Sex": result.data.sex,
-      "Nationality": result.data.nationality,
-      "Address": result.data.address,
-      "Postal Address": result.data.postalAddress,
-      "Phone Number": result.data.phoneNumber,
-      "Email": result.data.email,
-      "Employment Status": result.data.employmentStatus,
-      "Marital Status": result.data.maritalStatus,
-      "Number of Children": result.data.numberOfChildren,
-      "Passport Number": result.data.passportNumber,
-      "Birth Certificate": result.data.birthCertificate,
-      "Driver's License": result.data.driverLicense,
-      "Image": result.data.images?.profile,
-      "Passport Image": result.data.images?.passport,
-      "Birth Certificate Image": result.data.images?.birthCertificate,
-      "Drivers License Image": result.data.images?.driverLicense,
-      "National Id Image": result.data.images?.nationalId,
-      // Add metadata if needed
-      "Search Timestamp": result.metadata?.timestamp
+      "Full Name": result.data.fullName || 'Not available',
+      "Place of Birth": result.data.placeOfBirth || 'Not available',
+      "Date of Birth": result.data.dateOfBirth || 'Not available',
+      "Sex": result.data.sex || 'Not available',
+      "Nationality": result.data.nationality || 'Not available',
+      "Address": result.data.address || 'Not available',
+      "Postal Address": result.data.postalAddress || 'Not available',
+      "Phone Number": result.data.phoneNumber || 'Not available',
+      "Email": result.data.email || 'Not available',
+      "Employment Status": result.data.employmentStatus || 'Not available',
+      "Marital Status": result.data.maritalStatus || 'Not available',
+      "Number of Children": result.data.numberOfChildren || 'Not available',
+      "Passport Number": result.data.passportNumber || 'Not available',
+      "Birth Certificate": result.data.birthCertificate || 'Not available',
+      "Driver's License": result.data.driverLicense || 'Not available',
+      "Image": result.data.images?.profile || null,
+      "Passport Image": result.data.images?.passport || null,
+      "Birth Certificate Image": result.data.images?.birthCertificate || null,
+      "Drivers License Image": result.data.images?.driverLicense || null,
+      "National Id Image": result.data.images?.nationalId || null,
+      "Search Metadata": result.metadata ? 
+        `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}` 
+        : 'No metadata available'
     };
 
     setCustomerData(transformedData);
     setShowInfoModal(true);
 
   } catch (err) {
-    console.error("Search Error:", err);
     setError({
-      title: err.title || 'Search Failed',
-      message: err.message || 'An unexpected error occurred',
-      details: err.details || 'Please try again later'
+      title: err.title || 'Search Error',
+      message: err.message || 'Failed to process request',
+      details: err.details || `DSSN: ${cleanedDssn}`,
+      technical: `Status: ${err.status || 'Unknown'} | ${err.timestamp || new Date().toISOString()}`
+    });
+    console.error("Search Failed:", {
+      error: err,
+      dssn: cleanedDssn,
+      timestamp: new Date().toISOString()
     });
   } finally {
     setIsSearching(false);
