@@ -37,6 +37,68 @@ const sanitizeHTML = (str) => {
     .replace(/'/g, '&#39;');
 };
 
+const GoogleStorageImage = ({ src, alt, className, onClick }) => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (!src) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(false);
+    
+    const img = new Image();
+    img.src = src;
+    
+    img.onload = () => {
+      setLoading(false);
+    };
+    
+    img.onerror = () => {
+      console.error('Failed to load image:', src);
+      setError(true);
+      setLoading(false);
+    };
+  }, [src]);
+
+  if (!src) {
+    return (
+      <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
+        <span className="text-gray-400 text-sm">No image available</span>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
+        <span className="text-red-400 text-sm">Failed to load image</span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      onClick={onClick}
+      crossOrigin="anonymous"
+    />
+  );
+};
+
 export default function Dssn() {
   const location = useLocation();
   const [activeLogo, setActiveLogo] = useState(0);
@@ -65,98 +127,105 @@ export default function Dssn() {
     return () => clearInterval(logoInterval);
   }, []);
 
-const handleSearch = async (e) => {
-  e.preventDefault();
-  const cleanedDssn = dssn.trim().toUpperCase();
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    const cleanedDssn = dssn.trim().toUpperCase();
 
-  // Input validation
-  if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
-    setError({
-      title: "Invalid DSSN Format",
-      message: "Must be exactly 15 alphanumeric characters",
-      details: `Received: ${cleanedDssn} (${cleanedDssn.length} characters)`
-    });
-    return;
-  }
-
-  setIsSearching(true);
-  setError(null);
-
-  try {
-    const apiUrl = `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`;
-    
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    });
-
-    const result = await response.json();
-
-    // Handle all error cases
-    if (!response.ok || !result.success) {
-      const errorDetails = {
-        title: result.error || `HTTP ${response.status}`,
-        message: result.message || 'Request failed',
-        details: `Reference: ${result.metadata?.requestId || 'N/A'}`,
-        dssn: cleanedDssn,
-        timestamp: result.metadata?.timestamp || new Date().toISOString()
-      };
-      console.error('API Error:', errorDetails);
-      throw errorDetails;
+    if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
+      setError({
+        title: "Invalid DSSN Format",
+        message: "Must be exactly 15 alphanumeric characters",
+        details: `Received: ${cleanedDssn} (${cleanedDssn.length} chars)`
+      });
+      return;
     }
 
-    // Transform data for frontend display
-    const transformedData = {
-      "Full Name": result.data.fullName || 'Not available',
-      "Place of Birth": result.data.placeOfBirth || 'Not available',
-      "Date of Birth": result.data.dateOfBirth || 'Not available',
-      "Sex": result.data.sex || 'Not available',
-      "Nationality": result.data.nationality || 'Not available',
-      "Address": result.data.address || 'Not available',
-      "Postal Address": result.data.postalAddress || 'Not available',
-      "Phone Number": result.data.phoneNumber || 'Not available',
-      "Email": result.data.email || 'Not available',
-      "Employment Status": result.data.employmentStatus || 'Not available',
-      "Marital Status": result.data.maritalStatus || 'Not available',
-      "Number of Children": result.data.numberOfChildren || 'Not available',
-      "Passport Number": result.data.passportNumber || 'Not available',
-      "Birth Certificate": result.data.birthCertificate || 'Not available',
-      "Driver's License": result.data.driverLicense || 'Not available',
-      "Image": result.data.images?.profile || null,
-      "Passport Image": result.data.images?.passport || null,
-      "Birth Certificate Image": result.data.images?.birthCertificate || null,
-      "Drivers License Image": result.data.images?.driverLicense || null,
-      "National Id Image": result.data.images?.nationalId || null,
-      "Search Metadata": result.metadata ? 
-        `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}` 
-        : 'No metadata available'
-    };
+    setIsSearching(true);
+    setError(null);
 
-    setCustomerData(transformedData);
-    setShowInfoModal(true);
+    try {
+      const apiUrl = `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`;
+      
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
 
-  } catch (err) {
-    setError({
-      title: err.title || 'Search Error',
-      message: err.message || 'Failed to process request',
-      details: err.details || `DSSN: ${cleanedDssn}`,
-      technical: `Status: ${err.status || 'Unknown'} | ${err.timestamp || new Date().toISOString()}`
-    });
-    console.error("Search Failed:", {
-      error: err,
-      dssn: cleanedDssn,
-      timestamp: new Date().toISOString()
-    });
-  } finally {
-    setIsSearching(false);
-  }
-};
-  
-  // ... (keep all other existing functions unchanged: formatDate, openDocumentModal, closeDocumentModal, downloadDocument, renderImage, useEffect for event listeners)
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        const errorDetails = {
+          title: result.error || `HTTP Error ${response.status}`,
+          message: result.message || 'Request failed',
+          details: `Reference: ${result.metadata?.requestId || 'N/A'}`,
+          timestamp: result.metadata?.timestamp || new Date().toISOString()
+        };
+        throw errorDetails;
+      }
+
+      // Add cache-buster to image URLs
+      const addCacheBuster = (url) => {
+        if (!url) return null;
+        return `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+      };
+
+      const transformedData = {
+        "Full Name": result.data.fullName || 'Not available',
+        "Place of Birth": result.data.placeOfBirth || 'Not available',
+        "Date of Birth": result.data.dateOfBirth || 'Not available',
+        "Sex": result.data.sex || 'Not available',
+        "Nationality": result.data.nationality || 'Not available',
+        "Address": result.data.address || 'Not available',
+        "Postal Address": result.data.postalAddress || 'Not available',
+        "Phone Number": result.data.phoneNumber || 'Not available',
+        "Email": result.data.email || 'Not available',
+        "Employment Status": result.data.employmentStatus || 'Not available',
+        "Marital Status": result.data.maritalStatus || 'Not available',
+        "Number of Children": result.data.numberOfChildren || 'Not available',
+        "Passport Number": result.data.passportNumber || 'Not available',
+        "Birth Certificate": result.data.birthCertificate || 'Not available',
+        "Driver's License": result.data.driverLicense || 'Not available',
+        "Images": {
+          profile: addCacheBuster(result.data.images?.profile),
+          passport: addCacheBuster(result.data.images?.passport),
+          birthCertificate: addCacheBuster(result.data.images?.birthCertificate),
+          driverLicense: addCacheBuster(result.data.images?.driverLicense),
+          nationalId: addCacheBuster(result.data.images?.nationalId)
+        },
+        "Search Metadata": result.metadata ? 
+          `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}` 
+          : 'No metadata available'
+      };
+
+      setCustomerData(transformedData);
+      setShowInfoModal(true);
+
+    } catch (err) {
+      setError({
+        title: err.title || 'Search Error',
+        message: err.message || 'Failed to process request',
+        details: err.details || `DSSN: ${cleanedDssn}`,
+        technical: `Status: ${err.status || 'Unknown'} | ${err.timestamp || new Date().toISOString()}`
+      });
+      console.error("Search Error:", err);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const openDocumentModal = (url) => {
+    setCurrentDocumentUrl(url);
+    setShowDocumentModal(true);
+  };
+
+  const closeDocumentModal = () => {
+    setShowDocumentModal(false);
+    setCurrentDocumentUrl("");
+  };
 
   return (
     <div className="relative min-h-screen w-full bg-gray-900 text-white font-inter overflow-x-hidden">
@@ -239,13 +308,10 @@ const handleSearch = async (e) => {
       {/* Main Content */}
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          {/* Glass Card with Contrast */}
           <div className="relative bg-indigo-900/50 backdrop-blur-lg rounded-xl border border-indigo-700/30 shadow-2xl overflow-hidden">
-            {/* Glass reflection effect */}
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-transparent pointer-events-none" />
             <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-radial from-blue-400/20 via-transparent to-transparent opacity-30 pointer-events-none" />
             
-            {/* Content */}
             <div className="relative p-6 md:p-8">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-indigo-700/30 pb-2">
                 DSSN Verification
@@ -299,10 +365,24 @@ const handleSearch = async (e) => {
 
                 {error && (
                   <div className="bg-red-900/40 border border-red-700/30 rounded-lg p-4 backdrop-blur-sm">
-                    <p className="text-red-300">{error}</p>
-                    <p className="text-sm text-red-200 mt-2">
-                      If this persists, please contact support with details from your browser console
-                    </p>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-bold text-red-300">{error.title}</h4>
+                        <p className="text-red-200">{error.message}</p>
+                        {error.details && (
+                          <p className="text-sm text-red-200/80 mt-1">{error.details}</p>
+                        )}
+                        {error.technical && (
+                          <p className="text-xs text-red-200/60 mt-2">{error.technical}</p>
+                        )}
+                      </div>
+                      <button 
+                        onClick={() => console.error('Full Error:', error)}
+                        className="text-xs text-red-300/70 hover:text-red-300 px-2 py-1 rounded"
+                      >
+                        Details
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -317,9 +397,16 @@ const handleSearch = async (e) => {
           <div className="bg-gradient-to-br from-indigo-900/90 to-blue-900/90 border border-indigo-700/30 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  Search Results for DSSN: {sanitizeHTML(dssn)}
-                </h3>
+                <div>
+                  <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    Search Results for DSSN: {sanitizeHTML(dssn)}
+                  </h3>
+                  {customerData["Search Metadata"] && (
+                    <p className="text-xs text-blue-300/70 mt-1">
+                      {customerData["Search Metadata"]}
+                    </p>
+                  )}
+                </div>
                 <button onClick={() => setShowInfoModal(false)} className="text-gray-400 hover:text-white transition-colors">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -327,27 +414,120 @@ const handleSearch = async (e) => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                {Object.entries(customerData).map(([key, value]) => {
-                  if (typeof value === 'string' && !key.includes('Image')) {
-                    return (
-                      <div key={key} className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                        <strong className="text-blue-300">{key}:</strong> 
-                        <span className="ml-2 text-white/90">{sanitizeHTML(value)}</span>
-                      </div>
-                    );
-                  }
-                  return null;
-                })}
+              <div className="flex flex-col md:flex-row gap-6 mb-6">
+                {/* Profile Image */}
+                <div className="w-full md:w-1/3">
+                  <h4 className="text-blue-300 mb-2">Profile Image</h4>
+                  <GoogleStorageImage 
+                    src={customerData.Images?.profile}
+                    alt="Profile"
+                    className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer"
+                    onClick={() => openDocumentModal(customerData.Images?.profile)}
+                  />
+                </div>
+
+                {/* Customer Details */}
+                <div className="w-full md:w-2/3 grid grid-cols-1 gap-4">
+                  {Object.entries(customerData).map(([key, value]) => {
+                    if (typeof value === 'string' && !key.includes('Image') && !key.includes('Metadata')) {
+                      return (
+                        <div key={key} className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
+                          <strong className="text-blue-300">{key}:</strong> 
+                          <span className="ml-2 text-white/90">{sanitizeHTML(value)}</span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
               </div>
 
-              {/* ... (keep document sections unchanged) ... */}
+              {/* Document Images */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {customerData.Images?.passport && (
+                  <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
+                    <h4 className="text-blue-300 mb-2">Passport</h4>
+                    <GoogleStorageImage 
+                      src={customerData.Images.passport}
+                      alt="Passport"
+                      className="w-full h-48 object-contain cursor-pointer"
+                      onClick={() => openDocumentModal(customerData.Images.passport)}
+                    />
+                  </div>
+                )}
+
+                {customerData.Images?.birthCertificate && (
+                  <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
+                    <h4 className="text-blue-300 mb-2">Birth Certificate</h4>
+                    <GoogleStorageImage 
+                      src={customerData.Images.birthCertificate}
+                      alt="Birth Certificate"
+                      className="w-full h-48 object-contain cursor-pointer"
+                      onClick={() => openDocumentModal(customerData.Images.birthCertificate)}
+                    />
+                  </div>
+                )}
+
+                {customerData.Images?.driverLicense && (
+                  <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
+                    <h4 className="text-blue-300 mb-2">Driver's License</h4>
+                    <GoogleStorageImage 
+                      src={customerData.Images.driverLicense}
+                      alt="Driver's License"
+                      className="w-full h-48 object-contain cursor-pointer"
+                      onClick={() => openDocumentModal(customerData.Images.driverLicense)}
+                    />
+                  </div>
+                )}
+
+                {customerData.Images?.nationalId && (
+                  <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
+                    <h4 className="text-blue-300 mb-2">National ID</h4>
+                    <GoogleStorageImage 
+                      src={customerData.Images.nationalId}
+                      alt="National ID"
+                      className="w-full h-48 object-contain cursor-pointer"
+                      onClick={() => openDocumentModal(customerData.Images.nationalId)}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Document Modal (unchanged) */}
+      {/* Document Modal */}
+      {showDocumentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
+          <div className="relative bg-gray-900 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-auto">
+            <button 
+              onClick={closeDocumentModal}
+              className="absolute top-4 right-4 z-50 text-white hover:text-red-400 transition-colors"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            <div className="p-4 h-full">
+              {currentDocumentUrl?.endsWith('.pdf') ? (
+                <iframe 
+                  src={currentDocumentUrl} 
+                  className="w-full h-[80vh]"
+                  title="Document Viewer"
+                />
+              ) : (
+                <GoogleStorageImage 
+                  src={currentDocumentUrl}
+                  alt="Document Full View"
+                  className="w-full h-auto max-h-[80vh] object-contain mx-auto"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
