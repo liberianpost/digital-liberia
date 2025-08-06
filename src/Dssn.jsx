@@ -41,9 +41,29 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  const constructImageUrl = (path) => {
+    if (!path) return null;
+    
+    // If it's already a full URL, return it
+    if (path.startsWith('http')) return path;
+    
+    // Remove any existing domain or protocol
+    const cleanPath = path.replace(/^(https?:\/\/[^\/]+)?\//, '');
+    
+    // Handle URL-encoded characters (like spaces)
+    const encodedPath = encodeURIComponent(cleanPath)
+      .replace(/%2F/g, '/')
+      .replace(/%3A/g, ':')
+      .replace(/%20/g, ' ');
+    
+    return `https://storage.googleapis.com/${encodedPath}`;
+  };
 
   useEffect(() => {
     if (!src) {
+      console.log('No image source provided');
       setLoading(false);
       setError(true);
       return;
@@ -52,27 +72,15 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
     setLoading(true);
     setError(false);
 
-    // Check if the URL is already a complete Google Storage URL
-    if (src.startsWith('https://storage.googleapis.com/')) {
-      setImageUrl(src);
-      return;
+    try {
+      const url = constructImageUrl(src);
+      console.log('Constructed image URL:', url);
+      setImageUrl(url);
+    } catch (err) {
+      console.error('Error constructing image URL:', err);
+      setError(true);
+      setLoading(false);
     }
-
-    // Construct proper Google Storage URL
-    const constructImageUrl = (path) => {
-      if (!path) return null;
-      
-      // Remove any existing domain or protocol
-      const cleanPath = path.replace(/^(https?:\/\/[^\/]+)?\//, '');
-      
-      // Handle URL-encoded characters (like spaces)
-      const encodedPath = encodeURIComponent(cleanPath).replace(/%2F/g, '/');
-      
-      return `https://storage.googleapis.com/${encodedPath}`;
-    };
-
-    const url = constructImageUrl(src);
-    setImageUrl(url);
   }, [src]);
 
   useEffect(() => {
@@ -82,6 +90,11 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
     img.src = imageUrl;
     
     img.onload = () => {
+      console.log('Image loaded successfully:', imageUrl);
+      setDimensions({
+        width: img.naturalWidth,
+        height: img.naturalHeight
+      });
       setLoading(false);
     };
     
@@ -90,6 +103,17 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
       setError(true);
       setLoading(false);
     };
+
+    // Add timeout for very large images
+    const timeout = setTimeout(() => {
+      if (loading) {
+        console.warn('Image loading timed out:', imageUrl);
+        setError(true);
+        setLoading(false);
+      }
+    }, 10000); // 10 second timeout
+
+    return () => clearTimeout(timeout);
   }, [imageUrl]);
 
   if (!src) {
@@ -103,28 +127,54 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
   if (loading) {
     return (
       <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <span className="text-xs mt-2 text-blue-300">Loading image...</span>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
-        <span className="text-red-400 text-sm">Failed to load image</span>
+      <div className={`${className} bg-gray-800/50 flex flex-col items-center justify-center rounded-lg p-4`}>
+        <svg className="w-8 h-8 text-red-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <span className="text-red-400 text-sm text-center">Failed to load image</span>
+        <span className="text-xs text-gray-400 mt-1 text-center truncate w-full">{src}</span>
       </div>
     );
   }
 
+  // If image is too large (>10MB), show warning but still display
+  const isLargeImage = dimensions.width * dimensions.height > 10000000; // ~10MP
+  const fileSizeWarning = isLargeImage ? (
+    <div className="absolute top-2 left-2 bg-yellow-500/90 text-black text-xs px-2 py-1 rounded">
+      Large Image
+    </div>
+  ) : null;
+
   return (
-    <img
-      src={imageUrl}
-      alt={alt}
-      className={className}
-      onClick={onClick}
-      crossOrigin="anonymous"
-      onError={() => setError(true)}
-    />
+    <div className="relative">
+      {fileSizeWarning}
+      <img
+        src={imageUrl}
+        alt={alt}
+        className={className}
+        onClick={onClick}
+        crossOrigin="anonymous"
+        onError={() => {
+          console.error('Image render error:', imageUrl);
+          setError(true);
+        }}
+        style={{
+          maxWidth: '100%',
+          height: 'auto',
+          objectFit: 'contain'
+        }}
+      />
+    </div>
   );
 };
 
@@ -533,7 +583,7 @@ export default function Dssn() {
               </svg>
             </button>
             
-            <div className="p-4 h-full">
+            <div className="p-4 h-full flex items-center justify-center">
               {currentDocumentUrl?.endsWith('.pdf') ? (
                 <iframe 
                   src={currentDocumentUrl} 
@@ -544,7 +594,8 @@ export default function Dssn() {
                 <GoogleStorageImage 
                   src={currentDocumentUrl}
                   alt="Document Full View"
-                  className="w-full h-auto max-h-[80vh] object-contain mx-auto"
+                  className="w-full max-h-[80vh] object-contain"
+                  onClick={null}
                 />
               )}
             </div>
