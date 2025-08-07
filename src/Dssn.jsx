@@ -40,7 +40,6 @@ const sanitizeHTML = (str) => {
 const GoogleStorageImage = ({ src, alt, className, onClick }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
-    const [finalSrc, setFinalSrc] = useState('');
 
     useEffect(() => {
         if (!src) {
@@ -52,22 +51,8 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         setLoading(true);
         setError(false);
 
-        let processedSrc = src;
-        try {
-            const url = new URL(src);
-            processedSrc = url.href;
-        } catch (e) {
-            if (src.startsWith('system-liberianpost/')) {
-                processedSrc = `https://storage.googleapis.com/${src}`;
-            } else if (!src.startsWith('http')) {
-                processedSrc = `https://storage.googleapis.com/system-liberianpost/${src}`;
-            }
-        }
-
-        setFinalSrc(processedSrc);
-
         const img = new Image();
-        img.src = processedSrc;
+        img.src = src;
 
         img.onload = () => {
             setLoading(false);
@@ -104,13 +89,14 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         return (
             <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
                 <span className="text-red-400 text-sm">Failed to load image</span>
+                <div className="text-xs text-gray-400 mt-1">URL: {src.length > 30 ? `${src.substring(0, 30)}...` : src}</div>
             </div>
         );
     }
 
     return (
         <img
-            src={finalSrc}
+            src={src}
             alt={alt}
             className={className}
             onClick={onClick}
