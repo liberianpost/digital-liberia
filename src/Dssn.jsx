@@ -40,6 +40,7 @@ const sanitizeHTML = (str) => {
 const GoogleStorageImage = ({ src, alt, className, onClick }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
     if (!src) {
@@ -47,9 +48,50 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
       setError(true);
       return;
     }
+
     setLoading(true);
     setError(false);
+
+    const fixUrl = (url) => {
+      if (!url) return null;
+      // Fix double-encoded spaces and other encoding issues
+      let fixedUrl = decodeURIComponent(url);
+      // Ensure proper encoding of special characters while preserving slashes
+      fixedUrl = encodeURI(fixedUrl)
+        .replace(/%3A/g, ':')
+        .replace(/%2F/g, '/');
+      // Add cache busting
+      return `${fixedUrl}?t=${Date.now()}`;
+    };
+
+    const finalUrl = fixUrl(src);
+    setImageUrl(finalUrl);
   }, [src]);
+
+  useEffect(() => {
+    if (!imageUrl) return;
+
+    const img = new Image();
+    img.src = imageUrl;
+    
+    img.onload = () => {
+      setLoading(false);
+    };
+    
+    img.onerror = () => {
+      setError(true);
+      setLoading(false);
+    };
+
+    const timeout = setTimeout(() => {
+      if (loading) {
+        setError(true);
+        setLoading(false);
+      }
+    }, 10000);
+
+    return () => clearTimeout(timeout);
+  }, [imageUrl]);
 
   if (!src) {
     return (
@@ -77,16 +119,12 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
 
   return (
     <img
-      src={src}
+      src={imageUrl}
       alt={alt}
       className={className}
       onClick={onClick}
       crossOrigin="anonymous"
-      onLoad={() => setLoading(false)}
-      onError={() => {
-        setError(true);
-        setLoading(false);
-      }}
+      onError={() => setError(true)}
     />
   );
 };
@@ -134,27 +172,30 @@ export default function Dssn() {
     setError(null);
 
     try {
-      const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
+      const apiUrl = `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`;
+      
+      const response = await fetch(apiUrl, {
         method: 'GET',
+        credentials: 'include',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
-        },
-        credentials: 'include'
+        }
       });
 
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        throw {
+        const errorDetails = {
           title: result.error || `HTTP Error ${response.status}`,
           message: result.message || 'Request failed',
           details: `Reference: ${result.metadata?.requestId || 'N/A'}`,
           timestamp: result.metadata?.timestamp || new Date().toISOString()
         };
+        throw errorDetails;
       }
 
-      setCustomerData({
+      const transformedData = {
         "Full Name": result.data.fullName || 'Not available',
         "Place of Birth": result.data.placeOfBirth || 'Not available',
         "Date of Birth": result.data.dateOfBirth || 'Not available',
@@ -170,11 +211,19 @@ export default function Dssn() {
         "Passport Number": result.data.passportNumber || 'Not available',
         "Birth Certificate": result.data.birthCertificate || 'Not available',
         "Driver's License": result.data.driverLicense || 'Not available',
-        "Images": result.data.images || {},
+        "Images": {
+          profile: result.data.images?.profile || null,
+          passport: result.data.images?.passport || null,
+          birthCertificate: result.data.images?.birthCertificate || null,
+          driverLicense: result.data.images?.driverLicense || null,
+          nationalId: result.data.images?.nationalId || null
+        },
         "Search Metadata": result.metadata ? 
           `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}` 
           : 'No metadata available'
-      });
+      };
+
+      setCustomerData(transformedData);
       setShowInfoModal(true);
 
     } catch (err) {
@@ -201,16 +250,15 @@ export default function Dssn() {
 
   return (
     <div className="relative min-h-screen w-full bg-gray-900 text-white font-inter overflow-x-hidden">
-      {/* Background layers */}
       <div className="fixed inset-0 -z-50 bg-gradient-to-br from-blue-900/90 to-indigo-900/90" />
       <div className="fixed inset-0 -z-40 bg-white/10 backdrop-blur-[3px] pointer-events-none" />
       <div className="fixed inset-0 -z-30 bg-[url('/noise.png')] opacity-10 pointer-events-none" />
+
       <div
         className="fixed inset-0 -z-20 bg-cover bg-center transition-opacity duration-1000 mix-blend-soft-light"
         style={{ backgroundImage: `url(${backgroundImages[bgIndex]})`, opacity: 0.15 }}
       />
 
-      {/* Logo animation */}
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
         <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
           {logos.map((logo, index) => (
@@ -221,12 +269,12 @@ export default function Dssn() {
               }`}
             >
               <img src={logo} alt={`Logo ${index}`} className="max-w-full max-h-full object-contain" />
+              <div className="absolute inset-0 bg-black/5" />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Header */}
       <header className="fixed top-0 left-0 w-full z-50">
         <div className="bg-indigo-900/70 backdrop-blur-md border-b border-indigo-700/30">
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
@@ -274,15 +322,16 @@ export default function Dssn() {
         </div>
       </header>
 
-      {/* Main content */}
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
           <div className="relative bg-indigo-900/50 backdrop-blur-lg rounded-xl border border-indigo-700/30 shadow-2xl overflow-hidden">
-            <div className="p-6 md:p-8">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-transparent pointer-events-none" />
+            <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-radial from-blue-400/20 via-transparent to-transparent opacity-30 pointer-events-none" />
+            
+            <div className="relative p-6 md:p-8">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-indigo-700/30 pb-2">
                 DSSN Verification
               </h2>
-              
               <div className="text-white/90 relative space-y-6">
                 <p>
                   Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information.
@@ -339,7 +388,16 @@ export default function Dssn() {
                         {error.details && (
                           <p className="text-sm text-red-200/80 mt-1">{error.details}</p>
                         )}
+                        {error.technical && (
+                          <p className="text-xs text-red-200/60 mt-2">{error.technical}</p>
+                        )}
                       </div>
+                      <button 
+                        onClick={() => console.error('Full Error:', error)}
+                        className="text-xs text-red-300/70 hover:text-red-300 px-2 py-1 rounded"
+                      >
+                        Details
+                      </button>
                     </div>
                   </div>
                 )}
@@ -349,9 +407,8 @@ export default function Dssn() {
         </section>
       </main>
 
-      {/* Modals */}
       {showInfoModal && customerData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div id="dssnInfo" className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="bg-gradient-to-br from-indigo-900/90 to-blue-900/90 border border-indigo-700/30 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
@@ -365,7 +422,7 @@ export default function Dssn() {
                     </p>
                   )}
                 </div>
-                <button onClick={() => setShowInfoModal(false)} className="text-gray-400 hover:text-white">
+                <button onClick={() => setShowInfoModal(false)} className="text-gray-400 hover:text-white transition-colors">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -457,7 +514,7 @@ export default function Dssn() {
           <div className="relative bg-gray-900 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-auto">
             <button 
               onClick={closeDocumentModal}
-              className="absolute top-4 right-4 z-50 text-white hover:text-red-400"
+              className="absolute top-4 right-4 z-50 text-white hover:text-red-400 transition-colors"
             >
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -476,6 +533,7 @@ export default function Dssn() {
                   src={currentDocumentUrl}
                   alt="Document Full View"
                   className="w-full max-h-[80vh] object-contain"
+                  onClick={null}
                 />
               )}
             </div>
@@ -483,15 +541,17 @@ export default function Dssn() {
         </div>
       )}
 
-      {/* Footer */}
       <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
         <div className="border-t border-indigo-700/30 pt-6">
           © {new Date().getFullYear()} Digital Liberia. All rights reserved.
         </div>
       </footer>
 
-      {/* Global styles */}
       <style jsx global>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
         @keyframes heartbeat {
           0% { transform: scale(1); }
           25% { transform: scale(1.1); }
@@ -499,8 +559,18 @@ export default function Dssn() {
           75% { transform: scale(1.1); }
           100% { transform: scale(1); }
         }
+        .overflow-x-auto {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
         .overflow-x-auto::-webkit-scrollbar {
           display: none;
+        }
+        .document-thumbnail {
+          transition: all 0.3s ease;
+        }
+        .document-thumbnail:hover {
+          transform: translateY(-5px);
         }
       `}</style>
     </div>
