@@ -52,16 +52,21 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         setLoading(true);
         setError(false);
 
-        // Construct the full URL if it's not already one
-        let fullUrl = src;
+        // Construct the proper URL based on the source
+        let url = src;
         if (!src.startsWith('http') && !src.startsWith('data:')) {
-            fullUrl = `https://storage.googleapis.com/${src.replace(/^\//, '')}`;
+            // If it's just a path, prepend the base URL
+            if (src.startsWith('system-liberianpost/')) {
+                url = `https://storage.googleapis.com/${src}`;
+            } else {
+                url = `https://storage.googleapis.com/system-liberianpost/${src}`;
+            }
         }
 
-        setImageUrl(fullUrl);
+        setImageUrl(url);
 
         const img = new Image();
-        img.src = fullUrl;
+        img.src = url;
 
         img.onload = () => {
             setLoading(false);
@@ -223,10 +228,16 @@ export default function Dssn() {
     };
 
     const openDocumentModal = (url) => {
+        if (!url) return;
+        
         // Construct full URL if it's not already one
         let fullUrl = url;
-        if (url && !url.startsWith('http') && !url.startsWith('data:')) {
-            fullUrl = `https://storage.googleapis.com/${url.replace(/^\//, '')}`;
+        if (!url.startsWith('http') && !url.startsWith('data:')) {
+            if (url.startsWith('system-liberianpost/')) {
+                fullUrl = `https://storage.googleapis.com/${url}`;
+            } else {
+                fullUrl = `https://storage.googleapis.com/system-liberianpost/${url}`;
+            }
         }
         setCurrentDocumentUrl(fullUrl);
         setShowDocumentModal(true);
