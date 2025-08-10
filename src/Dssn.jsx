@@ -37,7 +37,6 @@ const getFileType = (url) => {
     return 'other';
 };
 
-// Renamed for clarity: this component is specifically for loading images.
 const ImageLoader = ({ src, alt, className, onClick }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -86,7 +85,6 @@ const ImageLoader = ({ src, alt, className, onClick }) => {
     );
 };
 
-// NEW: A component to display either an image or a PDF icon
 const DocumentThumbnail = ({ url, name, onOpen }) => {
     if (!url) {
         return (
@@ -121,7 +119,6 @@ const DocumentThumbnail = ({ url, name, onOpen }) => {
         </div>
     );
 };
-
 
 export default function Dssn() {
     const location = useLocation();
@@ -194,11 +191,13 @@ export default function Dssn() {
                 "Passport Number": result.data.passportNumber || 'Not available',
                 "Birth Certificate": result.data.birthCertificate || 'Not available',
                 "Driver's License": result.data.driverLicense || 'Not available',
-                "Image": result.data.images?.profile || null,
+                "Profile Image": result.data.images?.profile || null,
                 "Passport Image": result.data.images?.passport || null,
                 "Birth Certificate Image": result.data.images?.birthCertificate || null,
                 "Drivers License Image": result.data.images?.driverLicense || null,
-                "National Id Image": result.data.images?.nationalId || null,
+                "National ID Image": result.data.images?.nationalId || null,
+                "Signature Image": result.data.images?.signature || null,
+                "Fingerprint Image": result.data.images?.fingerprint || null,
                 "Search Metadata": result.metadata ? `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}` : 'No metadata'
             };
 
@@ -217,6 +216,7 @@ export default function Dssn() {
     };
 
     const openDocumentModal = (url) => {
+        if (!url) return;
         setCurrentDocumentUrl(url);
         setShowDocumentModal(true);
     };
@@ -230,7 +230,7 @@ export default function Dssn() {
         if (!currentDocumentUrl) return;
         const link = document.createElement('a');
         link.href = currentDocumentUrl;
-        link.target = '_blank'; // Open in new tab
+        link.target = '_blank';
         link.download = currentDocumentUrl.split('/').pop() || 'document';
         document.body.appendChild(link);
         link.click();
@@ -239,12 +239,14 @@ export default function Dssn() {
 
     return (
         <div className="relative min-h-screen w-full bg-gray-900 text-white font-inter overflow-x-hidden">
+            {/* Background elements remain the same */}
             <div className="fixed inset-0 -z-50 bg-gradient-to-br from-blue-900/90 to-indigo-900/90" />
             <div className="fixed inset-0 -z-40 bg-white/10 backdrop-blur-[3px] pointer-events-none" />
             <div className="fixed inset-0 -z-30 bg-[url('/noise.png')] opacity-10 pointer-events-none" />
             <div className="fixed inset-0 -z-20 bg-cover bg-center transition-opacity duration-1000 mix-blend-soft-light"
                 style={{ backgroundImage: `url(${backgroundImages[bgIndex]})`, opacity: 0.15 }} />
 
+            {/* Logo display remains the same */}
             <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
                 <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
                     {logos.map((logo, index) => (
@@ -257,6 +259,7 @@ export default function Dssn() {
                 </div>
             </div>
 
+            {/* Header remains the same */}
             <header className="fixed top-0 left-0 w-full z-50">
                 <div className="bg-indigo-900/70 backdrop-blur-md border-b border-indigo-700/30">
                     <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
@@ -285,6 +288,7 @@ export default function Dssn() {
                 </div>
             </header>
 
+            {/* Main content remains the same */}
             <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
                 <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
                     <div className="relative bg-indigo-900/50 backdrop-blur-lg rounded-xl border border-indigo-700/30 shadow-2xl overflow-hidden">
@@ -346,7 +350,12 @@ export default function Dssn() {
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                                 <div className="lg:col-span-1 bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                     <h4 className="text-blue-300 mb-3 font-semibold text-lg">Profile Photo</h4>
-                                    <ImageLoader src={customerData["Image"]} alt="Profile Photo" className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer" onClick={() => openDocumentModal(customerData["Image"])} />
+                                    <ImageLoader 
+                                        src={customerData["Profile Image"]} 
+                                        alt="Profile Photo" 
+                                        className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer" 
+                                        onClick={() => openDocumentModal(customerData["Profile Image"])} 
+                                    />
                                 </div>
                                 <div className="lg:col-span-2 bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                     <h4 className="text-blue-300 mb-3 font-semibold text-lg">Profile Information</h4>
@@ -369,12 +378,44 @@ export default function Dssn() {
                             </div>
 
                             <div>
+                                <h4 className="text-blue-300 mb-3 border-b border-indigo-700/30 pb-2 font-semibold text-lg">Biometric Data</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                                    <DocumentThumbnail 
+                                        url={customerData["Signature Image"]} 
+                                        name="Signature" 
+                                        onOpen={openDocumentModal} 
+                                    />
+                                    <DocumentThumbnail 
+                                        url={customerData["Fingerprint Image"]} 
+                                        name="Fingerprint" 
+                                        onOpen={openDocumentModal} 
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
                                 <h4 className="text-blue-300 mb-3 border-b border-indigo-700/30 pb-2 font-semibold text-lg">Associated Documents</h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    <DocumentThumbnail url={customerData["Passport Image"]} name="Passport" onOpen={openDocumentModal} />
-                                    <DocumentThumbnail url={customerData["Birth Certificate Image"]} name="Birth Certificate" onOpen={openDocumentModal} />
-                                    <DocumentThumbnail url={customerData["Drivers License Image"]} name="Driver's License" onOpen={openDocumentModal} />
-                                    <DocumentThumbnail url={customerData["National Id Image"]} name="National ID" onOpen={openDocumentModal} />
+                                    <DocumentThumbnail 
+                                        url={customerData["Passport Image"]} 
+                                        name="Passport" 
+                                        onOpen={openDocumentModal} 
+                                    />
+                                    <DocumentThumbnail 
+                                        url={customerData["Birth Certificate Image"]} 
+                                        name="Birth Certificate" 
+                                        onOpen={openDocumentModal} 
+                                    />
+                                    <DocumentThumbnail 
+                                        url={customerData["Drivers License Image"]} 
+                                        name="Driver's License" 
+                                        onOpen={openDocumentModal} 
+                                    />
+                                    <DocumentThumbnail 
+                                        url={customerData["National ID Image"]} 
+                                        name="National ID" 
+                                        onOpen={openDocumentModal} 
+                                    />
                                 </div>
                             </div>
                         </div>
