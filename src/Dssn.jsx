@@ -40,6 +40,7 @@ const sanitizeHTML = (str) => {
 const GoogleStorageImage = ({ src, alt, className, onClick }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [imageUrl, setImageUrl] = useState('');
 
     useEffect(() => {
         if (!src) {
@@ -51,8 +52,16 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         setLoading(true);
         setError(false);
 
+        // Construct the full URL if it's not already one
+        let fullUrl = src;
+        if (!src.startsWith('http') && !src.startsWith('data:')) {
+            fullUrl = `https://storage.googleapis.com/${src.replace(/^\//, '')}`;
+        }
+
+        setImageUrl(fullUrl);
+
         const img = new Image();
-        img.src = src;
+        img.src = fullUrl;
 
         img.onload = () => {
             setLoading(false);
@@ -96,7 +105,7 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
 
     return (
         <img
-            src={src}
+            src={imageUrl}
             alt={alt}
             className={className}
             onClick={onClick}
@@ -214,7 +223,12 @@ export default function Dssn() {
     };
 
     const openDocumentModal = (url) => {
-        setCurrentDocumentUrl(url);
+        // Construct full URL if it's not already one
+        let fullUrl = url;
+        if (url && !url.startsWith('http') && !url.startsWith('data:')) {
+            fullUrl = `https://storage.googleapis.com/${url.replace(/^\//, '')}`;
+        }
+        setCurrentDocumentUrl(fullUrl);
         setShowDocumentModal(true);
     };
 
