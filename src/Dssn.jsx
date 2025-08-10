@@ -142,90 +142,89 @@ export default function Dssn() {
         return () => clearInterval(logoInterval);
     }, []);
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
-        const cleanedDssn = dssn.trim().toUpperCase();
+   const handleSearch = async (e) => {
+    e.preventDefault();
+    const cleanedDssn = dssn.trim().toUpperCase();
 
-        if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
-            setError({
-                title: "Invalid DSSN Format", 
-                message: "Must be exactly 15 alphanumeric characters",
-                details: `Received: ${cleanedDssn} (${cleanedDssn.length} chars)`
-            });
-            return;
+    if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
+        setError({
+            title: "Invalid DSSN Format", 
+            message: "Must be exactly 15 alphanumeric characters",
+            details: `Received: ${cleanedDssn} (${cleanedDssn.length} chars)`
+        });
+        return;
+    }
+
+    setIsSearching(true);
+    setError(null);
+    setCustomerData(null);
+
+    try {
+        const apiUrl = `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`;
+        
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: { 
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            mode: 'cors'
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        setIsSearching(true);
-        setError(null);
-        setCustomerData(null);
+        const result = await response.json();
 
-        try {
-            const apiUrl = `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`;
-            const response = await fetch(apiUrl, {
-                method: 'GET',
-                headers: { 
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include'
-            });
-
-            const result = await response.json();
-
-            if (!response.ok || !result.success) {
-                throw {
-                    title: result.error || `HTTP Error ${response.status}`,
-                    message: result.message || 'Request failed',
-                    details: `Reference: ${result.metadata?.requestId || 'N/A'}`,
-                    timestamp: result.metadata?.timestamp || new Date().toISOString()
-                };
-            }
-
-            // Transform data for display
-            const transformedData = {
-                // Basic info
-                "Full Name": result.data.fullName || 'Not available',
-                "Place of Birth": result.data.placeOfBirth || 'Not available',
-                "Date of Birth": result.data.dateOfBirth || 'Not available',
-                "Sex": result.data.sex || 'Not available',
-                "Nationality": result.data.nationality || 'Not available',
-                "Address": result.data.address || 'Not available',
-                "Postal Address": result.data.postalAddress || 'Not available',
-                "Phone Number": result.data.phoneNumber || 'Not available',
-                "Email": result.data.email || 'Not available',
-                "Employment Status": result.data.employmentStatus || 'Not available',
-                "Marital Status": result.data.maritalStatus || 'Not available',
-                "Number of Children": result.data.numberOfChildren,
-                "Passport Number": result.data.passportNumber || 'Not available',
-                "Birth Certificate": result.data.birthCertificate || 'Not available',
-                "Driver's License": result.data.driverLicense || 'Not available',
-                
-                // Images
-                "Profile Image": result.data.images?.profile || null,
-                "Passport Image": result.data.images?.passport || null,
-                "Birth Certificate Image": result.data.images?.birthCertificate || null,
-                "Drivers License Image": result.data.images?.driverLicense || null,
-                "National ID Image": result.data.images?.nationalId || null,
-                
-                // Metadata
-                "Search Metadata": result.metadata ? `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}` : 'No metadata'
+        if (!result.success) {
+            throw {
+                title: result.error || 'Request failed',
+                message: result.message || 'No data returned',
+                details: `DSSN: ${cleanedDssn}`
             };
-
-            setCustomerData(transformedData);
-            setShowInfoModal(true);
-
-        } catch (err) {
-            console.error('Search error:', err);
-            setError({
-                title: err.title || 'Search Error', 
-                message: err.message || 'Failed to process request',
-                details: err.details || `DSSN: ${cleanedDssn}`,
-                technical: err.stack || `Status: ${err.status || 'Unknown'}`
-            });
-        } finally {
-            setIsSearching(false);
         }
-    };
+
+        const transformedData = {
+            "Full Name": result.data.fullName || 'Not available',
+            "Place of Birth": result.data.placeOfBirth || 'Not available',
+            "Date of Birth": result.data.dateOfBirth || 'Not available',
+            "Sex": result.data.sex || 'Not available',
+            "Nationality": result.data.nationality || 'Not available',
+            "Address": result.data.address || 'Not available',
+            "Postal Address": result.data.postalAddress || 'Not available',
+            "Phone Number": result.data.phoneNumber || 'Not available',
+            "Email": result.data.email || 'Not available',
+            "Employment Status": result.data.employmentStatus || 'Not available',
+            "Marital Status": result.data.maritalStatus || 'Not available',
+            "Number of Children": result.data.numberOfChildren,
+            "Passport Number": result.data.passportNumber || 'Not available',
+            "Birth Certificate": result.data.birthCertificate || 'Not available',
+            "Driver's License": result.data.driverLicense || 'Not available',
+            "Profile Image": result.data.images?.profile || null,
+            "Passport Image": result.data.images?.passport || null,
+            "Birth Certificate Image": result.data.images?.birthCertificate || null,
+            "Drivers License Image": result.data.images?.driverLicense || null,
+            "National ID Image": result.data.images?.nationalId || null,
+            "Search Metadata": result.metadata ? `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}` : 'No metadata'
+        };
+
+        setCustomerData(transformedData);
+        setShowInfoModal(true);
+
+    } catch (err) {
+        console.error('Search error:', err);
+        setError({
+            title: err.title || 'Search Error', 
+            message: err.message || 'Failed to process request',
+            details: err.details || `DSSN: ${cleanedDssn}`,
+            technical: err.stack || `Status: ${err.status || 'Unknown'}`
+        });
+    } finally {
+        setIsSearching(false);
+    }
+};
 
     const openDocumentModal = (url) => {
         if (!url) return;
