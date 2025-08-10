@@ -170,21 +170,20 @@ export default function Dssn() {
                 credentials: 'include'
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
             const result = await response.json();
 
-            if (!result.success) {
+            if (!response.ok || !result.success) {
                 throw {
-                    title: result.error || 'Request failed',
-                    message: result.message || 'No data returned',
-                    details: result.details || `DSSN: ${cleanedDssn}`
+                    title: result.error || `HTTP Error ${response.status}`,
+                    message: result.message || 'Request failed',
+                    details: `Reference: ${result.metadata?.requestId || 'N/A'}`,
+                    timestamp: result.metadata?.timestamp || new Date().toISOString()
                 };
             }
 
+            // Transform data for display
             const transformedData = {
+                // Basic info
                 "Full Name": result.data.fullName || 'Not available',
                 "Place of Birth": result.data.placeOfBirth || 'Not available',
                 "Date of Birth": result.data.dateOfBirth || 'Not available',
@@ -200,11 +199,15 @@ export default function Dssn() {
                 "Passport Number": result.data.passportNumber || 'Not available',
                 "Birth Certificate": result.data.birthCertificate || 'Not available',
                 "Driver's License": result.data.driverLicense || 'Not available',
+                
+                // Images
                 "Profile Image": result.data.images?.profile || null,
                 "Passport Image": result.data.images?.passport || null,
                 "Birth Certificate Image": result.data.images?.birthCertificate || null,
                 "Drivers License Image": result.data.images?.driverLicense || null,
                 "National ID Image": result.data.images?.nationalId || null,
+                
+                // Metadata
                 "Search Metadata": result.metadata ? `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}` : 'No metadata'
             };
 
