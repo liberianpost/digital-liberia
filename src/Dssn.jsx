@@ -148,7 +148,8 @@ export default function Dssn() {
 
         if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
             setError({
-                title: "Invalid DSSN Format", message: "Must be exactly 15 alphanumeric characters",
+                title: "Invalid DSSN Format", 
+                message: "Must be exactly 15 alphanumeric characters",
                 details: `Received: ${cleanedDssn} (${cleanedDssn.length} chars)`
             });
             return;
@@ -156,22 +157,30 @@ export default function Dssn() {
 
         setIsSearching(true);
         setError(null);
+        setCustomerData(null);
 
         try {
             const apiUrl = `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`;
             const response = await fetch(apiUrl, {
-                method: 'GET', credentials: 'include',
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+                method: 'GET',
+                headers: { 
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
             });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
             const result = await response.json();
 
-            if (!response.ok || !result.success) {
+            if (!result.success) {
                 throw {
-                    title: result.error || `HTTP Error ${response.status}`,
-                    message: result.message || 'Request failed',
-                    details: `Reference: ${result.metadata?.requestId || 'N/A'}`,
-                    timestamp: result.metadata?.timestamp || new Date().toISOString()
+                    title: result.error || 'Request failed',
+                    message: result.message || 'No data returned',
+                    details: result.details || `DSSN: ${cleanedDssn}`
                 };
             }
 
@@ -196,8 +205,6 @@ export default function Dssn() {
                 "Birth Certificate Image": result.data.images?.birthCertificate || null,
                 "Drivers License Image": result.data.images?.driverLicense || null,
                 "National ID Image": result.data.images?.nationalId || null,
-                "Signature Image": result.data.images?.signature || null,
-                "Fingerprint Image": result.data.images?.fingerprint || null,
                 "Search Metadata": result.metadata ? `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}` : 'No metadata'
             };
 
@@ -205,10 +212,12 @@ export default function Dssn() {
             setShowInfoModal(true);
 
         } catch (err) {
+            console.error('Search error:', err);
             setError({
-                title: err.title || 'Search Error', message: err.message || 'Failed to process request',
+                title: err.title || 'Search Error', 
+                message: err.message || 'Failed to process request',
                 details: err.details || `DSSN: ${cleanedDssn}`,
-                technical: `Status: ${err.status || 'Unknown'} | ${err.timestamp || new Date().toISOString()}`
+                technical: err.stack || `Status: ${err.status || 'Unknown'}`
             });
         } finally {
             setIsSearching(false);
@@ -239,14 +248,14 @@ export default function Dssn() {
 
     return (
         <div className="relative min-h-screen w-full bg-gray-900 text-white font-inter overflow-x-hidden">
-            {/* Background elements remain the same */}
+            {/* Background elements */}
             <div className="fixed inset-0 -z-50 bg-gradient-to-br from-blue-900/90 to-indigo-900/90" />
             <div className="fixed inset-0 -z-40 bg-white/10 backdrop-blur-[3px] pointer-events-none" />
             <div className="fixed inset-0 -z-30 bg-[url('/noise.png')] opacity-10 pointer-events-none" />
             <div className="fixed inset-0 -z-20 bg-cover bg-center transition-opacity duration-1000 mix-blend-soft-light"
                 style={{ backgroundImage: `url(${backgroundImages[bgIndex]})`, opacity: 0.15 }} />
 
-            {/* Logo display remains the same */}
+            {/* Logo display */}
             <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
                 <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
                     {logos.map((logo, index) => (
@@ -259,7 +268,7 @@ export default function Dssn() {
                 </div>
             </div>
 
-            {/* Header remains the same */}
+            {/* Header */}
             <header className="fixed top-0 left-0 w-full z-50">
                 <div className="bg-indigo-900/70 backdrop-blur-md border-b border-indigo-700/30">
                     <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
@@ -288,7 +297,7 @@ export default function Dssn() {
                 </div>
             </header>
 
-            {/* Main content remains the same */}
+            {/* Main content */}
             <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
                 <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
                     <div className="relative bg-indigo-900/50 backdrop-blur-lg rounded-xl border border-indigo-700/30 shadow-2xl overflow-hidden">
@@ -307,13 +316,32 @@ export default function Dssn() {
                                 <form onSubmit={handleSearch} className="space-y-4">
                                     <div>
                                         <label htmlFor="dssn" className="block text-sm font-medium mb-2">Enter DSSN to Verify:</label>
-                                        <input type="text" id="dssn" value={dssn} onChange={(e) => setDssn(e.target.value)}
+                                        <input 
+                                            type="text" 
+                                            id="dssn" 
+                                            value={dssn} 
+                                            onChange={(e) => setDssn(e.target.value)}
                                             className="w-full bg-indigo-900/40 border border-indigo-700/30 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 backdrop-blur-sm text-white placeholder-indigo-400/70"
-                                            placeholder="e.g. PYGMNL94LR09Z24" required pattern="[A-Za-z0-9]{15}" title="15-character alphanumeric DSSN" />
+                                            placeholder="e.g. PYGMNL94LR09Z24" 
+                                            required 
+                                            pattern="[A-Za-z0-9]{15}" 
+                                            title="15-character alphanumeric DSSN" 
+                                        />
                                     </div>
-                                    <button type="submit" disabled={isSearching}
-                                        className={`flex items-center justify-center px-6 py-3 rounded-lg border transition-all ${isSearching ? "bg-blue-700/50 border-blue-600/30 cursor-not-allowed" : "bg-gradient-to-r from-blue-500/80 to-indigo-600/80 border-blue-400/30 hover:from-blue-600/80 hover:to-indigo-700/80 hover:shadow-lg"}`}>
-                                        {isSearching ? (<><svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Searching...</>) : ("Search")}
+                                    <button 
+                                        type="submit" 
+                                        disabled={isSearching}
+                                        className={`flex items-center justify-center px-6 py-3 rounded-lg border transition-all ${isSearching ? "bg-blue-700/50 border-blue-600/30 cursor-not-allowed" : "bg-gradient-to-r from-blue-500/80 to-indigo-600/80 border-blue-400/30 hover:from-blue-600/80 hover:to-indigo-700/80 hover:shadow-lg"}`}
+                                    >
+                                        {isSearching ? (
+                                            <>
+                                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Searching...
+                                            </>
+                                        ) : "Search"}
                                     </button>
                                 </form>
                                 {error && (
@@ -335,16 +363,28 @@ export default function Dssn() {
                 </section>
             </main>
 
+            {/* Info Modal */}
             {showInfoModal && customerData && (
                 <div id="dssnInfo" className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
                     <div className="bg-gradient-to-br from-indigo-900/90 to-blue-900/90 border border-indigo-700/30 rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
                         <div className="p-6">
                             <div className="flex justify-between items-center mb-4 pb-4 border-b border-indigo-700/30">
                                 <div>
-                                    <h3 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Search Results for DSSN: {sanitizeHTML(dssn)}</h3>
-                                    {customerData["Search Metadata"] && (<p className="text-xs text-blue-300/70 mt-1">{customerData["Search Metadata"]}</p>)}
+                                    <h3 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                                        Search Results for DSSN: {sanitizeHTML(dssn)}
+                                    </h3>
+                                    {customerData["Search Metadata"] && (
+                                        <p className="text-xs text-blue-300/70 mt-1">{customerData["Search Metadata"]}</p>
+                                    )}
                                 </div>
-                                <button onClick={() => setShowInfoModal(false)} className="text-gray-400 hover:text-white transition-colors"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+                                <button 
+                                    onClick={() => setShowInfoModal(false)} 
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
                             </div>
 
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -378,22 +418,6 @@ export default function Dssn() {
                             </div>
 
                             <div>
-                                <h4 className="text-blue-300 mb-3 border-b border-indigo-700/30 pb-2 font-semibold text-lg">Biometric Data</h4>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                                    <DocumentThumbnail 
-                                        url={customerData["Signature Image"]} 
-                                        name="Signature" 
-                                        onOpen={openDocumentModal} 
-                                    />
-                                    <DocumentThumbnail 
-                                        url={customerData["Fingerprint Image"]} 
-                                        name="Fingerprint" 
-                                        onOpen={openDocumentModal} 
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
                                 <h4 className="text-blue-300 mb-3 border-b border-indigo-700/30 pb-2 font-semibold text-lg">Associated Documents</h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                     <DocumentThumbnail 
@@ -423,20 +447,45 @@ export default function Dssn() {
                 </div>
             )}
 
+            {/* Document Modal */}
             {showDocumentModal && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={closeDocumentModal}>
                     <div className="bg-gray-900 rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
                         <div className="flex justify-between items-center p-4 border-b border-gray-700">
                             <h4 className="font-bold text-white">Document Viewer</h4>
                             <div>
-                                <button onClick={downloadDocument} className="text-sm text-blue-400 hover:text-blue-300 mr-4">Download</button>
-                                <button onClick={closeDocumentModal} className="text-gray-400 hover:text-white">&times;</button>
+                                <button 
+                                    onClick={downloadDocument} 
+                                    className="text-sm text-blue-400 hover:text-blue-300 mr-4"
+                                >
+                                    Download
+                                </button>
+                                <button 
+                                    onClick={closeDocumentModal} 
+                                    className="text-gray-400 hover:text-white"
+                                >
+                                    &times;
+                                </button>
                             </div>
                         </div>
                         <div className="p-4 flex-grow">
-                            {getFileType(currentDocumentUrl) === 'image' && <img src={currentDocumentUrl} alt="Document" className="max-w-full max-h-full mx-auto object-contain" />}
-                            {getFileType(currentDocumentUrl) === 'pdf' && <iframe src={currentDocumentUrl} title="Document" className="w-full h-[75vh] border-0"></iframe>}
-                            {getFileType(currentDocumentUrl) === 'other' && <p className="text-center text-white">Cannot display this file type. Please download to view.</p>}
+                            {getFileType(currentDocumentUrl) === 'image' && (
+                                <img 
+                                    src={currentDocumentUrl} 
+                                    alt="Document" 
+                                    className="max-w-full max-h-full mx-auto object-contain" 
+                                />
+                            )}
+                            {getFileType(currentDocumentUrl) === 'pdf' && (
+                                <iframe 
+                                    src={currentDocumentUrl} 
+                                    title="Document" 
+                                    className="w-full h-[75vh] border-0"
+                                />
+                            )}
+                            {getFileType(currentDocumentUrl) === 'other' && (
+                                <p className="text-center text-white">Cannot display this file type. Please download to view.</p>
+                            )}
                         </div>
                     </div>
                 </div>
