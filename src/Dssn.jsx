@@ -10,37 +10,37 @@ const navLinks = [
 ];
 
 const logos = [
-    "/logos/liberianpost.png",
-    "/logos/digital.png",
-    "/logos/libmusic.png",
-    "/logos/libconnectsit.png",
-    "/logos/libpaysit.png",
-    "/logos/seal of liberia.png",
-    "/logos/liberia.png"
+    "/logos/liberianpost.png", "/logos/digital.png", "/logos/libmusic.png",
+    "/logos/libconnectsit.png", "/logos/libpaysit.png", "/logos/seal of liberia.png", "/logos/liberia.png"
 ];
 
 const backgroundImages = [
-    "/backgrounds/bg1.jpg",
-    "/backgrounds/bg2.jpg",
-    "/backgrounds/bg3.jpg",
-    "/backgrounds/bg4.jpg",
-    "/backgrounds/bg5.jpg"
+    "/backgrounds/bg1.jpg", "/backgrounds/bg2.jpg", "/backgrounds/bg3.jpg", "/backgrounds/bg4.jpg", "/backgrounds/bg5.jpg"
 ];
 
 const sanitizeHTML = (str) => {
-    if (!str) return '';
-    return str.toString()
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 };
 
-const GoogleStorageImage = ({ src, alt, className, onClick }) => {
+const getFileType = (url) => {
+    if (!url || typeof url !== 'string') return 'unknown';
+    const extension = url.split('.').pop().toLowerCase().split('?')[0];
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(extension)) {
+        return 'image';
+    }
+    if (extension === 'pdf') {
+        return 'pdf';
+    }
+    return 'other';
+};
+
+// Renamed for clarity: this component is specifically for loading images.
+const ImageLoader = ({ src, alt, className, onClick }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
-    const [imageUrl, setImageUrl] = useState('');
 
     useEffect(() => {
         if (!src) {
@@ -51,27 +51,9 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
 
         setLoading(true);
         setError(false);
-
-        // Construct the proper URL based on the source
-        let url = src;
-        if (!src.startsWith('http') && !src.startsWith('data:')) {
-            // If it's just a path, prepend the base URL
-            if (src.startsWith('system-liberianpost/')) {
-                url = `https://storage.googleapis.com/${src}`;
-            } else {
-                url = `https://storage.googleapis.com/system-liberianpost/${src}`;
-            }
-        }
-
-        setImageUrl(url);
-
         const img = new Image();
-        img.src = url;
-
-        img.onload = () => {
-            setLoading(false);
-        };
-
+        img.src = src;
+        img.onload = () => setLoading(false);
         img.onerror = () => {
             setError(true);
             setLoading(false);
@@ -83,10 +65,10 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         };
     }, [src]);
 
-    if (!src) {
+    if (error) {
         return (
-            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
-                <span className="text-gray-400 text-sm">No image available</span>
+            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg text-center`}>
+                <span className="text-red-400 text-sm">Image not available</span>
             </div>
         );
     }
@@ -99,26 +81,47 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         );
     }
 
-    if (error) {
+    return (
+        <img src={src} alt={alt} className={className} onClick={onClick} crossOrigin="anonymous" onError={() => setError(true)} />
+    );
+};
+
+// NEW: A component to display either an image or a PDF icon
+const DocumentThumbnail = ({ url, name, onOpen }) => {
+    if (!url) {
         return (
-            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
-                <span className="text-red-400 text-sm">Failed to load image</span>
-                <div className="text-xs text-gray-400 mt-1">URL: {src.length > 30 ? `${src.substring(0, 30)}...` : src}</div>
+            <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm h-full flex flex-col justify-between">
+                <h5 className="text-blue-300 mb-2 font-semibold">{name}</h5>
+                <div className="flex-grow flex items-center justify-center bg-gray-800/50 rounded text-gray-400 text-sm">
+                    Not Provided
+                </div>
             </div>
         );
     }
 
+    const fileType = getFileType(url);
+
     return (
-        <img
-            src={imageUrl}
-            alt={alt}
-            className={className}
-            onClick={onClick}
-            crossOrigin="anonymous"
-            onError={() => setError(true)}
-        />
+        <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm h-full flex flex-col">
+            <h5 className="text-blue-300 mb-2 font-semibold">{name}</h5>
+            <div className="flex-grow cursor-pointer" onClick={() => onOpen(url)}>
+                {fileType === 'image' ? (
+                    <ImageLoader src={url} alt={name} className="w-full h-48 rounded border border-indigo-700/30 object-cover" />
+                ) : (
+                    <div className="w-full h-48 rounded border border-indigo-700/30 bg-gray-800/50 flex flex-col items-center justify-center text-center p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-red-400 mb-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 11-2 0V4H6v12a1 1 0 11-2 0V4zm4 11a1 1 0 100-2h4a1 1 0 100 2H8z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-white font-bold">PDF Document</span>
+                        <span className="text-xs text-white/80 mt-1 break-all">{url.split('/').pop()}</span>
+                    </div>
+                )}
+                <div className="text-center text-xs text-white/80 mt-2">Click to view</div>
+            </div>
+        </div>
     );
 };
+
 
 export default function Dssn() {
     const location = useLocation();
@@ -133,16 +136,12 @@ export default function Dssn() {
     const [showInfoModal, setShowInfoModal] = useState(false);
 
     useEffect(() => {
-        const bgInterval = setInterval(() => {
-            setBgIndex(prev => (prev + 1) % backgroundImages.length);
-        }, 5000);
+        const bgInterval = setInterval(() => setBgIndex(prev => (prev + 1) % backgroundImages.length), 5000);
         return () => clearInterval(bgInterval);
     }, []);
 
     useEffect(() => {
-        const logoInterval = setInterval(() => {
-            setActiveLogo(prev => (prev + 1) % logos.length);
-        }, 600);
+        const logoInterval = setInterval(() => setActiveLogo(prev => (prev + 1) % logos.length), 600);
         return () => clearInterval(logoInterval);
     }, []);
 
@@ -152,8 +151,7 @@ export default function Dssn() {
 
         if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
             setError({
-                title: "Invalid DSSN Format",
-                message: "Must be exactly 15 alphanumeric characters",
+                title: "Invalid DSSN Format", message: "Must be exactly 15 alphanumeric characters",
                 details: `Received: ${cleanedDssn} (${cleanedDssn.length} chars)`
             });
             return;
@@ -164,26 +162,20 @@ export default function Dssn() {
 
         try {
             const apiUrl = `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`;
-
             const response = await fetch(apiUrl, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
+                method: 'GET', credentials: 'include',
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
             });
 
             const result = await response.json();
 
             if (!response.ok || !result.success) {
-                const errorDetails = {
+                throw {
                     title: result.error || `HTTP Error ${response.status}`,
                     message: result.message || 'Request failed',
                     details: `Reference: ${result.metadata?.requestId || 'N/A'}`,
                     timestamp: result.metadata?.timestamp || new Date().toISOString()
                 };
-                throw errorDetails;
             }
 
             const transformedData = {
@@ -198,7 +190,7 @@ export default function Dssn() {
                 "Email": result.data.email || 'Not available',
                 "Employment Status": result.data.employmentStatus || 'Not available',
                 "Marital Status": result.data.maritalStatus || 'Not available',
-                "Number of Children": result.data.numberOfChildren || 'Not available',
+                "Number of Children": result.data.numberOfChildren,
                 "Passport Number": result.data.passportNumber || 'Not available',
                 "Birth Certificate": result.data.birthCertificate || 'Not available',
                 "Driver's License": result.data.driverLicense || 'Not available',
@@ -207,9 +199,7 @@ export default function Dssn() {
                 "Birth Certificate Image": result.data.images?.birthCertificate || null,
                 "Drivers License Image": result.data.images?.driverLicense || null,
                 "National Id Image": result.data.images?.nationalId || null,
-                "Search Metadata": result.metadata ?
-                    `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}`
-                    : 'No metadata available'
+                "Search Metadata": result.metadata ? `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}` : 'No metadata'
             };
 
             setCustomerData(transformedData);
@@ -217,8 +207,7 @@ export default function Dssn() {
 
         } catch (err) {
             setError({
-                title: err.title || 'Search Error',
-                message: err.message || 'Failed to process request',
+                title: err.title || 'Search Error', message: err.message || 'Failed to process request',
                 details: err.details || `DSSN: ${cleanedDssn}`,
                 technical: `Status: ${err.status || 'Unknown'} | ${err.timestamp || new Date().toISOString()}`
             });
@@ -228,18 +217,7 @@ export default function Dssn() {
     };
 
     const openDocumentModal = (url) => {
-        if (!url) return;
-        
-        // Construct full URL if it's not already one
-        let fullUrl = url;
-        if (!url.startsWith('http') && !url.startsWith('data:')) {
-            if (url.startsWith('system-liberianpost/')) {
-                fullUrl = `https://storage.googleapis.com/${url}`;
-            } else {
-                fullUrl = `https://storage.googleapis.com/system-liberianpost/${url}`;
-            }
-        }
-        setCurrentDocumentUrl(fullUrl);
+        setCurrentDocumentUrl(url);
         setShowDocumentModal(true);
     };
 
@@ -250,11 +228,10 @@ export default function Dssn() {
 
     const downloadDocument = () => {
         if (!currentDocumentUrl) return;
-        
         const link = document.createElement('a');
         link.href = currentDocumentUrl;
-        const filename = currentDocumentUrl.split('/').pop() || 'document';
-        link.download = filename;
+        link.target = '_blank'; // Open in new tab
+        link.download = currentDocumentUrl.split('/').pop() || 'document';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -265,21 +242,14 @@ export default function Dssn() {
             <div className="fixed inset-0 -z-50 bg-gradient-to-br from-blue-900/90 to-indigo-900/90" />
             <div className="fixed inset-0 -z-40 bg-white/10 backdrop-blur-[3px] pointer-events-none" />
             <div className="fixed inset-0 -z-30 bg-[url('/noise.png')] opacity-10 pointer-events-none" />
-
-            <div
-                className="fixed inset-0 -z-20 bg-cover bg-center transition-opacity duration-1000 mix-blend-soft-light"
-                style={{ backgroundImage: `url(${backgroundImages[bgIndex]})`, opacity: 0.15 }}
-            />
+            <div className="fixed inset-0 -z-20 bg-cover bg-center transition-opacity duration-1000 mix-blend-soft-light"
+                style={{ backgroundImage: `url(${backgroundImages[bgIndex]})`, opacity: 0.15 }} />
 
             <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
                 <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
                     {logos.map((logo, index) => (
-                        <div
-                            key={index}
-                            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
-                                index === activeLogo ? "opacity-100" : "opacity-0"
-                            }`}
-                        >
+                        <div key={index}
+                            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${index === activeLogo ? "opacity-100" : "opacity-0"}`}>
                             <img src={logo} alt={`Logo ${index}`} className="max-w-full max-h-full object-contain" />
                             <div className="absolute inset-0 bg-black/5" />
                         </div>
@@ -293,40 +263,21 @@ export default function Dssn() {
                         <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
                             {navLinks.map(link => (
                                 <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
-                                    <Link
-                                        to={link.to}
-                                        className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
-                                            location.pathname === link.to
-                                                ? "text-yellow-300"
-                                                : "text-white hover:text-blue-200"
-                                        }`}
-                                    >
+                                    <Link to={link.to}
+                                        className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${location.pathname === link.to ? "text-yellow-300" : "text-white hover:text-blue-200"}`}>
                                         {link.label}
                                     </Link>
                                 </div>
                             ))}
                         </nav>
                     </div>
-
                     <div className="w-full bg-gradient-to-b from-indigo-900/50 to-transparent overflow-x-auto">
                         <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
                             {logos.map((logo, index) => (
-                                <div
-                                    key={index}
-                                    className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
-                                        index === activeLogo
-                                            ? "scale-110 bg-white shadow-lg"
-                                            : "scale-100 bg-white/90"
-                                    }`}
-                                    style={{
-                                        animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none'
-                                    }}
-                                >
-                                    <img
-                                        src={logo}
-                                        alt={`Logo ${index}`}
-                                        className="w-12 h-12 md:w-16 md:h-16 object-contain"
-                                    />
+                                <div key={index}
+                                    className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${index === activeLogo ? "scale-110 bg-white shadow-lg" : "scale-100 bg-white/90"}`}
+                                    style={{ animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none' }}>
+                                    <img src={logo} alt={`Logo ${index}`} className="w-12 h-12 md:w-16 md:h-16 object-contain" />
                                 </div>
                             ))}
                         </div>
@@ -349,67 +300,28 @@ export default function Dssn() {
                                     Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information.
                                     Enter the 15-digit alphanumeric DSSN in the field below.
                                 </p>
-
                                 <form onSubmit={handleSearch} className="space-y-4">
                                     <div>
-                                        <label htmlFor="dssn" className="block text-sm font-medium mb-2">
-                                            Enter DSSN to Verify:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="dssn"
-                                            value={dssn}
-                                            onChange={(e) => setDssn(e.target.value)}
+                                        <label htmlFor="dssn" className="block text-sm font-medium mb-2">Enter DSSN to Verify:</label>
+                                        <input type="text" id="dssn" value={dssn} onChange={(e) => setDssn(e.target.value)}
                                             className="w-full bg-indigo-900/40 border border-indigo-700/30 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 backdrop-blur-sm text-white placeholder-indigo-400/70"
-                                            placeholder="e.g. LIB123456789ABCD"
-                                            required
-                                            pattern="[A-Za-z0-9]{15}"
-                                            title="15-character alphanumeric DSSN"
-                                        />
+                                            placeholder="e.g. PYGMNL94LR09Z24" required pattern="[A-Za-z0-9]{15}" title="15-character alphanumeric DSSN" />
                                     </div>
-
-                                    <button
-                                        type="submit"
-                                        disabled={isSearching}
-                                        className={`flex items-center justify-center px-6 py-3 rounded-lg border transition-all ${
-                                            isSearching
-                                                ? "bg-blue-700/50 border-blue-600/30 cursor-not-allowed"
-                                                : "bg-gradient-to-r from-blue-500/80 to-indigo-600/80 border-blue-400/30 hover:from-blue-600/80 hover:to-indigo-700/80 hover:shadow-lg"
-                                        }`}
-                                    >
-                                        {isSearching ? (
-                                            <>
-                                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                                Searching...
-                                            </>
-                                        ) : (
-                                            "Search"
-                                        )}
+                                    <button type="submit" disabled={isSearching}
+                                        className={`flex items-center justify-center px-6 py-3 rounded-lg border transition-all ${isSearching ? "bg-blue-700/50 border-blue-600/30 cursor-not-allowed" : "bg-gradient-to-r from-blue-500/80 to-indigo-600/80 border-blue-400/30 hover:from-blue-600/80 hover:to-indigo-700/80 hover:shadow-lg"}`}>
+                                        {isSearching ? (<><svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Searching...</>) : ("Search")}
                                     </button>
                                 </form>
-
                                 {error && (
                                     <div className="bg-red-900/40 border border-red-700/30 rounded-lg p-4 backdrop-blur-sm">
                                         <div className="flex justify-between items-start">
                                             <div>
                                                 <h4 className="font-bold text-red-300">{error.title}</h4>
                                                 <p className="text-red-200">{error.message}</p>
-                                                {error.details && (
-                                                    <p className="text-sm text-red-200/80 mt-1">{error.details}</p>
-                                                )}
-                                                {error.technical && (
-                                                    <p className="text-xs text-red-200/60 mt-2">{error.technical}</p>
-                                                )}
+                                                {error.details && <p className="text-sm text-red-200/80 mt-1">{error.details}</p>}
+                                                {error.technical && <p className="text-xs text-red-200/60 mt-2">{error.technical}</p>}
                                             </div>
-                                            <button
-                                                onClick={() => console.error('Full Error:', error)}
-                                                className="text-xs text-red-300/70 hover:text-red-300 px-2 py-1 rounded"
-                                            >
-                                                Details
-                                            </button>
+                                            <button onClick={() => console.error('Full Error:', error)} className="text-xs text-red-300/70 hover:text-red-300 px-2 py-1 rounded">Details</button>
                                         </div>
                                     </div>
                                 )}
@@ -421,115 +333,48 @@ export default function Dssn() {
 
             {showInfoModal && customerData && (
                 <div id="dssnInfo" className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-gradient-to-br from-indigo-900/90 to-blue-900/90 border border-indigo-700/30 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+                    <div className="bg-gradient-to-br from-indigo-900/90 to-blue-900/90 border border-indigo-700/30 rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
                         <div className="p-6">
-                            <div className="flex justify-between items-center mb-4">
+                            <div className="flex justify-between items-center mb-4 pb-4 border-b border-indigo-700/30">
                                 <div>
-                                    <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                                        Search Results for DSSN: {sanitizeHTML(dssn)}
-                                    </h3>
-                                    {customerData["Search Metadata"] && (
-                                        <p className="text-xs text-blue-300/70 mt-1">
-                                            {customerData["Search Metadata"]}
-                                        </p>
-                                    )}
+                                    <h3 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Search Results for DSSN: {sanitizeHTML(dssn)}</h3>
+                                    {customerData["Search Metadata"] && (<p className="text-xs text-blue-300/70 mt-1">{customerData["Search Metadata"]}</p>)}
                                 </div>
-                                <button onClick={() => setShowInfoModal(false)} className="text-gray-400 hover:text-white transition-colors">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
+                                <button onClick={() => setShowInfoModal(false)} className="text-gray-400 hover:text-white transition-colors"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div className="bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                                    <h4 className="text-blue-300 mb-3">Profile Information</h4>
-                                    <div className="space-y-3">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                                <div className="lg:col-span-1 bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
+                                    <h4 className="text-blue-300 mb-3 font-semibold text-lg">Profile Photo</h4>
+                                    <ImageLoader src={customerData["Image"]} alt="Profile Photo" className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer" onClick={() => openDocumentModal(customerData["Image"])} />
+                                </div>
+                                <div className="lg:col-span-2 bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
+                                    <h4 className="text-blue-300 mb-3 font-semibold text-lg">Profile Information</h4>
+                                    <div className="space-y-2 text-sm max-h-[250px] overflow-y-auto pr-2">
                                         {Object.entries(customerData).map(([key, value]) => {
-                                            if (typeof value === 'string' && !key.includes('Image') && !key.includes('Metadata')) {
-                                                return (
-                                                    <div key={key} className="bg-indigo-800/20 p-2 rounded border border-indigo-700/20">
-                                                        <strong className="text-blue-300 text-sm">{key}:</strong>
-                                                        <span className="ml-2 text-white/90 text-sm">{sanitizeHTML(value)}</span>
-                                                    </div>
-                                                );
+                                            if (typeof value === 'string' || typeof value === 'number') {
+                                                if (!key.includes('Image') && !key.includes('Metadata')) {
+                                                    return (
+                                                        <div key={key} className="bg-indigo-800/20 p-2 rounded border border-indigo-700/20 flex justify-between">
+                                                            <strong className="text-blue-300/80 font-medium">{key}:</strong>
+                                                            <span className="ml-2 text-white/90 text-right">{sanitizeHTML(value)}</span>
+                                                        </div>
+                                                    );
+                                                }
                                             }
                                             return null;
                                         })}
                                     </div>
                                 </div>
-
-                                <div className="bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                                    <h4 className="text-blue-300 mb-3">Profile Photo</h4>
-                                    <GoogleStorageImage
-                                        src={customerData["Image"]}
-                                        alt="Profile Photo"
-                                        className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer"
-                                        onClick={() => openDocumentModal(customerData["Image"])}
-                                    />
-                                </div>
                             </div>
 
-                            <div className="space-y-6">
-                                <div className="document-category">
-                                    <h4 className="text-blue-300 mb-3 border-b border-indigo-700/30 pb-2">Documents</h4>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {customerData["Passport Image"] && (
-                                            <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                                                <h5 className="text-blue-300 mb-2">Passport</h5>
-                                                <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Passport Image"])}>
-                                                    <GoogleStorageImage
-                                                        src={customerData["Passport Image"]}
-                                                        alt="Passport"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover"
-                                                    />
-                                                    <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {customerData["Birth Certificate Image"] && (
-                                            <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                                                <h5 className="text-blue-300 mb-2">Birth Certificate</h5>
-                                                <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Birth Certificate Image"])}>
-                                                    <GoogleStorageImage
-                                                        src={customerData["Birth Certificate Image"]}
-                                                        alt="Birth Certificate"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover"
-                                                    />
-                                                    <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {customerData["Drivers License Image"] && (
-                                            <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                                                <h5 className="text-blue-300 mb-2">Driver's License</h5>
-                                                <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Drivers License Image"])}>
-                                                    <GoogleStorageImage
-                                                        src={customerData["Drivers License Image"]}
-                                                        alt="Driver's License"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover"
-                                                    />
-                                                    <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {customerData["National Id Image"] && (
-                                            <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                                                <h5 className="text-blue-300 mb-2">National ID</h5>
-                                                <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["National Id Image"])}>
-                                                    <GoogleStorageImage
-                                                        src={customerData["National Id Image"]}
-                                                        alt="National ID"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover"
-                                                    />
-                                                    <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
+                            <div>
+                                <h4 className="text-blue-300 mb-3 border-b border-indigo-700/30 pb-2 font-semibold text-lg">Associated Documents</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <DocumentThumbnail url={customerData["Passport Image"]} name="Passport" onOpen={openDocumentModal} />
+                                    <DocumentThumbnail url={customerData["Birth Certificate Image"]} name="Birth Certificate" onOpen={openDocumentModal} />
+                                    <DocumentThumbnail url={customerData["Drivers License Image"]} name="Driver's License" onOpen={openDocumentModal} />
+                                    <DocumentThumbnail url={customerData["National Id Image"]} name="National ID" onOpen={openDocumentModal} />
                                 </div>
                             </div>
                         </div>
@@ -538,63 +383,23 @@ export default function Dssn() {
             )}
 
             {showDocumentModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
-                    <div className="relative bg-gray-900 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-auto">
-                        <button
-                            onClick={closeDocumentModal}
-                            className="absolute top-4 right-4 z-50 text-white hover:text-red-400 transition-colors"
-                        >
-                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-
-                        <div className="p-4 h-full flex flex-col items-center justify-center">
-                            {currentDocumentUrl?.endsWith('.pdf') ? (
-                                <iframe
-                                    src={currentDocumentUrl}
-                                    className="w-full h-[80vh]"
-                                    title="Document Viewer"
-                                />
-                            ) : (
-                                <>
-                                    <GoogleStorageImage
-                                        src={currentDocumentUrl}
-                                        alt="Document Full View"
-                                        className="w-full max-h-[80vh] object-contain"
-                                    />
-                                    <button
-                                        onClick={downloadDocument}
-                                        className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
-                                    >
-                                        Download Document
-                                    </button>
-                                </>
-                            )}
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={closeDocumentModal}>
+                    <div className="bg-gray-900 rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex justify-between items-center p-4 border-b border-gray-700">
+                            <h4 className="font-bold text-white">Document Viewer</h4>
+                            <div>
+                                <button onClick={downloadDocument} className="text-sm text-blue-400 hover:text-blue-300 mr-4">Download</button>
+                                <button onClick={closeDocumentModal} className="text-gray-400 hover:text-white">&times;</button>
+                            </div>
+                        </div>
+                        <div className="p-4 flex-grow">
+                            {getFileType(currentDocumentUrl) === 'image' && <img src={currentDocumentUrl} alt="Document" className="max-w-full max-h-full mx-auto object-contain" />}
+                            {getFileType(currentDocumentUrl) === 'pdf' && <iframe src={currentDocumentUrl} title="Document" className="w-full h-[75vh] border-0"></iframe>}
+                            {getFileType(currentDocumentUrl) === 'other' && <p className="text-center text-white">Cannot display this file type. Please download to view.</p>}
                         </div>
                     </div>
                 </div>
             )}
-
-            <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
-                <div className="border-t border-indigo-700/30 pt-6">
-                    © {new Date().getFullYear()} Digital Liberia. All rights reserved.
-                </div>
-            </footer>
-
-            <style jsx global>{`
-                @keyframes fadeInUp {
-                    from { opacity: 0; transform: translateY(20px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                @keyframes heartbeat {
-                    0% { transform: scale(1); }
-                    25% { transform: scale(1.1); }
-                    50% { transform: scale(1); }
-                    75% { transform: scale(1.05); }
-                    100% { transform: scale(1); }
-                }
-            `}</style>
         </div>
     );
 }
