@@ -54,7 +54,7 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         <img
             src={src}
             alt={alt}
-            className={`${className} object-cover`}
+            className={`${className} object-contain max-w-full max-h-full`}
             onClick={onClick}
             loading="lazy"
             onError={(e) => {
@@ -369,11 +369,11 @@ export default function Dssn() {
 
                                 <div className="bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                     <h4 className="text-blue-300 mb-3">Profile Photo</h4>
-                                    <div className="relative">
+                                    <div className="relative w-full h-64 flex items-center justify-center">
                                         <GoogleStorageImage
                                             src={customerData["Image"]}
                                             alt="Profile Photo"
-                                            className="w-full h-64 rounded-lg border-2 border-blue-500/30 cursor-pointer"
+                                            className="max-w-full max-h-full rounded-lg border-2 border-blue-500/30 cursor-pointer"
                                             onClick={() => openDocumentModal(customerData["Image"])}
                                         />
                                     </div>
@@ -387,11 +387,11 @@ export default function Dssn() {
                                         {customerData["Passport Image"] && (
                                             <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                                 <h5 className="text-blue-300 mb-2">Passport</h5>
-                                                <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Passport Image"])}>
+                                                <div className="document-thumbnail w-full h-48 flex items-center justify-center" onClick={() => openDocumentModal(customerData["Passport Image"])}>
                                                     <GoogleStorageImage
                                                         src={customerData["Passport Image"]}
                                                         alt="Passport"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 cursor-pointer"
+                                                        className="max-w-full max-h-full rounded border border-indigo-700/30 cursor-pointer"
                                                     />
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
@@ -401,11 +401,11 @@ export default function Dssn() {
                                         {customerData["Birth Certificate Image"] && (
                                             <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                                 <h5 className="text-blue-300 mb-2">Birth Certificate</h5>
-                                                <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Birth Certificate Image"])}>
+                                                <div className="document-thumbnail w-full h-48 flex items-center justify-center" onClick={() => openDocumentModal(customerData["Birth Certificate Image"])}>
                                                     <GoogleStorageImage
                                                         src={customerData["Birth Certificate Image"]}
                                                         alt="Birth Certificate"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 cursor-pointer"
+                                                        className="max-w-full max-h-full rounded border border-indigo-700/30 cursor-pointer"
                                                     />
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
@@ -415,11 +415,11 @@ export default function Dssn() {
                                         {customerData["Drivers License Image"] && (
                                             <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                                 <h5 className="text-blue-300 mb-2">Driver's License</h5>
-                                                <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Drivers License Image"])}>
+                                                <div className="document-thumbnail w-full h-48 flex items-center justify-center" onClick={() => openDocumentModal(customerData["Drivers License Image"])}>
                                                     <GoogleStorageImage
                                                         src={customerData["Drivers License Image"]}
                                                         alt="Driver's License"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 cursor-pointer"
+                                                        className="max-w-full max-h-full rounded border border-indigo-700/30 cursor-pointer"
                                                     />
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
@@ -429,11 +429,11 @@ export default function Dssn() {
                                         {customerData["National Id Image"] && (
                                             <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                                 <h5 className="text-blue-300 mb-2">National ID</h5>
-                                                <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["National Id Image"])}>
+                                                <div className="document-thumbnail w-full h-48 flex items-center justify-center" onClick={() => openDocumentModal(customerData["National Id Image"])}>
                                                     <GoogleStorageImage
                                                         src={customerData["National Id Image"]}
                                                         alt="National ID"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 cursor-pointer"
+                                                        className="max-w-full max-h-full rounded border border-indigo-700/30 cursor-pointer"
                                                     />
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
@@ -471,7 +471,7 @@ export default function Dssn() {
                                     <GoogleStorageImage
                                         src={currentDocumentUrl}
                                         alt="Document Full View"
-                                        className="w-full max-h-[80vh] object-contain"
+                                        className="max-w-full max-h-[80vh] object-contain"
                                     />
                                     <button
                                         onClick={downloadDocument}
