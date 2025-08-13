@@ -38,37 +38,8 @@ const sanitizeHTML = (str) => {
 };
 
 const GoogleStorageImage = ({ src, alt, className, onClick }) => {
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        console.group(`Image Debug: ${src || 'No Source'}`);
-        console.log('Rendering image with source:', src);
-
-        if (!src) {
-            console.warn('No image source provided');
-            setError('No image source');
-            console.groupEnd();
-            return;
-        }
-
-        const img = new Image();
-        img.src = src;
-        img.crossOrigin = 'anonymous';
-
-        img.onload = () => {
-            console.log('Image loaded successfully:', src);
-            setError(null);
-            console.groupEnd();
-        };
-
-        img.onerror = (err) => {
-            console.error('Image failed to load:', src, err);
-            setError('Failed to load image');
-            console.groupEnd();
-        };
-    }, [src]);
-
     if (!src) {
+        console.warn(`Image Debug: No source provided for ${alt}`);
         return (
             <div className={`${className} bg-gray-200 flex items-center justify-center rounded-lg`}>
                 <span className="text-gray-500">No image available</span>
@@ -76,14 +47,7 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         );
     }
 
-    if (error) {
-        return (
-            <div className={`${className} bg-red-50 border border-red-200 flex flex-col items-center justify-center rounded-lg p-2`}>
-                <span className="text-red-500 text-sm">{error}</span>
-                <span className="text-xs text-gray-600 mt-1">Source: {src.substring(0, 30)}{src.length > 30 ? '...' : ''}</span>
-            </div>
-        );
-    }
+    console.log(`Image Debug: Rendering ${alt} with URL: ${src}`);
 
     return (
         <img
@@ -93,8 +57,10 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
             onClick={onClick}
             crossOrigin="anonymous"
             onError={(e) => {
-                console.error('Image render failed:', src, e);
-                setError('Rendering failed');
+                console.error(`Image Debug: Failed to render ${alt} at ${src}`, e);
+            }}
+            onLoad={() => {
+                console.log(`Image Debug: Successfully loaded ${alt} at ${src}`);
             }}
         />
     );
