@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const navLinks = [
@@ -7,24 +7,6 @@ const navLinks = [
     { label: "Digital Liberia", to: "/digital-liberia", color: "bg-purple-500/80" },
     { label: "LibPay", to: "/libpay", color: "bg-yellow-500/80" },
     { label: "Liberian Post", to: "/liberian-post", color: "bg-pink-500/80" }
-];
-
-const logos = [
-    "/logos/liberianpost.png",
-    "/logos/digital.png",
-    "/logos/libmusic.png",
-    "/logos/libconnectsit.png",
-    "/logos/libpaysit.png",
-    "/logos/seal of liberia.png",
-    "/logos/liberia.png"
-];
-
-const backgroundImages = [
-    "/backgrounds/bg1.jpg",
-    "/backgrounds/bg2.jpg",
-    "/backgrounds/bg3.jpg",
-    "/backgrounds/bg4.jpg",
-    "/backgrounds/bg5.jpg"
 ];
 
 const sanitizeHTML = (str) => {
@@ -39,27 +21,16 @@ const sanitizeHTML = (str) => {
 
 export default function Dssn() {
     const location = useLocation();
-    const [activeLogo, setActiveLogo] = useState(0);
-    const [bgIndex, setBgIndex] = useState(0);
     const [dssn, setDssn] = useState("");
     const [isSearching, setIsSearching] = useState(false);
     const [customerData, setCustomerData] = useState(null);
     const [error, setError] = useState(null);
+    const renderCount = useRef(0);
 
     useEffect(() => {
-        console.log('Dssn component mounted - Version 3');
-        alert('Dssn component loaded - Check console for logs');
-        const bgInterval = setInterval(() => {
-            setBgIndex(prev => (prev + 1) % backgroundImages.length);
-        }, 5000);
-        return () => clearInterval(bgInterval);
-    }, []);
-
-    useEffect(() => {
-        const logoInterval = setInterval(() => {
-            setActiveLogo(prev => (prev + 1) % logos.length);
-        }, 600);
-        return () => clearInterval(logoInterval);
+        renderCount.current += 1;
+        console.log(`Dssn component rendered - Version 5, Render #${renderCount.current}`);
+        alert(`Dssn component loaded - Version 5, Render #${renderCount.current}`);
     }, []);
 
     const handleSearch = async (e) => {
@@ -68,6 +39,7 @@ export default function Dssn() {
         console.clear();
         console.group(`DSSN Search Debug: ${cleanedDssn}`);
         console.log('Starting search with DSSN:', cleanedDssn);
+        alert(`Starting search for DSSN: ${cleanedDssn}`);
 
         if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
             const errorMsg = {
@@ -170,181 +142,121 @@ export default function Dssn() {
         }
     };
 
-    const debugPageLoad = () => {
-        console.log('Debug Page Load clicked - Version 3');
-        console.log('Current customerData:', customerData);
-        alert('Debug Page Load: Check console for customerData');
-    };
-
     return (
-        <div className="relative min-h-screen w-full bg-gray-900 text-white font-inter">
-            <div className="fixed inset-0 -z-50 bg-gradient-to-br from-blue-900/90 to-indigo-900/90" />
-            <div className="fixed inset-0 -z-40 bg-white/10 backdrop-blur-[3px] pointer-events-none" />
-            <div className="fixed inset-0 -z-30 bg-[url('/noise.png')] opacity-10 pointer-events-none" />
-
-            <div
-                className="fixed inset-0 -z-20 bg-cover bg-center transition-opacity duration-1000 mix-blend-soft-light"
-                style={{ backgroundImage: `url(${backgroundImages[bgIndex]})`, opacity: 0.15 }}
-            />
-
-            <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
-                    {logos.map((logo, index) => (
-                        <div
-                            key={index}
-                            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
-                                index === activeLogo ? "opacity-100" : "opacity-0"
-                            }`}
-                        >
-                            <img src={logo} alt={`Logo ${index}`} className="max-w-full max-h-full object-contain" />
-                            <div className="absolute inset-0 bg-black/5" />
+        <div style={{ minHeight: '100vh', backgroundColor: '#1a202c', color: 'white', fontFamily: 'Arial, sans-serif' }}>
+            <header style={{ position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 50, background: 'rgba(79, 70, 229, 0.7)', backdropFilter: 'blur(4px)' }}>
+                <nav style={{ display: 'flex', justifyContent: 'center', padding: '16px', maxWidth: '1280px', margin: '0 auto' }}>
+                    {navLinks.map(link => (
+                        <div key={link.to} style={{ padding: '4px 12px', borderRadius: '8px', backgroundColor: link.color }}>
+                            <Link
+                                to={link.to}
+                                style={{
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                    color: location.pathname === link.to ? '#facc15' : 'white',
+                                    textDecoration: 'none'
+                                }}
+                            >
+                                {link.label}
+                            </Link>
                         </div>
                     ))}
-                </div>
-            </div>
-
-            <header className="fixed top-0 left-0 w-full z-50">
-                <div className="bg-indigo-900/70 backdrop-blur-md border-b border-indigo-700/30">
-                    <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
-                        <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
-                            {navLinks.map(link => (
-                                <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
-                                    <Link
-                                        to={link.to}
-                                        className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
-                                            location.pathname === link.to
-                                                ? "text-yellow-300"
-                                                : "text-white hover:text-blue-200"
-                                        }`}
-                                    >
-                                        {link.label}
-                                    </Link>
-                                </div>
-                            ))}
-                        </nav>
-                    </div>
-
-                    <div className="w-full bg-gradient-to-b from-indigo-900/50 to-transparent overflow-x-auto">
-                        <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
-                            {logos.map((logo, index) => (
-                                <div
-                                    key={index}
-                                    className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
-                                        index === activeLogo
-                                            ? "scale-110 bg-white shadow-lg"
-                                            : "scale-100 bg-white/90"
-                                    }`}
-                                    style={{
-                                        animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none'
-                                    }}
-                                >
-                                    <img
-                                        src={logo}
-                                        alt={`Logo ${index}`}
-                                        className="w-12 h-12 md:w-16 md:h-16 object-contain"
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+                </nav>
             </header>
 
-            <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
-                <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-                    <div className="relative bg-indigo-900/50 backdrop-blur-lg rounded-xl border border-indigo-700/30 shadow-2xl">
-                        <div className="relative p-6 md:p-8">
-                            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white">
-                                DSSN Verification
-                            </h2>
-                            <div className="text-white/90 space-y-6">
-                                <button
-                                    onClick={debugPageLoad}
-                                    className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white mb-4"
-                                >
-                                    Debug Page Load
-                                </button>
-                                <div>
-                                    <img
-                                        src="https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg"
-                                        alt="Debug Test Image"
-                                        style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid red' }}
-                                        loading="lazy"
-                                        onLoad={() => {
-                                            console.log('Debug Test Image loaded successfully at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg');
-                                            alert('Debug Test Image loaded successfully');
-                                        }}
-                                        onError={(e) => {
-                                            console.error('Debug Test Image failed to load at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg', e);
-                                            alert('Debug Test Image failed to load');
-                                        }}
-                                    />
-                                </div>
-                                <p>
-                                    Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information.
-                                    Enter the 15-digit alphanumeric DSSN in the field below.
-                                </p>
+            <main style={{ paddingTop: '120px', paddingBottom: '80px', paddingLeft: '16px', paddingRight: '16px' }}>
+                <section style={{ maxWidth: '1024px', margin: '0 auto', padding: '32px', background: 'rgba(79, 70, 229, 0.5)', borderRadius: '12px', border: '1px solid rgba(99, 102, 241, 0.3)' }}>
+                    <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', color: 'white' }}>
+                        DSSN Verification
+                    </h2>
+                    <div style={{ color: 'rgba(255, 255, 255, 0.9)', marginBottom: '24px' }}>
+                        <button
+                            onClick={() => {
+                                console.log(`Debug Render - Version 5, Render #${renderCount.current}`);
+                                alert(`Debug Render - Version 5, Render #${renderCount.current}, customerData: ${JSON.stringify(customerData)}`);
+                            }}
+                            style={{ backgroundColor: 'red', color: 'white', padding: '8px 16px', borderRadius: '8px', marginBottom: '16px' }}
+                        >
+                            Debug Render
+                        </button>
+                        <div>
+                            <img
+                                src="https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg"
+                                alt="Debug Test Image"
+                                style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid red' }}
+                                loading="lazy"
+                                onLoad={() => {
+                                    console.log('Debug Test Image loaded successfully');
+                                    alert('Debug Test Image loaded successfully');
+                                }}
+                                onError={(e) => {
+                                    console.error('Debug Test Image failed to load', e);
+                                    alert('Debug Test Image failed to load');
+                                }}
+                            />
+                        </div>
+                        <p style={{ marginTop: '16px' }}>
+                            Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information.
+                            Enter the 15-digit alphanumeric DSSN below.
+                        </p>
 
-                                <form onSubmit={handleSearch} className="space-y-4">
-                                    <div>
-                                        <label htmlFor="dssn" className="block text-sm font-medium mb-2">
-                                            Enter DSSN to Verify:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="dssn"
-                                            value={dssn}
-                                            onChange={(e) => setDssn(e.target.value)}
-                                            className="w-full bg-indigo-900/40 border border-indigo-700/30 rounded-lg px-4 py-3 text-white"
-                                            placeholder="e.g. LIB123456789ABCD"
-                                            required
-                                            pattern="[A-Za-z0-9]{15}"
-                                            title="15-character alphanumeric DSSN"
-                                        />
-                                    </div>
+                        <form onSubmit={handleSearch} style={{ marginBottom: '16px' }}>
+                            <div>
+                                <label htmlFor="dssn" style={{ display: 'block', fontSize: '14px', marginBottom: '8px' }}>
+                                    Enter DSSN to Verify:
+                                </label>
+                                <input
+                                    type="text"
+                                    id="dssn"
+                                    value={dssn}
+                                    onChange={(e) => setDssn(e.target.value)}
+                                    style={{ width: '100%', background: 'rgba(79, 70, 229, 0.4)', border: '1px solid rgba(99, 102, 241, 0.3)', borderRadius: '8px', padding: '12px', color: 'white' }}
+                                    placeholder="e.g. LIB123456789ABCD"
+                                    required
+                                    pattern="[A-Za-z0-9]{15}"
+                                    title="15-character alphanumeric DSSN"
+                                />
+                            </div>
 
-                                    <button
-                                        type="submit"
-                                        disabled={isSearching}
-                                        className={`flex items-center justify-center px-6 py-3 rounded-lg ${
-                                            isSearching
-                                                ? "bg-blue-700/50 cursor-not-allowed"
-                                                : "bg-blue-500 hover:bg-blue-600"
-                                        }`}
-                                    >
-                                        {isSearching ? (
-                                            <>
-                                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                                Searching...
-                                            </>
-                                        ) : (
-                                            "Search"
-                                        )}
-                                    </button>
-                                </form>
+                            <button
+                                type="submit"
+                                disabled={isSearching}
+                                style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 24px', borderRadius: '8px', marginTop: '12px',
+                                    background: isSearching ? 'rgba(59, 130, 246, 0.5)' : '#3b82f6', color: 'white'
+                                }}
+                            >
+                                {isSearching ? (
+                                    <>
+                                        <svg style={{ animation: 'spin 1s linear infinite', marginRight: '8px', height: '20px', width: '20px' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path style={{ opacity: 0.75 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Searching...
+                                    </>
+                                ) : (
+                                    "Search"
+                                )}
+                            </button>
+                        </form>
 
-                                {error && (
-                                    <div className="bg-red-900/40 border border-red-700/30 rounded-lg p-4">
-                                        <h4 className="font-bold text-red-300">{error.title}</h4>
-                                        <p className="text-red-200">{error.message}</p>
-                                        {error.details && (
-                                            <p className="text-sm text-red-200/80 mt-1">{error.details}</p>
-                                        )}
-                                    </div>
+                        {error && (
+                            <div style={{ background: 'rgba(239, 68, 68, 0.4)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', padding: '16px' }}>
+                                <h4 style={{ fontWeight: 'bold', color: '#f87171' }}>{error.title}</h4>
+                                <p style={{ color: '#fecaca' }}>{error.message}</p>
+                                {error.details && (
+                                    <p style={{ fontSize: '14px', color: 'rgba(254, 202, 202, 0.8)', marginTop: '4px' }}>{error.details}</p>
                                 )}
                             </div>
-                        </div>
+                        )}
                     </div>
                 </section>
 
                 {customerData ? (
-                    <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto">
-                        <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-h-[80vh] overflow-y-auto">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-2xl font-bold text-white">
+                    <section style={{ maxWidth: '1024px', margin: '0 auto', padding: '32px' }}>
+                        <div style={{ background: '#1f2937', border: '1px solid #374151', borderRadius: '12px', padding: '24px', maxHeight: '80vh', overflowY: 'auto' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white' }}>
                                     Search Results for DSSN: {sanitizeHTML(dssn)}
                                 </h3>
                                 <button
@@ -353,185 +265,181 @@ export default function Dssn() {
                                         console.log('Results cleared');
                                         alert('Results cleared');
                                     }}
-                                    className="text-gray-400 hover:text-white"
+                                    style={{ color: '#9ca3af' }}
                                 >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg style={{ width: '24px', height: '24px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                 </button>
                             </div>
 
-                            <div className="space-y-6">
-                                <div>
-                                    <h4 className="text-blue-300 mb-3">Profile Information</h4>
-                                    {Object.entries(customerData).map(([key, value]) => {
-                                        if (typeof value === 'string' && !key.includes('Image') && !key.includes('Metadata')) {
-                                            return (
-                                                <div key={key} className="p-2">
-                                                    <strong className="text-blue-300 text-sm">{key}:</strong>
-                                                    <span className="ml-2 text-white text-sm">{sanitizeHTML(value)}</span>
-                                                </div>
-                                            );
-                                        }
-                                        return null;
-                                    })}
-                                    {customerData["Search Metadata"] && (
-                                        <div className="p-2">
-                                            <strong className="text-blue-300 text-sm">Search Metadata:</strong>
-                                            <span className="ml-2 text-white text-sm">{sanitizeHTML(customerData["Search Metadata"])}</span>
-                                        </div>
-                                    )}
-                                </div>
+                            <div style={{ marginBottom: '24px' }}>
+                                <h4 style={{ color: '#93c5fd', marginBottom: '12px' }}>Profile Information</h4>
+                                {Object.entries(customerData).map(([key, value]) => {
+                                    if (typeof value === 'string' && !key.includes('Image') && !key.includes('Metadata')) {
+                                        return (
+                                            <div key={key} style={{ padding: '8px' }}>
+                                                <strong style={{ color: '#93c5fd', fontSize: '14px' }}>{key}:</strong>
+                                                <span style={{ marginLeft: '8px', color: 'white', fontSize: '14px' }}>{sanitizeHTML(value)}</span>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })}
+                                {customerData["Search Metadata"] && (
+                                    <div style={{ padding: '8px' }}>
+                                        <strong style={{ color: '#93c5fd', fontSize: '14px' }}>Search Metadata:</strong>
+                                        <span style={{ marginLeft: '8px', color: 'white', fontSize: '14px' }}>{sanitizeHTML(customerData["Search Metadata"])}</span>
+                                    </div>
+                                )}
+                            </div>
 
-                                <div>
-                                    <h4 className="text-blue-300 mb-3">Images</h4>
-                                    <div className="space-y-4">
+                            <div style={{ marginBottom: '24px' }}>
+                                <h4 style={{ color: '#93c5fd', marginBottom: '12px' }}>Images</h4>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                    <div>
+                                        <h5 style={{ color: '#93c5fd', marginBottom: '8px' }}>Test Image</h5>
+                                        <img
+                                            src="https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg"
+                                            alt="Test Image"
+                                            style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid red' }}
+                                            loading="lazy"
+                                            onLoad={() => {
+                                                console.log('Test Image loaded successfully');
+                                                alert('Test Image loaded successfully');
+                                            }}
+                                            onError={(e) => {
+                                                console.error('Test Image failed to load', e);
+                                                alert('Test Image failed to load');
+                                            }}
+                                        />
+                                    </div>
+
+                                    {customerData["Image"] && (
                                         <div>
-                                            <h5 className="text-blue-300 mb-2">Test Image</h5>
+                                            <h5 style={{ color: '#93c5fd', marginBottom: '8px' }}>Profile Photo</h5>
                                             <img
-                                                src="https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg"
-                                                alt="Test Image"
-                                                style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid red' }}
+                                                src={customerData["Image"]}
+                                                alt="Profile Photo"
+                                                style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
                                                 loading="lazy"
                                                 onLoad={() => {
-                                                    console.log('Test Image loaded successfully at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg');
-                                                    alert('Test Image loaded successfully');
+                                                    console.log(`Profile Photo loaded successfully at ${customerData["Image"]}`);
+                                                    alert(`Profile Photo loaded at ${customerData["Image"]}`);
                                                 }}
                                                 onError={(e) => {
-                                                    console.error('Test Image failed to load at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg', e);
-                                                    alert('Test Image failed to load');
+                                                    console.error(`Profile Photo failed to load at ${customerData["Image"]}`, e);
+                                                    alert(`Profile Photo failed to load at ${customerData["Image"]}`);
                                                 }}
                                             />
                                         </div>
+                                    )}
 
-                                        {customerData["Image"] && (
-                                            <div>
-                                                <h5 className="text-blue-300 mb-2">Profile Photo</h5>
-                                                <img
-                                                    src={customerData["Image"]}
-                                                    alt="Profile Photo"
-                                                    style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
-                                                    loading="lazy"
-                                                    onLoad={() => {
-                                                        console.log(`Profile Photo loaded successfully at ${customerData["Image"]}`);
-                                                        alert(`Profile Photo loaded at ${customerData["Image"]}`);
-                                                    }}
-                                                    onError={(e) => {
-                                                        console.error(`Profile Photo failed to load at ${customerData["Image"]}`, e);
-                                                        alert(`Profile Photo failed to load at ${customerData["Image"]}`);
-                                                    }}
-                                                />
-                                            </div>
-                                        )}
+                                    {customerData["Passport Image"] && (
+                                        <div>
+                                            <h5 style={{ color: '#93c5fd', marginBottom: '8px' }}>Passport</h5>
+                                            <img
+                                                src={customerData["Passport Image"]}
+                                                alt="Passport"
+                                                style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                loading="lazy"
+                                                onLoad={() => {
+                                                    console.log(`Passport loaded successfully at ${customerData["Passport Image"]}`);
+                                                    alert(`Passport loaded at ${customerData["Passport Image"]}`);
+                                                }}
+                                                onError={(e) => {
+                                                    console.error(`Passport failed to load at ${customerData["Passport Image"]}`, e);
+                                                    alert(`Passport failed to load at ${customerData["Passport Image"]}`);
+                                                }}
+                                            />
+                                        </div>
+                                    )}
 
-                                        {customerData["Passport Image"] && (
-                                            <div>
-                                                <h5 className="text-blue-300 mb-2">Passport</h5>
-                                                <img
-                                                    src={customerData["Passport Image"]}
-                                                    alt="Passport"
-                                                    style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
-                                                    loading="lazy"
-                                                    onLoad={() => {
-                                                        console.log(`Passport loaded successfully at ${customerData["Passport Image"]}`);
-                                                        alert(`Passport loaded at ${customerData["Passport Image"]}`);
-                                                    }}
-                                                    onError={(e) => {
-                                                        console.error(`Passport failed to load at ${customerData["Passport Image"]}`, e);
-                                                        alert(`Passport failed to load at ${customerData["Passport Image"]}`);
-                                                    }}
-                                                />
-                                            </div>
-                                        )}
+                                    {customerData["Birth Certificate Image"] && (
+                                        <div>
+                                            <h5 style={{ color: '#93c5fd', marginBottom: '8px' }}>Birth Certificate</h5>
+                                            <img
+                                                src={customerData["Birth Certificate Image"]}
+                                                alt="Birth Certificate"
+                                                style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                loading="lazy"
+                                                onLoad={() => {
+                                                    console.log(`Birth Certificate loaded successfully at ${customerData["Birth Certificate Image"]}`);
+                                                    alert(`Birth Certificate loaded at ${customerData["Birth Certificate Image"]}`);
+                                                }}
+                                                onError={(e) => {
+                                                    console.error(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`, e);
+                                                    alert(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`);
+                                                }}
+                                            />
+                                        </div>
+                                    )}
 
-                                        {customerData["Birth Certificate Image"] && (
-                                            <div>
-                                                <h5 className="text-blue-300 mb-2">Birth Certificate</h5>
-                                                <img
-                                                    src={customerData["Birth Certificate Image"]}
-                                                    alt="Birth Certificate"
-                                                    style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
-                                                    loading="lazy"
-                                                    onLoad={() => {
-                                                        console.log(`Birth Certificate loaded successfully at ${customerData["Birth Certificate Image"]}`);
-                                                        alert(`Birth Certificate loaded at ${customerData["Birth Certificate Image"]}`);
-                                                    }}
-                                                    onError={(e) => {
-                                                        console.error(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`, e);
-                                                        alert(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`);
-                                                    }}
-                                                />
-                                            </div>
-                                        )}
+                                    {customerData["Drivers License Image"] && (
+                                        <div>
+                                            <h5 style={{ color: '#93c5fd', marginBottom: '8px' }}>Driver's License</h5>
+                                            <img
+                                                src={customerData["Drivers License Image"]}
+                                                alt="Driver's License"
+                                                style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                loading="lazy"
+                                                onLoad={() => {
+                                                    console.log(`Driver's License loaded successfully at ${customerData["Drivers License Image"]}`);
+                                                    alert(`Driver's License loaded at ${customerData["Drivers License Image"]}`);
+                                                }}
+                                                onError={(e) => {
+                                                    console.error(`Driver's License failed to load at ${customerData["Drivers License Image"]}`, e);
+                                                    alert(`Driver's License failed to load at ${customerData["Drivers License Image"]}`);
+                                                }}
+                                            />
+                                        </div>
+                                    )}
 
-                                        {customerData["Drivers License Image"] && (
-                                            <div>
-                                                <h5 className="text-blue-300 mb-2">Driver's License</h5>
-                                                <img
-                                                    src={customerData["Drivers License Image"]}
-                                                    alt="Driver's License"
-                                                    style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
-                                                    loading="lazy"
-                                                    onLoad={() => {
-                                                        console.log(`Driver's License loaded successfully at ${customerData["Drivers License Image"]}`);
-                                                        alert(`Driver's License loaded at ${customerData["Drivers License Image"]}`);
-                                                    }}
-                                                    onError={(e) => {
-                                                        console.error(`Driver's License failed to load at ${customerData["Drivers License Image"]}`, e);
-                                                        alert(`Driver's License failed to load at ${customerData["Drivers License Image"]}`);
-                                                    }}
-                                                />
-                                            </div>
-                                        )}
-
-                                        {customerData["National Id Image"] && (
-                                            <div>
-                                                <h5 className="text-blue-300 mb-2">National ID</h5>
-                                                <img
-                                                    src={customerData["National Id Image"]}
-                                                    alt="National ID"
-                                                    style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
-                                                    loading="lazy"
-                                                    onLoad={() => {
-                                                        console.log(`National ID loaded successfully at ${customerData["National Id Image"]}`);
-                                                        alert(`National ID loaded at ${customerData["National Id Image"]}`);
-                                                    }}
-                                                    onError={(e) => {
-                                                        console.error(`National ID failed to load at ${customerData["National Id Image"]}`, e);
-                                                        alert(`National ID failed to load at ${customerData["National Id Image"]}`);
-                                                    }}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
+                                    {customerData["National Id Image"] && (
+                                        <div>
+                                            <h5 style={{ color: '#93c5fd', marginBottom: '8px' }}>National ID</h5>
+                                            <img
+                                                src={customerData["National Id Image"]}
+                                                alt="National ID"
+                                                style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                loading="lazy"
+                                                onLoad={() => {
+                                                    console.log(`National ID loaded successfully at ${customerData["National Id Image"]}`);
+                                                    alert(`National ID loaded at ${customerData["National Id Image"]}`);
+                                                }}
+                                                onError={(e) => {
+                                                    console.error(`National ID failed to load at ${customerData["National Id Image"]}`, e);
+                                                    alert(`National ID failed to load at ${customerData["National Id Image"]}`);
+                                                }}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
+                            </div>
 
-                                <div>
-                                    <h4 className="text-blue-300 mb-3">Debug URLs</h4>
-                                    <div className="text-sm text-white">
-                                        <p>Profile Photo: {customerData["Image"] || 'None'}</p>
-                                        <p>Passport: {customerData["Passport Image"] || 'None'}</p>
-                                        <p>Birth Certificate: {customerData["Birth Certificate Image"] || 'None'}</p>
-                                        <p>Driver's License: {customerData["Drivers License Image"] || 'None'}</p>
-                                        <p>National ID: {customerData["National Id Image"] || 'None'}</p>
-                                    </div>
+                            <div>
+                                <h4 style={{ color: '#93c5fd', marginBottom: '12px' }}>Debug URLs</h4>
+                                <div style={{ fontSize: '14px', color: 'white' }}>
+                                    <p>Profile Photo: {customerData["Image"] || 'None'}</p>
+                                    <p>Passport: {customerData["Passport Image"] || 'None'}</p>
+                                    <p>Birth Certificate: {customerData["Birth Certificate Image"] || 'None'}</p>
+                                    <p>Driver's License: {customerData["Drivers License Image"] || 'None'}</p>
+                                    <p>National ID: {customerData["National Id Image"] || 'None'}</p>
                                 </div>
                             </div>
                         </div>
                     </section>
                 ) : (
-                    customerData === null && (
-                        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto">
-                            <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
-                                <p className="text-white">No results yet. Perform a search to view data.</p>
-                            </div>
-                        </section>
-                    )
+                    <section style={{ maxWidth: '1024px', margin: '0 auto', padding: '32px' }}>
+                        <div style={{ background: '#1f2937', border: '1px solid #374151', borderRadius: '12px', padding: '24px' }}>
+                            <p style={{ color: 'white' }}>No results yet. Perform a search to view data.</p>
+                        </div>
+                    </section>
                 )}
             </main>
 
-            <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
-                <div className="border-t border-indigo-700/30 pt-6">
+            <footer style={{ padding: '24px', textAlign: 'center', color: 'rgba(255, 255, 255, 0.6)', fontSize: '14px' }}>
+                <div style={{ borderTop: '1px solid rgba(99, 102, 241, 0.3)', paddingTop: '24px' }}>
                     © {new Date().getFullYear()} Digital Liberia. All rights reserved.
                 </div>
             </footer>
