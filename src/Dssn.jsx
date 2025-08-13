@@ -1,4 +1,4 @@
- import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const navLinks = [
@@ -40,7 +40,6 @@ const sanitizeHTML = (str) => {
 const GoogleStorageImage = ({ src, alt, className, onClick }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
-    const [imageUrl, setImageUrl] = useState('');
 
     useEffect(() => {
         if (!src) {
@@ -52,28 +51,9 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         setLoading(true);
         setError(false);
 
-        const constructImageUrl = (imagePath) => {
-            if (!imagePath) return null;
-            if (imagePath.startsWith('http')) return imagePath;
-            if (imagePath.startsWith('gs://')) {
-                return https://storage.googleapis.com/${imagePath.replace('gs://', '')};
-            }
-            if (imagePath.startsWith('system-liberianpost/')) {
-                return https://storage.googleapis.com/${imagePath};
-            }
-            return https://storage.googleapis.com/system-liberianpost/${imagePath};
-        };
-
-        const url = constructImageUrl(src);
-        setImageUrl(url);
-
         const img = new Image();
-        img.src = url;
-
-        img.onload = () => {
-            setLoading(false);
-        };
-
+        img.src = src;
+        img.onload = () => setLoading(false);
         img.onerror = () => {
             setError(true);
             setLoading(false);
@@ -87,7 +67,7 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
 
     if (!src) {
         return (
-            <div className={${className} bg-gray-800/50 flex items-center justify-center rounded-lg}>
+            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
                 <span className="text-gray-400 text-sm">No image available</span>
             </div>
         );
@@ -95,7 +75,7 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
 
     if (loading) {
         return (
-            <div className={${className} bg-gray-800/50 flex items-center justify-center rounded-lg}>
+            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             </div>
         );
@@ -103,21 +83,20 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
 
     if (error) {
         return (
-            <div className={${className} bg-gray-800/50 flex items-center justify-center rounded-lg}>
+            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
                 <span className="text-red-400 text-sm">Failed to load image</span>
-                <div className="text-xs text-gray-400 mt-1">URL: {src.length > 30 ? ${src.substring(0, 30)}... : src}</div>
             </div>
         );
     }
 
     return (
         <img
-            src={imageUrl}
+            src={src}
             alt={alt}
             className={className}
             onClick={onClick}
             crossOrigin="anonymous"
-            onError={() => setError(true)}
+            loading="lazy"
         />
     );
 };
@@ -156,7 +135,7 @@ export default function Dssn() {
             setError({
                 title: "Invalid DSSN Format",
                 message: "Must be exactly 15 alphanumeric characters",
-                details: Received: ${cleanedDssn} (${cleanedDssn.length} chars)
+                details: `Received: ${cleanedDssn} (${cleanedDssn.length} chars)`
             });
             return;
         }
@@ -165,9 +144,7 @@ export default function Dssn() {
         setError(null);
 
         try {
-            const apiUrl = https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)};
-
-            const response = await fetch(apiUrl, {
+            const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -179,13 +156,12 @@ export default function Dssn() {
             const result = await response.json();
 
             if (!response.ok || !result.success) {
-                const errorDetails = {
-                    title: result.error || HTTP Error ${response.status},
+                throw {
+                    title: result.error || `HTTP Error ${response.status}`,
                     message: result.message || 'Request failed',
-                    details: Reference: ${result.metadata?.requestId || 'N/A'},
+                    details: `Reference: ${result.metadata?.requestId || 'N/A'}`,
                     timestamp: result.metadata?.timestamp || new Date().toISOString()
                 };
-                throw errorDetails;
             }
 
             const transformedData = {
@@ -204,13 +180,13 @@ export default function Dssn() {
                 "Passport Number": result.data.passportNumber || 'Not available',
                 "Birth Certificate": result.data.birthCertificate || 'Not available',
                 "Driver's License": result.data.driverLicense || 'Not available',
-                "Image": result.data.images?.profile || null,
-                "Passport Image": result.data.images?.passport || null,
-                "Birth Certificate Image": result.data.images?.birthCertificate || null,
-                "Drivers License Image": result.data.images?.driverLicense || null,
-                "National Id Image": result.data.images?.nationalId || null,
+                "Image": result.data.images?.profile?.url || null,
+                "Passport Image": result.data.images?.passport?.url || null,
+                "Birth Certificate Image": result.data.images?.birthCertificate?.url || null,
+                "Drivers License Image": result.data.images?.driverLicense?.url || null,
+                "National Id Image": result.data.images?.nationalId?.url || null,
                 "Search Metadata": result.metadata ?
-                    Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}
+                    `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}`
                     : 'No metadata available'
             };
 
@@ -221,8 +197,8 @@ export default function Dssn() {
             setError({
                 title: err.title || 'Search Error',
                 message: err.message || 'Failed to process request',
-                details: err.details || DSSN: ${cleanedDssn},
-                technical: Status: ${err.status || 'Unknown'} | ${err.timestamp || new Date().toISOString()}
+                details: err.details || `DSSN: ${cleanedDssn}`,
+                technical: `Status: ${err.status || 'Unknown'} | ${err.timestamp || new Date().toISOString()}`
             });
         } finally {
             setIsSearching(false);
@@ -241,7 +217,6 @@ export default function Dssn() {
 
     const downloadDocument = () => {
         if (!currentDocumentUrl) return;
-        
         const link = document.createElement('a');
         link.href = currentDocumentUrl;
         const filename = currentDocumentUrl.split('/').pop() || 'document';
@@ -259,7 +234,7 @@ export default function Dssn() {
 
             <div
                 className="fixed inset-0 -z-20 bg-cover bg-center transition-opacity duration-1000 mix-blend-soft-light"
-                style={{ backgroundImage: url(${backgroundImages[bgIndex]}), opacity: 0.15 }}
+                style={{ backgroundImage: `url(${backgroundImages[bgIndex]})`, opacity: 0.15 }}
             />
 
             <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -267,11 +242,9 @@ export default function Dssn() {
                     {logos.map((logo, index) => (
                         <div
                             key={index}
-                            className={absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
-                                index === activeLogo ? "opacity-100" : "opacity-0"
-                            }}
+                            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${index === activeLogo ? "opacity-100" : "opacity-0"}`}
                         >
-                            <img src={logo} alt={Logo ${index}} className="max-w-full max-h-full object-contain" />
+                            <img src={logo} alt={`Logo ${index}`} className="max-w-full max-h-full object-contain" />
                             <div className="absolute inset-0 bg-black/5" />
                         </div>
                     ))}
@@ -283,14 +256,10 @@ export default function Dssn() {
                     <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
                         <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
                             {navLinks.map(link => (
-                                <div key={link.to} className={flex-shrink-0 ${link.color} px-3 py-1 rounded-lg}>
+                                <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
                                     <Link
                                         to={link.to}
-                                        className={text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
-                                            location.pathname === link.to
-                                                ? "text-yellow-300"
-                                                : "text-white hover:text-blue-200"
-                                        }}
+                                        className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${location.pathname === link.to ? "text-yellow-300" : "text-white hover:text-blue-200"}`}
                                     >
                                         {link.label}
                                     </Link>
@@ -304,18 +273,12 @@ export default function Dssn() {
                             {logos.map((logo, index) => (
                                 <div
                                     key={index}
-                                    className={flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
-                                        index === activeLogo
-                                            ? "scale-110 bg-white shadow-lg"
-                                            : "scale-100 bg-white/90"
-                                    }}
-                                    style={{
-                                        animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none'
-                                    }}
+                                    className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${index === activeLogo ? "scale-110 bg-white shadow-lg" : "scale-100 bg-white/90"}`}
+                                    style={{ animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none' }}
                                 >
                                     <img
                                         src={logo}
-                                        alt={Logo ${index}}
+                                        alt={`Logo ${index}`}
                                         className="w-12 h-12 md:w-16 md:h-16 object-contain"
                                     />
                                 </div>
@@ -362,11 +325,7 @@ export default function Dssn() {
                                     <button
                                         type="submit"
                                         disabled={isSearching}
-                                        className={flex items-center justify-center px-6 py-3 rounded-lg border transition-all ${
-                                            isSearching
-                                                ? "bg-blue-700/50 border-blue-600/30 cursor-not-allowed"
-                                                : "bg-gradient-to-r from-blue-500/80 to-indigo-600/80 border-blue-400/30 hover:from-blue-600/80 hover:to-indigo-700/80 hover:shadow-lg"
-                                        }}
+                                        className={`flex items-center justify-center px-6 py-3 rounded-lg border transition-all ${isSearching ? "bg-blue-700/50 border-blue-600/30 cursor-not-allowed" : "bg-gradient-to-r from-blue-500/80 to-indigo-600/80 border-blue-400/30 hover:from-blue-600/80 hover:to-indigo-700/80 hover:shadow-lg"}`}
                                     >
                                         {isSearching ? (
                                             <>
@@ -395,12 +354,6 @@ export default function Dssn() {
                                                     <p className="text-xs text-red-200/60 mt-2">{error.technical}</p>
                                                 )}
                                             </div>
-                                            <button
-                                                onClick={() => console.error('Full Error:', error)}
-                                                className="text-xs text-red-300/70 hover:text-red-300 px-2 py-1 rounded"
-                                            >
-                                                Details
-                                            </button>
                                         </div>
                                     </div>
                                 )}
@@ -472,7 +425,7 @@ export default function Dssn() {
                                                     <GoogleStorageImage
                                                         src={customerData["Passport Image"]}
                                                         alt="Passport"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover"
+                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover cursor-pointer"
                                                     />
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
@@ -486,7 +439,7 @@ export default function Dssn() {
                                                     <GoogleStorageImage
                                                         src={customerData["Birth Certificate Image"]}
                                                         alt="Birth Certificate"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover"
+                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover cursor-pointer"
                                                     />
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
@@ -500,7 +453,7 @@ export default function Dssn() {
                                                     <GoogleStorageImage
                                                         src={customerData["Drivers License Image"]}
                                                         alt="Driver's License"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover"
+                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover cursor-pointer"
                                                     />
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
@@ -514,7 +467,7 @@ export default function Dssn() {
                                                     <GoogleStorageImage
                                                         src={customerData["National Id Image"]}
                                                         alt="National ID"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover"
+                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover cursor-pointer"
                                                     />
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
@@ -573,7 +526,7 @@ export default function Dssn() {
                 </div>
             </footer>
 
-            <style jsx global>{
+            <style jsx global>{`
                 @keyframes fadeInUp {
                     from { opacity: 0; transform: translateY(20px); }
                     to { opacity: 1; transform: translateY(0); }
@@ -585,7 +538,7 @@ export default function Dssn() {
                     75% { transform: scale(1.05); }
                     100% { transform: scale(1); }
                 }
-            }</style>
+            `}</style>
         </div>
     );
 }
