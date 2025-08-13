@@ -27,6 +27,34 @@ const backgroundImages = [
     "/backgrounds/bg5.jpg"
 ];
 
+/** ---- Helpers for URL + type handling ---- */
+const normalizeUrl = (u) => {
+    try {
+        const trimmed = (u || "").trim();
+        if (!trimmed) return "";
+        // Decode then re-encode to fix mixed-encoded strings like "...birth%20certificate .jpeg"
+        return encodeURI(decodeURI(trimmed));
+    } catch {
+        // Fallback: just replace spaces if decoding fails
+        return (u || "").trim().replace(/ /g, "%20");
+    }
+};
+
+const getFileUrl = (file) => {
+    if (!file) return "";
+    const raw = typeof file === "string" ? file : file.url || "";
+    return normalizeUrl(raw);
+};
+
+const inferType = (file) => {
+    if (!file) return "unknown";
+    if (typeof file === "object" && file.type) return file.type;
+    const url = getFileUrl(file).toLowerCase();
+    if (url.endsWith(".pdf")) return "pdf";
+    return "image";
+};
+/** ---------------------------------------- */
+
 const sanitizeHTML = (str) => {
     if (!str) return '';
     return str.toString()
@@ -44,7 +72,11 @@ const GoogleStorageImage = ({ file, alt = "Document", className, onClick }) => {
     const [isPdf, setIsPdf] = useState(false);
 
     useEffect(() => {
-        if (!file || !file.url) {
+        const url = getFileUrl(file);
+        const type = inferType(file);
+        setIsPdf(type === "pdf");
+
+        if (!url) {
             setLoading(false);
             setError('No file source provided');
             return;
@@ -52,12 +84,10 @@ const GoogleStorageImage = ({ file, alt = "Document", className, onClick }) => {
 
         setLoading(true);
         setError(null);
-
-        const url = file.url;
         setImageUrl(url);
-        setIsPdf(file.type === 'pdf');
 
-        if (file.type === 'pdf') {
+        if (type === "pdf") {
+            // No need to preload PDFs
             setLoading(false);
             console.log('PDF detected:', url);
             return;
@@ -72,7 +102,7 @@ const GoogleStorageImage = ({ file, alt = "Document", className, onClick }) => {
         };
 
         img.onerror = (err) => {
-            setError(`Failed to load image: ${err.message || 'Unknown error'}`);
+            setError(`Failed to load image`);
             setLoading(false);
             console.error('Image load error:', { url, error: err });
         };
@@ -83,11 +113,21 @@ const GoogleStorageImage = ({ file, alt = "Document", className, onClick }) => {
         };
     }, [file]);
 
-    if (!file || !file.url || error) {
+    if (error) {
+        const url = getFileUrl(file);
         return (
             <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg flex-col`}>
-                <span className="text-red-400 text-sm">{error || 'No image available'}</span>
-                {file?.url && <div className="text-xs text-gray-400 mt-1">URL: {file.url.length > 30 ? `${file.url.substring(0, 30)}...` : file.url}</div>}
+                <span className="text-red-400 text-sm">{error}</span>
+                {url && <div className="text-xs text-gray-400 mt-1">URL: {url.length > 42 ? `${url.substring(0, 42)}...` : url}</div>}
+            </div>
+        );
+    }
+
+    const url = getFileUrl(file);
+    if (!url) {
+        return (
+            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg flex-col`}>
+                <span className="text-red-400 text-sm">No image available</span>
             </div>
         );
     }
@@ -102,9 +142,14 @@ const GoogleStorageImage = ({ file, alt = "Document", className, onClick }) => {
 
     if (isPdf) {
         return (
-            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg cursor-pointer`} onClick={onClick}>
+            <div
+                className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg cursor-pointer`}
+                onClick={onClick}
+                role="button"
+                title="Open PDF"
+            >
                 <div className="text-gray-400 text-sm text-center">
-                    PDF Document<br />
+                    📄 PDF Document<br />
                     <span className="text-xs">Click to view</span>
                 </div>
             </div>
@@ -113,14 +158,16 @@ const GoogleStorageImage = ({ file, alt = "Document", className, onClick }) => {
 
     return (
         <img
-            src={imageUrl}
+            src={url}
             alt={alt}
             className={className}
             onClick={onClick}
+            loading="lazy"
+            referrerPolicy="no-referrer"
             crossOrigin="anonymous"
-            onError={(e) => {
+            onError={() => {
                 setError('Image failed to render');
-                console.error('Image render error:', { url: imageUrl, error: e.message });
+                setLoading(false);
             }}
         />
     );
@@ -209,6 +256,7 @@ export default function Dssn() {
                 "Passport Number": result.data.passportNumber || 'Not available',
                 "Birth Certificate": result.data.birthCertificate || 'Not available',
                 "Driver's License": result.data.driverLicense || 'Not available',
+                // Images can be strings or objects; GoogleStorageImage handles both
                 "Image": result.data.images?.profile || null,
                 "Passport Image": result.data.images?.passport || null,
                 "Birth Certificate Image": result.data.images?.birthCertificate || null,
@@ -237,12 +285,13 @@ export default function Dssn() {
     };
 
     const openDocumentModal = (file) => {
-        if (!file || !file.url) {
+        const url = getFileUrl(file);
+        if (!url) {
             console.warn('No URL provided for document modal');
             return;
         }
-        console.log('Opening document modal with URL:', file.url);
-        setCurrentDocumentUrl(file.url);
+        console.log('Opening document modal with URL:', url);
+        setCurrentDocumentUrl(url);
         setShowDocumentModal(true);
     };
 
@@ -256,7 +305,7 @@ export default function Dssn() {
             console.warn('No document URL for download');
             return;
         }
-        
+
         console.log('Downloading document:', currentDocumentUrl);
         const link = document.createElement('a');
         link.href = currentDocumentUrl;
