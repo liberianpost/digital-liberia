@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@context/AuthContext";
-<<<<<<< Updated upstream
 import { SecurityLevels, getRoleName } from "@/utils/auth";
-=======
 import { SecurityLevels, getRoleName } from "@/utils/auth.js";
->>>>>>> Stashed changes
 import { DashboardItems } from "@/config/dashboardItems";
 
 const navLinks = [
