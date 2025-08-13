@@ -37,53 +37,29 @@ const sanitizeHTML = (str) => {
         .replace(/'/g, '&#39;');
 };
 
-const GoogleStorageImage = ({ src, alt = "Document", className, onClick }) => {
+const GoogleStorageImage = ({ file, alt = "Document", className, onClick }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [imageUrl, setImageUrl] = useState('');
     const [isPdf, setIsPdf] = useState(false);
 
     useEffect(() => {
-        if (!src) {
+        if (!file || !file.url) {
             setLoading(false);
-            setError('No image source provided');
+            setError('No file source provided');
             return;
         }
 
         setLoading(true);
         setError(null);
 
-        const constructImageUrl = (imagePath) => {
-            try {
-                if (!imagePath) return null;
-                if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-                    return imagePath;
-                }
-                if (imagePath.startsWith('gs://')) {
-                    return `https://storage.googleapis.com/${imagePath.replace('gs://', '')}`;
-                }
-                const path = imagePath.startsWith('system-liberianpost/')
-                    ? imagePath
-                    : `system-liberianpost/${imagePath}`;
-                return `https://storage.googleapis.com/${encodeURIComponent(path)}`;
-            } catch (err) {
-                console.error('Error constructing image URL:', { imagePath, error: err.message });
-                return null;
-            }
-        };
-
-        const url = constructImageUrl(src);
-        if (!url) {
-            setLoading(false);
-            setError('Invalid image URL');
-            return;
-        }
-
+        const url = file.url;
         setImageUrl(url);
-        setIsPdf(url.toLowerCase().endsWith('.pdf'));
+        setIsPdf(file.type === 'pdf');
 
-        if (url.toLowerCase().endsWith('.pdf')) {
+        if (file.type === 'pdf') {
             setLoading(false);
+            console.log('PDF detected:', url);
             return;
         }
 
@@ -105,13 +81,13 @@ const GoogleStorageImage = ({ src, alt = "Document", className, onClick }) => {
             img.onload = null;
             img.onerror = null;
         };
-    }, [src]);
+    }, [file]);
 
-    if (!src || error) {
+    if (!file || !file.url || error) {
         return (
             <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg flex-col`}>
                 <span className="text-red-400 text-sm">{error || 'No image available'}</span>
-                {src && <div className="text-xs text-gray-400 mt-1">URL: {src.length > 30 ? `${src.substring(0, 30)}...` : src}</div>}
+                {file?.url && <div className="text-xs text-gray-400 mt-1">URL: {file.url.length > 30 ? `${file.url.substring(0, 30)}...` : file.url}</div>}
             </div>
         );
     }
@@ -260,13 +236,13 @@ export default function Dssn() {
         }
     };
 
-    const openDocumentModal = (url) => {
-        if (!url) {
+    const openDocumentModal = (file) => {
+        if (!file || !file.url) {
             console.warn('No URL provided for document modal');
             return;
         }
-        console.log('Opening document modal with URL:', url);
-        setCurrentDocumentUrl(url);
+        console.log('Opening document modal with URL:', file.url);
+        setCurrentDocumentUrl(file.url);
         setShowDocumentModal(true);
     };
 
@@ -493,7 +469,7 @@ export default function Dssn() {
                                 <div className="bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                     <h4 className="text-blue-300 mb-3">Profile Photo</h4>
                                     <GoogleStorageImage
-                                        src={customerData["Image"]}
+                                        file={customerData["Image"]}
                                         alt="Profile Photo"
                                         className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer"
                                         onClick={() => openDocumentModal(customerData["Image"])}
@@ -510,7 +486,7 @@ export default function Dssn() {
                                                 <h5 className="text-blue-300 mb-2">Passport</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Passport Image"])}>
                                                     <GoogleStorageImage
-                                                        src={customerData["Passport Image"]}
+                                                        file={customerData["Passport Image"]}
                                                         alt="Passport"
                                                         className="w-full h-48 rounded border border-indigo-700/30 object-cover"
                                                     />
@@ -524,7 +500,7 @@ export default function Dssn() {
                                                 <h5 className="text-blue-300 mb-2">Birth Certificate</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Birth Certificate Image"])}>
                                                     <GoogleStorageImage
-                                                        src={customerData["Birth Certificate Image"]}
+                                                        file={customerData["Birth Certificate Image"]}
                                                         alt="Birth Certificate"
                                                         className="w-full h-48 rounded border border-indigo-700/30 object-cover"
                                                     />
@@ -538,7 +514,7 @@ export default function Dssn() {
                                                 <h5 className="text-blue-300 mb-2">Driver's License</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Drivers License Image"])}>
                                                     <GoogleStorageImage
-                                                        src={customerData["Drivers License Image"]}
+                                                        file={customerData["Drivers License Image"]}
                                                         alt="Driver's License"
                                                         className="w-full h-48 rounded border border-indigo-700/30 object-cover"
                                                     />
@@ -552,7 +528,7 @@ export default function Dssn() {
                                                 <h5 className="text-blue-300 mb-2">National ID</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["National Id Image"])}>
                                                     <GoogleStorageImage
-                                                        src={customerData["National Id Image"]}
+                                                        file={customerData["National Id Image"]}
                                                         alt="National ID"
                                                         className="w-full h-48 rounded border border-indigo-700/30 object-cover"
                                                     />
@@ -591,7 +567,7 @@ export default function Dssn() {
                             ) : (
                                 <>
                                     <GoogleStorageImage
-                                        src={currentDocumentUrl}
+                                        file={{ url: currentDocumentUrl, type: currentDocumentUrl.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image' }}
                                         alt="Document Full View"
                                         className="w-full max-h-[80vh] object-contain"
                                     />
