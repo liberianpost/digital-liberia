@@ -45,10 +45,10 @@ export default function Dssn() {
     const [isSearching, setIsSearching] = useState(false);
     const [customerData, setCustomerData] = useState(null);
     const [error, setError] = useState(null);
-    const [showResults, setShowResults] = useState(false);
 
     useEffect(() => {
-        console.log('Component mounted');
+        console.log('Dssn component mounted - Version 3');
+        alert('Dssn component loaded - Check console for logs');
         const bgInterval = setInterval(() => {
             setBgIndex(prev => (prev + 1) % backgroundImages.length);
         }, 5000);
@@ -76,6 +76,7 @@ export default function Dssn() {
                 details: `Received: ${cleanedDssn} (${cleanedDssn.length} chars)`
             };
             console.warn('Validation failed:', errorMsg);
+            alert(`Error: ${errorMsg.message}`);
             setError(errorMsg);
             console.groupEnd();
             return;
@@ -109,6 +110,7 @@ export default function Dssn() {
                     timestamp: result.metadata?.timestamp || new Date().toISOString()
                 };
                 console.error('API Error:', errorDetails);
+                alert(`Error: ${errorDetails.message}`);
                 throw errorDetails;
             }
 
@@ -153,7 +155,6 @@ export default function Dssn() {
             console.log('Transformed Data:', transformedData);
             alert(`Search completed for DSSN: ${cleanedDssn}. Displaying results.`);
             setCustomerData(transformedData);
-            setShowResults(true);
 
         } catch (err) {
             console.error('Search Failed:', err);
@@ -169,15 +170,14 @@ export default function Dssn() {
         }
     };
 
-    const debugRender = () => {
-        console.log('Debug Render button clicked');
+    const debugPageLoad = () => {
+        console.log('Debug Page Load clicked - Version 3');
         console.log('Current customerData:', customerData);
-        alert('Debug Render: Check console for customerData');
-        setShowResults(prev => !prev); // Force re-render
+        alert('Debug Page Load: Check console for customerData');
     };
 
     return (
-        <div className="relative min-h-screen w-full bg-gray-900 text-white font-inter overflow-x-hidden">
+        <div className="relative min-h-screen w-full bg-gray-900 text-white font-inter">
             <div className="fixed inset-0 -z-50 bg-gradient-to-br from-blue-900/90 to-indigo-900/90" />
             <div className="fixed inset-0 -z-40 bg-white/10 backdrop-blur-[3px] pointer-events-none" />
             <div className="fixed inset-0 -z-30 bg-[url('/noise.png')] opacity-10 pointer-events-none" />
@@ -252,23 +252,17 @@ export default function Dssn() {
 
             <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
                 <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-                    <div className="relative bg-indigo-900/50 backdrop-blur-lg rounded-xl border border-indigo-700/30 shadow-2xl overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-transparent pointer-events-none" />
-                        <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-radial from-blue-400/20 via-transparent to-transparent opacity-30 pointer-events-none" />
-
+                    <div className="relative bg-indigo-900/50 backdrop-blur-lg rounded-xl border border-indigo-700/30 shadow-2xl">
                         <div className="relative p-6 md:p-8">
-                            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-indigo-700/30 pb-2">
+                            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white">
                                 DSSN Verification
                             </h2>
-                            <div className="text-white/90 relative space-y-6">
+                            <div className="text-white/90 space-y-6">
                                 <button
-                                    onClick={() => {
-                                        console.log('Debug Image button clicked');
-                                        alert('Attempting to load test image');
-                                    }}
+                                    onClick={debugPageLoad}
                                     className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white mb-4"
                                 >
-                                    Debug Image
+                                    Debug Page Load
                                 </button>
                                 <div>
                                     <img
@@ -301,7 +295,7 @@ export default function Dssn() {
                                             id="dssn"
                                             value={dssn}
                                             onChange={(e) => setDssn(e.target.value)}
-                                            className="w-full bg-indigo-900/40 border border-indigo-700/30 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 backdrop-blur-sm text-white placeholder-indigo-400/70"
+                                            className="w-full bg-indigo-900/40 border border-indigo-700/30 rounded-lg px-4 py-3 text-white"
                                             placeholder="e.g. LIB123456789ABCD"
                                             required
                                             pattern="[A-Za-z0-9]{15}"
@@ -312,10 +306,10 @@ export default function Dssn() {
                                     <button
                                         type="submit"
                                         disabled={isSearching}
-                                        className={`flex items-center justify-center px-6 py-3 rounded-lg border transition-all ${
+                                        className={`flex items-center justify-center px-6 py-3 rounded-lg ${
                                             isSearching
-                                                ? "bg-blue-700/50 border-blue-600/30 cursor-not-allowed"
-                                                : "bg-gradient-to-r from-blue-500/80 to-indigo-600/80 border-blue-400/30 hover:from-blue-600/80 hover:to-indigo-700/80 hover:shadow-lg"
+                                                ? "bg-blue-700/50 cursor-not-allowed"
+                                                : "bg-blue-500 hover:bg-blue-600"
                                         }`}
                                     >
                                         {isSearching ? (
@@ -333,25 +327,12 @@ export default function Dssn() {
                                 </form>
 
                                 {error && (
-                                    <div className="bg-red-900/40 border border-red-700/30 rounded-lg p-4 backdrop-blur-sm">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <h4 className="font-bold text-red-300">{error.title}</h4>
-                                                <p className="text-red-200">{error.message}</p>
-                                                {error.details && (
-                                                    <p className="text-sm text-red-200/80 mt-1">{error.details}</p>
-                                                )}
-                                                {error.technical && (
-                                                    <p className="text-xs text-red-200/60 mt-2">{error.technical}</p>
-                                                )}
-                                            </div>
-                                            <button
-                                                onClick={() => console.error('Full Error:', error)}
-                                                className="text-xs text-red-300/70 hover:text-red-300 px-2 py-1 rounded"
-                                            >
-                                                Details
-                                            </button>
-                                        </div>
+                                    <div className="bg-red-900/40 border border-red-700/30 rounded-lg p-4">
+                                        <h4 className="font-bold text-red-300">{error.title}</h4>
+                                        <p className="text-red-200">{error.message}</p>
+                                        {error.details && (
+                                            <p className="text-sm text-red-200/80 mt-1">{error.details}</p>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -359,22 +340,19 @@ export default function Dssn() {
                     </div>
                 </section>
 
-                {showResults && customerData && (
+                {customerData ? (
                     <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto">
                         <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-h-[80vh] overflow-y-auto">
                             <div className="flex justify-between items-center mb-4">
-                                <div>
-                                    <h3 className="text-2xl font-bold text-white">
-                                        Search Results for DSSN: {sanitizeHTML(dssn)}
-                                    </h3>
-                                    {customerData["Search Metadata"] && (
-                                        <p className="text-xs text-gray-400 mt-1">
-                                            {customerData["Search Metadata"]}
-                                        </p>
-                                    )}
-                                </div>
+                                <h3 className="text-2xl font-bold text-white">
+                                    Search Results for DSSN: {sanitizeHTML(dssn)}
+                                </h3>
                                 <button
-                                    onClick={() => setShowResults(false)}
+                                    onClick={() => {
+                                        setCustomerData(null);
+                                        console.log('Results cleared');
+                                        alert('Results cleared');
+                                    }}
                                     className="text-gray-400 hover:text-white"
                                 >
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -382,13 +360,6 @@ export default function Dssn() {
                                     </svg>
                                 </button>
                             </div>
-
-                            <button
-                                onClick={debugRender}
-                                className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white mb-4"
-                            >
-                                Debug Render
-                            </button>
 
                             <div className="space-y-6">
                                 <div>
@@ -404,6 +375,12 @@ export default function Dssn() {
                                         }
                                         return null;
                                     })}
+                                    {customerData["Search Metadata"] && (
+                                        <div className="p-2">
+                                            <strong className="text-blue-300 text-sm">Search Metadata:</strong>
+                                            <span className="ml-2 text-white text-sm">{sanitizeHTML(customerData["Search Metadata"])}</span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div>
@@ -430,155 +407,100 @@ export default function Dssn() {
                                         {customerData["Image"] && (
                                             <div>
                                                 <h5 className="text-blue-300 mb-2">Profile Photo</h5>
-                                                {customerData["Image"].toLowerCase().endsWith('.pdf') ? (
-                                                    <a
-                                                        href={customerData["Image"]}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center text-white"
-                                                    >
-                                                        PDF Profile (Click to view)
-                                                    </a>
-                                                ) : (
-                                                    <img
-                                                        src={customerData["Image"]}
-                                                        alt="Profile Photo"
-                                                        style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
-                                                        loading="lazy"
-                                                        onLoad={() => {
-                                                            console.log(`Profile Photo loaded successfully at ${customerData["Image"]}`);
-                                                            alert(`Profile Photo loaded at ${customerData["Image"]}`);
-                                                        }}
-                                                        onError={(e) => {
-                                                            console.error(`Profile Photo failed to load at ${customerData["Image"]}`, e);
-                                                            alert(`Profile Photo failed to load at ${customerData["Image"]}`);
-                                                        }}
-                                                    />
-                                                )}
+                                                <img
+                                                    src={customerData["Image"]}
+                                                    alt="Profile Photo"
+                                                    style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                    loading="lazy"
+                                                    onLoad={() => {
+                                                        console.log(`Profile Photo loaded successfully at ${customerData["Image"]}`);
+                                                        alert(`Profile Photo loaded at ${customerData["Image"]}`);
+                                                    }}
+                                                    onError={(e) => {
+                                                        console.error(`Profile Photo failed to load at ${customerData["Image"]}`, e);
+                                                        alert(`Profile Photo failed to load at ${customerData["Image"]}`);
+                                                    }}
+                                                />
                                             </div>
                                         )}
 
                                         {customerData["Passport Image"] && (
                                             <div>
                                                 <h5 className="text-blue-300 mb-2">Passport</h5>
-                                                {customerData["Passport Image"].toLowerCase().endsWith('.pdf') ? (
-                                                    <a
-                                                        href={customerData["Passport Image"]}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center text-white"
-                                                    >
-                                                        PDF Passport
-                                                    </a>
-                                                ) : (
-                                                    <img
-                                                        src={customerData["Passport Image"]}
-                                                        alt="Passport"
-                                                        style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
-                                                        loading="lazy"
-                                                        onLoad={() => {
-                                                            console.log(`Passport loaded successfully at ${customerData["Passport Image"]}`);
-                                                            alert(`Passport loaded at ${customerData["Passport Image"]}`);
-                                                        }}
-                                                        onError={(e) => {
-                                                            console.error(`Passport failed to load at ${customerData["Passport Image"]}`, e);
-                                                            alert(`Passport failed to load at ${customerData["Passport Image"]}`);
-                                                        }}
-                                                    />
-                                                )}
+                                                <img
+                                                    src={customerData["Passport Image"]}
+                                                    alt="Passport"
+                                                    style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                    loading="lazy"
+                                                    onLoad={() => {
+                                                        console.log(`Passport loaded successfully at ${customerData["Passport Image"]}`);
+                                                        alert(`Passport loaded at ${customerData["Passport Image"]}`);
+                                                    }}
+                                                    onError={(e) => {
+                                                        console.error(`Passport failed to load at ${customerData["Passport Image"]}`, e);
+                                                        alert(`Passport failed to load at ${customerData["Passport Image"]}`);
+                                                    }}
+                                                />
                                             </div>
                                         )}
 
                                         {customerData["Birth Certificate Image"] && (
                                             <div>
                                                 <h5 className="text-blue-300 mb-2">Birth Certificate</h5>
-                                                {customerData["Birth Certificate Image"].toLowerCase().endsWith('.pdf') ? (
-                                                    <a
-                                                        href={customerData["Birth Certificate Image"]}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center text-white"
-                                                    >
-                                                        PDF Birth Certificate
-                                                    </a>
-                                                ) : (
-                                                    <img
-                                                        src={customerData["Birth Certificate Image"]}
-                                                        alt="Birth Certificate"
-                                                        style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
-                                                        loading="lazy"
-                                                        onLoad={() => {
-                                                            console.log(`Birth Certificate loaded successfully at ${customerData["Birth Certificate Image"]}`);
-                                                            alert(`Birth Certificate loaded at ${customerData["Birth Certificate Image"]}`);
-                                                        }}
-                                                        onError={(e) => {
-                                                            console.error(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`, e);
-                                                            alert(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`);
-                                                        }}
-                                                    />
-                                                )}
+                                                <img
+                                                    src={customerData["Birth Certificate Image"]}
+                                                    alt="Birth Certificate"
+                                                    style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                    loading="lazy"
+                                                    onLoad={() => {
+                                                        console.log(`Birth Certificate loaded successfully at ${customerData["Birth Certificate Image"]}`);
+                                                        alert(`Birth Certificate loaded at ${customerData["Birth Certificate Image"]}`);
+                                                    }}
+                                                    onError={(e) => {
+                                                        console.error(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`, e);
+                                                        alert(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`);
+                                                    }}
+                                                />
                                             </div>
                                         )}
 
                                         {customerData["Drivers License Image"] && (
                                             <div>
                                                 <h5 className="text-blue-300 mb-2">Driver's License</h5>
-                                                {customerData["Drivers License Image"].toLowerCase().endsWith('.pdf') ? (
-                                                    <a
-                                                        href={customerData["Drivers License Image"]}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center text-white"
-                                                    >
-                                                        PDF Driver's License
-                                                    </a>
-                                                ) : (
-                                                    <img
-                                                        src={customerData["Drivers License Image"]}
-                                                        alt="Driver's License"
-                                                        style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
-                                                        loading="lazy"
-                                                        onLoad={() => {
-                                                            console.log(`Driver's License loaded successfully at ${customerData["Drivers License Image"]}`);
-                                                            alert(`Driver's License loaded at ${customerData["Drivers License Image"]}`);
-                                                        }}
-                                                        onError={(e) => {
-                                                            console.error(`Driver's License failed to load at ${customerData["Drivers License Image"]}`, e);
-                                                            alert(`Driver's License failed to load at ${customerData["Drivers License Image"]}`);
-                                                        }}
-                                                    />
-                                                )}
+                                                <img
+                                                    src={customerData["Drivers License Image"]}
+                                                    alt="Driver's License"
+                                                    style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                    loading="lazy"
+                                                    onLoad={() => {
+                                                        console.log(`Driver's License loaded successfully at ${customerData["Drivers License Image"]}`);
+                                                        alert(`Driver's License loaded at ${customerData["Drivers License Image"]}`);
+                                                    }}
+                                                    onError={(e) => {
+                                                        console.error(`Driver's License failed to load at ${customerData["Drivers License Image"]}`, e);
+                                                        alert(`Driver's License failed to load at ${customerData["Drivers License Image"]}`);
+                                                    }}
+                                                />
                                             </div>
                                         )}
 
                                         {customerData["National Id Image"] && (
                                             <div>
                                                 <h5 className="text-blue-300 mb-2">National ID</h5>
-                                                {customerData["National Id Image"].toLowerCase().endsWith('.pdf') ? (
-                                                    <a
-                                                        href={customerData["National Id Image"]}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center text-white"
-                                                    >
-                                                        PDF National ID
-                                                    </a>
-                                                ) : (
-                                                    <img
-                                                        src={customerData["National Id Image"]}
-                                                        alt="National ID"
-                                                        style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
-                                                        loading="lazy"
-                                                        onLoad={() => {
-                                                            console.log(`National ID loaded successfully at ${customerData["National Id Image"]}`);
-                                                            alert(`National ID loaded at ${customerData["National Id Image"]}`);
-                                                        }}
-                                                        onError={(e) => {
-                                                            console.error(`National ID failed to load at ${customerData["National Id Image"]}`, e);
-                                                            alert(`National ID failed to load at ${customerData["National Id Image"]}`);
-                                                        }}
-                                                    />
-                                                )}
+                                                <img
+                                                    src={customerData["National Id Image"]}
+                                                    alt="National ID"
+                                                    style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                    loading="lazy"
+                                                    onLoad={() => {
+                                                        console.log(`National ID loaded successfully at ${customerData["National Id Image"]}`);
+                                                        alert(`National ID loaded at ${customerData["National Id Image"]}`);
+                                                    }}
+                                                    onError={(e) => {
+                                                        console.error(`National ID failed to load at ${customerData["National Id Image"]}`, e);
+                                                        alert(`National ID failed to load at ${customerData["National Id Image"]}`);
+                                                    }}
+                                                />
                                             </div>
                                         )}
                                     </div>
@@ -597,6 +519,14 @@ export default function Dssn() {
                             </div>
                         </div>
                     </section>
+                ) : (
+                    customerData === null && (
+                        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto">
+                            <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
+                                <p className="text-white">No results yet. Perform a search to view data.</p>
+                            </div>
+                        </section>
+                    )
                 )}
             </main>
 
