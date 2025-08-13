@@ -1,4 +1,3 @@
-```javascript
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -39,16 +38,14 @@ const sanitizeHTML = (str) => {
 };
 
 const GoogleStorageImage = ({ src, alt, className, onClick }) => {
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         console.group(`Image Debug: ${src || 'No Source'}`);
-        console.log('Initial source value:', src);
+        console.log('Rendering image with source:', src);
 
         if (!src) {
             console.warn('No image source provided');
-            setLoading(false);
             setError('No image source');
             console.groupEnd();
             return;
@@ -60,7 +57,6 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
 
         img.onload = () => {
             console.log('Image loaded successfully:', src);
-            setLoading(false);
             setError(null);
             console.groupEnd();
         };
@@ -68,24 +64,14 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         img.onerror = (err) => {
             console.error('Image failed to load:', src, err);
             setError('Failed to load image');
-            setLoading(false);
             console.groupEnd();
         };
-
     }, [src]);
 
     if (!src) {
         return (
             <div className={`${className} bg-gray-200 flex items-center justify-center rounded-lg`}>
                 <span className="text-gray-500">No image available</span>
-            </div>
-        );
-    }
-
-    if (loading) {
-        return (
-            <div className={`${className} bg-gray-200 flex items-center justify-center rounded-lg`}>
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             </div>
         );
     }
@@ -107,7 +93,7 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
             onClick={onClick}
             crossOrigin="anonymous"
             onError={(e) => {
-                console.error('Final render failed for URL:', src, e);
+                console.error('Image render failed:', src, e);
                 setError('Rendering failed');
             }}
         />
@@ -197,7 +183,7 @@ export default function Dssn() {
                         console.warn(`Missing ${key} image or URL`);
                         continue;
                     }
-                    console.log(`Image ${key} URL:`, imgObj.url);
+                    console.log(`Image ${key} URL:`, imgObj.url, `Type: ${imgObj.type}`);
                 }
             }
             console.groupEnd();
@@ -643,4 +629,3 @@ export default function Dssn() {
         </div>
     );
 }
-```
