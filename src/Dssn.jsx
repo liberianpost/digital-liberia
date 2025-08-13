@@ -37,57 +37,6 @@ const sanitizeHTML = (str) => {
         .replace(/'/g, '&#39;');
 };
 
-const GoogleStorageImage = ({ src, alt, className, onClick }) => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    if (!src) {
-        console.warn(`Image Debug: No source provided for ${alt}`);
-        return (
-            <div className={`${className} bg-gray-200 flex items-center justify-center rounded-lg min-h-[100px]`}>
-                <span className="text-gray-500">No image available</span>
-            </div>
-        );
-    }
-
-    console.log(`Image Debug: Attempting to render ${alt} with URL: ${src}`);
-
-    return (
-        <div className="relative">
-            {isLoading && (
-                <div className={`${className} flex items-center justify-center bg-gray-800 rounded-lg min-h-[100px]`}>
-                    <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                </div>
-            )}
-            {error && (
-                <div className={`${className} bg-red-900/40 flex items-center justify-center rounded-lg min-h-[100px]`}>
-                    <span className="text-red-300">Error: {error}</span>
-                </div>
-            )}
-            <img
-                src={src}
-                alt={alt}
-                className={`${className} block min-h-[100px] max-w-full max-h-full ${isLoading || error ? 'hidden' : ''}`}
-                onClick={onClick}
-                crossOrigin="anonymous"
-                onLoad={() => {
-                    console.log(`Image Debug: Successfully loaded ${alt} at ${src}`);
-                    setIsLoading(false);
-                    setError(null);
-                }}
-                onError={(e) => {
-                    console.error(`Image Debug: Failed to render ${alt} at ${src}`, e);
-                    setIsLoading(false);
-                    setError('Failed to load image');
-                }}
-            />
-        </div>
-    );
-};
-
 export default function Dssn() {
     const location = useLocation();
     const [activeLogo, setActiveLogo] = useState(0);
@@ -305,7 +254,7 @@ export default function Dssn() {
                                         index === activeLogo
                                             ? "scale-110 bg-white shadow-lg"
                                             : "scale-100 bg-white/90"
-                                    }`}
+                                        }`}
                                     style={{
                                         animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none'
                                     }}
@@ -454,39 +403,15 @@ export default function Dssn() {
                                             <span className="text-white/80">PDF Profile (Click to view)</span>
                                         </div>
                                     ) : (
-                                        <>
-                                            <div className="mb-4">
-                                                <h5 className="text-blue-200">Using GoogleStorageImage:</h5>
-                                                <GoogleStorageImage
-                                                    src={customerData["Image"]}
-                                                    alt="Profile Photo"
-                                                    className="w-full h-64 max-w-[800px] max-h-[600px] rounded-lg border-2 border-blue-500/30 object-contain cursor-pointer"
-                                                    onClick={() => openDocumentModal(customerData["Image"])}
-                                                />
-                                            </div>
-                                            <div className="mb-4">
-                                                <h5 className="text-blue-200">Direct img tag (test):</h5>
-                                                <img
-                                                    src={customerData["Image"]}
-                                                    alt="Profile Photo (Direct)"
-                                                    className="w-full h-64 max-w-[800px] max-h-[600px] rounded-lg border-2 border-green-500/30 object-contain"
-                                                    crossOrigin="anonymous"
-                                                    onError={(e) => console.error(`Direct img tag failed for Profile Photo at ${customerData["Image"]}`, e)}
-                                                    onLoad={() => console.log(`Direct img tag loaded for Profile Photo at ${customerData["Image"]}`)}
-                                                />
-                                            </div>
-                                            <div>
-                                                <h5 className="text-blue-200">Hardcoded test image:</h5>
-                                                <img
-                                                    src="https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg"
-                                                    alt="Hardcoded Test"
-                                                    className="w-full h-64 max-w-[800px] max-h-[600px] rounded-lg border-2 border-red-500/30 object-contain"
-                                                    crossOrigin="anonymous"
-                                                    onError={(e) => console.error(`Hardcoded img tag failed at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg`, e)}
-                                                    onLoad={() => console.log(`Hardcoded img tag loaded at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg`)}
-                                                />
-                                            </div>
-                                        </>
+                                        <img
+                                            src={customerData["Image"]}
+                                            alt="Profile Photo"
+                                            className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer"
+                                            loading="lazy"
+                                            onClick={() => openDocumentModal(customerData["Image"])}
+                                            onLoad={() => console.log(`Profile Photo loaded successfully at ${customerData["Image"]}`)}
+                                            onError={(e) => console.error(`Profile Photo failed to load at ${customerData["Image"]}`, e)}
+                                        />
                                     )}
                                 </div>
                             </div>
@@ -504,27 +429,14 @@ export default function Dssn() {
                                                             <span className="text-white/80">PDF Document (Click to view)</span>
                                                         </div>
                                                     ) : (
-                                                        <>
-                                                            <div className="mb-2">
-                                                                <h6 className="text-blue-200 text-sm">Using GoogleStorageImage:</h6>
-                                                                <GoogleStorageImage
-                                                                    src={customerData["Passport Image"]}
-                                                                    alt="Passport"
-                                                                    className="w-full h-48 max-w-[600px] max-h-[400px] rounded border border-indigo-700/30 object-contain"
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <h6 className="text-blue-200 text-sm">Direct img tag (test):</h6>
-                                                                <img
-                                                                    src={customerData["Passport Image"]}
-                                                                    alt="Passport (Direct)"
-                                                                    className="w-full h-48 max-w-[600px] max-h-[400px] rounded border border-green-500/30 object-contain"
-                                                                    crossOrigin="anonymous"
-                                                                    onError={(e) => console.error(`Direct img tag failed for Passport at ${customerData["Passport Image"]}`, e)}
-                                                                    onLoad={() => console.log(`Direct img tag loaded for Passport at ${customerData["Passport Image"]}`)}
-                                                                />
-                                                            </div>
-                                                        </>
+                                                        <img
+                                                            src={customerData["Passport Image"]}
+                                                            alt="Passport"
+                                                            className="w-full h-48 rounded border border-indigo-700/30 object-cover"
+                                                            loading="lazy"
+                                                            onLoad={() => console.log(`Passport loaded successfully at ${customerData["Passport Image"]}`)}
+                                                            onError={(e) => console.error(`Passport failed to load at ${customerData["Passport Image"]}`, e)}
+                                                        />
                                                     )}
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
@@ -540,27 +452,14 @@ export default function Dssn() {
                                                             <span className="text-white/80">PDF Document (Click to view)</span>
                                                         </div>
                                                     ) : (
-                                                        <>
-                                                            <div className="mb-2">
-                                                                <h6 className="text-blue-200 text-sm">Using GoogleStorageImage:</h6>
-                                                                <GoogleStorageImage
-                                                                    src={customerData["Birth Certificate Image"]}
-                                                                    alt="Birth Certificate"
-                                                                    className="w-full h-48 max-w-[600px] max-h-[400px] rounded border border-indigo-700/30 object-contain"
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <h6 className="text-blue-200 text-sm">Direct img tag (test):</h6>
-                                                                <img
-                                                                    src={customerData["Birth Certificate Image"]}
-                                                                    alt="Birth Certificate (Direct)"
-                                                                    className="w-full h-48 max-w-[600px] max-h-[400px] rounded border border-green-500/30 object-contain"
-                                                                    crossOrigin="anonymous"
-                                                                    onError={(e) => console.error(`Direct img tag failed for Birth Certificate at ${customerData["Birth Certificate Image"]}`, e)}
-                                                                    onLoad={() => console.log(`Direct img tag loaded for Birth Certificate at ${customerData["Birth Certificate Image"]}`)}
-                                                                />
-                                                            </div>
-                                                        </>
+                                                        <img
+                                                            src={customerData["Birth Certificate Image"]}
+                                                            alt="Birth Certificate"
+                                                            className="w-full h-48 rounded border border-indigo-700/30 object-cover"
+                                                            loading="lazy"
+                                                            onLoad={() => console.log(`Birth Certificate loaded successfully at ${customerData["Birth Certificate Image"]}`)}
+                                                            onError={(e) => console.error(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`, e)}
+                                                        />
                                                     )}
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
@@ -576,27 +475,14 @@ export default function Dssn() {
                                                             <span className="text-white/80">PDF Document (Click to view)</span>
                                                         </div>
                                                     ) : (
-                                                        <>
-                                                            <div className="mb-2">
-                                                                <h6 className="text-blue-200 text-sm">Using GoogleStorageImage:</h6>
-                                                                <GoogleStorageImage
-                                                                    src={customerData["Drivers License Image"]}
-                                                                    alt="Driver's License"
-                                                                    className="w-full h-48 max-w-[600px] max-h-[400px] rounded border border-indigo-700/30 object-contain"
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <h6 className="text-blue-200 text-sm">Direct img tag (test):</h6>
-                                                                <img
-                                                                    src={customerData["Drivers License Image"]}
-                                                                    alt="Driver's License (Direct)"
-                                                                    className="w-full h-48 max-w-[600px] max-h-[400px] rounded border border-green-500/30 object-contain"
-                                                                    crossOrigin="anonymous"
-                                                                    onError={(e) => console.error(`Direct img tag failed for Driver's License at ${customerData["Drivers License Image"]}`, e)}
-                                                                    onLoad={() => console.log(`Direct img tag loaded for Driver's License at ${customerData["Drivers License Image"]}`)}
-                                                                />
-                                                            </div>
-                                                        </>
+                                                        <img
+                                                            src={customerData["Drivers License Image"]}
+                                                            alt="Driver's License"
+                                                            className="w-full h-48 rounded border border-indigo-700/30 object-cover"
+                                                            loading="lazy"
+                                                            onLoad={() => console.log(`Driver's License loaded successfully at ${customerData["Drivers License Image"]}`)}
+                                                            onError={(e) => console.error(`Driver's License failed to load at ${customerData["Drivers License Image"]}`, e)}
+                                                        />
                                                     )}
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
@@ -612,43 +498,19 @@ export default function Dssn() {
                                                             <span className="text-white/80">PDF Document (Click to view)</span>
                                                         </div>
                                                     ) : (
-                                                        <>
-                                                            <div className="mb-2">
-                                                                <h6 className="text-blue-200 text-sm">Using GoogleStorageImage:</h6>
-                                                                <GoogleStorageImage
-                                                                    src={customerData["National Id Image"]}
-                                                                    alt="National ID"
-                                                                    className="w-full h-48 max-w-[600px] max-h-[400px] rounded border border-indigo-700/30 object-contain"
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <h6 className="text-blue-200 text-sm">Direct img tag (test):</h6>
-                                                                <img
-                                                                    src={customerData["National Id Image"]}
-                                                                    alt="National ID (Direct)"
-                                                                    className="w-full h-48 max-w-[600px] max-h-[400px] rounded border border-green-500/30 object-contain"
-                                                                    crossOrigin="anonymous"
-                                                                    onError={(e) => console.error(`Direct img tag failed for National ID at ${customerData["National Id Image"]}`, e)}
-                                                                    onLoad={() => console.log(`Direct img tag loaded for National ID at ${customerData["National Id Image"]}`)}
-                                                                />
-                                                            </div>
-                                                        </>
+                                                        <img
+                                                            src={customerData["National Id Image"]}
+                                                            alt="National ID"
+                                                            className="w-full h-48 rounded border border-indigo-700/30 object-cover"
+                                                            loading="lazy"
+                                                            onLoad={() => console.log(`National ID loaded successfully at ${customerData["National Id Image"]}`)}
+                                                            onError={(e) => console.error(`National ID failed to load at ${customerData["National Id Image"]}`, e)}
+                                                        />
                                                     )}
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
                                             </div>
                                         )}
-                                    </div>
-                                </div>
-
-                                <div className="bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                                    <h4 className="text-blue-300 mb-3">Debug Information</h4>
-                                    <div className="space-y-2 text-sm text-white/80">
-                                        <p>Profile Image URL: {customerData["Image"] || 'Not available'}</p>
-                                        <p>Passport Image URL: {customerData["Passport Image"] || 'Not available'}</p>
-                                        <p>Birth Certificate Image URL: {customerData["Birth Certificate Image"] || 'Not available'}</p>
-                                        <p>Driver's License Image URL: {customerData["Drivers License Image"] || 'Not available'}</p>
-                                        <p>National ID Image URL: {customerData["National Id Image"] || 'Not available'}</p>
                                     </div>
                                 </div>
                             </div>
@@ -673,42 +535,20 @@ export default function Dssn() {
                             {currentDocumentUrl.toLowerCase().endsWith('.pdf') ? (
                                 <iframe
                                     src={`${currentDocumentUrl}#toolbar=0`}
-                                    className="w-full h-[80vh] max-w-[1200px]"
+                                    className="w-full h-[80vh]"
                                     title="Document Viewer"
                                     onError={(e) => console.error('Iframe load error:', e)}
                                 />
                             ) : (
                                 <>
-                                    <div className="mb-4">
-                                        <h5 className="text-blue-200">Using GoogleStorageImage:</h5>
-                                        <GoogleStorageImage
-                                            src={currentDocumentUrl}
-                                            alt="Document Full View"
-                                            className="w-full max-h-[80vh] max-w-[1200px] object-contain"
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <h5 className="text-blue-200">Direct img tag (test):</h5>
-                                        <img
-                                            src={currentDocumentUrl}
-                                            alt="Document Full View (Direct)"
-                                            className="w-full max-h-[80vh] max-w-[1200px] object-contain"
-                                            crossOrigin="anonymous"
-                                            onError={(e) => console.error(`Direct img tag failed for Document Full View at ${currentDocumentUrl}`, e)}
-                                            onLoad={() => console.log(`Direct img tag loaded for Document Full View at ${currentDocumentUrl}`)}
-                                        />
-                                    </div>
-                                    <div>
-                                        <h5 className="text-blue-200">Hardcoded test image:</h5>
-                                        <img
-                                            src="https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg"
-                                            alt="Hardcoded Test"
-                                            className="w-full max-h-[80vh] max-w-[1200px] object-contain border-2 border-red-500/30"
-                                            crossOrigin="anonymous"
-                                            onError={(e) => console.error(`Hardcoded img tag failed at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg`, e)}
-                                            onLoad={() => console.log(`Hardcoded img tag loaded at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg`)}
-                                        />
-                                    </div>
+                                    <img
+                                        src={currentDocumentUrl}
+                                        alt="Document Full View"
+                                        className="w-full max-h-[80vh] object-contain"
+                                        loading="lazy"
+                                        onLoad={() => console.log(`Document Full View loaded successfully at ${currentDocumentUrl}`)}
+                                        onError={(e) => console.error(`Document Full View failed to load at ${currentDocumentUrl}`, e)}
+                                    />
                                     <button
                                         onClick={downloadDocument}
                                         className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
@@ -739,13 +579,6 @@ export default function Dssn() {
                     50% { transform: scale(1); }
                     75% { transform: scale(1.05); }
                     100% { transform: scale(1); }
-                }
-                img {
-                    display: block !important;
-                    visibility: visible !important;
-                    opacity: 1 !important;
-                    max-width: 100% !important;
-                    max-height: 100% !important;
                 }
             `}</style>
         </div>
