@@ -61,11 +61,22 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
             if (imagePath.startsWith('system-liberianpost/')) {
                 return `https://storage.googleapis.com/${imagePath}`;
             }
-            return `https://storage.googleapis.com/system-liberianpost/${imagePath}`;
+            return `https://storage.googleapis.com/system-liberianpost/${encodeURIComponent(imagePath)}`;
         };
 
         const url = constructImageUrl(src);
         setImageUrl(url);
+
+        if (!url) {
+            setLoading(false);
+            setError(true);
+            return;
+        }
+
+        if (url.endsWith('.pdf')) {
+            setLoading(false);
+            return;
+        }
 
         const img = new Image();
         img.src = url;
@@ -101,11 +112,20 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         );
     }
 
-    if (error) {
+    if (error || imageUrl?.endsWith('.pdf')) {
         return (
             <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
-                <span className="text-red-400 text-sm">Failed to load image</span>
-                <div className="text-xs text-gray-400 mt-1">URL: {src.length > 30 ? `${src.substring(0, 30)}...` : src}</div>
+                {imageUrl?.endsWith('.pdf') ? (
+                    <div className="text-gray-400 text-sm text-center">
+                        PDF Document<br />
+                        <span className="text-xs">Click to view</span>
+                    </div>
+                ) : (
+                    <>
+                        <span className="text-red-400 text-sm">Failed to load image</span>
+                        <div className="text-xs text-gray-400 mt-1">URL: {src.length > 30 ? `${src.substring(0, 30)}...` : src}</div>
+                    </>
+                )}
             </div>
         );
     }
@@ -230,6 +250,7 @@ export default function Dssn() {
     };
 
     const openDocumentModal = (url) => {
+        if (!url) return;
         setCurrentDocumentUrl(url);
         setShowDocumentModal(true);
     };
@@ -244,7 +265,7 @@ export default function Dssn() {
         
         const link = document.createElement('a');
         link.href = currentDocumentUrl;
-        const filename = currentDocumentUrl.split('/').pop() || 'document';
+        const filename = decodeURIComponent(currentDocumentUrl.split('/').pop()) || 'document';
         link.download = filename;
         document.body.appendChild(link);
         link.click();
@@ -528,7 +549,7 @@ export default function Dssn() {
                 </div>
             )}
 
-            {showDocumentModal && (
+            {showDocumentModal && currentDocumentUrl && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
                     <div className="relative bg-gray-900 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-auto">
                         <button
@@ -541,9 +562,9 @@ export default function Dssn() {
                         </button>
 
                         <div className="p-4 h-full flex flex-col items-center justify-center">
-                            {currentDocumentUrl?.endsWith('.pdf') ? (
+                            {currentDocumentUrl.endsWith('.pdf') ? (
                                 <iframe
-                                    src={currentDocumentUrl}
+                                    src={`${currentDocumentUrl}#toolbar=0`}
                                     className="w-full h-[80vh]"
                                     title="Document Viewer"
                                 />
