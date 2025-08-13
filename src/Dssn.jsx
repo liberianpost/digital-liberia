@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const navLinks = [
@@ -25,32 +25,17 @@ export default function Dssn() {
     const [isSearching, setIsSearching] = useState(false);
     const [customerData, setCustomerData] = useState(null);
     const [error, setError] = useState(null);
-    const renderCount = useRef(0);
-
-    useEffect(() => {
-        renderCount.current += 1;
-        console.log(`Dssn component rendered - Version 5, Render #${renderCount.current}`);
-        alert(`Dssn component loaded - Version 5, Render #${renderCount.current}`);
-    }, []);
 
     const handleSearch = async (e) => {
         e.preventDefault();
         const cleanedDssn = dssn.trim().toUpperCase();
-        console.clear();
-        console.group(`DSSN Search Debug: ${cleanedDssn}`);
-        console.log('Starting search with DSSN:', cleanedDssn);
-        alert(`Starting search for DSSN: ${cleanedDssn}`);
 
         if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
-            const errorMsg = {
+            setError({
                 title: "Invalid DSSN Format",
                 message: "Must be exactly 15 alphanumeric characters",
                 details: `Received: ${cleanedDssn} (${cleanedDssn.length} chars)`
-            };
-            console.warn('Validation failed:', errorMsg);
-            alert(`Error: ${errorMsg.message}`);
-            setError(errorMsg);
-            console.groupEnd();
+            });
             return;
         }
 
@@ -58,10 +43,7 @@ export default function Dssn() {
         setError(null);
 
         try {
-            const apiUrl = `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`;
-            console.log('API Request URL:', apiUrl);
-
-            const response = await fetch(apiUrl, {
+            const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -70,33 +52,16 @@ export default function Dssn() {
                 }
             });
 
-            console.log('Response status:', response.status);
             const result = await response.json();
-            console.log('API Response Data:', result);
 
             if (!response.ok || !result.success) {
-                const errorDetails = {
+                throw {
                     title: result.error || `HTTP Error ${response.status}`,
                     message: result.message || 'Request failed',
                     details: `Reference: ${result.metadata?.requestId || 'N/A'}`,
                     timestamp: result.metadata?.timestamp || new Date().toISOString()
                 };
-                console.error('API Error:', errorDetails);
-                alert(`Error: ${errorDetails.message}`);
-                throw errorDetails;
             }
-
-            console.group('Image URL Verification');
-            if (result.data.images) {
-                for (const [key, imgObj] of Object.entries(result.data.images)) {
-                    if (!imgObj || !imgObj.url) {
-                        console.warn(`Missing ${key} image or URL`);
-                        continue;
-                    }
-                    console.log(`Image ${key} URL:`, imgObj.url, `Type: ${imgObj.type}`);
-                }
-            }
-            console.groupEnd();
 
             const transformedData = {
                 "Full Name": result.data.fullName || 'Not available',
@@ -124,12 +89,9 @@ export default function Dssn() {
                     : 'No metadata available'
             };
 
-            console.log('Transformed Data:', transformedData);
-            alert(`Search completed for DSSN: ${cleanedDssn}. Displaying results.`);
             setCustomerData(transformedData);
 
         } catch (err) {
-            console.error('Search Failed:', err);
             setError({
                 title: err.title || 'Search Error',
                 message: err.message || 'Failed to process request',
@@ -138,7 +100,6 @@ export default function Dssn() {
             });
         } finally {
             setIsSearching(false);
-            console.groupEnd();
         }
     };
 
@@ -170,32 +131,7 @@ export default function Dssn() {
                         DSSN Verification
                     </h2>
                     <div style={{ color: 'rgba(255, 255, 255, 0.9)', marginBottom: '24px' }}>
-                        <button
-                            onClick={() => {
-                                console.log(`Debug Render - Version 5, Render #${renderCount.current}`);
-                                alert(`Debug Render - Version 5, Render #${renderCount.current}, customerData: ${JSON.stringify(customerData)}`);
-                            }}
-                            style={{ backgroundColor: 'red', color: 'white', padding: '8px 16px', borderRadius: '8px', marginBottom: '16px' }}
-                        >
-                            Debug Render
-                        </button>
-                        <div>
-                            <img
-                                src="https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg"
-                                alt="Debug Test Image"
-                                style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid red' }}
-                                loading="lazy"
-                                onLoad={() => {
-                                    console.log('Debug Test Image loaded successfully');
-                                    alert('Debug Test Image loaded successfully');
-                                }}
-                                onError={(e) => {
-                                    console.error('Debug Test Image failed to load', e);
-                                    alert('Debug Test Image failed to load');
-                                }}
-                            />
-                        </div>
-                        <p style={{ marginTop: '16px' }}>
+                        <p style={{ marginBottom: '16px' }}>
                             Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information.
                             Enter the 15-digit alphanumeric DSSN below.
                         </p>
@@ -260,11 +196,7 @@ export default function Dssn() {
                                     Search Results for DSSN: {sanitizeHTML(dssn)}
                                 </h3>
                                 <button
-                                    onClick={() => {
-                                        setCustomerData(null);
-                                        console.log('Results cleared');
-                                        alert('Results cleared');
-                                    }}
+                                    onClick={() => setCustomerData(null)}
                                     style={{ color: '#9ca3af' }}
                                 >
                                     <svg style={{ width: '24px', height: '24px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -297,24 +229,6 @@ export default function Dssn() {
                             <div style={{ marginBottom: '24px' }}>
                                 <h4 style={{ color: '#93c5fd', marginBottom: '12px' }}>Images</h4>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                    <div>
-                                        <h5 style={{ color: '#93c5fd', marginBottom: '8px' }}>Test Image</h5>
-                                        <img
-                                            src="https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg"
-                                            alt="Test Image"
-                                            style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid red' }}
-                                            loading="lazy"
-                                            onLoad={() => {
-                                                console.log('Test Image loaded successfully');
-                                                alert('Test Image loaded successfully');
-                                            }}
-                                            onError={(e) => {
-                                                console.error('Test Image failed to load', e);
-                                                alert('Test Image failed to load');
-                                            }}
-                                        />
-                                    </div>
-
                                     {customerData["Image"] && (
                                         <div>
                                             <h5 style={{ color: '#93c5fd', marginBottom: '8px' }}>Profile Photo</h5>
@@ -323,18 +237,9 @@ export default function Dssn() {
                                                 alt="Profile Photo"
                                                 style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
                                                 loading="lazy"
-                                                onLoad={() => {
-                                                    console.log(`Profile Photo loaded successfully at ${customerData["Image"]}`);
-                                                    alert(`Profile Photo loaded at ${customerData["Image"]}`);
-                                                }}
-                                                onError={(e) => {
-                                                    console.error(`Profile Photo failed to load at ${customerData["Image"]}`, e);
-                                                    alert(`Profile Photo failed to load at ${customerData["Image"]}`);
-                                                }}
                                             />
                                         </div>
                                     )}
-
                                     {customerData["Passport Image"] && (
                                         <div>
                                             <h5 style={{ color: '#93c5fd', marginBottom: '8px' }}>Passport</h5>
@@ -343,18 +248,9 @@ export default function Dssn() {
                                                 alt="Passport"
                                                 style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
                                                 loading="lazy"
-                                                onLoad={() => {
-                                                    console.log(`Passport loaded successfully at ${customerData["Passport Image"]}`);
-                                                    alert(`Passport loaded at ${customerData["Passport Image"]}`);
-                                                }}
-                                                onError={(e) => {
-                                                    console.error(`Passport failed to load at ${customerData["Passport Image"]}`, e);
-                                                    alert(`Passport failed to load at ${customerData["Passport Image"]}`);
-                                                }}
                                             />
                                         </div>
                                     )}
-
                                     {customerData["Birth Certificate Image"] && (
                                         <div>
                                             <h5 style={{ color: '#93c5fd', marginBottom: '8px' }}>Birth Certificate</h5>
@@ -363,18 +259,9 @@ export default function Dssn() {
                                                 alt="Birth Certificate"
                                                 style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
                                                 loading="lazy"
-                                                onLoad={() => {
-                                                    console.log(`Birth Certificate loaded successfully at ${customerData["Birth Certificate Image"]}`);
-                                                    alert(`Birth Certificate loaded at ${customerData["Birth Certificate Image"]}`);
-                                                }}
-                                                onError={(e) => {
-                                                    console.error(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`, e);
-                                                    alert(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`);
-                                                }}
                                             />
                                         </div>
                                     )}
-
                                     {customerData["Drivers License Image"] && (
                                         <div>
                                             <h5 style={{ color: '#93c5fd', marginBottom: '8px' }}>Driver's License</h5>
@@ -383,18 +270,9 @@ export default function Dssn() {
                                                 alt="Driver's License"
                                                 style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
                                                 loading="lazy"
-                                                onLoad={() => {
-                                                    console.log(`Driver's License loaded successfully at ${customerData["Drivers License Image"]}`);
-                                                    alert(`Driver's License loaded at ${customerData["Drivers License Image"]}`);
-                                                }}
-                                                onError={(e) => {
-                                                    console.error(`Driver's License failed to load at ${customerData["Drivers License Image"]}`, e);
-                                                    alert(`Driver's License failed to load at ${customerData["Drivers License Image"]}`);
-                                                }}
                                             />
                                         </div>
                                     )}
-
                                     {customerData["National Id Image"] && (
                                         <div>
                                             <h5 style={{ color: '#93c5fd', marginBottom: '8px' }}>National ID</h5>
@@ -403,28 +281,9 @@ export default function Dssn() {
                                                 alt="National ID"
                                                 style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
                                                 loading="lazy"
-                                                onLoad={() => {
-                                                    console.log(`National ID loaded successfully at ${customerData["National Id Image"]}`);
-                                                    alert(`National ID loaded at ${customerData["National Id Image"]}`);
-                                                }}
-                                                onError={(e) => {
-                                                    console.error(`National ID failed to load at ${customerData["National Id Image"]}`, e);
-                                                    alert(`National ID failed to load at ${customerData["National Id Image"]}`);
-                                                }}
                                             />
                                         </div>
                                     )}
-                                </div>
-                            </div>
-
-                            <div>
-                                <h4 style={{ color: '#93c5fd', marginBottom: '12px' }}>Debug URLs</h4>
-                                <div style={{ fontSize: '14px', color: 'white' }}>
-                                    <p>Profile Photo: {customerData["Image"] || 'None'}</p>
-                                    <p>Passport: {customerData["Passport Image"] || 'None'}</p>
-                                    <p>Birth Certificate: {customerData["Birth Certificate Image"] || 'None'}</p>
-                                    <p>Driver's License: {customerData["Drivers License Image"] || 'None'}</p>
-                                    <p>National ID: {customerData["National Id Image"] || 'None'}</p>
                                 </div>
                             </div>
                         </div>
