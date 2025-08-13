@@ -38,10 +38,14 @@ const sanitizeHTML = (str) => {
 };
 
 const GoogleStorageImage = ({ src, alt, className, onClick }) => {
-    if (!src) {
+    const [error, setError] = useState(false);
+
+    if (!src || error) {
         return (
             <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
-                <span className="text-gray-400 text-sm">No image available</span>
+                <span className="text-red-400 text-sm">
+                    {error ? `Failed to load image: ${src}` : "No image available"}
+                </span>
             </div>
         );
     }
@@ -52,11 +56,10 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
             alt={alt}
             className={`${className} object-cover`}
             onClick={onClick}
-            crossOrigin="anonymous"
             loading="lazy"
             onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.nextSibling.style.display = 'flex';
+                console.error(`Image failed to load: ${src}`);
+                setError(true);
             }}
         />
     );
@@ -373,9 +376,6 @@ export default function Dssn() {
                                             className="w-full h-64 rounded-lg border-2 border-blue-500/30 cursor-pointer"
                                             onClick={() => openDocumentModal(customerData["Image"])}
                                         />
-                                        <div className="hidden bg-gray-800/50 flex items-center justify-center rounded-lg w-full h-64">
-                                            <span className="text-red-400 text-sm">Failed to load image</span>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -393,9 +393,6 @@ export default function Dssn() {
                                                         alt="Passport"
                                                         className="w-full h-48 rounded border border-indigo-700/30 cursor-pointer"
                                                     />
-                                                    <div className="hidden bg-gray-800/50 flex items-center justify-center rounded-lg w-full h-48">
-                                                        <span className="text-red-400 text-sm">Failed to load image</span>
-                                                    </div>
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
                                             </div>
@@ -410,9 +407,6 @@ export default function Dssn() {
                                                         alt="Birth Certificate"
                                                         className="w-full h-48 rounded border border-indigo-700/30 cursor-pointer"
                                                     />
-                                                    <div className="hidden bg-gray-800/50 flex items-center justify-center rounded-lg w-full h-48">
-                                                        <span className="text-red-400 text-sm">Failed to load image</span>
-                                                    </div>
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
                                             </div>
@@ -427,9 +421,6 @@ export default function Dssn() {
                                                         alt="Driver's License"
                                                         className="w-full h-48 rounded border border-indigo-700/30 cursor-pointer"
                                                     />
-                                                    <div className="hidden bg-gray-800/50 flex items-center justify-center rounded-lg w-full h-48">
-                                                        <span className="text-red-400 text-sm">Failed to load image</span>
-                                                    </div>
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
                                             </div>
@@ -444,9 +435,6 @@ export default function Dssn() {
                                                         alt="National ID"
                                                         className="w-full h-48 rounded border border-indigo-700/30 cursor-pointer"
                                                     />
-                                                    <div className="hidden bg-gray-800/50 flex items-center justify-center rounded-lg w-full h-48">
-                                                        <span className="text-red-400 text-sm">Failed to load image</span>
-                                                    </div>
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
                                             </div>
@@ -485,9 +473,6 @@ export default function Dssn() {
                                         alt="Document Full View"
                                         className="w-full max-h-[80vh] object-contain"
                                     />
-                                    <div className="hidden bg-gray-800/50 flex items-center justify-center w-full max-h-[80vh]">
-                                        <span className="text-red-400 text-sm">Failed to load image</span>
-                                    </div>
                                     <button
                                         onClick={downloadDocument}
                                         className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
