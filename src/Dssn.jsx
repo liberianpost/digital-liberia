@@ -247,17 +247,17 @@ export default function Dssn() {
 
             console.group('Image URL Verification');
             if (result.data.images) {
-                for (const [key, url] of Object.entries(result.data.images)) {
-                    if (!url) {
+                for (const [key, imgObj] of Object.entries(result.data.images)) {
+                    if (!imgObj) {
                         console.warn(`Missing ${key} image`);
                         continue;
                     }
                     
                     try {
-                        const testResponse = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
-                        console.log(`Image ${key} accessible:`, url);
+                        const testResponse = await fetch(imgObj.url, { method: 'HEAD', mode: 'no-cors' });
+                        console.log(`Image ${key} accessible:`, imgObj.url);
                     } catch (err) {
-                        console.error(`Image ${key} inaccessible:`, url, err);
+                        console.error(`Image ${key} inaccessible:`, imgObj.url, err);
                     }
                 }
             }
@@ -279,11 +279,11 @@ export default function Dssn() {
                 "Passport Number": result.data.passportNumber || 'Not available',
                 "Birth Certificate": result.data.birthCertificate || 'Not available',
                 "Driver's License": result.data.driverLicense || 'Not available',
-                "Image": result.data.images?.profile || null,
-                "Passport Image": result.data.images?.passport || null,
-                "Birth Certificate Image": result.data.images?.birthCertificate || null,
-                "Drivers License Image": result.data.images?.driverLicense || null,
-                "National Id Image": result.data.images?.nationalId || null,
+                "Image": result.data.images?.profile?.url || null,
+                "Passport Image": result.data.images?.passport?.url || null,
+                "Birth Certificate Image": result.data.images?.birthCertificate?.url || null,
+                "Drivers License Image": result.data.images?.driverLicense?.url || null,
+                "National Id Image": result.data.images?.nationalId?.url || null,
                 "Search Metadata": result.metadata ?
                     `Request ID: ${result.metadata.requestId} | ${new Date(result.metadata.timestamp).toLocaleString()}`
                     : 'No metadata available'
@@ -553,11 +553,17 @@ export default function Dssn() {
                                             <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                                 <h5 className="text-blue-300 mb-2">Passport</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Passport Image"])}>
-                                                    <GoogleStorageImage
-                                                        src={customerData["Passport Image"]}
-                                                        alt="Passport"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover"
-                                                    />
+                                                    {customerData["Passport Image"]?.toLowerCase().endsWith('.pdf') ? (
+                                                        <div className="w-full h-48 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer">
+                                                            <span className="text-white/80">PDF Document (Click to view)</span>
+                                                        </div>
+                                                    ) : (
+                                                        <GoogleStorageImage
+                                                            src={customerData["Passport Image"]}
+                                                            alt="Passport"
+                                                            className="w-full h-48 rounded border border-indigo-700/30 object-cover"
+                                                        />
+                                                    )}
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
                                             </div>
@@ -567,11 +573,17 @@ export default function Dssn() {
                                             <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                                 <h5 className="text-blue-300 mb-2">Birth Certificate</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Birth Certificate Image"])}>
-                                                    <GoogleStorageImage
-                                                        src={customerData["Birth Certificate Image"]}
-                                                        alt="Birth Certificate"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover"
-                                                    />
+                                                    {customerData["Birth Certificate Image"]?.toLowerCase().endsWith('.pdf') ? (
+                                                        <div className="w-full h-48 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer">
+                                                            <span className="text-white/80">PDF Document (Click to view)</span>
+                                                        </div>
+                                                    ) : (
+                                                        <GoogleStorageImage
+                                                            src={customerData["Birth Certificate Image"]}
+                                                            alt="Birth Certificate"
+                                                            className="w-full h-48 rounded border border-indigo-700/30 object-cover"
+                                                        />
+                                                    )}
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
                                             </div>
@@ -581,11 +593,17 @@ export default function Dssn() {
                                             <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                                 <h5 className="text-blue-300 mb-2">Driver's License</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Drivers License Image"])}>
-                                                    <GoogleStorageImage
-                                                        src={customerData["Drivers License Image"]}
-                                                        alt="Driver's License"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover"
-                                                    />
+                                                    {customerData["Drivers License Image"]?.toLowerCase().endsWith('.pdf') ? (
+                                                        <div className="w-full h-48 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer">
+                                                            <span className="text-white/80">PDF Document (Click to view)</span>
+                                                        </div>
+                                                    ) : (
+                                                        <GoogleStorageImage
+                                                            src={customerData["Drivers License Image"]}
+                                                            alt="Driver's License"
+                                                            className="w-full h-48 rounded border border-indigo-700/30 object-cover"
+                                                        />
+                                                    )}
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
                                             </div>
@@ -595,11 +613,17 @@ export default function Dssn() {
                                             <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                                 <h5 className="text-blue-300 mb-2">National ID</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["National Id Image"])}>
-                                                    <GoogleStorageImage
-                                                        src={customerData["National Id Image"]}
-                                                        alt="National ID"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover"
-                                                    />
+                                                    {customerData["National Id Image"]?.toLowerCase().endsWith('.pdf') ? (
+                                                        <div className="w-full h-48 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer">
+                                                            <span className="text-white/80">PDF Document (Click to view)</span>
+                                                        </div>
+                                                    ) : (
+                                                        <GoogleStorageImage
+                                                            src={customerData["National Id Image"]}
+                                                            alt="National ID"
+                                                            className="w-full h-48 rounded border border-indigo-700/30 object-cover"
+                                                        />
+                                                    )}
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
                                             </div>
