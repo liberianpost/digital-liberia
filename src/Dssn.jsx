@@ -45,11 +45,10 @@ export default function Dssn() {
     const [isSearching, setIsSearching] = useState(false);
     const [customerData, setCustomerData] = useState(null);
     const [error, setError] = useState(null);
-    const [currentDocumentUrl, setCurrentDocumentUrl] = useState("");
-    const [showDocumentModal, setShowDocumentModal] = useState(false);
-    const [showInfoModal, setShowInfoModal] = useState(false);
+    const [showResults, setShowResults] = useState(false);
 
     useEffect(() => {
+        console.log('Component mounted');
         const bgInterval = setInterval(() => {
             setBgIndex(prev => (prev + 1) % backgroundImages.length);
         }, 5000);
@@ -152,9 +151,9 @@ export default function Dssn() {
             };
 
             console.log('Transformed Data:', transformedData);
-            alert(`Search completed for DSSN: ${cleanedDssn}. Opening modal.`);
+            alert(`Search completed for DSSN: ${cleanedDssn}. Displaying results.`);
             setCustomerData(transformedData);
-            setShowInfoModal(true);
+            setShowResults(true);
 
         } catch (err) {
             console.error('Search Failed:', err);
@@ -170,39 +169,11 @@ export default function Dssn() {
         }
     };
 
-    const openDocumentModal = (url) => {
-        console.log('Opening document modal with URL:', url);
-        alert(`Opening document modal for URL: ${url}`);
-        setCurrentDocumentUrl(url);
-        setShowDocumentModal(true);
-    };
-
-    const closeDocumentModal = () => {
-        console.log('Closing document modal');
-        setShowDocumentModal(false);
-        setCurrentDocumentUrl("");
-    };
-
-    const downloadDocument = () => {
-        console.log('Downloading document:', currentDocumentUrl);
-        if (!currentDocumentUrl) {
-            console.warn('No document URL to download');
-            return;
-        }
-        const link = document.createElement('a');
-        link.href = currentDocumentUrl;
-        const filename = currentDocumentUrl.split('/').pop() || 'document';
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    const debugImage = () => {
-        console.log('Debug Image button clicked');
-        alert('Attempting to load test image');
-        const testUrl = 'https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg';
-        console.log(`Debug: Attempting to load test image at ${testUrl}`);
+    const debugRender = () => {
+        console.log('Debug Render button clicked');
+        console.log('Current customerData:', customerData);
+        alert('Debug Render: Check console for customerData');
+        setShowResults(prev => !prev); // Force re-render
     };
 
     return (
@@ -291,7 +262,10 @@ export default function Dssn() {
                             </h2>
                             <div className="text-white/90 relative space-y-6">
                                 <button
-                                    onClick={debugImage}
+                                    onClick={() => {
+                                        console.log('Debug Image button clicked');
+                                        alert('Attempting to load test image');
+                                    }}
                                     className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white mb-4"
                                 >
                                     Debug Image
@@ -384,109 +358,118 @@ export default function Dssn() {
                         </div>
                     </div>
                 </section>
-            </main>
 
-            {showInfoModal && customerData && (
-                <div id="dssnInfo" className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-gray-900 border border-gray-700 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <div>
-                                <h3 className="text-2xl font-bold text-white">
-                                    Search Results for DSSN: {sanitizeHTML(dssn)}
-                                </h3>
-                                {customerData["Search Metadata"] && (
-                                    <p className="text-xs text-gray-400 mt-1">
-                                        {customerData["Search Metadata"]}
-                                    </p>
-                                )}
+                {showResults && customerData && (
+                    <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto">
+                        <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-h-[80vh] overflow-y-auto">
+                            <div className="flex justify-between items-center mb-4">
+                                <div>
+                                    <h3 className="text-2xl font-bold text-white">
+                                        Search Results for DSSN: {sanitizeHTML(dssn)}
+                                    </h3>
+                                    {customerData["Search Metadata"] && (
+                                        <p className="text-xs text-gray-400 mt-1">
+                                            {customerData["Search Metadata"]}
+                                        </p>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => setShowResults(false)}
+                                    className="text-gray-400 hover:text-white"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
                             </div>
-                            <button onClick={() => setShowInfoModal(false)} className="text-gray-400 hover:text-white">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+
+                            <button
+                                onClick={debugRender}
+                                className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white mb-4"
+                            >
+                                Debug Render
                             </button>
-                        </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div className="p-4">
-                                <h4 className="text-blue-300 mb-3">Profile Information</h4>
-                                {Object.entries(customerData).map(([key, value]) => {
-                                    if (typeof value === 'string' && !key.includes('Image') && !key.includes('Metadata')) {
-                                        return (
-                                            <div key={key} className="p-2">
-                                                <strong className="text-blue-300 text-sm">{key}:</strong>
-                                                <span className="ml-2 text-white text-sm">{sanitizeHTML(value)}</span>
-                                            </div>
-                                        );
-                                    }
-                                    return null;
-                                })}
-                            </div>
+                            <div className="space-y-6">
+                                <div>
+                                    <h4 className="text-blue-300 mb-3">Profile Information</h4>
+                                    {Object.entries(customerData).map(([key, value]) => {
+                                        if (typeof value === 'string' && !key.includes('Image') && !key.includes('Metadata')) {
+                                            return (
+                                                <div key={key} className="p-2">
+                                                    <strong className="text-blue-300 text-sm">{key}:</strong>
+                                                    <span className="ml-2 text-white text-sm">{sanitizeHTML(value)}</span>
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    })}
+                                </div>
 
-                            <div className="p-4">
-                                <h4 className="text-blue-300 mb-3">Profile Photo</h4>
-                                {customerData["Image"] ? (
-                                    customerData["Image"].toLowerCase().endsWith('.pdf') ? (
-                                        <div
-                                            className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center cursor-pointer"
-                                            onClick={() => openDocumentModal(customerData["Image"])}
-                                        >
-                                            <span className="text-white">PDF Profile (Click to view)</span>
-                                        </div>
-                                    ) : (
+                                <div>
+                                    <h4 className="text-blue-300 mb-3">Images</h4>
+                                    <div className="space-y-4">
                                         <div>
+                                            <h5 className="text-blue-300 mb-2">Test Image</h5>
                                             <img
-                                                src={customerData["Image"]}
-                                                alt="Profile Photo"
-                                                style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                src="https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg"
+                                                alt="Test Image"
+                                                style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid red' }}
                                                 loading="lazy"
                                                 onLoad={() => {
-                                                    console.log(`Profile Photo loaded successfully at ${customerData["Image"]}`);
-                                                    alert(`Profile Photo loaded at ${customerData["Image"]}`);
+                                                    console.log('Test Image loaded successfully at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg');
+                                                    alert('Test Image loaded successfully');
                                                 }}
                                                 onError={(e) => {
-                                                    console.error(`Profile Photo failed to load at ${customerData["Image"]}`, e);
-                                                    alert(`Profile Photo failed to load at ${customerData["Image"]}`);
+                                                    console.error('Test Image failed to load at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg', e);
+                                                    alert('Test Image failed to load');
                                                 }}
-                                                onClick={() => openDocumentModal(customerData["Image"])}
                                             />
                                         </div>
-                                    )
-                                ) : (
-                                    <div className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center">
-                                        <span className="text-white">No profile photo</span>
-                                    </div>
-                                )}
-                                <h4 className="text-blue-300 mt-4 mb-2">Test Image</h4>
-                                <img
-                                    src="https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg"
-                                    alt="Test Image"
-                                    style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid red' }}
-                                    loading="lazy"
-                                    onLoad={() => {
-                                        console.log('Test Image loaded successfully at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg');
-                                        alert('Test Image loaded successfully');
-                                    }}
-                                    onError={(e) => {
-                                        console.error('Test Image failed to load at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg', e);
-                                        alert('Test Image failed to load');
-                                    }}
-                                />
-                            </div>
-                        </div>
 
-                        <div className="space-y-6">
-                            <div>
-                                <h4 className="text-blue-300 mb-3">Documents</h4>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {customerData["Passport Image"] && (
-                                        <div className="p-3">
-                                            <h5 className="text-blue-300 mb-2">Passport</h5>
-                                            <div onClick={() => openDocumentModal(customerData["Passport Image"])}>
+                                        {customerData["Image"] && (
+                                            <div>
+                                                <h5 className="text-blue-300 mb-2">Profile Photo</h5>
+                                                {customerData["Image"].toLowerCase().endsWith('.pdf') ? (
+                                                    <a
+                                                        href={customerData["Image"]}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center text-white"
+                                                    >
+                                                        PDF Profile (Click to view)
+                                                    </a>
+                                                ) : (
+                                                    <img
+                                                        src={customerData["Image"]}
+                                                        alt="Profile Photo"
+                                                        style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                        loading="lazy"
+                                                        onLoad={() => {
+                                                            console.log(`Profile Photo loaded successfully at ${customerData["Image"]}`);
+                                                            alert(`Profile Photo loaded at ${customerData["Image"]}`);
+                                                        }}
+                                                        onError={(e) => {
+                                                            console.error(`Profile Photo failed to load at ${customerData["Image"]}`, e);
+                                                            alert(`Profile Photo failed to load at ${customerData["Image"]}`);
+                                                        }}
+                                                    />
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {customerData["Passport Image"] && (
+                                            <div>
+                                                <h5 className="text-blue-300 mb-2">Passport</h5>
                                                 {customerData["Passport Image"].toLowerCase().endsWith('.pdf') ? (
-                                                    <div className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center cursor-pointer">
-                                                        <span className="text-white">PDF Passport</span>
-                                                    </div>
+                                                    <a
+                                                        href={customerData["Passport Image"]}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center text-white"
+                                                    >
+                                                        PDF Passport
+                                                    </a>
                                                 ) : (
                                                     <img
                                                         src={customerData["Passport Image"]}
@@ -503,19 +486,21 @@ export default function Dssn() {
                                                         }}
                                                     />
                                                 )}
-                                                <div className="text-center text-xs text-white mt-1">Click to view</div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
-                                    {customerData["Birth Certificate Image"] && (
-                                        <div className="p-3">
-                                            <h5 className="text-blue-300 mb-2">Birth Certificate</h5>
-                                            <div onClick={() => openDocumentModal(customerData["Birth Certificate Image"])}>
+                                        {customerData["Birth Certificate Image"] && (
+                                            <div>
+                                                <h5 className="text-blue-300 mb-2">Birth Certificate</h5>
                                                 {customerData["Birth Certificate Image"].toLowerCase().endsWith('.pdf') ? (
-                                                    <div className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center cursor-pointer">
-                                                        <span className="text-white">PDF Birth Certificate</span>
-                                                    </div>
+                                                    <a
+                                                        href={customerData["Birth Certificate Image"]}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center text-white"
+                                                    >
+                                                        PDF Birth Certificate
+                                                    </a>
                                                 ) : (
                                                     <img
                                                         src={customerData["Birth Certificate Image"]}
@@ -532,19 +517,21 @@ export default function Dssn() {
                                                         }}
                                                     />
                                                 )}
-                                                <div className="text-center text-xs text-white mt-1">Click to view</div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
-                                    {customerData["Drivers License Image"] && (
-                                        <div className="p-3">
-                                            <h5 className="text-blue-300 mb-2">Driver's License</h5>
-                                            <div onClick={() => openDocumentModal(customerData["Drivers License Image"])}>
+                                        {customerData["Drivers License Image"] && (
+                                            <div>
+                                                <h5 className="text-blue-300 mb-2">Driver's License</h5>
                                                 {customerData["Drivers License Image"].toLowerCase().endsWith('.pdf') ? (
-                                                    <div className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center cursor-pointer">
-                                                        <span className="text-white">PDF Driver's License</span>
-                                                    </div>
+                                                    <a
+                                                        href={customerData["Drivers License Image"]}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center text-white"
+                                                    >
+                                                        PDF Driver's License
+                                                    </a>
                                                 ) : (
                                                     <img
                                                         src={customerData["Drivers License Image"]}
@@ -561,19 +548,21 @@ export default function Dssn() {
                                                         }}
                                                     />
                                                 )}
-                                                <div className="text-center text-xs text-white mt-1">Click to view</div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
-                                    {customerData["National Id Image"] && (
-                                        <div className="p-3">
-                                            <h5 className="text-blue-300 mb-2">National ID</h5>
-                                            <div onClick={() => openDocumentModal(customerData["National Id Image"])}>
+                                        {customerData["National Id Image"] && (
+                                            <div>
+                                                <h5 className="text-blue-300 mb-2">National ID</h5>
                                                 {customerData["National Id Image"].toLowerCase().endsWith('.pdf') ? (
-                                                    <div className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center cursor-pointer">
-                                                        <span className="text-white">PDF National ID</span>
-                                                    </div>
+                                                    <a
+                                                        href={customerData["National Id Image"]}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center text-white"
+                                                    >
+                                                        PDF National ID
+                                                    </a>
                                                 ) : (
                                                     <img
                                                         src={customerData["National Id Image"]}
@@ -590,78 +579,26 @@ export default function Dssn() {
                                                         }}
                                                     />
                                                 )}
-                                                <div className="text-center text-xs text-white mt-1">Click to view</div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div className="p-4">
-                                <h4 className="text-blue-300 mb-3">Debug URLs</h4>
-                                <div className="text-sm text-white">
-                                    <p>Profile Photo: {customerData["Image"] || 'None'}</p>
-                                    <p>Passport: {customerData["Passport Image"] || 'None'}</p>
-                                    <p>Birth Certificate: {customerData["Birth Certificate Image"] || 'None'}</p>
-                                    <p>Driver's License: {customerData["Drivers License Image"] || 'None'}</p>
-                                    <p>National ID: {customerData["National Id Image"] || 'None'}</p>
+                                <div>
+                                    <h4 className="text-blue-300 mb-3">Debug URLs</h4>
+                                    <div className="text-sm text-white">
+                                        <p>Profile Photo: {customerData["Image"] || 'None'}</p>
+                                        <p>Passport: {customerData["Passport Image"] || 'None'}</p>
+                                        <p>Birth Certificate: {customerData["Birth Certificate Image"] || 'None'}</p>
+                                        <p>Driver's License: {customerData["Drivers License Image"] || 'None'}</p>
+                                        <p>National ID: {customerData["National Id Image"] || 'None'}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            )}
-
-            {showDocumentModal && currentDocumentUrl && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
-                    <div className="bg-gray-900 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto p-4">
-                        <button
-                            onClick={closeDocumentModal}
-                            className="absolute top-4 right-4 text-white hover:text-red-400"
-                        >
-                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                        <div className="flex flex-col items-center">
-                            {currentDocumentUrl.toLowerCase().endsWith('.pdf') ? (
-                                <iframe
-                                    src={`${currentDocumentUrl}#toolbar=0`}
-                                    style={{ width: '100%', height: '80vh' }}
-                                    title="Document Viewer"
-                                    onError={(e) => {
-                                        console.error('Iframe load error:', e);
-                                        alert('Iframe load error');
-                                    }}
-                                />
-                            ) : (
-                                <>
-                                    <img
-                                        src={currentDocumentUrl}
-                                        alt="Document Full View"
-                                        style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain' }}
-                                        loading="lazy"
-                                        onLoad={() => {
-                                            console.log(`Document Full View loaded successfully at ${currentDocumentUrl}`);
-                                            alert(`Document Full View loaded at ${currentDocumentUrl}`);
-                                        }}
-                                        onError={(e) => {
-                                            console.error(`Document Full View failed to load at ${currentDocumentUrl}`, e);
-                                            alert(`Document Full View failed to load at ${currentDocumentUrl}`);
-                                        }}
-                                    />
-                                    <button
-                                        onClick={downloadDocument}
-                                        className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
-                                    >
-                                        Download Document
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
+                    </section>
+                )}
+            </main>
 
             <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
                 <div className="border-t border-indigo-700/30 pt-6">
