@@ -39,124 +39,124 @@ const sanitizeHTML = (str) => {
 
 const GoogleStorageImage = ({ src, alt, className, onClick }) => {
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
+    const [error, setError] = useState(null);
     const [imageUrl, setImageUrl] = useState('');
 
     useEffect(() => {
-        console.log('GoogleStorageImage initial src:', src);
-        
+        console.groupCollapsed(`Image Load Debug: ${src || 'No source'}`);
+        console.log('Initial source:', src);
+
         if (!src) {
-            console.log('No image source provided');
+            console.warn('No image source provided');
             setLoading(false);
-            setError(true);
+            setError('No image source provided');
+            console.groupEnd();
             return;
         }
 
-        setLoading(true);
-        setError(false);
+        const constructImageUrl = (rawPath) => {
+            try {
+                let processedPath = rawPath.trim();
+                
+                console.log('Processing path:', processedPath);
 
-        const constructImageUrl = (imagePath) => {
-            console.log('Constructing URL from:', imagePath);
-            
-            if (!imagePath) {
-                console.log('Empty image path');
+                // Handle already complete URLs
+                if (processedPath.startsWith('http')) {
+                    console.log('Already a complete URL');
+                    return processedPath;
+                }
+
+                // Handle gs:// format
+                if (processedPath.startsWith('gs://')) {
+                    processedPath = processedPath.substring(5);
+                    console.log('Removed gs:// prefix');
+                }
+
+                // Handle relative paths
+                if (!processedPath.startsWith('system-liberianpost/')) {
+                    processedPath = `system-liberianpost/${processedPath}`;
+                    console.log('Added bucket prefix');
+                }
+
+                // Encode special characters but preserve forward slashes
+                const encodedPath = processedPath.split('/').map(part => 
+                    part === '' ? '' : encodeURIComponent(part)
+                ).join('/');
+
+                const finalUrl = `https://storage.googleapis.com/${encodedPath}`;
+                console.log('Final constructed URL:', finalUrl);
+                return finalUrl;
+            } catch (err) {
+                console.error('Error constructing URL:', err);
                 return null;
             }
-            
-            if (imagePath.startsWith('http')) {
-                console.log('Already full URL:', imagePath);
-                return imagePath;
-            }
-            
-            if (imagePath.startsWith('gs://')) {
-                const url = `https://storage.googleapis.com/${imagePath.replace('gs://', '')}`;
-                console.log('Converted gs:// to URL:', url);
-                return url;
-            }
-            
-            if (imagePath.startsWith('system-liberianpost/')) {
-                const url = `https://storage.googleapis.com/${imagePath}`;
-                console.log('Converted relative path to URL:', url);
-                return url;
-            }
-            
-            let encodedPath = imagePath;
-            if (imagePath.includes('%20') || imagePath.includes(' ')) {
-                encodedPath = encodeURIComponent(imagePath);
-                console.log('Encoded path with spaces:', encodedPath);
-            }
-            
-            const finalUrl = `https://storage.googleapis.com/system-liberianpost/${encodedPath}`;
-            console.log('Final constructed URL:', finalUrl);
-            return finalUrl;
         };
 
         const url = constructImageUrl(src);
+        if (!url) {
+            console.error('Failed to construct valid URL');
+            setError('Invalid image URL');
+            setLoading(false);
+            console.groupEnd();
+            return;
+        }
+
         setImageUrl(url);
-        console.log('Setting image URL:', url);
+        console.log('Attempting to load image from:', url);
 
         const img = new Image();
         img.src = url;
-        console.log('Created image element with src:', url);
 
         img.onload = () => {
-            console.log('Image loaded successfully:', url);
+            console.log('Image loaded successfully');
             setLoading(false);
+            setError(null);
+            console.groupEnd();
         };
 
-        img.onerror = (e) => {
-            console.error('Image load error:', { 
-                url, 
-                error: e, 
-                imagePath: src 
+        img.onerror = (err) => {
+            console.error('Image load failed:', {
+                constructedUrl: url,
+                originalSource: src,
+                error: err
             });
-            setError(true);
+            setError('Failed to load image');
             setLoading(false);
+            console.groupEnd();
         };
 
         return () => {
-            console.log('Cleaning up image loader');
             img.onload = null;
             img.onerror = null;
         };
     }, [src]);
 
     if (!src) {
-        console.log('Rendering no image state');
         return (
-            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
-                <span className="text-gray-400 text-sm">No image available</span>
+            <div className={`${className} bg-gray-200 flex items-center justify-center rounded-lg`}>
+                <span className="text-gray-500">No image available</span>
             </div>
         );
     }
 
     if (loading) {
-        console.log('Rendering loading state for:', src);
         return (
-            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
+            <div className={`${className} bg-gray-200 flex items-center justify-center rounded-lg`}>
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             </div>
         );
     }
 
     if (error) {
-        console.log('Rendering error state for:', src);
         return (
-            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
-                <div className="text-center">
-                    <span className="text-red-400 text-sm">Failed to load image</span>
-                    <div className="text-xs text-gray-400 mt-1">
-                        URL: {src.length > 30 ? `${src.substring(0, 30)}...` : src}
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">
-                        Constructed: {imageUrl.length > 30 ? `${imageUrl.substring(0, 30)}...` : imageUrl}
-                    </div>
-                </div>
+            <div className={`${className} bg-red-50 border border-red-200 flex flex-col items-center justify-center rounded-lg p-2`}>
+                <span className="text-red-500 text-sm">{error}</span>
+                <span className="text-xs text-gray-600 mt-1">Source: {src.substring(0, 30)}{src.length > 30 ? '...' : ''}</span>
+                <span className="text-xs text-gray-600">URL: {imageUrl.substring(0, 30)}{imageUrl.length > 30 ? '...' : ''}</span>
             </div>
         );
     }
 
-    console.log('Rendering image:', imageUrl);
     return (
         <img
             src={imageUrl}
@@ -164,13 +164,9 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
             className={className}
             onClick={onClick}
             crossOrigin="anonymous"
-            onError={(e) => {
-                console.error('Image render error:', {
-                    url: imageUrl,
-                    src,
-                    error: e
-                });
-                setError(true);
+            onError={() => {
+                console.error('Rendering failed for image:', imageUrl);
+                setError('Rendering failed');
             }}
         />
     );
@@ -205,7 +201,8 @@ export default function Dssn() {
     const handleSearch = async (e) => {
         e.preventDefault();
         const cleanedDssn = dssn.trim().toUpperCase();
-        console.log('Search initiated for DSSN:', cleanedDssn);
+        console.groupCollapsed(`DSSN Search: ${cleanedDssn}`);
+        console.log('Starting search for DSSN:', cleanedDssn);
 
         if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
             const errorMsg = {
@@ -213,18 +210,18 @@ export default function Dssn() {
                 message: "Must be exactly 15 alphanumeric characters",
                 details: `Received: ${cleanedDssn} (${cleanedDssn.length} chars)`
             };
-            console.log('Validation error:', errorMsg);
+            console.warn('Validation failed:', errorMsg);
             setError(errorMsg);
+            console.groupEnd();
             return;
         }
 
         setIsSearching(true);
         setError(null);
-        console.log('Starting search...');
 
         try {
             const apiUrl = `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`;
-            console.log('Making API request to:', apiUrl);
+            console.log('Fetching from API:', apiUrl);
 
             const response = await fetch(apiUrl, {
                 method: 'GET',
@@ -235,8 +232,9 @@ export default function Dssn() {
                 }
             });
 
+            console.log('Response status:', response.status);
             const result = await response.json();
-            console.log('API response received:', result);
+            console.log('API response data:', result);
 
             if (!response.ok || !result.success) {
                 const errorDetails = {
@@ -249,8 +247,21 @@ export default function Dssn() {
                 throw errorDetails;
             }
 
-            console.log('API success, processing data...');
-            console.log('Raw image data from API:', result.data.images);
+            console.log('Processing image URLs:', result.data.images);
+            if (result.data.images) {
+                for (const [key, url] of Object.entries(result.data.images)) {
+                    if (url) {
+                        try {
+                            const testResponse = await fetch(url, { method: 'HEAD' });
+                            console.log(`Image ${key} status:`, testResponse.status, url);
+                        } catch (err) {
+                            console.error(`Image ${key} verification failed:`, err.message, url);
+                        }
+                    } else {
+                        console.warn(`Missing ${key} image`);
+                    }
+                }
+            }
 
             const transformedData = {
                 "Full Name": result.data.fullName || 'Not available',
@@ -283,7 +294,7 @@ export default function Dssn() {
             setShowInfoModal(true);
 
         } catch (err) {
-            console.error('Search error:', err);
+            console.error('Search failed:', err);
             setError({
                 title: err.title || 'Search Error',
                 message: err.message || 'Failed to process request',
@@ -291,8 +302,8 @@ export default function Dssn() {
                 technical: `Status: ${err.status || 'Unknown'} | ${err.timestamp || new Date().toISOString()}`
             });
         } finally {
-            console.log('Search completed');
             setIsSearching(false);
+            console.groupEnd();
         }
     };
 
@@ -619,7 +630,7 @@ export default function Dssn() {
                                     src={`${currentDocumentUrl}#toolbar=0`}
                                     className="w-full h-[80vh]"
                                     title="Document Viewer"
-                                    onError={(e) => console.error('Iframe load error:', { url: currentDocumentUrl, error: e.message })}
+                                    onError={(e) => console.error('Iframe load error:', e)}
                                 />
                             ) : (
                                 <>
