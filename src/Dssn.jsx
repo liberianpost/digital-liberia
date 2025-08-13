@@ -254,7 +254,7 @@ export default function Dssn() {
                                         index === activeLogo
                                             ? "scale-110 bg-white shadow-lg"
                                             : "scale-100 bg-white/90"
-                                        }`}
+                                    }`}
                                     style={{
                                         animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none'
                                     }}
@@ -398,20 +398,26 @@ export default function Dssn() {
 
                                 <div className="bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                     <h4 className="text-blue-300 mb-3">Profile Photo</h4>
-                                    {customerData["Image"]?.toLowerCase().endsWith('.pdf') ? (
-                                        <div className="w-full h-64 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer" onClick={() => openDocumentModal(customerData["Image"])}>
-                                            <span className="text-white/80">PDF Profile (Click to view)</span>
-                                        </div>
+                                    {customerData["Image"] ? (
+                                        customerData["Image"].toLowerCase().endsWith('.pdf') ? (
+                                            <div className="w-full h-64 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer" onClick={() => openDocumentModal(customerData["Image"])}>
+                                                <span className="text-white/80">PDF Profile (Click to view)</span>
+                                            </div>
+                                        ) : (
+                                            <img
+                                                src={customerData["Image"]}
+                                                alt="Profile Photo"
+                                                className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer"
+                                                loading="lazy"
+                                                onLoad={() => console.log(`Profile Photo loaded successfully at ${customerData["Image"]}`)}
+                                                onError={(e) => console.error(`Profile Photo failed to load at ${customerData["Image"]}`, e)}
+                                                onClick={() => openDocumentModal(customerData["Image"])}
+                                            />
+                                        )
                                     ) : (
-                                        <img
-                                            src={customerData["Image"]}
-                                            alt="Profile Photo"
-                                            className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer"
-                                            loading="lazy"
-                                            onClick={() => openDocumentModal(customerData["Image"])}
-                                            onLoad={() => console.log(`Profile Photo loaded successfully at ${customerData["Image"]}`)}
-                                            onError={(e) => console.error(`Profile Photo failed to load at ${customerData["Image"]}`, e)}
-                                        />
+                                        <div className="w-full h-64 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center">
+                                            <span className="text-white/80">No profile photo available</span>
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -424,7 +430,7 @@ export default function Dssn() {
                                             <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                                 <h5 className="text-blue-300 mb-2">Passport</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Passport Image"])}>
-                                                    {customerData["Passport Image"]?.toLowerCase().endsWith('.pdf') ? (
+                                                    {customerData["Passport Image"].toLowerCase().endsWith('.pdf') ? (
                                                         <div className="w-full h-48 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer">
                                                             <span className="text-white/80">PDF Document (Click to view)</span>
                                                         </div>
@@ -447,7 +453,7 @@ export default function Dssn() {
                                             <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                                 <h5 className="text-blue-300 mb-2">Birth Certificate</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Birth Certificate Image"])}>
-                                                    {customerData["Birth Certificate Image"]?.toLowerCase().endsWith('.pdf') ? (
+                                                    {customerData["Birth Certificate Image"].toLowerCase().endsWith('.pdf') ? (
                                                         <div className="w-full h-48 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer">
                                                             <span className="text-white/80">PDF Document (Click to view)</span>
                                                         </div>
@@ -470,7 +476,7 @@ export default function Dssn() {
                                             <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                                 <h5 className="text-blue-300 mb-2">Driver's License</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Drivers License Image"])}>
-                                                    {customerData["Drivers License Image"]?.toLowerCase().endsWith('.pdf') ? (
+                                                    {customerData["Drivers License Image"].toLowerCase().endsWith('.pdf') ? (
                                                         <div className="w-full h-48 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer">
                                                             <span className="text-white/80">PDF Document (Click to view)</span>
                                                         </div>
@@ -493,7 +499,7 @@ export default function Dssn() {
                                             <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                                 <h5 className="text-blue-300 mb-2">National ID</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["National Id Image"])}>
-                                                    {customerData["National Id Image"]?.toLowerCase().endsWith('.pdf') ? (
+                                                    {customerData["National Id Image"].toLowerCase().endsWith('.pdf') ? (
                                                         <div className="w-full h-48 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer">
                                                             <span className="text-white/80">PDF Document (Click to view)</span>
                                                         </div>
