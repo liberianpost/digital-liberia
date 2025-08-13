@@ -38,33 +38,6 @@ const sanitizeHTML = (str) => {
 };
 
 const GoogleStorageImage = ({ src, alt, className, onClick }) => {
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
-
-    useEffect(() => {
-        if (!src) {
-            setLoading(false);
-            setError(true);
-            return;
-        }
-
-        setLoading(true);
-        setError(false);
-
-        const img = new Image();
-        img.src = src;
-        img.onload = () => setLoading(false);
-        img.onerror = () => {
-            setError(true);
-            setLoading(false);
-        };
-
-        return () => {
-            img.onload = null;
-            img.onerror = null;
-        };
-    }, [src]);
-
     if (!src) {
         return (
             <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
@@ -73,30 +46,18 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         );
     }
 
-    if (loading) {
-        return (
-            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
-                <span className="text-red-400 text-sm">Failed to load image</span>
-            </div>
-        );
-    }
-
     return (
         <img
             src={src}
             alt={alt}
-            className={className}
+            className={`${className} object-cover`}
             onClick={onClick}
             crossOrigin="anonymous"
             loading="lazy"
+            onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+            }}
         />
     );
 };
@@ -405,12 +366,17 @@ export default function Dssn() {
 
                                 <div className="bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                     <h4 className="text-blue-300 mb-3">Profile Photo</h4>
-                                    <GoogleStorageImage
-                                        src={customerData["Image"]}
-                                        alt="Profile Photo"
-                                        className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer"
-                                        onClick={() => openDocumentModal(customerData["Image"])}
-                                    />
+                                    <div className="relative">
+                                        <GoogleStorageImage
+                                            src={customerData["Image"]}
+                                            alt="Profile Photo"
+                                            className="w-full h-64 rounded-lg border-2 border-blue-500/30 cursor-pointer"
+                                            onClick={() => openDocumentModal(customerData["Image"])}
+                                        />
+                                        <div className="hidden bg-gray-800/50 flex items-center justify-center rounded-lg w-full h-64">
+                                            <span className="text-red-400 text-sm">Failed to load image</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -425,8 +391,11 @@ export default function Dssn() {
                                                     <GoogleStorageImage
                                                         src={customerData["Passport Image"]}
                                                         alt="Passport"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover cursor-pointer"
+                                                        className="w-full h-48 rounded border border-indigo-700/30 cursor-pointer"
                                                     />
+                                                    <div className="hidden bg-gray-800/50 flex items-center justify-center rounded-lg w-full h-48">
+                                                        <span className="text-red-400 text-sm">Failed to load image</span>
+                                                    </div>
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
                                             </div>
@@ -439,8 +408,11 @@ export default function Dssn() {
                                                     <GoogleStorageImage
                                                         src={customerData["Birth Certificate Image"]}
                                                         alt="Birth Certificate"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover cursor-pointer"
+                                                        className="w-full h-48 rounded border border-indigo-700/30 cursor-pointer"
                                                     />
+                                                    <div className="hidden bg-gray-800/50 flex items-center justify-center rounded-lg w-full h-48">
+                                                        <span className="text-red-400 text-sm">Failed to load image</span>
+                                                    </div>
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
                                             </div>
@@ -453,8 +425,11 @@ export default function Dssn() {
                                                     <GoogleStorageImage
                                                         src={customerData["Drivers License Image"]}
                                                         alt="Driver's License"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover cursor-pointer"
+                                                        className="w-full h-48 rounded border border-indigo-700/30 cursor-pointer"
                                                     />
+                                                    <div className="hidden bg-gray-800/50 flex items-center justify-center rounded-lg w-full h-48">
+                                                        <span className="text-red-400 text-sm">Failed to load image</span>
+                                                    </div>
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
                                             </div>
@@ -467,8 +442,11 @@ export default function Dssn() {
                                                     <GoogleStorageImage
                                                         src={customerData["National Id Image"]}
                                                         alt="National ID"
-                                                        className="w-full h-48 rounded border border-indigo-700/30 object-cover cursor-pointer"
+                                                        className="w-full h-48 rounded border border-indigo-700/30 cursor-pointer"
                                                     />
+                                                    <div className="hidden bg-gray-800/50 flex items-center justify-center rounded-lg w-full h-48">
+                                                        <span className="text-red-400 text-sm">Failed to load image</span>
+                                                    </div>
                                                     <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
                                                 </div>
                                             </div>
@@ -507,6 +485,9 @@ export default function Dssn() {
                                         alt="Document Full View"
                                         className="w-full max-h-[80vh] object-contain"
                                     />
+                                    <div className="hidden bg-gray-800/50 flex items-center justify-center w-full max-h-[80vh]">
+                                        <span className="text-red-400 text-sm">Failed to load image</span>
+                                    </div>
                                     <button
                                         onClick={downloadDocument}
                                         className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
