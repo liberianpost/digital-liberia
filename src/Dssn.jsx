@@ -1,3 +1,4 @@
+```javascript
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -40,7 +41,6 @@ const sanitizeHTML = (str) => {
 const GoogleStorageImage = ({ src, alt, className, onClick }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [imageUrl, setImageUrl] = useState('');
 
     useEffect(() => {
         console.group(`Image Debug: ${src || 'No Source'}`);
@@ -54,77 +54,23 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
             return;
         }
 
-        const constructImageUrl = (rawPath) => {
-            try {
-                console.log('Raw path input:', rawPath);
-                
-                let processedPath = rawPath;
-                
-                if (processedPath.startsWith('gs://')) {
-                    processedPath = processedPath.substring(5);
-                    console.log('Removed gs:// prefix:', processedPath);
-                }
+        const img = new Image();
+        img.src = src;
+        img.crossOrigin = 'anonymous';
 
-                if (processedPath.startsWith('http')) {
-                    console.log('Already a complete URL');
-                    return processedPath;
-                }
-
-                if (!processedPath.startsWith('system-liberianpost/')) {
-                    processedPath = `system-liberianpost/${processedPath}`;
-                    console.log('Added bucket prefix:', processedPath);
-                }
-
-                const encodedPath = encodeURI(processedPath);
-                const finalUrl = `https://storage.googleapis.com/${encodedPath}`;
-                
-                console.log('Final constructed URL:', finalUrl);
-                return finalUrl;
-            } catch (err) {
-                console.error('URL construction failed:', err);
-                return null;
-            }
+        img.onload = () => {
+            console.log('Image loaded successfully:', src);
+            setLoading(false);
+            setError(null);
+            console.groupEnd();
         };
 
-        const url = constructImageUrl(src);
-        if (!url) {
-            console.error('Failed to construct valid URL');
-            setError('Invalid URL');
+        img.onerror = (err) => {
+            console.error('Image failed to load:', src, err);
+            setError('Failed to load image');
             setLoading(false);
             console.groupEnd();
-            return;
-        }
-
-        setImageUrl(url);
-        console.log('Testing image accessibility:', url);
-
-        // First verify the URL is accessible
-        fetch(url, { method: 'HEAD', mode: 'no-cors' })
-            .then(() => {
-                console.log('Image is accessible, creating img element');
-                const img = new Image();
-                img.src = url;
-
-                img.onload = () => {
-                    console.log('Image loaded successfully');
-                    setLoading(false);
-                    setError(null);
-                    console.groupEnd();
-                };
-
-                img.onerror = (err) => {
-                    console.error('Image element failed to load:', err);
-                    setError('Failed to render');
-                    setLoading(false);
-                    console.groupEnd();
-                };
-            })
-            .catch(err => {
-                console.error('Image accessibility check failed:', err);
-                setError('Cannot access image');
-                setLoading(false);
-                console.groupEnd();
-            });
+        };
 
     }, [src]);
 
@@ -149,20 +95,19 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
             <div className={`${className} bg-red-50 border border-red-200 flex flex-col items-center justify-center rounded-lg p-2`}>
                 <span className="text-red-500 text-sm">{error}</span>
                 <span className="text-xs text-gray-600 mt-1">Source: {src.substring(0, 30)}{src.length > 30 ? '...' : ''}</span>
-                <span className="text-xs text-gray-600">Constructed: {imageUrl.substring(0, 30)}{imageUrl.length > 30 ? '...' : ''}</span>
             </div>
         );
     }
 
     return (
         <img
-            src={imageUrl}
+            src={src}
             alt={alt}
             className={className}
             onClick={onClick}
             crossOrigin="anonymous"
-            onError={() => {
-                console.error('Final render failed for URL:', imageUrl);
+            onError={(e) => {
+                console.error('Final render failed for URL:', src, e);
                 setError('Rendering failed');
             }}
         />
@@ -248,17 +193,11 @@ export default function Dssn() {
             console.group('Image URL Verification');
             if (result.data.images) {
                 for (const [key, imgObj] of Object.entries(result.data.images)) {
-                    if (!imgObj) {
-                        console.warn(`Missing ${key} image`);
+                    if (!imgObj || !imgObj.url) {
+                        console.warn(`Missing ${key} image or URL`);
                         continue;
                     }
-                    
-                    try {
-                        const testResponse = await fetch(imgObj.url, { method: 'HEAD', mode: 'no-cors' });
-                        console.log(`Image ${key} accessible:`, imgObj.url);
-                    } catch (err) {
-                        console.error(`Image ${key} inaccessible:`, imgObj.url, err);
-                    }
+                    console.log(`Image ${key} URL:`, imgObj.url);
                 }
             }
             console.groupEnd();
@@ -536,12 +475,18 @@ export default function Dssn() {
 
                                 <div className="bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                     <h4 className="text-blue-300 mb-3">Profile Photo</h4>
-                                    <GoogleStorageImage
-                                        src={customerData["Image"]}
-                                        alt="Profile Photo"
-                                        className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer"
-                                        onClick={() => openDocumentModal(customerData["Image"])}
-                                    />
+                                    {customerData["Image"]?.toLowerCase().endsWith('.pdf') ? (
+                                        <div className="w-full h-64 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer" onClick={() => openDocumentModal(customerData["Image"])}>
+                                            <span className="text-white/80">PDF Profile (Click to view)</span>
+                                        </div>
+                                    ) : (
+                                        <GoogleStorageImage
+                                            src={customerData["Image"]}
+                                            alt="Profile Photo"
+                                            className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer"
+                                            onClick={() => openDocumentModal(customerData["Image"])}
+                                        />
+                                    )}
                                 </div>
                             </div>
 
@@ -698,3 +643,4 @@ export default function Dssn() {
         </div>
     );
 }
+```
