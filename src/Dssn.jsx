@@ -152,6 +152,7 @@ export default function Dssn() {
             };
 
             console.log('Transformed Data:', transformedData);
+            alert(`Search completed for DSSN: ${cleanedDssn}. Opening modal.`);
             setCustomerData(transformedData);
             setShowInfoModal(true);
 
@@ -171,6 +172,7 @@ export default function Dssn() {
 
     const openDocumentModal = (url) => {
         console.log('Opening document modal with URL:', url);
+        alert(`Opening document modal for URL: ${url}`);
         setCurrentDocumentUrl(url);
         setShowDocumentModal(true);
     };
@@ -187,7 +189,6 @@ export default function Dssn() {
             console.warn('No document URL to download');
             return;
         }
-        
         const link = document.createElement('a');
         link.href = currentDocumentUrl;
         const filename = currentDocumentUrl.split('/').pop() || 'document';
@@ -195,6 +196,13 @@ export default function Dssn() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+
+    const debugImage = () => {
+        console.log('Debug Image button clicked');
+        alert('Attempting to load test image');
+        const testUrl = 'https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg';
+        console.log(`Debug: Attempting to load test image at ${testUrl}`);
     };
 
     return (
@@ -282,6 +290,28 @@ export default function Dssn() {
                                 DSSN Verification
                             </h2>
                             <div className="text-white/90 relative space-y-6">
+                                <button
+                                    onClick={debugImage}
+                                    className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white mb-4"
+                                >
+                                    Debug Image
+                                </button>
+                                <div>
+                                    <img
+                                        src="https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg"
+                                        alt="Debug Test Image"
+                                        style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid red' }}
+                                        loading="lazy"
+                                        onLoad={() => {
+                                            console.log('Debug Test Image loaded successfully at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg');
+                                            alert('Debug Test Image loaded successfully');
+                                        }}
+                                        onError={(e) => {
+                                            console.error('Debug Test Image failed to load at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg', e);
+                                            alert('Debug Test Image failed to load');
+                                        }}
+                                    />
+                                </div>
                                 <p>
                                     Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information.
                                     Enter the 15-digit alphanumeric DSSN in the field below.
@@ -358,166 +388,223 @@ export default function Dssn() {
 
             {showInfoModal && customerData && (
                 <div id="dssnInfo" className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-gradient-to-br from-indigo-900/90 to-blue-900/90 border border-indigo-700/30 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-                        <div className="p-6">
-                            <div className="flex justify-between items-center mb-4">
-                                <div>
-                                    <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                                        Search Results for DSSN: {sanitizeHTML(dssn)}
-                                    </h3>
-                                    {customerData["Search Metadata"] && (
-                                        <p className="text-xs text-blue-300/70 mt-1">
-                                            {customerData["Search Metadata"]}
-                                        </p>
-                                    )}
-                                </div>
-                                <button onClick={() => setShowInfoModal(false)} className="text-gray-400 hover:text-white transition-colors">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
+                    <div className="bg-gray-900 border border-gray-700 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 className="text-2xl font-bold text-white">
+                                    Search Results for DSSN: {sanitizeHTML(dssn)}
+                                </h3>
+                                {customerData["Search Metadata"] && (
+                                    <p className="text-xs text-gray-400 mt-1">
+                                        {customerData["Search Metadata"]}
+                                    </p>
+                                )}
+                            </div>
+                            <button onClick={() => setShowInfoModal(false)} className="text-gray-400 hover:text-white">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div className="p-4">
+                                <h4 className="text-blue-300 mb-3">Profile Information</h4>
+                                {Object.entries(customerData).map(([key, value]) => {
+                                    if (typeof value === 'string' && !key.includes('Image') && !key.includes('Metadata')) {
+                                        return (
+                                            <div key={key} className="p-2">
+                                                <strong className="text-blue-300 text-sm">{key}:</strong>
+                                                <span className="ml-2 text-white text-sm">{sanitizeHTML(value)}</span>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })}
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div className="bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                                    <h4 className="text-blue-300 mb-3">Profile Information</h4>
-                                    <div className="space-y-3">
-                                        {Object.entries(customerData).map(([key, value]) => {
-                                            if (typeof value === 'string' && !key.includes('Image') && !key.includes('Metadata')) {
-                                                return (
-                                                    <div key={key} className="bg-indigo-800/20 p-2 rounded border border-indigo-700/20">
-                                                        <strong className="text-blue-300 text-sm">{key}:</strong>
-                                                        <span className="ml-2 text-white/90 text-sm">{sanitizeHTML(value)}</span>
-                                                    </div>
-                                                );
-                                            }
-                                            return null;
-                                        })}
-                                    </div>
-                                </div>
-
-                                <div className="bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                                    <h4 className="text-blue-300 mb-3">Profile Photo</h4>
-                                    {customerData["Image"] ? (
-                                        customerData["Image"].toLowerCase().endsWith('.pdf') ? (
-                                            <div className="w-full h-64 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer" onClick={() => openDocumentModal(customerData["Image"])}>
-                                                <span className="text-white/80">PDF Profile (Click to view)</span>
-                                            </div>
-                                        ) : (
+                            <div className="p-4">
+                                <h4 className="text-blue-300 mb-3">Profile Photo</h4>
+                                {customerData["Image"] ? (
+                                    customerData["Image"].toLowerCase().endsWith('.pdf') ? (
+                                        <div
+                                            className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center cursor-pointer"
+                                            onClick={() => openDocumentModal(customerData["Image"])}
+                                        >
+                                            <span className="text-white">PDF Profile (Click to view)</span>
+                                        </div>
+                                    ) : (
+                                        <div>
                                             <img
                                                 src={customerData["Image"]}
                                                 alt="Profile Photo"
-                                                className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer"
+                                                style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
                                                 loading="lazy"
-                                                onLoad={() => console.log(`Profile Photo loaded successfully at ${customerData["Image"]}`)}
-                                                onError={(e) => console.error(`Profile Photo failed to load at ${customerData["Image"]}`, e)}
+                                                onLoad={() => {
+                                                    console.log(`Profile Photo loaded successfully at ${customerData["Image"]}`);
+                                                    alert(`Profile Photo loaded at ${customerData["Image"]}`);
+                                                }}
+                                                onError={(e) => {
+                                                    console.error(`Profile Photo failed to load at ${customerData["Image"]}`, e);
+                                                    alert(`Profile Photo failed to load at ${customerData["Image"]}`);
+                                                }}
                                                 onClick={() => openDocumentModal(customerData["Image"])}
                                             />
-                                        )
-                                    ) : (
-                                        <div className="w-full h-64 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center">
-                                            <span className="text-white/80">No profile photo available</span>
+                                        </div>
+                                    )
+                                ) : (
+                                    <div className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center">
+                                        <span className="text-white">No profile photo</span>
+                                    </div>
+                                )}
+                                <h4 className="text-blue-300 mt-4 mb-2">Test Image</h4>
+                                <img
+                                    src="https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg"
+                                    alt="Test Image"
+                                    style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid red' }}
+                                    loading="lazy"
+                                    onLoad={() => {
+                                        console.log('Test Image loaded successfully at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg');
+                                        alert('Test Image loaded successfully');
+                                    }}
+                                    onError={(e) => {
+                                        console.error('Test Image failed to load at https://storage.googleapis.com/system-liberianpost/ceo%20passport.jpg', e);
+                                        alert('Test Image failed to load');
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div>
+                                <h4 className="text-blue-300 mb-3">Documents</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {customerData["Passport Image"] && (
+                                        <div className="p-3">
+                                            <h5 className="text-blue-300 mb-2">Passport</h5>
+                                            <div onClick={() => openDocumentModal(customerData["Passport Image"])}>
+                                                {customerData["Passport Image"].toLowerCase().endsWith('.pdf') ? (
+                                                    <div className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center cursor-pointer">
+                                                        <span className="text-white">PDF Passport</span>
+                                                    </div>
+                                                ) : (
+                                                    <img
+                                                        src={customerData["Passport Image"]}
+                                                        alt="Passport"
+                                                        style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                        loading="lazy"
+                                                        onLoad={() => {
+                                                            console.log(`Passport loaded successfully at ${customerData["Passport Image"]}`);
+                                                            alert(`Passport loaded at ${customerData["Passport Image"]}`);
+                                                        }}
+                                                        onError={(e) => {
+                                                            console.error(`Passport failed to load at ${customerData["Passport Image"]}`, e);
+                                                            alert(`Passport failed to load at ${customerData["Passport Image"]}`);
+                                                        }}
+                                                    />
+                                                )}
+                                                <div className="text-center text-xs text-white mt-1">Click to view</div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {customerData["Birth Certificate Image"] && (
+                                        <div className="p-3">
+                                            <h5 className="text-blue-300 mb-2">Birth Certificate</h5>
+                                            <div onClick={() => openDocumentModal(customerData["Birth Certificate Image"])}>
+                                                {customerData["Birth Certificate Image"].toLowerCase().endsWith('.pdf') ? (
+                                                    <div className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center cursor-pointer">
+                                                        <span className="text-white">PDF Birth Certificate</span>
+                                                    </div>
+                                                ) : (
+                                                    <img
+                                                        src={customerData["Birth Certificate Image"]}
+                                                        alt="Birth Certificate"
+                                                        style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                        loading="lazy"
+                                                        onLoad={() => {
+                                                            console.log(`Birth Certificate loaded successfully at ${customerData["Birth Certificate Image"]}`);
+                                                            alert(`Birth Certificate loaded at ${customerData["Birth Certificate Image"]}`);
+                                                        }}
+                                                        onError={(e) => {
+                                                            console.error(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`, e);
+                                                            alert(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`);
+                                                        }}
+                                                    />
+                                                )}
+                                                <div className="text-center text-xs text-white mt-1">Click to view</div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {customerData["Drivers License Image"] && (
+                                        <div className="p-3">
+                                            <h5 className="text-blue-300 mb-2">Driver's License</h5>
+                                            <div onClick={() => openDocumentModal(customerData["Drivers License Image"])}>
+                                                {customerData["Drivers License Image"].toLowerCase().endsWith('.pdf') ? (
+                                                    <div className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center cursor-pointer">
+                                                        <span className="text-white">PDF Driver's License</span>
+                                                    </div>
+                                                ) : (
+                                                    <img
+                                                        src={customerData["Drivers License Image"]}
+                                                        alt="Driver's License"
+                                                        style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                        loading="lazy"
+                                                        onLoad={() => {
+                                                            console.log(`Driver's License loaded successfully at ${customerData["Drivers License Image"]}`);
+                                                            alert(`Driver's License loaded at ${customerData["Drivers License Image"]}`);
+                                                        }}
+                                                        onError={(e) => {
+                                                            console.error(`Driver's License failed to load at ${customerData["Drivers License Image"]}`, e);
+                                                            alert(`Driver's License failed to load at ${customerData["Drivers License Image"]}`);
+                                                        }}
+                                                    />
+                                                )}
+                                                <div className="text-center text-xs text-white mt-1">Click to view</div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {customerData["National Id Image"] && (
+                                        <div className="p-3">
+                                            <h5 className="text-blue-300 mb-2">National ID</h5>
+                                            <div onClick={() => openDocumentModal(customerData["National Id Image"])}>
+                                                {customerData["National Id Image"].toLowerCase().endsWith('.pdf') ? (
+                                                    <div className="w-[150px] h-[150px] bg-gray-800 flex items-center justify-center cursor-pointer">
+                                                        <span className="text-white">PDF National ID</span>
+                                                    </div>
+                                                ) : (
+                                                    <img
+                                                        src={customerData["National Id Image"]}
+                                                        alt="National ID"
+                                                        style={{ width: '150px', height: '150px', objectFit: 'cover', border: '2px solid blue' }}
+                                                        loading="lazy"
+                                                        onLoad={() => {
+                                                            console.log(`National ID loaded successfully at ${customerData["National Id Image"]}`);
+                                                            alert(`National ID loaded at ${customerData["National Id Image"]}`);
+                                                        }}
+                                                        onError={(e) => {
+                                                            console.error(`National ID failed to load at ${customerData["National Id Image"]}`, e);
+                                                            alert(`National ID failed to load at ${customerData["National Id Image"]}`);
+                                                        }}
+                                                    />
+                                                )}
+                                                <div className="text-center text-xs text-white mt-1">Click to view</div>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="space-y-6">
-                                <div className="document-category">
-                                    <h4 className="text-blue-300 mb-3 border-b border-indigo-700/30 pb-2">Documents</h4>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {customerData["Passport Image"] && (
-                                            <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                                                <h5 className="text-blue-300 mb-2">Passport</h5>
-                                                <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Passport Image"])}>
-                                                    {customerData["Passport Image"].toLowerCase().endsWith('.pdf') ? (
-                                                        <div className="w-full h-48 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer">
-                                                            <span className="text-white/80">PDF Document (Click to view)</span>
-                                                        </div>
-                                                    ) : (
-                                                        <img
-                                                            src={customerData["Passport Image"]}
-                                                            alt="Passport"
-                                                            className="w-full h-48 rounded border border-indigo-700/30 object-cover"
-                                                            loading="lazy"
-                                                            onLoad={() => console.log(`Passport loaded successfully at ${customerData["Passport Image"]}`)}
-                                                            onError={(e) => console.error(`Passport failed to load at ${customerData["Passport Image"]}`, e)}
-                                                        />
-                                                    )}
-                                                    <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {customerData["Birth Certificate Image"] && (
-                                            <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                                                <h5 className="text-blue-300 mb-2">Birth Certificate</h5>
-                                                <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Birth Certificate Image"])}>
-                                                    {customerData["Birth Certificate Image"].toLowerCase().endsWith('.pdf') ? (
-                                                        <div className="w-full h-48 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer">
-                                                            <span className="text-white/80">PDF Document (Click to view)</span>
-                                                        </div>
-                                                    ) : (
-                                                        <img
-                                                            src={customerData["Birth Certificate Image"]}
-                                                            alt="Birth Certificate"
-                                                            className="w-full h-48 rounded border border-indigo-700/30 object-cover"
-                                                            loading="lazy"
-                                                            onLoad={() => console.log(`Birth Certificate loaded successfully at ${customerData["Birth Certificate Image"]}`)}
-                                                            onError={(e) => console.error(`Birth Certificate failed to load at ${customerData["Birth Certificate Image"]}`, e)}
-                                                        />
-                                                    )}
-                                                    <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {customerData["Drivers License Image"] && (
-                                            <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                                                <h5 className="text-blue-300 mb-2">Driver's License</h5>
-                                                <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Drivers License Image"])}>
-                                                    {customerData["Drivers License Image"].toLowerCase().endsWith('.pdf') ? (
-                                                        <div className="w-full h-48 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer">
-                                                            <span className="text-white/80">PDF Document (Click to view)</span>
-                                                        </div>
-                                                    ) : (
-                                                        <img
-                                                            src={customerData["Drivers License Image"]}
-                                                            alt="Driver's License"
-                                                            className="w-full h-48 rounded border border-indigo-700/30 object-cover"
-                                                            loading="lazy"
-                                                            onLoad={() => console.log(`Driver's License loaded successfully at ${customerData["Drivers License Image"]}`)}
-                                                            onError={(e) => console.error(`Driver's License failed to load at ${customerData["Drivers License Image"]}`, e)}
-                                                        />
-                                                    )}
-                                                    <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {customerData["National Id Image"] && (
-                                            <div className="bg-indigo-900/40 p-3 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
-                                                <h5 className="text-blue-300 mb-2">National ID</h5>
-                                                <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["National Id Image"])}>
-                                                    {customerData["National Id Image"].toLowerCase().endsWith('.pdf') ? (
-                                                        <div className="w-full h-48 rounded border border-indigo-700/30 bg-gray-800 flex items-center justify-center cursor-pointer">
-                                                            <span className="text-white/80">PDF Document (Click to view)</span>
-                                                        </div>
-                                                    ) : (
-                                                        <img
-                                                            src={customerData["National Id Image"]}
-                                                            alt="National ID"
-                                                            className="w-full h-48 rounded border border-indigo-700/30 object-cover"
-                                                            loading="lazy"
-                                                            onLoad={() => console.log(`National ID loaded successfully at ${customerData["National Id Image"]}`)}
-                                                            onError={(e) => console.error(`National ID failed to load at ${customerData["National Id Image"]}`, e)}
-                                                        />
-                                                    )}
-                                                    <div className="text-center text-xs text-white/80 mt-1">Click to view</div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
+                            <div className="p-4">
+                                <h4 className="text-blue-300 mb-3">Debug URLs</h4>
+                                <div className="text-sm text-white">
+                                    <p>Profile Photo: {customerData["Image"] || 'None'}</p>
+                                    <p>Passport: {customerData["Passport Image"] || 'None'}</p>
+                                    <p>Birth Certificate: {customerData["Birth Certificate Image"] || 'None'}</p>
+                                    <p>Driver's License: {customerData["Drivers License Image"] || 'None'}</p>
+                                    <p>National ID: {customerData["National Id Image"] || 'None'}</p>
                                 </div>
                             </div>
                         </div>
@@ -526,34 +613,42 @@ export default function Dssn() {
             )}
 
             {showDocumentModal && currentDocumentUrl && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
-                    <div className="relative bg-gray-900 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-auto">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
+                    <div className="bg-gray-900 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto p-4">
                         <button
                             onClick={closeDocumentModal}
-                            className="absolute top-4 right-4 z-50 text-white hover:text-red-400 transition-colors"
+                            className="absolute top-4 right-4 text-white hover:text-red-400"
                         >
                             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
-
-                        <div className="p-4 h-full flex flex-col items-center justify-center">
+                        <div className="flex flex-col items-center">
                             {currentDocumentUrl.toLowerCase().endsWith('.pdf') ? (
                                 <iframe
                                     src={`${currentDocumentUrl}#toolbar=0`}
-                                    className="w-full h-[80vh]"
+                                    style={{ width: '100%', height: '80vh' }}
                                     title="Document Viewer"
-                                    onError={(e) => console.error('Iframe load error:', e)}
+                                    onError={(e) => {
+                                        console.error('Iframe load error:', e);
+                                        alert('Iframe load error');
+                                    }}
                                 />
                             ) : (
                                 <>
                                     <img
                                         src={currentDocumentUrl}
                                         alt="Document Full View"
-                                        className="w-full max-h-[80vh] object-contain"
+                                        style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain' }}
                                         loading="lazy"
-                                        onLoad={() => console.log(`Document Full View loaded successfully at ${currentDocumentUrl}`)}
-                                        onError={(e) => console.error(`Document Full View failed to load at ${currentDocumentUrl}`, e)}
+                                        onLoad={() => {
+                                            console.log(`Document Full View loaded successfully at ${currentDocumentUrl}`);
+                                            alert(`Document Full View loaded at ${currentDocumentUrl}`);
+                                        }}
+                                        onError={(e) => {
+                                            console.error(`Document Full View failed to load at ${currentDocumentUrl}`, e);
+                                            alert(`Document Full View failed to load at ${currentDocumentUrl}`);
+                                        }}
                                     />
                                     <button
                                         onClick={downloadDocument}
@@ -575,16 +670,10 @@ export default function Dssn() {
             </footer>
 
             <style jsx global>{`
-                @keyframes fadeInUp {
-                    from { opacity: 0; transform: translateY(20px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                @keyframes heartbeat {
-                    0% { transform: scale(1); }
-                    25% { transform: scale(1.1); }
-                    50% { transform: scale(1); }
-                    75% { transform: scale(1.05); }
-                    100% { transform: scale(1); }
+                img {
+                    display: block !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
                 }
             `}</style>
         </div>
