@@ -43,51 +43,45 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
     const [imageUrl, setImageUrl] = useState('');
 
     useEffect(() => {
-        console.groupCollapsed(`Image Load Debug: ${src || 'No source'}`);
-        console.log('Initial source:', src);
+        console.group(`Image Debug: ${src || 'No Source'}`);
+        console.log('Initial source value:', src);
 
         if (!src) {
             console.warn('No image source provided');
             setLoading(false);
-            setError('No image source provided');
+            setError('No image source');
             console.groupEnd();
             return;
         }
 
         const constructImageUrl = (rawPath) => {
             try {
-                let processedPath = rawPath.trim();
+                console.log('Raw path input:', rawPath);
                 
-                console.log('Processing path:', processedPath);
+                let processedPath = rawPath;
+                
+                if (processedPath.startsWith('gs://')) {
+                    processedPath = processedPath.substring(5);
+                    console.log('Removed gs:// prefix:', processedPath);
+                }
 
-                // Handle already complete URLs
                 if (processedPath.startsWith('http')) {
                     console.log('Already a complete URL');
                     return processedPath;
                 }
 
-                // Handle gs:// format
-                if (processedPath.startsWith('gs://')) {
-                    processedPath = processedPath.substring(5);
-                    console.log('Removed gs:// prefix');
-                }
-
-                // Handle relative paths
                 if (!processedPath.startsWith('system-liberianpost/')) {
                     processedPath = `system-liberianpost/${processedPath}`;
-                    console.log('Added bucket prefix');
+                    console.log('Added bucket prefix:', processedPath);
                 }
 
-                // Encode special characters but preserve forward slashes
-                const encodedPath = processedPath.split('/').map(part => 
-                    part === '' ? '' : encodeURIComponent(part)
-                ).join('/');
-
+                const encodedPath = encodeURI(processedPath);
                 const finalUrl = `https://storage.googleapis.com/${encodedPath}`;
+                
                 console.log('Final constructed URL:', finalUrl);
                 return finalUrl;
             } catch (err) {
-                console.error('Error constructing URL:', err);
+                console.error('URL construction failed:', err);
                 return null;
             }
         };
@@ -95,40 +89,43 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         const url = constructImageUrl(src);
         if (!url) {
             console.error('Failed to construct valid URL');
-            setError('Invalid image URL');
+            setError('Invalid URL');
             setLoading(false);
             console.groupEnd();
             return;
         }
 
         setImageUrl(url);
-        console.log('Attempting to load image from:', url);
+        console.log('Testing image accessibility:', url);
 
-        const img = new Image();
-        img.src = url;
+        // First verify the URL is accessible
+        fetch(url, { method: 'HEAD', mode: 'no-cors' })
+            .then(() => {
+                console.log('Image is accessible, creating img element');
+                const img = new Image();
+                img.src = url;
 
-        img.onload = () => {
-            console.log('Image loaded successfully');
-            setLoading(false);
-            setError(null);
-            console.groupEnd();
-        };
+                img.onload = () => {
+                    console.log('Image loaded successfully');
+                    setLoading(false);
+                    setError(null);
+                    console.groupEnd();
+                };
 
-        img.onerror = (err) => {
-            console.error('Image load failed:', {
-                constructedUrl: url,
-                originalSource: src,
-                error: err
+                img.onerror = (err) => {
+                    console.error('Image element failed to load:', err);
+                    setError('Failed to render');
+                    setLoading(false);
+                    console.groupEnd();
+                };
+            })
+            .catch(err => {
+                console.error('Image accessibility check failed:', err);
+                setError('Cannot access image');
+                setLoading(false);
+                console.groupEnd();
             });
-            setError('Failed to load image');
-            setLoading(false);
-            console.groupEnd();
-        };
 
-        return () => {
-            img.onload = null;
-            img.onerror = null;
-        };
     }, [src]);
 
     if (!src) {
@@ -152,7 +149,7 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
             <div className={`${className} bg-red-50 border border-red-200 flex flex-col items-center justify-center rounded-lg p-2`}>
                 <span className="text-red-500 text-sm">{error}</span>
                 <span className="text-xs text-gray-600 mt-1">Source: {src.substring(0, 30)}{src.length > 30 ? '...' : ''}</span>
-                <span className="text-xs text-gray-600">URL: {imageUrl.substring(0, 30)}{imageUrl.length > 30 ? '...' : ''}</span>
+                <span className="text-xs text-gray-600">Constructed: {imageUrl.substring(0, 30)}{imageUrl.length > 30 ? '...' : ''}</span>
             </div>
         );
     }
@@ -165,7 +162,7 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
             onClick={onClick}
             crossOrigin="anonymous"
             onError={() => {
-                console.error('Rendering failed for image:', imageUrl);
+                console.error('Final render failed for URL:', imageUrl);
                 setError('Rendering failed');
             }}
         />
@@ -201,8 +198,9 @@ export default function Dssn() {
     const handleSearch = async (e) => {
         e.preventDefault();
         const cleanedDssn = dssn.trim().toUpperCase();
-        console.groupCollapsed(`DSSN Search: ${cleanedDssn}`);
-        console.log('Starting search for DSSN:', cleanedDssn);
+        console.clear();
+        console.group(`DSSN Search Debug: ${cleanedDssn}`);
+        console.log('Starting search with DSSN:', cleanedDssn);
 
         if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
             const errorMsg = {
@@ -221,7 +219,7 @@ export default function Dssn() {
 
         try {
             const apiUrl = `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`;
-            console.log('Fetching from API:', apiUrl);
+            console.log('API Request URL:', apiUrl);
 
             const response = await fetch(apiUrl, {
                 method: 'GET',
@@ -234,7 +232,7 @@ export default function Dssn() {
 
             console.log('Response status:', response.status);
             const result = await response.json();
-            console.log('API response data:', result);
+            console.log('API Response Data:', result);
 
             if (!response.ok || !result.success) {
                 const errorDetails = {
@@ -243,25 +241,27 @@ export default function Dssn() {
                     details: `Reference: ${result.metadata?.requestId || 'N/A'}`,
                     timestamp: result.metadata?.timestamp || new Date().toISOString()
                 };
-                console.error('API error:', errorDetails);
+                console.error('API Error:', errorDetails);
                 throw errorDetails;
             }
 
-            console.log('Processing image URLs:', result.data.images);
+            console.group('Image URL Verification');
             if (result.data.images) {
                 for (const [key, url] of Object.entries(result.data.images)) {
-                    if (url) {
-                        try {
-                            const testResponse = await fetch(url, { method: 'HEAD' });
-                            console.log(`Image ${key} status:`, testResponse.status, url);
-                        } catch (err) {
-                            console.error(`Image ${key} verification failed:`, err.message, url);
-                        }
-                    } else {
+                    if (!url) {
                         console.warn(`Missing ${key} image`);
+                        continue;
+                    }
+                    
+                    try {
+                        const testResponse = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+                        console.log(`Image ${key} accessible:`, url);
+                    } catch (err) {
+                        console.error(`Image ${key} inaccessible:`, url, err);
                     }
                 }
             }
+            console.groupEnd();
 
             const transformedData = {
                 "Full Name": result.data.fullName || 'Not available',
@@ -289,12 +289,12 @@ export default function Dssn() {
                     : 'No metadata available'
             };
 
-            console.log('Transformed customer data:', transformedData);
+            console.log('Transformed Data:', transformedData);
             setCustomerData(transformedData);
             setShowInfoModal(true);
 
         } catch (err) {
-            console.error('Search failed:', err);
+            console.error('Search Failed:', err);
             setError({
                 title: err.title || 'Search Error',
                 message: err.message || 'Failed to process request',
