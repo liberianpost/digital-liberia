@@ -27,34 +27,6 @@ const backgroundImages = [
     "/backgrounds/bg5.jpg"
 ];
 
-/** ---- Helpers for URL + type handling ---- */
-const normalizeUrl = (u) => {
-    try {
-        const trimmed = (u || "").trim();
-        if (!trimmed) return "";
-        // Decode then re-encode to fix mixed-encoded strings like "...birth%20certificate .jpeg"
-        return encodeURI(decodeURI(trimmed));
-    } catch {
-        // Fallback: just replace spaces if decoding fails
-        return (u || "").trim().replace(/ /g, "%20");
-    }
-};
-
-const getFileUrl = (file) => {
-    if (!file) return "";
-    const raw = typeof file === "string" ? file : file.url || "";
-    return normalizeUrl(raw);
-};
-
-const inferType = (file) => {
-    if (!file) return "unknown";
-    if (typeof file === "object" && file.type) return file.type;
-    const url = getFileUrl(file).toLowerCase();
-    if (url.endsWith(".pdf")) return "pdf";
-    return "image";
-};
-/** ---------------------------------------- */
-
 const sanitizeHTML = (str) => {
     if (!str) return '';
     return str.toString()
@@ -65,74 +37,101 @@ const sanitizeHTML = (str) => {
         .replace(/'/g, '&#39;');
 };
 
-const GoogleStorageImage = ({ file, alt = "Document", className, onClick }) => {
+const GoogleStorageImage = ({ src, alt, className, onClick }) => {
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
-    const [isPdf, setIsPdf] = useState(false);
 
     useEffect(() => {
-        const url = getFileUrl(file);
-        const type = inferType(file);
-        setIsPdf(type === "pdf");
-
-        if (!url) {
+        console.log('GoogleStorageImage initial src:', src);
+        
+        if (!src) {
+            console.log('No image source provided');
             setLoading(false);
-            setError('No file source provided');
+            setError(true);
             return;
         }
 
         setLoading(true);
-        setError(null);
-        setImageUrl(url);
+        setError(false);
 
-        if (type === "pdf") {
-            // No need to preload PDFs
-            setLoading(false);
-            console.log('PDF detected:', url);
-            return;
-        }
+        const constructImageUrl = (imagePath) => {
+            console.log('Constructing URL from:', imagePath);
+            
+            if (!imagePath) {
+                console.log('Empty image path');
+                return null;
+            }
+            
+            if (imagePath.startsWith('http')) {
+                console.log('Already full URL:', imagePath);
+                return imagePath;
+            }
+            
+            if (imagePath.startsWith('gs://')) {
+                const url = `https://storage.googleapis.com/${imagePath.replace('gs://', '')}`;
+                console.log('Converted gs:// to URL:', url);
+                return url;
+            }
+            
+            if (imagePath.startsWith('system-liberianpost/')) {
+                const url = `https://storage.googleapis.com/${imagePath}`;
+                console.log('Converted relative path to URL:', url);
+                return url;
+            }
+            
+            let encodedPath = imagePath;
+            if (imagePath.includes('%20') || imagePath.includes(' ')) {
+                encodedPath = encodeURIComponent(imagePath);
+                console.log('Encoded path with spaces:', encodedPath);
+            }
+            
+            const finalUrl = `https://storage.googleapis.com/system-liberianpost/${encodedPath}`;
+            console.log('Final constructed URL:', finalUrl);
+            return finalUrl;
+        };
+
+        const url = constructImageUrl(src);
+        setImageUrl(url);
+        console.log('Setting image URL:', url);
 
         const img = new Image();
         img.src = url;
+        console.log('Created image element with src:', url);
 
         img.onload = () => {
-            setLoading(false);
             console.log('Image loaded successfully:', url);
+            setLoading(false);
         };
 
-        img.onerror = (err) => {
-            setError(`Failed to load image`);
+        img.onerror = (e) => {
+            console.error('Image load error:', { 
+                url, 
+                error: e, 
+                imagePath: src 
+            });
+            setError(true);
             setLoading(false);
-            console.error('Image load error:', { url, error: err });
         };
 
         return () => {
+            console.log('Cleaning up image loader');
             img.onload = null;
             img.onerror = null;
         };
-    }, [file]);
+    }, [src]);
 
-    if (error) {
-        const url = getFileUrl(file);
+    if (!src) {
+        console.log('Rendering no image state');
         return (
-            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg flex-col`}>
-                <span className="text-red-400 text-sm">{error}</span>
-                {url && <div className="text-xs text-gray-400 mt-1">URL: {url.length > 42 ? `${url.substring(0, 42)}...` : url}</div>}
-            </div>
-        );
-    }
-
-    const url = getFileUrl(file);
-    if (!url) {
-        return (
-            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg flex-col`}>
-                <span className="text-red-400 text-sm">No image available</span>
+            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
+                <span className="text-gray-400 text-sm">No image available</span>
             </div>
         );
     }
 
     if (loading) {
+        console.log('Rendering loading state for:', src);
         return (
             <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -140,34 +139,38 @@ const GoogleStorageImage = ({ file, alt = "Document", className, onClick }) => {
         );
     }
 
-    if (isPdf) {
+    if (error) {
+        console.log('Rendering error state for:', src);
         return (
-            <div
-                className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg cursor-pointer`}
-                onClick={onClick}
-                role="button"
-                title="Open PDF"
-            >
-                <div className="text-gray-400 text-sm text-center">
-                    📄 PDF Document<br />
-                    <span className="text-xs">Click to view</span>
+            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
+                <div className="text-center">
+                    <span className="text-red-400 text-sm">Failed to load image</span>
+                    <div className="text-xs text-gray-400 mt-1">
+                        URL: {src.length > 30 ? `${src.substring(0, 30)}...` : src}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">
+                        Constructed: {imageUrl.length > 30 ? `${imageUrl.substring(0, 30)}...` : imageUrl}
+                    </div>
                 </div>
             </div>
         );
     }
 
+    console.log('Rendering image:', imageUrl);
     return (
         <img
-            src={url}
+            src={imageUrl}
             alt={alt}
             className={className}
             onClick={onClick}
-            loading="lazy"
-            referrerPolicy="no-referrer"
             crossOrigin="anonymous"
-            onError={() => {
-                setError('Image failed to render');
-                setLoading(false);
+            onError={(e) => {
+                console.error('Image render error:', {
+                    url: imageUrl,
+                    src,
+                    error: e
+                });
+                setError(true);
             }}
         />
     );
@@ -202,21 +205,26 @@ export default function Dssn() {
     const handleSearch = async (e) => {
         e.preventDefault();
         const cleanedDssn = dssn.trim().toUpperCase();
+        console.log('Search initiated for DSSN:', cleanedDssn);
 
         if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
-            setError({
+            const errorMsg = {
                 title: "Invalid DSSN Format",
                 message: "Must be exactly 15 alphanumeric characters",
                 details: `Received: ${cleanedDssn} (${cleanedDssn.length} chars)`
-            });
+            };
+            console.log('Validation error:', errorMsg);
+            setError(errorMsg);
             return;
         }
 
         setIsSearching(true);
         setError(null);
+        console.log('Starting search...');
 
         try {
             const apiUrl = `https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`;
+            console.log('Making API request to:', apiUrl);
 
             const response = await fetch(apiUrl, {
                 method: 'GET',
@@ -228,7 +236,7 @@ export default function Dssn() {
             });
 
             const result = await response.json();
-            console.log('API Response:', result);
+            console.log('API response received:', result);
 
             if (!response.ok || !result.success) {
                 const errorDetails = {
@@ -237,8 +245,12 @@ export default function Dssn() {
                     details: `Reference: ${result.metadata?.requestId || 'N/A'}`,
                     timestamp: result.metadata?.timestamp || new Date().toISOString()
                 };
+                console.error('API error:', errorDetails);
                 throw errorDetails;
             }
+
+            console.log('API success, processing data...');
+            console.log('Raw image data from API:', result.data.images);
 
             const transformedData = {
                 "Full Name": result.data.fullName || 'Not available',
@@ -256,7 +268,6 @@ export default function Dssn() {
                 "Passport Number": result.data.passportNumber || 'Not available',
                 "Birth Certificate": result.data.birthCertificate || 'Not available',
                 "Driver's License": result.data.driverLicense || 'Not available',
-                // Images can be strings or objects; GoogleStorageImage handles both
                 "Image": result.data.images?.profile || null,
                 "Passport Image": result.data.images?.passport || null,
                 "Birth Certificate Image": result.data.images?.birthCertificate || null,
@@ -267,12 +278,12 @@ export default function Dssn() {
                     : 'No metadata available'
             };
 
-            console.log('Transformed Data:', transformedData);
+            console.log('Transformed customer data:', transformedData);
             setCustomerData(transformedData);
             setShowInfoModal(true);
 
         } catch (err) {
-            console.error('Search Error:', err);
+            console.error('Search error:', err);
             setError({
                 title: err.title || 'Search Error',
                 message: err.message || 'Failed to process request',
@@ -280,36 +291,33 @@ export default function Dssn() {
                 technical: `Status: ${err.status || 'Unknown'} | ${err.timestamp || new Date().toISOString()}`
             });
         } finally {
+            console.log('Search completed');
             setIsSearching(false);
         }
     };
 
-    const openDocumentModal = (file) => {
-        const url = getFileUrl(file);
-        if (!url) {
-            console.warn('No URL provided for document modal');
-            return;
-        }
+    const openDocumentModal = (url) => {
         console.log('Opening document modal with URL:', url);
         setCurrentDocumentUrl(url);
         setShowDocumentModal(true);
     };
 
     const closeDocumentModal = () => {
+        console.log('Closing document modal');
         setShowDocumentModal(false);
         setCurrentDocumentUrl("");
     };
 
     const downloadDocument = () => {
+        console.log('Downloading document:', currentDocumentUrl);
         if (!currentDocumentUrl) {
-            console.warn('No document URL for download');
+            console.warn('No document URL to download');
             return;
         }
-
-        console.log('Downloading document:', currentDocumentUrl);
+        
         const link = document.createElement('a');
         link.href = currentDocumentUrl;
-        const filename = decodeURIComponent(currentDocumentUrl.split('/').pop()) || 'document';
+        const filename = currentDocumentUrl.split('/').pop() || 'document';
         link.download = filename;
         document.body.appendChild(link);
         link.click();
@@ -518,7 +526,7 @@ export default function Dssn() {
                                 <div className="bg-indigo-900/40 p-4 rounded-lg border border-indigo-700/30 backdrop-blur-sm">
                                     <h4 className="text-blue-300 mb-3">Profile Photo</h4>
                                     <GoogleStorageImage
-                                        file={customerData["Image"]}
+                                        src={customerData["Image"]}
                                         alt="Profile Photo"
                                         className="w-full h-64 rounded-lg border-2 border-blue-500/30 object-cover cursor-pointer"
                                         onClick={() => openDocumentModal(customerData["Image"])}
@@ -535,7 +543,7 @@ export default function Dssn() {
                                                 <h5 className="text-blue-300 mb-2">Passport</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Passport Image"])}>
                                                     <GoogleStorageImage
-                                                        file={customerData["Passport Image"]}
+                                                        src={customerData["Passport Image"]}
                                                         alt="Passport"
                                                         className="w-full h-48 rounded border border-indigo-700/30 object-cover"
                                                     />
@@ -549,7 +557,7 @@ export default function Dssn() {
                                                 <h5 className="text-blue-300 mb-2">Birth Certificate</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Birth Certificate Image"])}>
                                                     <GoogleStorageImage
-                                                        file={customerData["Birth Certificate Image"]}
+                                                        src={customerData["Birth Certificate Image"]}
                                                         alt="Birth Certificate"
                                                         className="w-full h-48 rounded border border-indigo-700/30 object-cover"
                                                     />
@@ -563,7 +571,7 @@ export default function Dssn() {
                                                 <h5 className="text-blue-300 mb-2">Driver's License</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["Drivers License Image"])}>
                                                     <GoogleStorageImage
-                                                        file={customerData["Drivers License Image"]}
+                                                        src={customerData["Drivers License Image"]}
                                                         alt="Driver's License"
                                                         className="w-full h-48 rounded border border-indigo-700/30 object-cover"
                                                     />
@@ -577,7 +585,7 @@ export default function Dssn() {
                                                 <h5 className="text-blue-300 mb-2">National ID</h5>
                                                 <div className="document-thumbnail" onClick={() => openDocumentModal(customerData["National Id Image"])}>
                                                     <GoogleStorageImage
-                                                        file={customerData["National Id Image"]}
+                                                        src={customerData["National Id Image"]}
                                                         alt="National ID"
                                                         className="w-full h-48 rounded border border-indigo-700/30 object-cover"
                                                     />
@@ -616,7 +624,7 @@ export default function Dssn() {
                             ) : (
                                 <>
                                     <GoogleStorageImage
-                                        file={{ url: currentDocumentUrl, type: currentDocumentUrl.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image' }}
+                                        src={currentDocumentUrl}
                                         alt="Document Full View"
                                         className="w-full max-h-[80vh] object-contain"
                                     />
