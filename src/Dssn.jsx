@@ -37,43 +37,52 @@ const sanitizeHTML = (str) => {
         .replace(/'/g, '&#39;');
 };
 
-const GoogleStorageImage = ({ src, alt, className, onClick }) => {
+const GoogleStorageImage = ({ src, alt = "Document", className, onClick }) => {
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
+    const [error, setError] = useState(null);
     const [imageUrl, setImageUrl] = useState('');
+    const [isPdf, setIsPdf] = useState(false);
 
     useEffect(() => {
         if (!src) {
             setLoading(false);
-            setError(true);
+            setError('No image source provided');
             return;
         }
 
         setLoading(true);
-        setError(false);
+        setError(null);
 
         const constructImageUrl = (imagePath) => {
-            if (!imagePath) return null;
-            if (imagePath.startsWith('http')) return imagePath;
-            if (imagePath.startsWith('gs://')) {
-                return `https://storage.googleapis.com/${imagePath.replace('gs://', '')}`;
+            try {
+                if (!imagePath) return null;
+                if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                    return imagePath;
+                }
+                if (imagePath.startsWith('gs://')) {
+                    return `https://storage.googleapis.com/${imagePath.replace('gs://', '')}`;
+                }
+                const path = imagePath.startsWith('system-liberianpost/')
+                    ? imagePath
+                    : `system-liberianpost/${imagePath}`;
+                return `https://storage.googleapis.com/${encodeURIComponent(path)}`;
+            } catch (err) {
+                console.error('Error constructing image URL:', { imagePath, error: err.message });
+                return null;
             }
-            if (imagePath.startsWith('system-liberianpost/')) {
-                return `https://storage.googleapis.com/${imagePath}`;
-            }
-            return `https://storage.googleapis.com/system-liberianpost/${encodeURIComponent(imagePath)}`;
         };
 
         const url = constructImageUrl(src);
-        setImageUrl(url);
-
         if (!url) {
             setLoading(false);
-            setError(true);
+            setError('Invalid image URL');
             return;
         }
 
-        if (url.endsWith('.pdf')) {
+        setImageUrl(url);
+        setIsPdf(url.toLowerCase().endsWith('.pdf'));
+
+        if (url.toLowerCase().endsWith('.pdf')) {
             setLoading(false);
             return;
         }
@@ -83,11 +92,13 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
 
         img.onload = () => {
             setLoading(false);
+            console.log('Image loaded successfully:', url);
         };
 
-        img.onerror = () => {
-            setError(true);
+        img.onerror = (err) => {
+            setError(`Failed to load image: ${err.message || 'Unknown error'}`);
             setLoading(false);
+            console.error('Image load error:', { url, error: err });
         };
 
         return () => {
@@ -96,10 +107,11 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         };
     }, [src]);
 
-    if (!src) {
+    if (!src || error) {
         return (
-            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
-                <span className="text-gray-400 text-sm">No image available</span>
+            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg flex-col`}>
+                <span className="text-red-400 text-sm">{error || 'No image available'}</span>
+                {src && <div className="text-xs text-gray-400 mt-1">URL: {src.length > 30 ? `${src.substring(0, 30)}...` : src}</div>}
             </div>
         );
     }
@@ -112,20 +124,13 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
         );
     }
 
-    if (error || imageUrl?.endsWith('.pdf')) {
+    if (isPdf) {
         return (
-            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg`}>
-                {imageUrl?.endsWith('.pdf') ? (
-                    <div className="text-gray-400 text-sm text-center">
-                        PDF Document<br />
-                        <span className="text-xs">Click to view</span>
-                    </div>
-                ) : (
-                    <>
-                        <span className="text-red-400 text-sm">Failed to load image</span>
-                        <div className="text-xs text-gray-400 mt-1">URL: {src.length > 30 ? `${src.substring(0, 30)}...` : src}</div>
-                    </>
-                )}
+            <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg cursor-pointer`} onClick={onClick}>
+                <div className="text-gray-400 text-sm text-center">
+                    PDF Document<br />
+                    <span className="text-xs">Click to view</span>
+                </div>
             </div>
         );
     }
@@ -137,7 +142,10 @@ const GoogleStorageImage = ({ src, alt, className, onClick }) => {
             className={className}
             onClick={onClick}
             crossOrigin="anonymous"
-            onError={() => setError(true)}
+            onError={(e) => {
+                setError('Image failed to render');
+                console.error('Image render error:', { url: imageUrl, error: e.message });
+            }}
         />
     );
 };
@@ -197,6 +205,7 @@ export default function Dssn() {
             });
 
             const result = await response.json();
+            console.log('API Response:', result);
 
             if (!response.ok || !result.success) {
                 const errorDetails = {
@@ -234,10 +243,12 @@ export default function Dssn() {
                     : 'No metadata available'
             };
 
+            console.log('Transformed Data:', transformedData);
             setCustomerData(transformedData);
             setShowInfoModal(true);
 
         } catch (err) {
+            console.error('Search Error:', err);
             setError({
                 title: err.title || 'Search Error',
                 message: err.message || 'Failed to process request',
@@ -250,7 +261,11 @@ export default function Dssn() {
     };
 
     const openDocumentModal = (url) => {
-        if (!url) return;
+        if (!url) {
+            console.warn('No URL provided for document modal');
+            return;
+        }
+        console.log('Opening document modal with URL:', url);
         setCurrentDocumentUrl(url);
         setShowDocumentModal(true);
     };
@@ -261,8 +276,12 @@ export default function Dssn() {
     };
 
     const downloadDocument = () => {
-        if (!currentDocumentUrl) return;
+        if (!currentDocumentUrl) {
+            console.warn('No document URL for download');
+            return;
+        }
         
+        console.log('Downloading document:', currentDocumentUrl);
         const link = document.createElement('a');
         link.href = currentDocumentUrl;
         const filename = decodeURIComponent(currentDocumentUrl.split('/').pop()) || 'document';
@@ -562,11 +581,12 @@ export default function Dssn() {
                         </button>
 
                         <div className="p-4 h-full flex flex-col items-center justify-center">
-                            {currentDocumentUrl.endsWith('.pdf') ? (
+                            {currentDocumentUrl.toLowerCase().endsWith('.pdf') ? (
                                 <iframe
                                     src={`${currentDocumentUrl}#toolbar=0`}
                                     className="w-full h-[80vh]"
                                     title="Document Viewer"
+                                    onError={(e) => console.error('Iframe load error:', { url: currentDocumentUrl, error: e.message })}
                                 />
                             ) : (
                                 <>
