@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { DashboardItems } from '@/config/dashboardItems';
-import { getRoleName, hasPermission } from '@/utils/auth';
+import { getAvailableDashboardItems, getDefaultRouteForLevel } from '@/utils/dashboardManager';
+import { getRoleName } from '@/utils/auth';
 
 const MoeDashboard = () => {
   const { user, logout } = useAuth();
@@ -10,12 +10,18 @@ const MoeDashboard = () => {
   const [currentDate] = useState(new Date());
 
   useEffect(() => {
-    if (!user) navigate('/system');
+    if (!user) {
+      navigate('/system');
+    } else {
+      // Redirect to default route for user's security level on mount
+      const defaultRoute = getDefaultRouteForLevel(user.securityLevel);
+      if (window.location.pathname === '/moe/dashboard') {
+        navigate(defaultRoute);
+      }
+    }
   }, [user, navigate]);
 
-  const availableItems = DashboardItems.filter(item => 
-    hasPermission(item.requiredLevel, user?.securityLevel)
-  );
+  const availableItems = getAvailableDashboardItems();
 
   const handleCardClick = (path) => {
     navigate(path);
