@@ -1,7 +1,7 @@
-// src/AppRoutes.js
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { SecurityLevels, hasPermission } from './utils/auth';
+import { getDefaultRouteForLevel } from './utils/dashboardManager';
 
 // Import all components
 import MoeDashboard from './components/MoeDashboard';
@@ -45,6 +45,15 @@ function ProtectedRoute({ children, requiredLevel }) {
   return children;
 }
 
+function DefaultRoute() {
+  const { user } = useAuth();
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  const defaultRoute = getDefaultRouteForLevel(user.securityLevel);
+  return <Navigate to={defaultRoute} replace />;
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -52,70 +61,54 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       
-      {/* Default redirect */}
-      <Route path="/" element={<Navigate to="/moe-dashboard" replace />} />
+      {/* Default redirect to user's default route */}
+      <Route path="/" element={<DefaultRoute />} />
 
       {/* MOE Dashboard - Accessible to all authenticated users */}
       <Route element={<ProtectedRoute requiredLevel={SecurityLevels.STUDENT} />}>
-        <Route path="/moe-dashboard" element={<MoeDashboard />} />
-      </Route>
-
-      {/* School Management - Requires SCHOOL_ADMIN */}
-      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.SCHOOL_ADMIN} />}>
-        <Route path="/school-management" element={<SchoolManagement />} />
-      </Route>
-
-      {/* Student Management - Requires SCHOOL_ADMIN */}
-      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.SCHOOL_ADMIN} />}>
-        <Route path="/student-registration" element={<StudentRegistration />} />
-        <Route path="/student-management" element={<StudentManagement />} />
-      </Route>
-
-      {/* Parent Management - Requires SCHOOL_ADMIN */}
-      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.SCHOOL_ADMIN} />}>
-        <Route path="/parent-management" element={<ParentManagement />} />
-        <Route path="/parent-details/:parentId" element={<ParentDetails />} />
-        <Route path="/add-parent" element={<AddParent />} />
-      </Route>
-
-      {/* Announcement Management - Requires SCHOOL_ADMIN */}
-      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.SCHOOL_ADMIN} />}>
-        <Route path="/announcement-management" element={<AnnouncementManagement />} />
-      </Route>
-
-      {/* Student Records - Requires TEACHER */}
-      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.TEACHER} />}>
-        <Route path="/student-records" element={<StudentRecords />} />
-      </Route>
-
-      {/* Teacher Management - Requires SCHOOL_ADMIN */}
-      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.SCHOOL_ADMIN} />}>
-        <Route path="/teacher-management" element={<TeacherManagement />} />
-      </Route>
-
-      {/* Reports - Requires TEACHER */}
-      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.TEACHER} />}>
-        <Route path="/reports" element={<Reports />} />
-      </Route>
-
-      {/* System Settings - Requires SYSTEM_ADMIN */}
-      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.SYSTEM_ADMIN} />}>
-        <Route path="/system-settings" element={<SystemSettings />} />
+        <Route path="/moe/dashboard" element={<MoeDashboard />} />
       </Route>
 
       {/* Student Profile - Accessible to all authenticated users */}
       <Route element={<ProtectedRoute requiredLevel={SecurityLevels.STUDENT} />}>
-        <Route path="/student-profile" element={<StudentProfile />} />
+        <Route path="/moe/student-profile" element={<StudentProfile />} />
+      </Route>
+
+      {/* Student Reports - Requires PARENT */}
+      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.PARENT} />}>
+        <Route path="/moe/student-reports" element={<StudentReports />} />
       </Route>
 
       {/* Class Management - Requires TEACHER */}
       <Route element={<ProtectedRoute requiredLevel={SecurityLevels.TEACHER} />}>
-        <Route path="/class-management" element={<ClassManagement />} />
+        <Route path="/moe/class-management" element={<ClassManagement />} />
+      </Route>
+
+      {/* Student Records - Requires TEACHER */}
+      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.TEACHER} />}>
+        <Route path="/moe/student-records" element={<StudentRecords />} />
+      </Route>
+
+      {/* Reports - Requires TEACHER */}
+      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.TEACHER} />}>
+        <Route path="/moe/reports" element={<Reports />} />
+      </Route>
+
+      {/* School Management - Requires SCHOOL_ADMIN */}
+      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.SCHOOL_ADMIN} />}>
+        <Route path="/moe/school-management" element={<SchoolManagement />} />
+        <Route path="/moe/student-registration" element={<StudentRegistration />} />
+        <Route path="/moe/student-management" element={<StudentManagement />} />
+        <Route path="/moe/parent-management" element={<ParentManagement />} />
+        <Route path="/moe/parent-management/parent-details/:parentId" element={<ParentDetails />} />
+        <Route path="/moe/parent-management/add-parent" element={<AddParent />} />
+        <Route path="/moe/announcement-management" element={<AnnouncementManagement />} />
+        <Route path="/moe/teacher-management" element={<TeacherManagement />} />
       </Route>
 
       {/* District Reports - Requires MINISTRY_OFFICIAL */}
       <Route element={<ProtectedRoute requiredLevel={SecurityLevels.MINISTRY_OFFICIAL} />}>
-        <Route path="/district-reports" element={<DistrictReports />}>
+        <Route path="/moe/district-reports" element={<DistrictReports />}>
           <Route index element={<DistrictOverview />} />
           <Route path="overview" element={<DistrictOverview />} />
           <Route path="school-reports" element={<SchoolReports />} />
@@ -127,26 +120,23 @@ function AppRoutes() {
 
       {/* Database Tools - Requires DATABASE_ADMIN */}
       <Route element={<ProtectedRoute requiredLevel={SecurityLevels.DATABASE_ADMIN} />}>
-        <Route path="/database-tools" element={<DatabaseTools />} />
+        <Route path="/moe/database-tools" element={<DatabaseTools />} />
+        <Route path="/moe/ministry-employee-management" element={<MinistryEmployeeManagement />} />
+        <Route path="/moe/school-admin-management" element={<SchoolAdminManagement />} />
       </Route>
 
       {/* User Management - Requires SYSTEM_ADMIN */}
       <Route element={<ProtectedRoute requiredLevel={SecurityLevels.SYSTEM_ADMIN} />}>
-        <Route path="/user-management" element={<UserManagement />} />
+        <Route path="/moe/user-management" element={<UserManagement />} />
       </Route>
 
-      {/* Ministry Employee Management - Requires DATABASE_ADMIN */}
-      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.DATABASE_ADMIN} />}>
-        <Route path="/ministry-employee-management" element={<MinistryEmployeeManagement />} />
-      </Route>
-
-      {/* School Admin Management - Requires DATABASE_ADMIN */}
-      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.DATABASE_ADMIN} />}>
-        <Route path="/school-admin-management" element={<SchoolAdminManagement />} />
+      {/* System Settings - Requires SYSTEM_ADMIN */}
+      <Route element={<ProtectedRoute requiredLevel={SecurityLevels.SYSTEM_ADMIN} />}>
+        <Route path="/moe/system-settings" element={<SystemSettings />} />
       </Route>
 
       {/* Catch-all route */}
-      <Route path="*" element={<Navigate to="/moe-dashboard" replace />} />
+      <Route path="*" element={<DefaultRoute />} />
     </Routes>
   );
 }
