@@ -1,4 +1,3 @@
-// src/utils/auth.js
 export const SecurityLevels = {
   STUDENT: 1,
   PARENT: 2,
@@ -33,4 +32,12 @@ export function getRoleName(level) {
     [SecurityLevels.SYSTEM_ADMIN]: "System Admin"
   };
   return roles[level] || "Unknown Role";
+}
+
+// Handle login success and redirect to default route
+export function handleLoginSuccess(userData) {
+  localStorage.setItem('moeAuth', JSON.stringify(userData));
+  const { getDefaultRouteForLevel } = require('./dashboardManager');
+  const defaultRoute = getDefaultRouteForLevel(userData.securityLevel);
+  window.location.href = defaultRoute; // Use this for simple redirect; replace with React Router's navigate if needed
 }
