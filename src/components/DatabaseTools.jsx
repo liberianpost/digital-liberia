@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { SecurityLevels, hasPermission } from '../utils/auth';
@@ -6,36 +6,35 @@ import { SecurityLevels, hasPermission } from '../utils/auth';
 const DatabaseTools = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-
   const REQUIRED_SECURITY_LEVEL = SecurityLevels.DATABASE_ADMIN;
 
-  // Check permissions and redirect if unauthorized
-  if (!hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
-    alert("Access denied. Requires DATABASE ADMIN privileges.");
-    navigate(-1);
-    return null;
-  }
+  useEffect(() => {
+    if (!user || !hasPermission(REQUIRED_SECURITY_LEVEL)) {
+      alert("Access denied. Requires DATABASE ADMIN privileges.");
+      navigate(-1);
+    }
+  }, [user, navigate]);
 
   const handleMinistryManagement = () => {
-    if (hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
-      navigate('/ministry-employee-management');
+    if (hasPermission(REQUIRED_SECURITY_LEVEL)) {
+      navigate('/moe/ministry-employee-management');
     }
   };
 
   const handleSchoolAdminManagement = () => {
-    if (hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
-      navigate('/school-admin-management');
+    if (hasPermission(REQUIRED_SECURITY_LEVEL)) {
+      navigate('/moe/school-admin-management');
     }
   };
 
   const handleBackup = () => {
-    if (hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
+    if (hasPermission(REQUIRED_SECURITY_LEVEL)) {
       alert('Backup Database feature coming soon');
     }
   };
 
   const handleRestore = () => {
-    if (hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
+    if (hasPermission(REQUIRED_SECURITY_LEVEL)) {
       alert('Restore Database feature coming soon');
     }
   };
@@ -72,11 +71,11 @@ const DatabaseTools = () => {
       </div>
 
       {/* Scrollable Content Area */}
-      <div className="overflow-y-auto h-[calc(100vh-80px)] p-4 max-w-3xl mx-auto">
+      <div className="overflow-y-auto h-[calc(100vh-4rem)] p-4 max-w-3xl mx-auto">
         {/* Ministry of Education Management Card */}
         <div
           onClick={handleMinistryManagement}
-          className="bg-white rounded-lg shadow-md mb-4 border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow"
+          className="bg-white rounded-lg shadow-md mb-4 border border-gray-300 cursor-pointer hover:shadow-lg transition-shadow"
         >
           <div className="p-4 text-center">
             <img
@@ -96,7 +95,7 @@ const DatabaseTools = () => {
         {/* School Administrators Management Card */}
         <div
           onClick={handleSchoolAdminManagement}
-          className="bg-white rounded-lg shadow-md mb-4 border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow"
+          className="bg-white rounded-lg shadow-md mb-4 border border-gray-300 cursor-pointer hover:shadow-lg transition-shadow"
         >
           <div className="p-4 text-center">
             <img
