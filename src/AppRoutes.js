@@ -30,15 +30,20 @@ import MinistryEmployeeManagement from './components/MinistryEmployeeManagement'
 import SchoolAdminManagement from './components/SchoolAdminManagement';
 import LoginPage from './components/LoginPage';
 import UnauthorizedPage from './components/UnauthorizedPage';
+import Home from './Home';
+import System from './System';
+import Dssn from './Dssn';
+import Digitalliberia from './Digitalliberia';
+import Libpay from './Libpay';
 
 function ProtectedRoute({ children, requiredLevel }) {
   const { user } = useAuth();
   
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/system" replace />;
   }
   
-  if (!hasPermission(requiredLevel)) {
+  if (requiredLevel && !hasPermission(requiredLevel)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
@@ -48,7 +53,7 @@ function ProtectedRoute({ children, requiredLevel }) {
 function DefaultRoute() {
   const { user } = useAuth();
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/system" replace />;
   }
   const defaultRoute = getDefaultRouteForLevel(user.securityLevel);
   return <Navigate to={defaultRoute} replace />;
@@ -58,7 +63,11 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/system" element={<System />} />
+      <Route path="/dssn" element={<Dssn />} />
+      <Route path="/digital-liberia" element={<Digitalliberia />} />
+      <Route path="/libpay" element={<Libpay />} />
+      <Route path="/liberian-post" element={<div>Coming Soon</div>} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       
       {/* Default redirect to user's default route */}
