@@ -297,6 +297,13 @@ const MoeDashboard = () => {
   const navigate = useNavigate();
   const [currentDate] = useState(new Date());
 
+  const handleLogout = () => {
+    localStorage.removeItem("MOE_LOGGED_IN");
+    localStorage.removeItem("MOE_USERNAME");
+    logout();
+    navigate("/system");
+  };
+
   useEffect(() => {
     if (!user) {
       navigate('/system');
@@ -329,7 +336,7 @@ const MoeDashboard = () => {
             <p className="text-gray-600">{formatDate(currentDate)}</p>
           </div>
           <button
-            onClick={logout}
+            onClick={handleLogout}
             className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
           >
             Logout
@@ -406,20 +413,22 @@ const System = () => {
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
-    if (isLoggedIn && !user) {
-      const username = localStorage.getItem("MOE_USERNAME");
-      if (username) {
-        navigate("/moe-dashboard");
-      }
-    } else if (user) {
+    if (isLoggedIn && user) {
       navigate("/moe-dashboard");
+    } else if (!user) {
+      localStorage.removeItem("MOE_LOGGED_IN");
+      localStorage.removeItem("MOE_USERNAME");
     }
   }, [user, navigate]);
 
   const handleMinistryClick = (ministryId, e) => {
     e.stopPropagation();
     if (ministryId === "education") {
-      setShowMoeLogin(true);
+      if (user) {
+        navigate("/moe-dashboard");
+      } else {
+        setShowMoeLogin(true);
+      }
     } else {
       alert(`Services for ${ministries.find(m => m.id === ministryId)?.name} are coming soon`);
     }
