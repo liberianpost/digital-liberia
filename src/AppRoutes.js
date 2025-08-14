@@ -28,8 +28,6 @@ import DatabaseTools from './components/DatabaseTools';
 import UserManagement from './components/UserManagement';
 import MinistryEmployeeManagement from './components/MinistryEmployeeManagement';
 import SchoolAdminManagement from './components/SchoolAdminManagement';
-import LoginPage from './components/LoginPage';
-import UnauthorizedPage from './components/UnauthorizedPage';
 import Home from './Home';
 import System from './System';
 import Dssn from './Dssn';
