@@ -1,0 +1,252 @@
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { SecurityLevels, hasPermission, getRoleName } from '../utils/auth';
+
+const SystemSettings = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get security level from route params or user context
+  const securityLevel = location.state?.securityLevel || user?.securityLevel || SecurityLevels.STUDENT;
+
+  const checkAdminAccess = (action) => {
+    if (hasPermission(SecurityLevels.SYSTEM_ADMIN, securityLevel)) {
+      action();
+    } else {
+      showAccessDenied();
+    }
+  };
+
+  const showAccessDenied = () => {
+    alert("Access denied. Requires SYSTEM ADMIN privileges.");
+  };
+
+  const handleAppSettings = () => {
+    navigate("/app-settings");
+  };
+
+  const handleUserManagement = () => {
+    checkAdminAccess(() => {
+      navigate("/user-management");
+    });
+  };
+
+  const handleDatabaseManagement = () => {
+    checkAdminAccess(() => {
+      navigate("/database-management");
+    });
+  };
+
+  const handleBackupSettings = () => {
+    checkAdminAccess(() => {
+      navigate("/backup-settings");
+    });
+  };
+
+  const isAdminFeatureDisabled = !hasPermission(SecurityLevels.SYSTEM_ADMIN, securityLevel);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Toolbar */}
+      <div className="bg-blue-600 text-white p-4 shadow-md">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div className="flex items-center">
+            <button
+              onClick={() => navigate(-1)}
+              className="mr-4 text-white"
+              aria-label="Go back"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+            </button>
+            <div>
+              <h1 className="text-xl font-bold">System Settings</h1>
+              <p className="text-sm opacity-80">
+                Security Level: {getRoleName(securityLevel) || 'Unknown Role'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              logout();
+              navigate('/system');
+            }}
+            className="text-white text-sm flex items-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
+            </svg>
+            Logout
+          </button>
+        </div>
+      </div>
+
+      {/* Settings Cards */}
+      <div className="p-4 max-w-3xl mx-auto">
+        {/* App Settings Card */}
+        <div
+          onClick={handleAppSettings}
+          className="bg-white rounded-lg shadow-md p-4 mb-4 cursor-pointer hover:shadow-lg transition-shadow"
+        >
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c-.94 1.543.826 3.31 2.37 2.37a1.724 1.724 0 002.572 1.065c1.756-.426 1.756-2.924 0-3.35a1.724 1.724 0 00-1.065-2.572c-1.543-.94-3.31.826-2.37 2.37a1.724 1.724 0 001.066 2.573c.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c.94-1.543-.826-3.31-2.37-2.37a1.724 1.724 0 00-2.572 1.065z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <h2 className="text-lg font-bold">Application Settings</h2>
+              <p className="text-gray-600 text-sm">Configure application preferences</p>
+            </div>
+          </div>
+        </div>
+
+        {/* User Management Card */}
+        <div
+          onClick={handleUserManagement}
+          className={`bg-white rounded-lg shadow-md p-4 mb-4 cursor-pointer transition-shadow ${
+            isAdminFeatureDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg'
+          }`}
+        >
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <h2 className="text-lg font-bold">User Management</h2>
+              <p className="text-gray-600 text-sm">Manage system users and permissions</p>
+              {isAdminFeatureDisabled && (
+                <p className="text-red-500 text-xs mt-1">Requires SYSTEM ADMIN access</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Database Management Card */}
+        <div
+          onClick={handleDatabaseManagement}
+          className={`bg-white rounded-lg shadow-md p-4 mb-4 cursor-pointer transition-shadow ${
+            isAdminFeatureDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg'
+          }`}
+        >
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"
+                />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <h2 className="text-lg font-bold">Database Management</h2>
+              <p className="text-gray-600 text-sm">Manage database settings</p>
+              {isAdminFeatureDisabled && (
+                <p className="text-red-500 text-xs mt-1">Requires SYSTEM ADMIN access</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Backup Settings Card */}
+        <div
+          onClick={handleBackupSettings}
+          className={`bg-white rounded-lg shadow-md p-4 mb-4 cursor-pointer transition-shadow ${
+            isAdminFeatureDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg'
+          }`}
+        >
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+                />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <h2 className="text-lg font-bold">Backup & Restore</h2>
+              <p className="text-gray-600 text-sm">Configure backup settings</p>
+              {isAdminFeatureDisabled && (
+                <p className="text-red-500 text-xs mt-1">Requires SYSTEM ADMIN access</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SystemSettings;
