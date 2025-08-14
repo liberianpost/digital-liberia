@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@context/AuthContext";
-import { SecurityLevels, getRoleName } from "@/utils/auth.js";
+import { SecurityLevels, getRoleName, handleLoginSuccess } from "@/utils/auth.js";
 import { DashboardItems } from "@/config/dashboardItems";
 
 const navLinks = [
@@ -172,7 +172,11 @@ const MoeLoginModal = ({ onClose }) => {
         localStorage.setItem("MOE_LOGGED_IN", "true");
         localStorage.setItem("MOE_USERNAME", formData.username);
         onClose();
-        navigate("/moe-dashboard");
+        // Use handleLoginSuccess to navigate to the default route based on securityLevel
+        handleLoginSuccess({ 
+          username: formData.username, 
+          securityLevel: result.user.securityLevel || SecurityLevels.STUDENT 
+        });
       } else {
         setError(result.error || "Invalid username or password");
       }
@@ -414,7 +418,9 @@ const System = () => {
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
     if (isLoggedIn && user) {
-      navigate("/moe-dashboard");
+      // Navigate to the default route based on securityLevel
+      const defaultRoute = handleLoginSuccess(user);
+      navigate(defaultRoute, { replace: true });
     } else if (!user) {
       localStorage.removeItem("MOE_LOGGED_IN");
       localStorage.removeItem("MOE_USERNAME");
@@ -425,7 +431,8 @@ const System = () => {
     e.stopPropagation();
     if (ministryId === "education") {
       if (user) {
-        navigate("/moe-dashboard");
+        const defaultRoute = handleLoginSuccess(user);
+        navigate(defaultRoute, { replace: true });
       } else {
         setShowMoeLogin(true);
       }
