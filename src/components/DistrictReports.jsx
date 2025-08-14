@@ -1,4 +1,3 @@
-// src/components/DistrictReports.js
 import React from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { 
@@ -12,7 +11,7 @@ import {
   Fab
 } from '@mui/material';
 import { 
-  Overview as OverviewIcon,
+  Dashboard as DashboardIcon,
   School as SchoolIcon,
   Person as StudentIcon,
   PersonOutline as TeacherIcon,
@@ -24,7 +23,7 @@ const reportItems = [
   {
     title: "Overview",
     description: "Summary of national education statistics",
-    Icon: OverviewIcon,
+    Icon: DashboardIcon,
     path: "overview",
     color: "#4CAF50" // green
   },
@@ -86,10 +85,10 @@ export default function DistrictReports() {
           <IconButton
             edge="start"
             color="inherit"
-            onClick={() => navigate('/moe-dashboard')}
+            onClick={() => navigate('/moe/dashboard')}
             sx={{ mr: 2 }}
           >
-            {/* Back icon - you can use an actual back icon */}
+            {/* Back icon - consider using ArrowBack for better UX */}
             <span>←</span>
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: 'black' }}>
