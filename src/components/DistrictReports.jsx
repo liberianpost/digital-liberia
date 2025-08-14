@@ -11,7 +11,7 @@ import {
   Fab
 } from '@mui/material';
 import { 
-  Dashboard as DashboardIcon,
+  Dashboard as OverviewIcon,
   School as SchoolIcon,
   Person as StudentIcon,
   PersonOutline as TeacherIcon,
