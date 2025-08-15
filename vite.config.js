@@ -9,7 +9,7 @@ export default defineConfig({
       babel: {
         plugins: [
           ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }],
-          ['@emotion', { autoLabel: 'dev-only', sourceMap: true }], // Fixed autoLabel
+          ['@emotion', { autoLabel: 'dev-only', sourceMap: true }],
         ],
       },
     }),
@@ -58,13 +58,13 @@ export default defineConfig({
     chunkSizeWarningLimit: 1600,
   },
   server: {
-    port: 3004, // Changed to 3004
+    port: 3005, // Changed to 3005
     strictPort: false,
     host: '0.0.0.0',
     open: false,
     hmr: {
       overlay: true,
-      clientPort: 3004,
+      clientPort: 3005,
     },
     fs: {
       strict: false,
