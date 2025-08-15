@@ -39,11 +39,6 @@ export default defineConfig({
       '@mui/material/Box',
       '@mui/material/Typography',
     ],
-    esbuildOptions: {
-      define: {
-        global: 'globalThis',
-      },
-    },
   },
   define: {
     global: 'globalThis',
@@ -53,4 +48,9 @@ export default defineConfig({
     port: 3005,
   },
   base: '/',
+  css: {
+    postcss: {
+      plugins: [require('tailwindcss'), require('autoprefixer')],
+    },
+  },
 });
