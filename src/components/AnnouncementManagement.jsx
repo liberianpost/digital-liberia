@@ -1,127 +1,131 @@
-// src/components/AnnouncementManagement.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  Card,
-  CardContent,
-  Fab,
-  Box,
-  List,
-  ListItem,
-  Divider,
-  Chip
-} from '@mui/material';
-import { 
-  ArrowBack as BackIcon,
-  Add as AddIcon,
-  Announcement as AnnouncementIcon
-} from '@mui/icons-material';
+import { useAuth } from '@context/AuthContext';
+import { SecurityLevels } from '@utils/securityLevels';
+import { hasPermission } from '@utils/auth';
+import api from '@utils/api';
 
-// Sample announcement data
-const announcements = [
-  {
-    title: "School Reopening",
-    date: "Jan 15, 2023",
-    description: "All classes resume on Monday"
-  },
-  {
-    title: "Parent-Teacher Meeting",
-    date: "Feb 2, 2023",
-    description: "Scheduled for next week"
-  },
-  {
-    title: "Holiday Notice",
-    date: "Mar 10, 2023",
-    description: "School will be closed on Friday"
-  }
-];
-
-export default function AnnouncementManagement() {
+const AnnouncementManagement = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const REQUIRED_SECURITY_LEVEL = SecurityLevels.SCHOOL_ADMIN;
+  const [announcements, setAnnouncements] = useState([]);
+
+  useEffect(() => {
+    if (!user || !hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
+      alert('Access denied. Requires SCHOOL ADMIN privileges.');
+      navigate(-1);
+    } else {
+      // Fetch announcements
+      api.get('/announcements')
+        .then(response => setAnnouncements(response.data))
+        .catch(error => {
+          console.error('Error fetching announcements:', error);
+          alert('Failed to load announcements.');
+        });
+    }
+  }, [user, navigate]);
 
   const handleAddAnnouncement = () => {
-    navigate('/add-announcement');
+    navigate('/moe/add-announcement');
   };
 
   const handleAnnouncementClick = (announcement) => {
-    // Navigate to announcement details
-    navigate('/announcement-details', { state: { announcement } });
+    navigate('/moe/announcement-details', { state: { announcement } });
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      {/* App Bar */}
-      <AppBar position="static" elevation={0} sx={{ backgroundColor: 'white' }}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={() => navigate(-1)}
-            sx={{ mr: 2, color: 'black' }}
-          >
-            <BackIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: 'black' }}>
-            Announcement Management
-          </Typography>
-        </Toolbar>
-      </AppBar>
+    <div className="min-h-screen bg-gray-50">
+      {/* Toolbar */}
+      <div className="bg-white text-black p-4 shadow-md border-b border-gray-200">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div className="flex items-center">
+            <button
+              onClick={() => navigate(-1)}
+              className="mr-4 text-black"
+              aria-label="Go back"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+            </button>
+            <h1 className="text-xl font-bold">Announcement Management</h1>
+          </div>
+        </div>
+      </div>
 
       {/* Announcement List */}
-      <List sx={{ flex: 1, overflow: 'auto' }}>
-        {announcements.map((announcement, index) => (
-          <React.Fragment key={index}>
-            <ListItem 
-              button 
-              onClick={() => handleAnnouncementClick(announcement)}
-              sx={{ p: 0 }}
-            >
-              <Card sx={{ width: '100%', mx: 2, my: 1 }}>
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <AnnouncementIcon color="primary" sx={{ mr: 2 }} />
-                    <Typography variant="h6" component="div">
-                      {announcement.title}
-                    </Typography>
-                  </Box>
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={{ mt: 1, ml: 6 }}
+      <div className="p-4 max-w-3xl mx-auto">
+        {announcements.length === 0 ? (
+          <p className="text-gray-500 text-center">No announcements available.</p>
+        ) : (
+          <ul className="space-y-2">
+            {announcements.map((announcement, index) => (
+              <li
+                key={index}
+                onClick={() => handleAnnouncementClick(announcement)}
+                className="bg-white rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow"
+              >
+                <div className="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-blue-600 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    {announcement.date}
-                  </Typography>
-                  <Typography 
-                    variant="body1" 
-                    sx={{ mt: 1, ml: 6 }}
-                  >
-                    {announcement.description}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </ListItem>
-            {index < announcements.length - 1 && <Divider />}
-          </React.Fragment>
-        ))}
-      </List>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.379c.484 0 .951.214 1.29.585"
+                    />
+                  </svg>
+                  <div>
+                    <h3 className="text-lg font-bold">{announcement.title}</h3>
+                    <p className="text-sm text-gray-600">{announcement.date}</p>
+                    <p className="text-gray-700">{announcement.description}</p>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
-      {/* Add Announcement FAB */}
-      <Fab
-        color="primary"
-        aria-label="add announcement"
+      {/* Add Announcement Button */}
+      <button
         onClick={handleAddAnnouncement}
-        sx={{ 
-          position: 'fixed',
-          bottom: 16,
-          right: 16
-        }}
+        className="fixed bottom-4 right-4 bg-blue-600 text-white rounded-full p-3 shadow-lg hover:bg-blue-700"
       >
-        <AddIcon />
-      </Fab>
-    </Box>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+      </button>
+    </div>
   );
-}
+};
+
+export default AnnouncementManagement;
