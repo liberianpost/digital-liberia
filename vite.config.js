@@ -41,9 +41,9 @@ export default defineConfig({
     ],
   },
   define: {
-    global: 'globalThis',
-    'process.env': {},
+    'process.env': {}, // Ensure compatibility with libraries expecting process.env
   },
+  envPrefix: 'VITE_', // Explicitly set to ensure VITE_ variables are loaded
   server: {
     port: 3005,
   },
