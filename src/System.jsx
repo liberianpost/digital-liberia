@@ -18,7 +18,7 @@ class ErrorBoundary extends Component {
         <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
             <h1 className="text-2xl font-bold mb-4">Something Went Wrong</h1>
-            <p className="text-red-600 mb-6">{this.state.error.message}</p>
+            <p className="text-red-600 mb-6">{this.state.error.message || 'An unexpected error occurred'}</p>
             <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -42,15 +42,15 @@ const navLinks = [
   { label: 'Liberian Post', to: '/liberian-post', color: 'bg-pink-500/80' },
 ];
 
-// Logos for carousel
+// Logos for carousel (with fallback)
 const logos = [
-  '/logos/liberianpost.png',
-  '/logos/digital.png',
-  '/logos/libmusic.png',
-  '/logos/libconnectsit.png',
-  '/logos/libpaysit.png',
-  '/logos/seal-of-liberia.png',
-  '/logos/liberia.png',
+  { src: '/logos/liberianpost.png', alt: 'Liberian Post' },
+  { src: '/logos/digital.png', alt: 'Digital Liberia' },
+  { src: '/logos/libmusic.png', alt: 'LibMusic' },
+  { src: '/logos/libconnectsit.png', alt: 'LibConnect' },
+  { src: '/logos/libpaysit.png', alt: 'LibPay' },
+  { src: '/logos/seal-of-liberia.png', alt: 'Seal of Liberia' },
+  { src: '/logos/liberia.png', alt: 'Liberia' },
 ];
 
 // Ministry data
@@ -186,6 +186,8 @@ const MoeLoginModal = ({ onClose }) => {
       const result = await login(formData, navigate);
       if (!result.success) {
         setError(result.error || 'Invalid username or password');
+      } else {
+        setShowMoeLogin(false); // Close modal on success
       }
     } catch (err) {
       console.error('Login error:', err);
@@ -213,7 +215,10 @@ const MoeLoginModal = ({ onClose }) => {
               src="/logos/moe.png"
               alt="MOE Logo"
               className="w-20 h-20 object-contain"
-              onError={() => console.error('Failed to load MOE logo')}
+              onError={(e) => {
+                console.error('Failed to load MOE logo');
+                e.target.src = 'https://via.placeholder.com/80?text=MOE';
+              }}
             />
           </div>
           {error && (
@@ -325,8 +330,8 @@ const System = () => {
 
   // Log auth context for debugging
   useEffect(() => {
-    console.log('Auth context:', { user, isAuthenticated: !!user, loading });
-  }, [user, loading]);
+    console.log('System.jsx - Auth context:', { user, isAuthenticated: !!user, loading, location: location.pathname });
+  }, [user, loading, location.pathname]);
 
   // Logo carousel
   useEffect(() => {
@@ -339,21 +344,22 @@ const System = () => {
   // Handle auth state
   useEffect(() => {
     if (loading) return;
-    const isLoggedIn = localStorage.getItem('moeAuth') !== null;
+    const isLoggedIn = !!localStorage.getItem('moeAuth');
     if (isLoggedIn && user && user.securityLevel) {
-      console.log('Navigating with user:', user);
+      console.log('System.jsx - Navigating with user:', user);
       const defaultRoute = getDefaultRouteForLevel(user.securityLevel);
-      if (location.pathname === '/system') {
+      if (location.pathname === '/system' || location.pathname === '/') {
         navigate(defaultRoute, { replace: true });
       }
-    } else if (!user) {
-      console.log('No user, clearing localStorage');
+    } else if (!user && isLoggedIn) {
+      console.log('System.jsx - Invalid user in localStorage, clearing');
       localStorage.removeItem('moeAuth');
     }
   }, [user, loading, navigate, location.pathname]);
 
   const handleMinistryClick = (ministryId, e) => {
     e.stopPropagation();
+    console.log('System.jsx - Ministry clicked:', ministryId);
     if (ministryId === 'education') {
       if (user) {
         handleLoginSuccess(user, navigate);
@@ -367,21 +373,22 @@ const System = () => {
 
   const handleServiceClick = (serviceId, e) => {
     e.stopPropagation();
+    console.log('System.jsx - Service clicked:', serviceId);
     alert(`${serviceId.replace('-', ' ')} service will be available soon`);
   };
 
   const handleLogout = () => {
-    console.log('Logging out user:', user);
+    console.log('System.jsx - Logging out user:', user);
     logout();
     navigate('/system', { replace: true });
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-blue-950 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900">
         <div className="flex items-center space-x-2">
           <svg
-            className="animate-spin h-8 w-8 text-white"
+            className="animate-spin h-8 w-8 text-gray-900"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -408,8 +415,8 @@ const System = () => {
 
   return (
     <ErrorBoundary>
-      <div className="relative min-h-screen w-full bg-blue-950 text-white font-inter overflow-x-hidden">
-        <div className="fixed inset-0 bg-blue-950 -z-50" />
+      <div className="relative min-h-screen w-full bg-gray-100 text-gray-900 font-inter overflow-x-hidden">
+        <div className="fixed inset-0 bg-gray-100 -z-50" />
 
         {/* Logo Carousel */}
         <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -422,12 +429,15 @@ const System = () => {
                 }`}
               >
                 <img
-                  src={logo}
-                  alt={`Logo ${index}`}
+                  src={logo.src}
+                  alt={logo.alt}
                   className="max-w-full max-h-full object-contain"
-                  onError={() => console.error(`Failed to load logo: ${logo}`)}
+                  onError={(e) => {
+                    console.error(`Failed to load logo: ${logo.src}`);
+                    e.target.src = `https://via.placeholder.com/200?text=${logo.alt}`;
+                  }}
                 />
-                <div className="absolute inset-0 bg-black/5" />
+                <div className="absolute inset-0 bg-gray-200/5" />
               </div>
             ))}
           </div>
@@ -435,7 +445,7 @@ const System = () => {
 
         {/* Header */}
         <header className="fixed top-0 left-0 w-full z-50">
-          <div className="bg-blue-950/80 backdrop-blur-md border-b border-blue-700/30">
+          <div className="bg-gray-100/80 backdrop-blur-md border-b border-gray-300/30">
             <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
               <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
                 {navLinks.map((link) => (
@@ -443,7 +453,7 @@ const System = () => {
                     <Link
                       to={link.to}
                       className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
-                        location.pathname === link.to ? 'text-red-500' : 'text-white hover:text-blue-300'
+                        location.pathname === link.to ? 'text-red-500' : 'text-gray-900 hover:text-blue-600'
                       }`}
                     >
                       {link.label}
@@ -452,7 +462,7 @@ const System = () => {
                 ))}
               </nav>
             </div>
-            <div className="w-full bg-gradient-to-b from-blue-950 to-transparent overflow-x-auto">
+            <div className="w-full bg-gradient-to-b from-gray-100 to-transparent overflow-x-auto">
               <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
                 {logos.map((logo, index) => (
                   <div
@@ -462,10 +472,13 @@ const System = () => {
                     }`}
                   >
                     <img
-                      src={logo}
-                      alt={`Logo ${index}`}
+                      src={logo.src}
+                      alt={logo.alt}
                       className="w-12 h-12 md:w-16 md:h-16 object-contain"
-                      onError={() => console.error(`Failed to load logo: ${logo}`)}
+                      onError={(e) => {
+                        console.error(`Failed to load logo: ${logo.src}`);
+                        e.target.src = `https://via.placeholder.com/64?text=${logo.alt}`;
+                      }}
                     />
                   </div>
                 ))}
@@ -477,13 +490,12 @@ const System = () => {
         {/* Main Content */}
         <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
           <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-            <div className="bg-gradient-to-br from-rose-500/10 via-red-500/10 to-orange-600/10 backdrop-blur-lg rounded-xl border border-rose-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="bg-glass rounded-xl p-6 md:p-8 shadow-lg relative overflow-hidden">
               <div className="relative">
-                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900 border-b border-gray-300 pb-2">
                   Digital Social Security Number (DSSN)
                 </h2>
-                <div className="text-white space-y-4">
+                <div className="text-gray-900 space-y-4">
                   <p>
                     In the Digital Liberia project, the DSSN (Digital Social Security Number) is a unique digital identifier assigned to every Liberian citizen or legal resident within the system.
                   </p>
@@ -499,13 +511,12 @@ const System = () => {
           </section>
 
           <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-            <div className="bg-gradient-to-br from-green-500/10 via-teal-500/10 to-emerald-600/10 backdrop-blur-lg rounded-xl border border-green-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="bg-glass rounded-xl p-6 md:p-8 shadow-lg relative overflow-hidden">
               <div className="relative">
-                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900 border-b border-gray-300 pb-2">
                   Digital Liberia System
                 </h2>
-                <div className="text-white">
+                <div className="text-gray-900">
                   <p>
                     The National Database Management System (NDMS) is the secure, centralized, and intelligent national data backbone that powers Digital Liberia.
                   </p>
@@ -515,10 +526,9 @@ const System = () => {
           </section>
 
           <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-            <div className="bg-gradient-to-br from-purple-500/10 via-indigo-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-purple-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="bg-glass rounded-xl p-6 md:p-8 shadow-lg relative overflow-hidden">
               <div className="relative">
-                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900 border-b border-gray-300 pb-2">
                   Government Ministries
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -526,18 +536,21 @@ const System = () => {
                     <div
                       key={ministry.id}
                       onClick={(e) => handleMinistryClick(ministry.id, e)}
-                      className="cursor-pointer bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm relative z-20"
+                      className="cursor-pointer bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-gray-200 backdrop-blur-sm relative z-20"
                     >
                       <div className="flex items-center space-x-4">
                         <img
                           src={ministry.icon}
                           alt={ministry.name}
                           className="w-12 h-12 object-contain"
-                          onError={() => console.error(`Failed to load icon: ${ministry.icon}`)}
+                          onError={(e) => {
+                            console.error(`Failed to load icon: ${ministry.icon}`);
+                            e.target.src = `https://via.placeholder.com/48?text=${ministry.name}`;
+                          }}
                         />
                         <div>
-                          <h3 className="font-bold text-lg">{ministry.name}</h3>
-                          <p className="text-sm text-white/80">{ministry.description}</p>
+                          <h3 className="font-bold text-lg text-gray-900">{ministry.name}</h3>
+                          <p className="text-sm text-gray-700">{ministry.description}</p>
                         </div>
                       </div>
                     </div>
@@ -548,10 +561,9 @@ const System = () => {
           </section>
 
           <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-            <div className="bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-blue-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="bg-glass rounded-xl p-6 md:p-8 shadow-lg relative overflow-hidden">
               <div className="relative">
-                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900 border-b border-gray-300 pb-2">
                   Quick Access Services
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -559,9 +571,9 @@ const System = () => {
                     <button
                       key={service.id}
                       onClick={(e) => handleServiceClick(service.id, e)}
-                      className="bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm text-left"
+                      className="bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-gray-200 backdrop-blur-sm text-left"
                     >
-                      <h3 className="font-bold text-lg">{service.name}</h3>
+                      <h3 className="font-bold text-lg text-gray-900">{service.name}</h3>
                     </button>
                   ))}
                 </div>
@@ -571,8 +583,8 @@ const System = () => {
         </main>
 
         {/* Footer */}
-        <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
-          <div className="border-t border-blue-700/30 pt-6">
+        <footer className="relative z-30 py-6 text-center text-gray-600 text-sm">
+          <div className="border-t border-gray-300 pt-6">
             © {new Date().getFullYear()} Digital Liberia. All rights reserved.
           </div>
         </footer>
