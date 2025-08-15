@@ -1,6 +1,10 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import Home from './Home';
 import System from '@components/System';
+import Dssn from './Dssn';
+import LibPay from './LibPay';
+import Digitalliberia from './Digitalliberia';
 import MoeDashboard from '@components/MoeDashboard';
 import ProtectedRoute from '@components/ProtectedRoute';
 import StudentProfile from '@components/StudentProfile';
@@ -31,11 +35,56 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route
+        path="/"
+        element={
+          <>
+            {console.log('AppRoutes.jsx - Rendering Home component')}
+            <Home />
+          </>
+        }
+      />
+      <Route
         path="/system"
         element={
           <>
             {console.log('AppRoutes.jsx - Rendering System component')}
             <System />
+          </>
+        }
+      />
+      <Route
+        path="/dssn"
+        element={
+          <>
+            {console.log('AppRoutes.jsx - Rendering Dssn component')}
+            <Dssn />
+          </>
+        }
+      />
+      <Route
+        path="/libpay"
+        element={
+          <>
+            {console.log('AppRoutes.jsx - Rendering LibPay component')}
+            <LibPay />
+          </>
+        }
+      />
+      <Route
+        path="/digital-liberia"
+        element={
+          <>
+            {console.log('AppRoutes.jsx - Rendering Digitalliberia component')}
+            <Digitalliberia />
+          </>
+        }
+      />
+      <Route
+        path="/liberian-post"
+        element={
+          <>
+            {console.log('AppRoutes.jsx - Rendering LiberianPost component')}
+            <div>LiberianPost component placeholder</div>
           </>
         }
       />
@@ -337,7 +386,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="*" element={<Navigate to="/system" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
