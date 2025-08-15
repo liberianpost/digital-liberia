@@ -1,109 +1,48 @@
-import React, { useEffect, useState, Component } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
-import { getDefaultRouteForLevel } from './utils/dashboardManager';
+import React, { Component } from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './AppRoutes';
-import { CircularProgress, Box, Typography } from '@mui/material';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CacheProvider } from '@emotion/react';
-import createCache from '@emotion/cache';
+import { AuthProvider } from '@context/AuthContext';
 
-// Create Emotion cache
-const cache = createCache({
-  key: 'css',
-  prepend: true,
-});
-
-// Create MUI theme
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    background: {
-      default: '#f5f5f5',
-    },
-  },
-});
-
-// Error Boundary Component
 class ErrorBoundary extends Component {
-  state = { hasError: false, error: null };
+  state = { error: null };
 
   static getDerivedStateFromError(error) {
-    return { hasError: true, error };
+    console.error('App.jsx - ErrorBoundary caught:', error, error.stack);
+    return { error };
   }
 
   render() {
-    if (this.state.hasError) {
+    if (this.state.error) {
       return (
-        <Box p={4}>
-          <Typography color="error" variant="h6">
-            Error: {this.state.error?.message || 'An unexpected error occurred'}
-          </Typography>
-        </Box>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+            <h1 className="text-2xl font-bold mb-4">Something Went Wrong</h1>
+            <p className="text-red-600 mb-6">{this.state.error.message || 'An unexpected error occurred'}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
       );
     }
     return this.props.children;
   }
 }
 
-function AppNavigator() {
-  const { user, loading } = useAuth() || { user: null, loading: true };
-  const navigate = useNavigate();
-  const [initialized, setInitialized] = useState(false);
-
-  useEffect(() => {
-    console.log('App.jsx - AppNavigator useEffect - loading:', loading, 'user:', user);
-    if (!loading) {
-      try {
-        if (user && user.securityLevel) {
-          const defaultRoute = getDefaultRouteForLevel(user.securityLevel);
-          console.log('App.jsx - Navigating to default route:', defaultRoute);
-          navigate(defaultRoute, { replace: true });
-        } else {
-          console.log('App.jsx - Navigating to /system (no user or invalid user)');
-          navigate('/system', { replace: true });
-        }
-        setInitialized(true);
-      } catch (error) {
-        console.error('App.jsx - Navigation error:', error);
-        setInitialized(true);
-      }
-    }
-  }, [user, loading, navigate]);
-
-  if (!initialized || loading) {
-    return (
-      <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-        bgcolor="background.default"
-      >
-        <CircularProgress />
-        <Typography mt={2}>Loading application...</Typography>
-      </Box>
-    );
-  }
-
+const App = () => {
+  console.log('App.jsx - Rendering App component');
   return (
     <ErrorBoundary>
-      <AppRoutes />
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
     </ErrorBoundary>
   );
-}
-
-function App() {
-  return (
-    <CacheProvider value={cache}>
-      <ThemeProvider theme={theme}>
-        <ErrorBoundary>
-          <AppNavigator />
-        </ErrorBoundary>
-      </ThemeProvider>
-    </CacheProvider>
-  );
-}
+};
 
 export default App;
