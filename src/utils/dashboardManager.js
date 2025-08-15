@@ -1,8 +1,6 @@
-import { DashboardItems } from '@/config/dashboardItems';
-import { getCurrentSecurityLevel } from '@/utils/auth';
-import { SecurityLevels } from '@/utils/auth';
+import { DashboardItems } from '@config/dashboardItems';
+import { SecurityLevels } from './auth';
 
-// Default routes mapped to security levels (inferred from Kotlin's defaultFragments)
 const defaultRoutes = {
   [SecurityLevels.STUDENT]: '/moe/student-profile',
   [SecurityLevels.PARENT]: '/moe/student-reports',
@@ -10,30 +8,19 @@ const defaultRoutes = {
   [SecurityLevels.SCHOOL_ADMIN]: '/moe/school-management',
   [SecurityLevels.MINISTRY_OFFICIAL]: '/moe/district-reports',
   [SecurityLevels.DATABASE_ADMIN]: '/moe/database-tools',
-  [SecurityLevels.SYSTEM_ADMIN]: '/moe/system-settings'
+  [SecurityLevels.SYSTEM_ADMIN]: '/moe/system-settings',
 };
 
 export function getDefaultRouteForLevel(securityLevel) {
-  return defaultRoutes[securityLevel] || '/moe/dashboard'; // Fallback to a generic dashboard
+  return defaultRoutes[securityLevel] || '/moe/dashboard';
 }
 
-export function getAvailableDashboardItems() {
-  const currentLevel = getCurrentSecurityLevel();
-  console.log(`=== START getAvailableDashboardItems ===`);
-  console.log(`Input security level: ${currentLevel}`);
-
-  console.log('All dashboard items:');
-  DashboardItems.forEach(item => {
-    console.log(`- ${item.title} (Level ${item.requiredLevel}) -> ${item.path}`);
+export function getAvailableDashboardItems(securityLevel) {
+  const currentLevel = securityLevel || SecurityLevels.STUDENT;
+  return DashboardItems.filter(item => {
+    const levels = Object.values(SecurityLevels);
+    const requiredIndex = levels.indexOf(item.requiredLevel);
+    const userIndex = levels.indexOf(currentLevel);
+    return userIndex >= requiredIndex;
   });
-
-  const availableItems = DashboardItems.filter(item => item.requiredLevel <= currentLevel);
-
-  console.log(`Filtered items for level ${currentLevel}:`);
-  availableItems.forEach(item => {
-    console.log(`- ${item.title} (Level ${item.requiredLevel})`);
-  });
-
-  console.log(`=== END getAvailableDashboardItems ===`);
-  return availableItems;
 }
