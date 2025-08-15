@@ -9,6 +9,8 @@ export default defineConfig({
       babel: {
         plugins: [
           ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }],
+          // Add Emotion plugin to ensure proper CSS-in-JS handling
+          ['@emotion', { autoLabel: true, labelFormat: '[local]' }],
         ],
       },
     }),
@@ -19,7 +21,7 @@ export default defineConfig({
       '@context': path.resolve(__dirname, 'src/context'),
       '@components': path.resolve(__dirname, 'src/components'),
       '@utils': path.resolve(__dirname, 'src/utils'),
-      '@config': path.resolve(__dirname, 'src/config'), // Ensure @config alias
+      '@config': path.resolve(__dirname, 'src/config'),
     },
   },
   esbuild: {
@@ -29,6 +31,8 @@ export default defineConfig({
   },
   build: {
     sourcemap: true, // Enable source maps for debugging
+    minify: 'esbuild',
+    target: 'esnext',
     rollupOptions: {
       output: {
         assetFileNames: 'assets/[name]-[hash][extname]',
@@ -38,34 +42,37 @@ export default defineConfig({
             if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
               return 'vendor-react';
             }
+            if (id.includes('@emotion') || id.includes('emotion')) {
+              return 'vendor-emotion'; // Separate Emotion chunk to avoid initialization issues
+            }
             return 'vendor';
           }
-          // Ensure config files are bundled
           if (id.includes('src/config')) {
             return 'config';
+          }
+          if (id.includes('src/utils')) {
+            return 'utils'; // Separate utils to avoid circular dependencies
           }
         },
       },
     },
     chunkSizeWarningLimit: 1600,
-    minify: 'esbuild',
-    target: 'esnext',
   },
   server: {
-    port: 3001,
-    strictPort: true,
-    open: false,
-    host: '0.0.0.0',
+    port: 3002, // Changed from 3001 to avoid conflicts
+    strictPort: false, // Allow Vite to pick another port if 3002 is in use
+    host: '0.0.0.0', // Allow localhost and network access
+    open: true, // Auto-open browser
     hmr: {
       overlay: true,
-      clientPort: 3001,
+      clientPort: 3002, // Match new port
     },
     fs: {
       strict: false,
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
+    include: ['react', 'react-dom', 'react-router-dom', '@emotion/react', '@emotion/styled'],
     esbuildOptions: {
       target: 'esnext',
     },
@@ -74,4 +81,5 @@ export default defineConfig({
     'process.env': {},
   },
   clearScreen: true,
+  logLevel: 'info', // Verbose logging for debugging
 });
