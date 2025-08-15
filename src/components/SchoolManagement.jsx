@@ -1,150 +1,197 @@
-// src/components/SchoolManagement.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  Box,
-  Avatar,
-  useTheme
-} from '@mui/material';
-import { 
-  ArrowBack as BackIcon,
-  People as TeacherIcon,
-  School as SchoolIcon,
-  Person as StudentIcon,
-  FamilyRestroom as ParentIcon,
-  Announcement as AnnouncementIcon
-} from '@mui/icons-material';
+import { useAuth } from '@context/AuthContext';
+import { SecurityLevels } from '@utils/securityLevels';
+import { hasPermission } from '@utils/auth';
 
 const managementItems = [
   {
-    title: "Teacher Management",
-    description: "Manage teacher profiles and assignments",
-    Icon: TeacherIcon,
-    color: '#4CAF50', // Green
-    path: '/teacher-management'
+    title: 'Teacher Management',
+    description: 'Manage teacher profiles and assignments',
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 4.5v15m7.5-7.5h-15"
+        />
+      </svg>
+    ),
+    color: 'bg-green-500',
+    textColor: 'text-white',
+    path: '/moe/teacher-management'
   },
   {
-    title: "Students Registration",
-    description: "Register new students and enrollments",
-    Icon: StudentIcon,
-    color: '#2196F3', // Blue
-    path: '/student-registration'
+    title: 'Students Registration',
+    description: 'Register new students and enrollments',
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
+      </svg>
+    ),
+    color: 'bg-blue-500',
+    textColor: 'text-white',
+    path: '/moe/student-registration'
   },
   {
-    title: "Student Management",
-    description: "Manage existing student records",
-    Icon: StudentIcon,
-    color: '#9C27B0', // Purple
-    path: '/student-management'
+    title: 'Student Management',
+    description: 'Manage existing student records',
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
+      </svg>
+    ),
+    color: 'bg-purple-500',
+    textColor: 'text-white',
+    path: '/moe/student-management'
   },
   {
-    title: "Parent Management",
-    description: "Manage parent accounts and connections",
-    Icon: ParentIcon,
-    color: '#FF9800', // Orange
-    path: '/parent-management'
+    title: 'Parent Management',
+    description: 'Manage parent accounts and connections',
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+        />
+      </svg>
+    ),
+    color: 'bg-orange-500',
+    textColor: 'text-white',
+    path: '/moe/parent-management'
   },
   {
-    title: "Announcement Management",
-    description: "Create and manage school announcements",
-    Icon: AnnouncementIcon,
-    color: '#F44336', // Red
-    path: '/announcement-management'
+    title: 'Announcement Management',
+    description: 'Create and manage school announcements',
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.379c.4 0 .78.157 1.06.44l2.12 2.12 1.414-.707"
+        />
+      </svg>
+    ),
+    color: 'bg-red-500',
+    textColor: 'text-white',
+    path: '/moe/announcement-management'
   }
 ];
 
 const ManagementCard = ({ item }) => {
   const navigate = useNavigate();
-  const theme = useTheme();
-  
-  // Determine text color based on card background
-  const getContrastText = (bgColor) => {
-    const color = bgColor.charAt(0) === '#' ? bgColor.substring(1, 7) : bgColor;
-    const r = parseInt(color.substring(0, 2), 16); // hexToR
-    const g = parseInt(color.substring(2, 4), 16); // hexToG
-    const b = parseInt(color.substring(4, 6), 16); // hexToB
-    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 128 ? 'black' : 'white';
-  };
-
-  const textColor = getContrastText(item.color);
 
   return (
-    <Card 
-      sx={{ 
-        height: '100%', 
-        display: 'flex', 
-        flexDirection: 'column',
-        backgroundColor: item.color,
-        color: textColor,
-        cursor: 'pointer',
-        transition: 'transform 0.2s',
-        '&:hover': {
-          transform: 'scale(1.03)'
-        }
-      }}
+    <div
+      className={`${item.color} ${item.textColor} rounded-lg p-6 h-full flex flex-col cursor-pointer hover:scale-105 transition-transform`}
       onClick={() => navigate(item.path)}
     >
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <Avatar sx={{ 
-            bgcolor: 'rgba(255, 255, 255, 0.2)', 
-            mr: 2,
-            color: textColor 
-          }}>
-            <item.Icon />
-          </Avatar>
-          <Typography variant="h6" component="h3">
-            {item.title}
-          </Typography>
-        </Box>
-        <Typography variant="body2" sx={{ color: textColor }}>
-          {item.description}
-        </Typography>
-      </CardContent>
-    </Card>
+      <div className="flex items-center mb-4">
+        <div className="bg-white bg-opacity-20 rounded-full p-2 mr-2">
+          {item.icon}
+        </div>
+        <h3 className="text-lg font-bold">{item.title}</h3>
+      </div>
+      <p className="text-sm">{item.description}</p>
+    </div>
   );
 };
 
-export default function SchoolManagement() {
+const SchoolManagement = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const REQUIRED_SECURITY_LEVEL = SecurityLevels.SCHOOL_ADMIN;
+
+  useEffect(() => {
+    if (!user || !hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
+      alert('Access denied. Requires SCHOOL ADMIN privileges.');
+      navigate('/moe/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      {/* App Bar */}
-      <AppBar position="static" elevation={4} sx={{ backgroundColor: 'white' }}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={() => navigate(-1)}
-            sx={{ mr: 2, color: 'black' }}
-          >
-            <BackIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: 'black' }}>
-            School Management
-          </Typography>
-        </Toolbar>
-      </AppBar>
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white text-black p-4 shadow-md border-b border-gray-200">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div className="flex items-center">
+            <button
+              onClick={() => navigate(-1)}
+              className="mr-4 text-black"
+              aria-label="Go back"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+            </button>
+            <h1 className="text-xl font-bold">School Management</h1>
+          </div>
+        </div>
+      </div>
 
-      {/* Management Grid */}
-      <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
-        <Grid container spacing={3}>
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {managementItems.map((item, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <ManagementCard item={item} />
-            </Grid>
+            <ManagementCard key={index} item={item} />
           ))}
-        </Grid>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
-}
+};
+
+export default SchoolManagement;
