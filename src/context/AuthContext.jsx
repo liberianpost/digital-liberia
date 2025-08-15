@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '@/api';
-import { SecurityLevels } from '@/utils/auth';
+import { SecurityLevels, handleLoginSuccess } from '@/utils/auth';
 
 const AuthContext = createContext();
 
@@ -10,12 +10,13 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const initializeAuth = () => {
-      const storedAuth = localStorage.getItem("moeAuth");
+      const storedAuth = localStorage.getItem('moeAuth');
       if (storedAuth) {
         try {
           setUser(JSON.parse(storedAuth));
         } catch (e) {
-          localStorage.removeItem("moeAuth");
+          console.error('Failed to parse moeAuth:', e);
+          localStorage.removeItem('moeAuth');
         }
       }
       setLoading(false);
@@ -23,37 +24,41 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const login = async (credentials) => {
+  const login = async (credentials, navigate) => {
     try {
       setLoading(true);
-      const response = await api.post("/auth/moe_login", credentials);
-      
+      const response = await api.post('/auth/moe_login', credentials);
+
       if (response.data?.success) {
         const userData = {
           ...response.data.data,
-          securityLevel: response.data.data.securityLevel || SecurityLevels.STUDENT
+          securityLevel: response.data.data.securityLevel || SecurityLevels.STUDENT,
         };
-        
-        localStorage.setItem("moeAuth", JSON.stringify(userData));
         setUser(userData);
+        handleLoginSuccess(userData, navigate); // Pass navigate
         return { success: true };
       }
-      
-      return { success: false, error: response.data?.message || "Login failed" };
+
+      return { success: false, error: response.data?.message || 'Login failed' };
     } catch (error) {
+      console.error('Login error:', error);
       return {
         success: false,
-        error: error.response?.data?.message || error.message
+        error: error.response?.data?.message || error.message,
       };
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("moeAuth");
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    localStorage.removeItem('moeAuth');
     setUser(null);
-    api.post("/auth/logout");
   };
 
   return (
@@ -66,7 +71,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
+    throw new Error('useAuth must be used within AuthProvider');
   }
   return context;
 };
