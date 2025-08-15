@@ -1,13 +1,8 @@
-<<<<<<< Updated upstream
 import React, { useState, useEffect, Component } from 'react';
-=======
-import React, { useState, useEffect } from 'react';
->>>>>>> Stashed changes
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
 import { SecurityLevels, handleLoginSuccess } from '@utils/auth';
 import { DashboardItems } from '@config/dashboardItems';
-<<<<<<< Updated upstream
 
 // Error Boundary Component
 class ErrorBoundary extends Component {
@@ -38,8 +33,6 @@ class ErrorBoundary extends Component {
     return this.props.children;
   }
 }
-=======
->>>>>>> Stashed changes
 
 // Navigation links
 const navLinks = [
