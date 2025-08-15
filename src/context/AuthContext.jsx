@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '@/api';
-import { SecurityLevels, handleLoginSuccess } from '@utils/auth';
-import { getCurrentSecurityLevel } from '@utils/auth';
+import { SecurityLevels } from '@utils/securityLevels';
+import { handleLoginSuccess, getCurrentSecurityLevel } from '@utils/auth';
 
 console.log('AuthContext.jsx - Initializing AuthContext');
 
@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = async (username, password) => {
+  const login = async (username, password, navigate) => {
     try {
       console.log('AuthContext.jsx - Attempting login for:', username);
       const response = await api.post('/auth/moe_login', { username, password });
@@ -56,6 +56,7 @@ export const AuthProvider = ({ children }) => {
       };
       setUser(userData);
       setIsAuthenticated(true);
+      handleLoginSuccess(userData, navigate);
       return userData;
     } catch (error) {
       console.error('AuthContext.jsx - Login error:', error);
