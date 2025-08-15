@@ -1,61 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { SecurityLevels, hasPermission } from '../utils/auth';
+import { useAuth } from '@context/AuthContext';
+import { SecurityLevels } from '@utils/securityLevels';
+import { hasPermission } from '@utils/auth';
+import api from '@utils/api';
 
 const SchoolAdminManagement = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-
   const REQUIRED_SECURITY_LEVEL = SecurityLevels.DATABASE_ADMIN;
+  const [admins, setAdmins] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Check permissions and redirect if unauthorized
-  if (!hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
-    alert("Access denied. Requires DATABASE ADMIN privileges.");
-    navigate(-1);
-    return null;
-  }
+  useEffect(() => {
+    if (!user || !hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
+      alert('Access denied. Requires DATABASE ADMIN privileges.');
+      navigate(-1);
+    } else {
+      setLoading(true);
+      api.get('/school-admins')
+        .then(response => {
+          setAdmins(response.data);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Error fetching admins:', error);
+          alert('Failed to load administrators.');
+          setLoading(false);
+        });
+    }
+  }, [user, navigate]);
 
-  // Dummy admin data (replace with actual data from API/ViewModel)
-  const [admins] = useState([
-    {
-      name: 'Alice Brown',
-      school: 'Springfield High',
-      county: 'Springfield County',
-      district: 'Central District',
-      city: 'Springfield',
-    },
-    {
-      name: 'Bob Wilson',
-      school: 'Lincoln Elementary',
-      county: 'Jefferson County',
-      district: 'North District',
-      city: 'Jefferson',
-    },
-    {
-      name: 'Carol Davis',
-      school: 'Washington Middle',
-      county: 'Washington County',
-      district: 'South District',
-      city: 'Washington',
-    },
-  ]);
-
-  const handleAddAdmin = () => {
-    alert('Add New Administrator feature coming soon');
+  const handleAddAdmin = async () => {
+    try {
+      await api.post('/school-admins/add');
+      alert('Add New Administrator feature initiated.');
+    } catch (error) {
+      console.error('Error adding admin:', error);
+      alert('Failed to initiate add administrator.');
+    }
   };
 
   const handleFilter = (type) => {
     alert(`Filter by ${type} feature coming soon`);
   };
 
-  const handleAdminAction = (admin, action) => {
-    alert(`${action} admin ${admin.name} feature coming soon`);
+  const handleAdminAction = async (admin, action) => {
+    try {
+      await api.post(`/school-admins/${admin.id}/${action.toLowerCase()}`);
+      alert(`${action} admin ${admin.name} initiated.`);
+    } catch (error) {
+      console.error(`Error performing ${action} on admin:`, error);
+      alert(`Failed to ${action.toLowerCase()} admin ${admin.name}.`);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-4/5 bg-gray-200 rounded-full h-2">
+          <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '50%' }}></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Toolbar */}
       <div className="bg-white text-black p-4 shadow-md border-b border-gray-200">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center">
@@ -84,16 +95,10 @@ const SchoolAdminManagement = () => {
         </div>
       </div>
 
-      {/* Content Area */}
       <div className="p-4 max-w-3xl mx-auto">
-        {/* Header Card */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-          <h2 className="text-lg font-bold text-black">
-            School Administrator Management
-          </h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Manage administrators by location
-          </p>
+          <h2 className="text-lg font-bold text-black">School Administrator Management</h2>
+          <p className="mt-1 text-sm text-gray-600">Manage administrators by location</p>
           <div className="mt-2 flex space-x-2">
             <button
               onClick={() => handleFilter('County')}
@@ -178,22 +183,24 @@ const SchoolAdminManagement = () => {
           </button>
         </div>
 
-        {/* Admin List */}
         <div className="space-y-2">
-          {admins.map((admin, index) => (
-            <AdminCard
-              key={index}
-              admin={admin}
-              onAction={handleAdminAction}
-            />
-          ))}
+          {admins.length === 0 ? (
+            <p className="text-gray-500 text-center">No administrators available.</p>
+          ) : (
+            admins.map((admin, index) => (
+              <AdminCard
+                key={index}
+                admin={admin}
+                onAction={handleAdminAction}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-// AdminCard component to replace SchoolAdminAdapter
 const AdminCard = ({ admin, onAction }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -202,6 +209,10 @@ const AdminCard = ({ admin, onAction }) => {
           src="/logos/admin.png"
           alt="Admin icon"
           className="w-10 h-10 object-contain"
+          onError={(e) => {
+            console.error('Failed to load admin icon');
+            e.target.src = 'https://via.placeholder.com/40?text=Admin';
+          }}
         />
         <div className="ml-4 flex-1">
           <h3 className="text-base font-bold text-black">{admin.name}</h3>
