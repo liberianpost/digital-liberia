@@ -19,6 +19,7 @@ const cache = createCache({
 const container = document.getElementById('root');
 if (!container) {
   console.error('Failed to find root element with ID "root". Check index.html.');
+  document.body.innerHTML = '<h1>Error: Root element not found</h1>';
   throw new Error('Failed to find root element');
 }
 
@@ -27,14 +28,19 @@ console.log('Mounting React app...');
 
 const root = createRoot(container);
 
-root.render(
-  <React.StrictMode>
-    <CacheProvider value={cache}>
-      <BrowserRouter>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </BrowserRouter>
-    </CacheProvider>
-  </React.StrictMode>
-);
+try {
+  root.render(
+    <React.StrictMode>
+      <CacheProvider value={cache}>
+        <BrowserRouter>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </BrowserRouter>
+      </CacheProvider>
+    </React.StrictMode>
+  );
+} catch (error) {
+  console.error('Root render error:', error);
+  document.body.innerHTML = '<h1>Error: Failed to render application</h1>';
+}
