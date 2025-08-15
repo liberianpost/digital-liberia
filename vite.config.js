@@ -8,10 +8,14 @@ export default defineConfig({
       jsxImportSource: '@emotion/react',
       babel: {
         plugins: [
-          '@emotion/babel-plugin', // Simplified configuration
-        ],
-      },
-    }),
+          ['@emotion/babel-plugin', {
+            sourceMap: true,
+            autoLabel: 'dev-only',
+            labelFormat: '[local]'
+          }]
+        ]
+      }
+    })
   ],
   resolve: {
     alias: {
@@ -19,45 +23,26 @@ export default defineConfig({
       '@context': path.resolve(__dirname, 'src/context'),
       '@components': path.resolve(__dirname, 'src/components'),
       '@utils': path.resolve(__dirname, 'src/utils'),
-      '@config': path.resolve(__dirname, 'src/config'),
-    },
-    dedupe: [
-      'react',
-      'react-dom',
-      '@emotion/react',
-      '@emotion/styled',
-    ],
+      '@config': path.resolve(__dirname, 'src/config')
+    }
   },
   optimizeDeps: {
     include: [
       '@emotion/react',
       '@emotion/styled',
-      '@mui/material',
+      '@mui/material'
     ],
     esbuildOptions: {
       define: {
-        global: 'globalThis',
-      },
-    },
-  },
-  build: {
-    commonjsOptions: {
-      transformMixedEsModules: true,
-    },
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'emotion': ['@emotion/react', '@emotion/styled'],
-          'mui': ['@mui/material'],
-        }
+        global: 'globalThis'
       }
     }
   },
   define: {
-    'process.env': {},
     global: 'globalThis',
+    'process.env': {}
   },
   server: {
-    port: 3005,
-  },
+    port: 3005
+  }
 });
