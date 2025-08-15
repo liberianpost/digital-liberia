@@ -1,49 +1,49 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
+import { SecurityLevels } from '@utils/securityLevels';
+import { hasPermission } from '@utils/auth';
+import api from '@utils/api';
 
 const Reports = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const REQUIRED_SECURITY_LEVEL = SecurityLevels.SCHOOL_ADMIN;
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Match Android reports
-  const reports = [
-    {
-      id: 'enrollment-statistics',
-      title: 'Enrollment Statistics',
-      lastUpdated: 'Last updated: 2 days ago',
-      icon: '/logos/report.png',
-    },
-    {
-      id: 'attendance-summary',
-      title: 'Attendance Summary',
-      lastUpdated: 'Last updated: 1 week ago',
-      icon: '/logos/report.png',
-    },
-    {
-      id: 'academic-performance',
-      title: 'Academic Performance',
-      lastUpdated: 'Last updated: 3 days ago',
-      icon: '/logos/report.png',
-    },
-    {
-      id: 'teacher-evaluation',
-      title: 'Teacher Evaluation',
-      lastUpdated: 'Last updated: 1 month ago',
-      icon: '/logos/report.png',
-    },
-  ];
+  useEffect(() => {
+    if (!user || !hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
+      alert('Access denied. Requires SCHOOL ADMIN privileges.');
+      navigate('/system', { replace: true });
+    } else {
+      setLoading(true);
+      api.get('/reports')
+        .then(response => {
+          setReports(response.data);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Error fetching reports:', error);
+          alert('Failed to load reports.');
+          setLoading(false);
+        });
+    }
+  }, [user, navigate]);
 
-  // Redirect if not authenticated
-  if (!user) {
-    navigate('/system', { replace: true });
-    return null;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-4/5 bg-gray-200 rounded-full h-2">
+          <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '50%' }}></div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-white p-4">
       <div className="max-w-4xl mx-auto">
-        {/* Toolbar */}
         <div className="bg-white shadow-md p-4 flex items-center justify-between">
           <button
             onClick={() => navigate('/moe/dashboard')}
@@ -65,30 +65,34 @@ const Reports = () => {
             </svg>
           </button>
           <h1 className="text-xl font-bold text-gray-800">Reports</h1>
-          <div className="w-6" /> {/* Spacer for alignment */}
+          <div className="w-6" />
         </div>
 
-        {/* Reports List */}
         <div className="mt-4 space-y-4">
-          {reports.map((report) => (
-            <div
-              key={report.id}
-              className="bg-white rounded-lg shadow-md p-4 flex items-center"
-            >
-              <img
-                src={report.icon}
-                alt={report.title}
-                className="w-12 h-12 mr-4 object-contain"
-                onError={(e) => {
-                  e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"%3E%3Cpath d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/%3E%3C/svg%3E';
-                }}
-              />
-              <div>
-                <h2 className="text-base font-bold text-gray-800">{report.title}</h2>
-                <p className="text-sm text-gray-600">{report.lastUpdated}</p>
+          {reports.length === 0 ? (
+            <p className="text-gray-500 text-center">No reports available.</p>
+          ) : (
+            reports.map((report) => (
+              <div
+                key={report.id}
+                className="bg-white rounded-lg shadow-md p-4 flex items-center"
+              >
+                <img
+                  src={report.icon || '/logos/report.png'}
+                  alt={report.title}
+                  className="w-12 h-12 mr-4 object-contain"
+                  onError={(e) => {
+                    console.error('Failed to load report icon');
+                    e.target.src = 'https://via.placeholder.com/48?text=Report';
+                  }}
+                />
+                <div>
+                  <h2 className="text-base font-bold text-gray-800">{report.title}</h2>
+                  <p className="text-sm text-gray-600">{report.lastUpdated}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
