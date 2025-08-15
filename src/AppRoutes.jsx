@@ -1,432 +1,144 @@
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '@context/AuthContext';
-import { SecurityLevels, hasPermission } from '@utils/auth';
-import { Box, Typography } from '@mui/material';
-import React, { Component } from 'react';
 import System from '@components/System';
 import MoeDashboard from '@components/MoeDashboard';
-import SystemSettings from '@components/SystemSettings';
-import SchoolManagement from '@components/SchoolManagement';
-import StudentRegistration from '@components/StudentRegistration';
-import StudentManagement from '@components/StudentManagement';
-import ParentManagement from '@components/ParentManagement';
-import ParentDetails from '@components/ParentDetails';
-import AddParent from '@components/AddParent';
-import AnnouncementManagement from '@components/AnnouncementManagement';
-import StudentRecords from '@components/StudentRecords';
-import TeacherManagement from '@components/TeacherManagement';
-import Reports from '@components/Reports';
+import ProtectedRoute from '@components/ProtectedRoute';
 import StudentProfile from '@components/StudentProfile';
-import ClassManagement from '@components/ClassManagement';
-import DistrictReports from '@components/DistrictReports';
-import DistrictOverview from '@components/DistrictOverview';
-import SchoolReports from '@components/SchoolReports';
+import SystemSettings from '@components/SystemSettings';
+import StudentRegistration from '@components/StudentRegistration';
 import StudentReports from '@components/StudentReports';
-import TeacherReports from '@components/TeacherReports';
-import ComplianceReports from '@components/ComplianceReports';
+import ClassManagement from '@components/ClassManagement';
+import StudentRecords from '@components/StudentRecords';
+import SchoolManagement from '@components/SchoolManagement';
+import TeacherManagement from '@components/TeacherManagement';
+import DistrictReports from '@components/DistrictReports';
 import DatabaseTools from '@components/DatabaseTools';
 import UserManagement from '@components/UserManagement';
-import MinistryEmployeeManagement from '@components/MinistryEmployeeManagement';
-import SchoolAdminManagement from '@components/SchoolAdminManagement';
 
-// Error Boundary Component
-class ErrorBoundary extends Component {
-  state = { hasError: false, error: null };
-
-  static getDerivedStateFromError(error) {
-    console.error('AppRoutes.jsx - ErrorBoundary caught:', error, error.stack);
-    return { hasError: true, error };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <Box p={4}>
-          <Typography color="error" variant="h6">
-            Route Error: {this.state.error?.message || 'Failed to render component'}
-          </Typography>
-          <Typography>
-            Check the console for details and try refreshing the page.
-          </Typography>
-          <Box mt={2}>
-            <button
-              onClick={() => window.location.reload()}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: '#1976d2',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
-            >
-              Reload Page
-            </button>
-          </Box>
-        </Box>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-function AppRoutes() {
-  const { user, isAuthenticated, loading } = useAuth() || { user: null, isAuthenticated: false, loading: false };
-  console.log('AppRoutes.jsx - user:', user, 'isAuthenticated:', isAuthenticated, 'loading:', loading);
-
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-      >
-        <Typography>Loading routes...</Typography>
-      </Box>
-    );
-  }
-
+const AppRoutes = () => {
+  console.log('AppRoutes.jsx - Rendering AppRoutes component');
   return (
     <Routes>
       <Route
-        path="/"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering System component')}
-            <System />
-          </ErrorBoundary>
-        }
-      />
-      <Route
         path="/system"
         element={
-          <ErrorBoundary>
+          <>
             {console.log('AppRoutes.jsx - Rendering System component')}
             <System />
-          </ErrorBoundary>
+          </>
         }
       />
       <Route
         path="/moe/dashboard"
         element={
-          <ErrorBoundary>
+          <ProtectedRoute>
             {console.log('AppRoutes.jsx - Rendering MoeDashboard component')}
-            {isAuthenticated ? <MoeDashboard /> : <Navigate to="/system" />}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/system-settings"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering SystemSettings component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SYSTEM_ADMIN) ? (
-              <SystemSettings />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/school-management"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering SchoolManagement component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
-              <SchoolManagement />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/student-registration"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering StudentRegistration component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
-              <StudentRegistration />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/student-management"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering StudentManagement component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
-              <StudentManagement />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/parent-management"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering ParentManagement component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
-              <ParentManagement />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/parent-details"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering ParentDetails component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
-              <ParentDetails />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/add-parent"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering AddParent component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
-              <AddParent />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/announcement-management"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering AnnouncementManagement component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
-              <AnnouncementManagement />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/student-records"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering StudentRecords component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
-              <StudentRecords />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/teacher-management"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering TeacherManagement component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
-              <TeacherManagement />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/reports"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering Reports component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
-              <Reports />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
+            <MoeDashboard />
+          </ProtectedRoute>
         }
       />
       <Route
         path="/moe/student-profile"
         element={
-          <ErrorBoundary>
+          <ProtectedRoute>
             {console.log('AppRoutes.jsx - Rendering StudentProfile component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.STUDENT) ? (
-              <StudentProfile />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
+            <StudentProfile />
+          </ProtectedRoute>
         }
       />
       <Route
-        path="/moe/class-management"
+        path="/moe/system-settings"
         element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering ClassManagement component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
-              <ClassManagement />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
+          <ProtectedRoute>
+            {console.log('AppRoutes.jsx - Rendering SystemSettings component')}
+            <SystemSettings />
+          </ProtectedRoute>
         }
       />
       <Route
-        path="/moe/district-reports"
+        path="/moe/student-registration"
         element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering DistrictReports component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
-              <DistrictReports />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/district-overview"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering DistrictOverview component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
-              <DistrictOverview />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/school-reports"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering SchoolReports component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
-              <SchoolReports />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
+          <ProtectedRoute>
+            {console.log('AppRoutes.jsx - Rendering StudentRegistration component')}
+            <StudentRegistration />
+          </ProtectedRoute>
         }
       />
       <Route
         path="/moe/student-reports"
         element={
-          <ErrorBoundary>
+          <ProtectedRoute>
             {console.log('AppRoutes.jsx - Rendering StudentReports component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.PARENT) ? (
-              <StudentReports />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
+            <StudentReports />
+          </ProtectedRoute>
         }
       />
       <Route
-        path="/moe/teacher-reports"
+        path="/moe/class-management"
         element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering TeacherReports component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
-              <TeacherReports />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
+          <ProtectedRoute>
+            {console.log('AppRoutes.jsx - Rendering ClassManagement component')}
+            <ClassManagement />
+          </ProtectedRoute>
         }
       />
       <Route
-        path="/moe/compliance-reports"
+        path="/moe/student-records"
         element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering ComplianceReports component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
-              <ComplianceReports />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
+          <ProtectedRoute>
+            {console.log('AppRoutes.jsx - Rendering StudentRecords component')}
+            <StudentRecords />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/moe/school-management"
+        element={
+          <ProtectedRoute>
+            {console.log('AppRoutes.jsx - Rendering SchoolManagement component')}
+            <SchoolManagement />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/moe/teacher-management"
+        element={
+          <ProtectedRoute>
+            {console.log('AppRoutes.jsx - Rendering TeacherManagement component')}
+            <TeacherManagement />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/moe/district-reports"
+        element={
+          <ProtectedRoute>
+            {console.log('AppRoutes.jsx - Rendering DistrictReports component')}
+            <DistrictReports />
+          </ProtectedRoute>
         }
       />
       <Route
         path="/moe/database-tools"
         element={
-          <ErrorBoundary>
+          <ProtectedRoute>
             {console.log('AppRoutes.jsx - Rendering DatabaseTools component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.DATABASE_ADMIN) ? (
-              <DatabaseTools />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
+            <DatabaseTools />
+          </ProtectedRoute>
         }
       />
       <Route
         path="/moe/user-management"
         element={
-          <ErrorBoundary>
+          <ProtectedRoute>
             {console.log('AppRoutes.jsx - Rendering UserManagement component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SYSTEM_ADMIN) ? (
-              <UserManagement />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
+            <UserManagement />
+          </ProtectedRoute>
         }
       />
-      <Route
-        path="/moe/ministry-employee-management"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering MinistryEmployeeManagement component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
-              <MinistryEmployeeManagement />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="/moe/school-admin-management"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering SchoolAdminManagement component')}
-            {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
-              <SchoolAdminManagement />
-            ) : (
-              <Navigate to="/system" />
-            )}
-          </ErrorBoundary>
-        }
-      />
-      <Route
-        path="*"
-        element={
-          <ErrorBoundary>
-            {console.log('AppRoutes.jsx - Rendering fallback Navigate to /system')}
-            <Navigate to="/system" />
-          </ErrorBoundary>
-        }
-      />
+      <Route path="*" element={<Navigate to="/system" replace />} />
     </Routes>
   );
-}
+};
 
 export default AppRoutes;
