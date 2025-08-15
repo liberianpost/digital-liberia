@@ -1,7 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
 import { SecurityLevels, hasPermission } from '@utils/auth';
-import System from './System';
+import { Box, Typography } from '@mui/material';
+import React, { Component } from 'react';
+import System from '@components/System';
 import MoeDashboard from '@components/MoeDashboard';
 import SystemSettings from '@components/SystemSettings';
 import SchoolManagement from '@components/SchoolManagement';
@@ -26,8 +28,6 @@ import DatabaseTools from '@components/DatabaseTools';
 import UserManagement from '@components/UserManagement';
 import MinistryEmployeeManagement from '@components/MinistryEmployeeManagement';
 import SchoolAdminManagement from '@components/SchoolAdminManagement';
-import { Box, Typography } from '@mui/material';
-import React, { Component } from 'react';
 
 // Error Boundary Component
 class ErrorBoundary extends Component {
@@ -53,7 +53,7 @@ class ErrorBoundary extends Component {
 
 function AppRoutes() {
   const { user, isAuthenticated, loading } = useAuth() || { user: null, isAuthenticated: false, loading: false };
-  console.log('AppRoutes - user:', user, 'isAuthenticated:', isAuthenticated, 'loading:', loading);
+  console.log('AppRoutes.jsx - user:', user, 'isAuthenticated:', isAuthenticated, 'loading:', loading);
 
   if (loading) {
     return (
