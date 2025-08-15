@@ -184,17 +184,8 @@ const MoeLoginModal = ({ onClose }) => {
 
     setLoading(true);
     try {
-      const result = await login(formData);
-      if (result.success) {
-        localStorage.setItem('MOE_LOGGED_IN', 'true');
-        localStorage.setItem('MOE_USERNAME', formData.username);
-        onClose();
-        const defaultRoute = handleLoginSuccess({
-          username: formData.username,
-          securityLevel: result.user?.securityLevel || SecurityLevels.STUDENT,
-        }) || '/moe/dashboard';
-        navigate(defaultRoute, { replace: true });
-      } else {
+      const result = await login(formData, navigate);
+      if (!result.success) {
         setError(result.error || 'Invalid username or password');
       }
     } catch (err) {
@@ -327,7 +318,7 @@ const MoeLoginModal = ({ onClose }) => {
 };
 
 const System = () => {
-  const { user, logout } = useAuth();
+  const { user, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [activeLogo, setActiveLogo] = useState(0);
@@ -335,8 +326,8 @@ const System = () => {
 
   // Log auth context for debugging
   useEffect(() => {
-    console.log('Auth context:', { user, isAuthenticated: !!user });
-  }, [user]);
+    console.log('Auth context:', { user, isAuthenticated: !!user, loading });
+  }, [user, loading]);
 
   // Logo carousel
   useEffect(() => {
@@ -348,26 +339,25 @@ const System = () => {
 
   // Handle auth state
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('MOE_LOGGED_IN') === 'true';
+    if (loading) return;
+    const isLoggedIn = localStorage.getItem('moeAuth') !== null;
     if (isLoggedIn && user && user.securityLevel) {
       console.log('Navigating with user:', user);
-      const defaultRoute = handleLoginSuccess(user) || '/moe/dashboard';
+      const defaultRoute = getDefaultRouteForLevel(user.securityLevel);
       if (location.pathname === '/system') {
         navigate(defaultRoute, { replace: true });
       }
     } else if (!user) {
       console.log('No user, clearing localStorage');
-      localStorage.removeItem('MOE_LOGGED_IN');
-      localStorage.removeItem('MOE_USERNAME');
+      localStorage.removeItem('moeAuth');
     }
-  }, [user, navigate, location.pathname]);
+  }, [user, loading, navigate, location.pathname]);
 
   const handleMinistryClick = (ministryId, e) => {
     e.stopPropagation();
     if (ministryId === 'education') {
       if (user) {
-        const defaultRoute = handleLoginSuccess(user) || '/moe/dashboard';
-        navigate(defaultRoute, { replace: true });
+        handleLoginSuccess(user, navigate);
       } else {
         setShowMoeLogin(true);
       }
@@ -384,10 +374,38 @@ const System = () => {
   const handleLogout = () => {
     console.log('Logging out user:', user);
     logout();
-    localStorage.removeItem('MOE_LOGGED_IN');
-    localStorage.removeItem('MOE_USERNAME');
     navigate('/system', { replace: true });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-blue-950 text-white">
+        <div className="flex items-center space-x-2">
+          <svg
+            className="animate-spin h-8 w-8 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+          <span>Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ErrorBoundary>
