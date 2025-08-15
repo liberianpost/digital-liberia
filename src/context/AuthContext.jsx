@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '@/api';
-import { SecurityLevels, handleLoginSuccess } from '@/utils/auth';
+import { SecurityLevels, handleLoginSuccess } from '@utils/auth';
 
 const AuthContext = createContext();
 
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
           securityLevel: response.data.data.securityLevel || SecurityLevels.STUDENT,
         };
         setUser(userData);
-        handleLoginSuccess(userData, navigate); // Pass navigate
+        handleLoginSuccess(userData, navigate);
         return { success: true };
       }
 
