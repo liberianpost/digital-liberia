@@ -1,20 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, useNavigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
 import { getDefaultRouteForLevel } from './utils/dashboardManager';
 import AppRoutes from './AppRoutes';
 import { CircularProgress, Box } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CacheProvider } from '@emotion/react';
-import createCache from '@emotion/cache';
 
-// Create Emotion cache
-const cache = createCache({
-  key: 'css',
-  prepend: true,
-});
-
-// Create MUI theme
+// Create MUI theme (moved outside component to prevent recreation)
 const theme = createTheme({
   palette: {
     mode: 'light',
@@ -64,15 +56,9 @@ function AppNavigator() {
 
 function App() {
   return (
-    <CacheProvider value={cache}>
-      <ThemeProvider theme={theme}>
-        <AuthProvider>
-          <BrowserRouter>
-            <AppNavigator />
-          </BrowserRouter>
-        </AuthProvider>
-      </ThemeProvider>
-    </CacheProvider>
+    <ThemeProvider theme={theme}>
+      <AppNavigator />
+    </ThemeProvider>
   );
 }
 
