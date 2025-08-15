@@ -23,6 +23,11 @@ export default defineConfig({
       '@config': path.resolve(__dirname, 'src/config'),
     },
   },
+  esbuild: {
+    loader: 'jsx',
+    include: /src\/.*\.(jsx?|tsx?)$/,
+    exclude: [],
+  },
   build: {
     sourcemap: true,
     minify: 'esbuild',
@@ -33,8 +38,16 @@ export default defineConfig({
         chunkFileNames: 'assets/[name]-[hash].js',
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (/react|react-dom|react-router-dom/.test(id)) return 'vendor-react';
-            if (/emotion/.test(id)) return 'vendor-emotion';
+            if (
+              id.includes('react') ||
+              id.includes('react-dom') ||
+              id.includes('react-router-dom')
+            ) {
+              return 'vendor-react';
+            }
+            if (id.includes('@emotion') || id.includes('emotion')) {
+              return 'vendor-emotion';
+            }
             return 'vendor';
           }
           if (id.includes('src/config')) return 'config';
@@ -49,14 +62,29 @@ export default defineConfig({
     strictPort: false,
     host: '0.0.0.0',
     open: false,
-    hmr: { overlay: true, clientPort: 3005 },
-    fs: { strict: false },
+    hmr: {
+      overlay: true,
+      clientPort: 3005,
+    },
+    fs: {
+      strict: false,
+    },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', '@emotion/react', '@emotion/styled'],
-    esbuildOptions: { target: 'esnext' },
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@emotion/react',
+      '@emotion/styled',
+    ],
+    esbuildOptions: {
+      target: 'esnext',
+    },
   },
-  define: { 'process.env': {} },
+  define: {
+    'process.env': {},
+  },
   clearScreen: true,
   logLevel: 'info',
 });
