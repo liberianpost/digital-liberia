@@ -1,10 +1,4 @@
 import React, { Component } from 'react';
-
-// Patch for Emotion's useInsertionEffect bug in production
-if (!React.useInsertionEffect) {
-  React.useInsertionEffect = React.useLayoutEffect;
-}
-
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { CacheProvider } from '@emotion/react';
@@ -13,14 +7,14 @@ import { AuthProvider } from '@context/AuthContext';
 import AppRoutes from './AppRoutes';
 import './index.css';
 
-const cache = createCache({ key: 'css' });
+// Patch for Emotion's useInsertionEffect in older React versions
+if (!React.useInsertionEffect) React.useInsertionEffect = React.useLayoutEffect;
+
+const cache = createCache({ key: 'css', prepend: true });
 
 class ErrorBoundary extends Component {
   state = { error: null };
-
-  static getDerivedStateFromError(error) {
-    return { error };
-  }
+  static getDerivedStateFromError(error) { return { error }; }
 
   render() {
     if (this.state.error) {
@@ -45,9 +39,9 @@ class ErrorBoundary extends Component {
 }
 
 const container = document.getElementById('root');
-if (!container) throw new Error('Failed to find root element');
-const root = createRoot(container);
+if (!container) throw new Error('Root element not found');
 
+const root = createRoot(container);
 root.render(
   <ErrorBoundary>
     <CacheProvider value={cache}>
