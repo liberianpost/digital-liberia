@@ -57,7 +57,7 @@
         "destination": "https://api.digitalliberia.com/api/"
       },
       {
-        "source": "!/assets/**",
+        "source": "**",
         "destination": "/index.html"
       }
     ]
