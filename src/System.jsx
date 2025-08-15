@@ -2,19 +2,18 @@ import React, { useState, useEffect, Component } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
 import { SecurityLevels, handleLoginSuccess } from '@utils/auth';
-import { DashboardItems } from '@config/dashboardItems';
 
 // Error Boundary Component
 class ErrorBoundary extends Component {
   state = { error: null };
 
   static getDerivedStateFromError(error) {
+    console.error('ErrorBoundary caught:', error, error.stack);
     return { error };
   }
 
   render() {
     if (this.state.error) {
-      console.error('ErrorBoundary caught:', this.state.error);
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
@@ -318,7 +317,7 @@ const MoeLoginModal = ({ onClose }) => {
 };
 
 const System = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [activeLogo, setActiveLogo] = useState(0);
@@ -596,24 +595,6 @@ const System = () => {
             </button>
           </div>
         )}
-
-        {/* Global Styles */}
-        <style jsx global>{`
-          @keyframes heartbeat {
-            0% { transform: scale(1); }
-            25% { transform: scale(1.1); }
-            50% { transform: scale(1); }
-            75% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-          }
-          .overflow-x-auto {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
-          .overflow-x-auto::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
       </div>
     </ErrorBoundary>
   );
