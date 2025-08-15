@@ -8,14 +8,22 @@ import { AuthProvider } from '@context/AuthContext';
 import App from './App';
 import './index.css';
 
+// Create Emotion cache
 const cache = createCache({
   key: 'css',
   prepend: true,
   speedy: false, // Disable speedy mode for debugging
 });
 
+// Verify root element
 const container = document.getElementById('root');
-if (!container) throw new Error('Failed to find root element');
+if (!container) {
+  console.error('Failed to find root element with ID "root". Check index.html.');
+  throw new Error('Failed to find root element');
+}
+
+// Log mounting
+console.log('Mounting React app...');
 
 const root = createRoot(container);
 
