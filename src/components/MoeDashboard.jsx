@@ -4,7 +4,6 @@ import { useAuth } from '@context/AuthContext';
 import { getAvailableDashboardItems, getDefaultRouteForLevel } from '@utils/dashboardManager';
 import { getRoleName } from '@utils/auth';
 
-// Error Boundary Component
 class ErrorBoundary extends Component {
   state = { error: null };
 
