@@ -45,8 +45,8 @@ export default defineConfig({
             ) {
               return 'vendor-react';
             }
-            if (id.includes('@emotion') || id.includes('emotion')) {
-              return 'vendor-emotion';
+            if (id.includes('@mui') || id.includes('emotion')) {
+              return 'vendor-mui-emotion'; // Group MUI and Emotion together
             }
             return 'vendor';
           }
@@ -77,6 +77,7 @@ export default defineConfig({
       'react-router-dom',
       '@emotion/react',
       '@emotion/styled',
+      '@mui/material',
     ],
     esbuildOptions: {
       target: 'esnext',
