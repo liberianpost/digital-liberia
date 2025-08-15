@@ -10,28 +10,28 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      console.log('Initializing auth...');
+      console.log('AuthContext.jsx - Initializing auth...');
       try {
         const storedAuth = localStorage.getItem('moeAuth');
         if (storedAuth) {
           try {
             const parsedUser = JSON.parse(storedAuth);
             setUser(parsedUser);
-            console.log('Loaded user from localStorage:', parsedUser);
+            console.log('AuthContext.jsx - Loaded user from localStorage:', parsedUser);
           } catch (e) {
-            console.error('Failed to parse moeAuth:', e);
+            console.error('AuthContext.jsx - Failed to parse moeAuth:', e);
             localStorage.removeItem('moeAuth');
           }
         } else {
-          console.log('No moeAuth found in localStorage');
+          console.log('AuthContext.jsx - No moeAuth found in localStorage');
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.error('AuthContext.jsx - Auth initialization error:', error);
       } finally {
         setTimeout(() => {
           setLoading(false);
-          console.log('Auth loading complete');
-        }, 5000); // Fallback timeout to prevent infinite loading
+          console.log('AuthContext.jsx - Auth loading complete');
+        }, 2000); // Reduced to 2s for faster debugging
       }
     };
     initializeAuth();
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials, navigate) => {
     try {
       setLoading(true);
-      console.log('Attempting login with credentials:', credentials);
+      console.log('AuthContext.jsx - Attempting login with credentials:', credentials);
       const response = await api.post('/auth/moe_login', credentials);
 
       if (response.data?.success) {
@@ -49,36 +49,36 @@ export const AuthProvider = ({ children }) => {
           securityLevel: response.data.data.securityLevel || SecurityLevels.STUDENT,
         };
         setUser(userData);
-        console.log('Login successful, user:', userData);
+        console.log('AuthContext.jsx - Login successful, user:', userData);
         handleLoginSuccess(userData, navigate);
         return { success: true };
       }
 
-      console.warn('Login failed:', response.data?.message);
+      console.warn('AuthContext.jsx - Login failed:', response.data?.message);
       return { success: false, error: response.data?.message || 'Login failed' };
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('AuthContext.jsx - Login error:', error);
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Login failed',
       };
     } finally {
       setLoading(false);
-      console.log('Login attempt complete, loading:', false);
+      console.log('AuthContext.jsx - Login attempt complete, loading:', false);
     }
   };
 
   const logout = async () => {
     try {
-      console.log('Attempting logout...');
+      console.log('AuthContext.jsx - Attempting logout...');
       await api.post('/auth/logout');
-      console.log('Logout successful');
+      console.log('AuthContext.jsx - Logout successful');
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('AuthContext.jsx - Logout error:', error);
     }
     localStorage.removeItem('moeAuth');
     setUser(null);
-    console.log('User logged out, user:', null);
+    console.log('AuthContext.jsx - User logged out, user:', null);
   };
 
   return (
@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    console.error('useAuth must be used within AuthProvider');
+    console.error('AuthContext.jsx - useAuth must be used within AuthProvider');
     throw new Error('useAuth must be used within AuthProvider');
   }
   return context;
