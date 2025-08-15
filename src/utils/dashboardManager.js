@@ -12,11 +12,13 @@ const defaultRoutes = {
 };
 
 export function getDefaultRouteForLevel(securityLevel) {
+  console.log('dashboardManager.js - getDefaultRouteForLevel called with:', securityLevel);
   return defaultRoutes[securityLevel] || '/moe/dashboard';
 }
 
 export function getAvailableDashboardItems(securityLevel) {
   const currentLevel = securityLevel || SecurityLevels.STUDENT;
+  console.log('dashboardManager.js - getAvailableDashboardItems called with:', currentLevel);
   return DashboardItems.filter((item) => {
     const levels = Object.values(SecurityLevels);
     const requiredIndex = levels.indexOf(item.requiredLevel);
