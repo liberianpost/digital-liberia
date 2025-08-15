@@ -1,62 +1,54 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
-import { SecurityLevels } from '@utils/securityLevels';
-import { hasPermission, getRoleName } from '@utils/auth';
+import { SecurityLevels, getRoleName } from '@utils/securityLevels';
+import { hasPermission } from '@utils/auth';
 
 const SystemSettings = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Get security level from route params or user context
   const securityLevel = location.state?.securityLevel || user?.securityLevel || SecurityLevels.STUDENT;
 
   const checkAdminAccess = (action) => {
     if (hasPermission(SecurityLevels.SYSTEM_ADMIN, securityLevel)) {
       action();
     } else {
-      showAccessDenied();
+      alert('Access denied. Requires SYSTEM ADMIN privileges.');
     }
   };
 
-  const showAccessDenied = () => {
-    alert("Access denied. Requires SYSTEM ADMIN privileges.");
-  };
-
   const handleAppSettings = () => {
-    navigate("/app-settings");
+    navigate('/app-settings');
   };
 
   const handleUserManagement = () => {
-    checkAdminAccess(() => {
-      navigate("/moe/user-management");
-    });
+    checkAdminAccess(() => navigate('/moe/user-management'));
   };
 
   const handleDatabaseManagement = () => {
-    checkAdminAccess(() => {
-      navigate("/moe/database-tools");
-    });
+    checkAdminAccess(() => navigate('/moe/database-tools'));
   };
 
   const handleBackupSettings = () => {
-    checkAdminAccess(() => {
-      navigate("/backup-settings");
-    });
+    checkAdminAccess(() => navigate('/backup-settings'));
   };
 
   const isAdminFeatureDisabled = !hasPermission(SecurityLevels.SYSTEM_ADMIN, securityLevel);
 
+  if (!user) {
+    navigate('/system', { replace: true });
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Toolbar */}
-      <div className="bg-blue-600 text-white p-4 shadow-md">
+      <div className="bg-white text-black p-4 shadow-md border-b border-gray-200">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center">
             <button
               onClick={() => navigate(-1)}
-              className="mr-4 text-white"
+              className="mr-4 text-black"
               aria-label="Go back"
             >
               <svg
@@ -76,7 +68,7 @@ const SystemSettings = () => {
             </button>
             <div>
               <h1 className="text-xl font-bold">System Settings</h1>
-              <p className="text-sm opacity-80">
+              <p className="text-sm text-gray-600">
                 Security Level: {getRoleName(securityLevel) || 'Unknown Role'}
               </p>
             </div>
@@ -84,9 +76,9 @@ const SystemSettings = () => {
           <button
             onClick={() => {
               logout();
-              navigate('/system');
+              navigate('/system', { replace: true });
             }}
-            className="text-white text-sm flex items-center"
+            className="text-red-600 hover:text-red-800 flex items-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -107,9 +99,7 @@ const SystemSettings = () => {
         </div>
       </div>
 
-      {/* Settings Cards */}
       <div className="p-4 max-w-3xl mx-auto">
-        {/* App Settings Card */}
         <div
           onClick={handleAppSettings}
           className="bg-white rounded-lg shadow-md p-4 mb-4 cursor-pointer hover:shadow-lg transition-shadow"
@@ -138,13 +128,12 @@ const SystemSettings = () => {
               </svg>
             </div>
             <div className="ml-4">
-              <h2 className="text-lg font-bold">Application Settings</h2>
-              <p className="text-gray-600 text-sm">Configure application preferences</p>
+              <h2 className="text-lg font-bold text-gray-800">Application Settings</h2>
+              <p className="text-sm text-gray-600">Configure application preferences</p>
             </div>
           </div>
         </div>
 
-        {/* User Management Card */}
         <div
           onClick={handleUserManagement}
           className={`bg-white rounded-lg shadow-md p-4 mb-4 cursor-pointer transition-shadow ${
@@ -169,8 +158,8 @@ const SystemSettings = () => {
               </svg>
             </div>
             <div className="ml-4">
-              <h2 className="text-lg font-bold">User Management</h2>
-              <p className="text-gray-600 text-sm">Manage system users and permissions</p>
+              <h2 className="text-lg font-bold text-gray-800">User Management</h2>
+              <p className="text-sm text-gray-600">Manage system users and permissions</p>
               {isAdminFeatureDisabled && (
                 <p className="text-red-500 text-xs mt-1">Requires SYSTEM ADMIN access</p>
               )}
@@ -178,7 +167,6 @@ const SystemSettings = () => {
           </div>
         </div>
 
-        {/* Database Management Card */}
         <div
           onClick={handleDatabaseManagement}
           className={`bg-white rounded-lg shadow-md p-4 mb-4 cursor-pointer transition-shadow ${
@@ -203,8 +191,8 @@ const SystemSettings = () => {
               </svg>
             </div>
             <div className="ml-4">
-              <h2 className="text-lg font-bold">Database Management</h2>
-              <p className="text-gray-600 text-sm">Manage database settings</p>
+              <h2 className="text-lg font-bold text-gray-800">Database Management</h2>
+              <p className="text-sm text-gray-600">Manage database settings</p>
               {isAdminFeatureDisabled && (
                 <p className="text-red-500 text-xs mt-1">Requires SYSTEM ADMIN access</p>
               )}
@@ -212,7 +200,6 @@ const SystemSettings = () => {
           </div>
         </div>
 
-        {/* Backup Settings Card */}
         <div
           onClick={handleBackupSettings}
           className={`bg-white rounded-lg shadow-md p-4 mb-4 cursor-pointer transition-shadow ${
@@ -237,8 +224,8 @@ const SystemSettings = () => {
               </svg>
             </div>
             <div className="ml-4">
-              <h2 className="text-lg font-bold">Backup & Restore</h2>
-              <p className="text-gray-600 text-sm">Configure backup settings</p>
+              <h2 className="text-lg font-bold text-gray-800">Backup & Restore</h2>
+              <p className="text-sm text-gray-600">Configure backup settings</p>
               {isAdminFeatureDisabled && (
                 <p className="text-red-500 text-xs mt-1">Requires SYSTEM ADMIN access</p>
               )}
