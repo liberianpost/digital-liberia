@@ -1,3 +1,9 @@
+// Patch for Emotion's useInsertionEffect bug in production
+import * as React from 'react';
+if (!React.useInsertionEffect) {
+  React.useInsertionEffect = React.useLayoutEffect;
+}
+
 import React, { Component } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
