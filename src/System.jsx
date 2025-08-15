@@ -1,16 +1,38 @@
-<<<<<<< Updated upstream
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
 import { SecurityLevels, handleLoginSuccess } from '@utils/auth';
 import { DashboardItems } from '@config/dashboardItems';
-=======
-import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@context/AuthContext";
-import { SecurityLevels, getRoleName } from "@/utils/auth.js";
-import { DashboardItems } from "@/config/dashboardItems";
->>>>>>> Stashed changes
+
+// Error Boundary Component
+class ErrorBoundary extends Component {
+  state = { error: null };
+
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+
+  render() {
+    if (this.state.error) {
+      console.error('ErrorBoundary caught:', this.state.error);
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+            <h1 className="text-2xl font-bold mb-4">Something Went Wrong</h1>
+            <p className="text-red-600 mb-6">{this.state.error.message}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // Navigation links
 const navLinks = [
@@ -311,6 +333,11 @@ const System = () => {
   const [activeLogo, setActiveLogo] = useState(0);
   const [showMoeLogin, setShowMoeLogin] = useState(false);
 
+  // Log auth context for debugging
+  useEffect(() => {
+    console.log('Auth context:', { user, isAuthenticated: !!user });
+  }, [user]);
+
   // Logo carousel
   useEffect(() => {
     const interval = setInterval(() => {
@@ -323,11 +350,13 @@ const System = () => {
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('MOE_LOGGED_IN') === 'true';
     if (isLoggedIn && user && user.securityLevel) {
+      console.log('Navigating with user:', user);
       const defaultRoute = handleLoginSuccess(user) || '/moe/dashboard';
       if (location.pathname === '/system') {
         navigate(defaultRoute, { replace: true });
       }
     } else if (!user) {
+      console.log('No user, clearing localStorage');
       localStorage.removeItem('MOE_LOGGED_IN');
       localStorage.removeItem('MOE_USERNAME');
     }
@@ -353,6 +382,7 @@ const System = () => {
   };
 
   const handleLogout = () => {
+    console.log('Logging out user:', user);
     logout();
     localStorage.removeItem('MOE_LOGGED_IN');
     localStorage.removeItem('MOE_USERNAME');
@@ -360,212 +390,214 @@ const System = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-blue-950 text-white font-inter overflow-x-hidden">
-      <div className="fixed inset-0 bg-blue-950 -z-50" />
+    <ErrorBoundary>
+      <div className="relative min-h-screen w-full bg-blue-950 text-white font-inter overflow-x-hidden">
+        <div className="fixed inset-0 bg-blue-950 -z-50" />
 
-      {/* Logo Carousel */}
-      <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
-        <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
-          {logos.map((logo, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
-                index === activeLogo ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <img
-                src={logo}
-                alt={`Logo ${index}`}
-                className="max-w-full max-h-full object-contain"
-                onError={() => console.error(`Failed to load logo: ${logo}`)}
-              />
-              <div className="absolute inset-0 bg-black/5" />
-            </div>
-          ))}
+        {/* Logo Carousel */}
+        <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
+          <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
+            {logos.map((logo, index) => (
+              <div
+                key={index}
+                className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
+                  index === activeLogo ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                <img
+                  src={logo}
+                  alt={`Logo ${index}`}
+                  className="max-w-full max-h-full object-contain"
+                  onError={() => console.error(`Failed to load logo: ${logo}`)}
+                />
+                <div className="absolute inset-0 bg-black/5" />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Header */}
-      <header className="fixed top-0 left-0 w-full z-50">
-        <div className="bg-blue-950/80 backdrop-blur-md border-b border-blue-700/30">
-          <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
-            <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
-              {navLinks.map((link) => (
-                <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
-                  <Link
-                    to={link.to}
-                    className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
-                      location.pathname === link.to ? 'text-red-500' : 'text-white hover:text-blue-300'
+        {/* Header */}
+        <header className="fixed top-0 left-0 w-full z-50">
+          <div className="bg-blue-950/80 backdrop-blur-md border-b border-blue-700/30">
+            <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
+              <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
+                {navLinks.map((link) => (
+                  <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
+                    <Link
+                      to={link.to}
+                      className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
+                        location.pathname === link.to ? 'text-red-500' : 'text-white hover:text-blue-300'
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  </div>
+                ))}
+              </nav>
+            </div>
+            <div className="w-full bg-gradient-to-b from-blue-950 to-transparent overflow-x-auto">
+              <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
+                {logos.map((logo, index) => (
+                  <div
+                    key={index}
+                    className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
+                      index === activeLogo ? 'scale-110 bg-white shadow-lg' : 'scale-100 bg-white/90'
                     }`}
                   >
-                    {link.label}
-                  </Link>
-                </div>
-              ))}
-            </nav>
-          </div>
-          <div className="w-full bg-gradient-to-b from-blue-950 to-transparent overflow-x-auto">
-            <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
-              {logos.map((logo, index) => (
-                <div
-                  key={index}
-                  className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
-                    index === activeLogo ? 'scale-110 bg-white shadow-lg' : 'scale-100 bg-white/90'
-                  }`}
-                >
-                  <img
-                    src={logo}
-                    alt={`Logo ${index}`}
-                    className="w-12 h-12 md:w-16 md:h-16 object-contain"
-                    onError={() => console.error(`Failed to load logo: ${logo}`)}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
-        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-gradient-to-br from-rose-500/10 via-red-500/10 to-orange-600/10 backdrop-blur-lg rounded-xl border border-rose-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
-            <div className="relative">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
-                Digital Social Security Number (DSSN)
-              </h2>
-              <div className="text-white space-y-4">
-                <p>
-                  In the Digital Liberia project, the DSSN (Digital Social Security Number) is a unique digital identifier assigned to every Liberian citizen or legal resident within the system.
-                </p>
-                <Link
-                  to="/dssn"
-                  className="inline-flex items-center bg-blue-500/80 backdrop-blur-sm rounded-lg px-3 py-1 ml-2 border border-blue-400/30 cursor-pointer hover:bg-blue-600/80 transition-colors"
-                >
-                  (click here to verify a DSSN)
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-gradient-to-br from-green-500/10 via-teal-500/10 to-emerald-600/10 backdrop-blur-lg rounded-xl border border-green-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
-            <div className="relative">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
-                Digital Liberia System
-              </h2>
-              <div className="text-white">
-                <p>
-                  The National Database Management System (NDMS) is the secure, centralized, and intelligent national data backbone that powers Digital Liberia.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-gradient-to-br from-purple-500/10 via-indigo-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-purple-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
-            <div className="relative">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
-                Government Ministries
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {ministries.map((ministry) => (
-                  <div
-                    key={ministry.id}
-                    onClick={(e) => handleMinistryClick(ministry.id, e)}
-                    className="cursor-pointer bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm relative z-20"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <img
-                        src={ministry.icon}
-                        alt={ministry.name}
-                        className="w-12 h-12 object-contain"
-                        onError={() => console.error(`Failed to load icon: ${ministry.icon}`)}
-                      />
-                      <div>
-                        <h3 className="font-bold text-lg">{ministry.name}</h3>
-                        <p className="text-sm text-white/80">{ministry.description}</p>
-                      </div>
-                    </div>
+                    <img
+                      src={logo}
+                      alt={`Logo ${index}`}
+                      className="w-12 h-12 md:w-16 md:h-16 object-contain"
+                      onError={() => console.error(`Failed to load logo: ${logo}`)}
+                    />
                   </div>
                 ))}
               </div>
             </div>
           </div>
-        </section>
+        </header>
 
-        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-blue-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
-            <div className="relative">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
-                Quick Access Services
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {quickAccessServices.map((service) => (
-                  <button
-                    key={service.id}
-                    onClick={(e) => handleServiceClick(service.id, e)}
-                    className="bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm text-left"
+        {/* Main Content */}
+        <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
+          <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
+            <div className="bg-gradient-to-br from-rose-500/10 via-red-500/10 to-orange-600/10 backdrop-blur-lg rounded-xl border border-rose-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+              <div className="relative">
+                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                  Digital Social Security Number (DSSN)
+                </h2>
+                <div className="text-white space-y-4">
+                  <p>
+                    In the Digital Liberia project, the DSSN (Digital Social Security Number) is a unique digital identifier assigned to every Liberian citizen or legal resident within the system.
+                  </p>
+                  <Link
+                    to="/dssn"
+                    className="inline-flex items-center bg-blue-500/80 backdrop-blur-sm rounded-lg px-3 py-1 ml-2 border border-blue-400/30 cursor-pointer hover:bg-blue-600/80 transition-colors"
                   >
-                    <h3 className="font-bold text-lg">{service.name}</h3>
-                  </button>
-                ))}
+                    (click here to verify a DSSN)
+                  </Link>
+                </div>
               </div>
             </div>
+          </section>
+
+          <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
+            <div className="bg-gradient-to-br from-green-500/10 via-teal-500/10 to-emerald-600/10 backdrop-blur-lg rounded-xl border border-green-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+              <div className="relative">
+                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                  Digital Liberia System
+                </h2>
+                <div className="text-white">
+                  <p>
+                    The National Database Management System (NDMS) is the secure, centralized, and intelligent national data backbone that powers Digital Liberia.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
+            <div className="bg-gradient-to-br from-purple-500/10 via-indigo-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-purple-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+              <div className="relative">
+                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                  Government Ministries
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {ministries.map((ministry) => (
+                    <div
+                      key={ministry.id}
+                      onClick={(e) => handleMinistryClick(ministry.id, e)}
+                      className="cursor-pointer bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm relative z-20"
+                    >
+                      <div className="flex items-center space-x-4">
+                        <img
+                          src={ministry.icon}
+                          alt={ministry.name}
+                          className="w-12 h-12 object-contain"
+                          onError={() => console.error(`Failed to load icon: ${ministry.icon}`)}
+                        />
+                        <div>
+                          <h3 className="font-bold text-lg">{ministry.name}</h3>
+                          <p className="text-sm text-white/80">{ministry.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
+            <div className="bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-blue-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+              <div className="relative">
+                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                  Quick Access Services
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {quickAccessServices.map((service) => (
+                    <button
+                      key={service.id}
+                      onClick={(e) => handleServiceClick(service.id, e)}
+                      className="bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm text-left"
+                    >
+                      <h3 className="font-bold text-lg">{service.name}</h3>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        {/* Footer */}
+        <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
+          <div className="border-t border-blue-700/30 pt-6">
+            © {new Date().getFullYear()} Digital Liberia. All rights reserved.
           </div>
-        </section>
-      </main>
+        </footer>
 
-      {/* Footer */}
-      <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
-        <div className="border-t border-blue-700/30 pt-6">
-          © {new Date().getFullYear()} Digital Liberia. All rights reserved.
-        </div>
-      </footer>
+        {/* Login Modal */}
+        {showMoeLogin && (
+          <div className="fixed inset-0 z-50">
+            <MoeLoginModal onClose={() => setShowMoeLogin(false)} />
+          </div>
+        )}
 
-      {/* Login Modal */}
-      {showMoeLogin && (
-        <div className="fixed inset-0 z-50">
-          <MoeLoginModal onClose={() => setShowMoeLogin(false)} />
-        </div>
-      )}
+        {/* Logout Button for Authenticated Users */}
+        {user && (
+          <div className="fixed top-4 right-4 z-50">
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        )}
 
-      {/* Logout Button for Authenticated Users */}
-      {user && (
-        <div className="fixed top-4 right-4 z-50">
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-          >
-            Logout
-          </button>
-        </div>
-      )}
-
-      {/* Global Styles */}
-      <style jsx global>{`
-        @keyframes heartbeat {
-          0% { transform: scale(1); }
-          25% { transform: scale(1.1); }
-          50% { transform: scale(1); }
-          75% { transform: scale(1.1); }
-          100% { transform: scale(1); }
-        }
-        .overflow-x-auto {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .overflow-x-auto::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
-    </div>
+        {/* Global Styles */}
+        <style jsx global>{`
+          @keyframes heartbeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+          }
+          .overflow-x-auto {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+          .overflow-x-auto::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+      </div>
+    </ErrorBoundary>
   );
 };
 
