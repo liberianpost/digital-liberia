@@ -5,15 +5,23 @@ import { getDefaultRouteForLevel } from './utils/dashboardManager';
 import AppRoutes from './AppRoutes';
 import { CircularProgress, Box } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { CacheProvider } from '@emotion/react';
+import createCache from '@emotion/cache';
 
-// Create MUI theme (moved outside component to prevent recreation)
+// Create Emotion cache
+const cache = createCache({
+  key: 'css',
+  prepend: true
+});
+
+// Create MUI theme
 const theme = createTheme({
   palette: {
     mode: 'light',
     background: {
-      default: '#ffffff',
-    },
-  },
+      default: '#ffffff'
+    }
+  }
 });
 
 function AppNavigator() {
@@ -47,18 +55,16 @@ function AppNavigator() {
     );
   }
 
-  return (
-    <div className="app-container">
-      <AppRoutes />
-    </div>
-  );
+  return <AppRoutes />;
 }
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <AppNavigator />
-    </ThemeProvider>
+    <CacheProvider value={cache}>
+      <ThemeProvider theme={theme}>
+        <AppNavigator />
+      </ThemeProvider>
+    </CacheProvider>
   );
 }
 
