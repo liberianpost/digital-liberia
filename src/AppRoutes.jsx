@@ -1,9 +1,7 @@
 import { Routes, Route, Navigate, Component } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
 import { SecurityLevels, hasPermission } from '@utils/auth';
-import { getDefaultRouteForLevel } from '@utils/dashboardManager';
-
-// Import components
+import System from './System';
 import MoeDashboard from '@components/MoeDashboard';
 import SystemSettings from '@components/SystemSettings';
 import SchoolManagement from '@components/SchoolManagement';
@@ -28,177 +26,250 @@ import DatabaseTools from '@components/DatabaseTools';
 import UserManagement from '@components/UserManagement';
 import MinistryEmployeeManagement from '@components/MinistryEmployeeManagement';
 import SchoolAdminManagement from '@components/SchoolAdminManagement';
-import Home from './Home';
-import System from './System';
-import Dssn from './Dssn';
-import Digitalliberia from './Digitalliberia';
-import Libpay from './Libpay';
-
-// Error Boundary Component
-class ErrorBoundary extends Component {
-  state = { error: null };
-
-  static getDerivedStateFromError(error) {
-    return { error };
-  }
-
-  render() {
-    if (this.state.error) {
-      console.error('ErrorBoundary caught:', this.state.error);
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
-            <h1 className="text-2xl font-bold mb-4">Something Went Wrong</h1>
-            <p className="text-red-600 mb-6">{this.state.error.message}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Reload Page
-            </button>
-          </div>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-// Unauthorized Page
-const UnauthorizedPage = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-100">
-    <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">Access Denied</h1>
-      <p className="text-gray-600 mb-6">You don't have permission to access this page.</p>
-      <button
-        onClick={() => window.history.back()}
-        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-      >
-        Go Back
-      </button>
-    </div>
-  </div>
-);
-
-function ProtectedRoute({ children, requiredLevel }) {
-  const { user } = useAuth();
-
-  if (!user) {
-    console.log('ProtectedRoute: No user, redirecting to /system');
-    return <Navigate to="/system" replace />;
-  }
-
-  if (requiredLevel && !hasPermission(requiredLevel, user.securityLevel)) {
-    console.log(`ProtectedRoute: User ${user.username} lacks permission for level ${requiredLevel}`);
-    return <Navigate to="/unauthorized" replace />;
-  }
-
-  return children;
-}
-
-function DefaultRoute() {
-  const { user } = useAuth();
-
-  if (!user) {
-    console.log('DefaultRoute: No user, redirecting to /system');
-    return <Navigate to="/system" replace />;
-  }
-
-  const defaultRoute = getDefaultRouteForLevel(user.securityLevel) || '/moe/dashboard';
-  console.log(`DefaultRoute: Navigating to ${defaultRoute} for user ${user.username}`);
-  return <Navigate to={defaultRoute} replace />;
-}
 
 function AppRoutes() {
+  const { user, isAuthenticated } = useAuth();
+
   return (
-    <ErrorBoundary>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/system" element={<System />} />
-        <Route path="/dssn" element={<Dssn />} />
-        <Route path="/digital-liberia" element={<Digitalliberia />} />
-        <Route path="/libpay" element={<Libpay />} />
-        <Route path="/liberian-post" element={<div>Coming Soon</div>} />
-        <Route path="/unauthorized" element={<UnauthorizedPage />} />
-        
-        {/* Default redirect */}
-        <Route path="/" element={<DefaultRoute />} />
-
-        {/* MOE Dashboard - Accessible to all authenticated users */}
-        <Route element={<ProtectedRoute requiredLevel={SecurityLevels.STUDENT} />}>
-          <Route path="/moe/dashboard" element={<MoeDashboard />} />
-        </Route>
-
-        {/* Student Profile */}
-        <Route element={<ProtectedRoute requiredLevel={SecurityLevels.STUDENT} />}>
-          <Route path="/moe/student-profile" element={<StudentProfile />} />
-        </Route>
-
-        {/* Student Reports - Requires PARENT */}
-        <Route element={<ProtectedRoute requiredLevel={SecurityLevels.PARENT} />}>
-          <Route path="/moe/student-reports" element={<StudentReports />} />
-        </Route>
-
-        {/* Class Management - Requires TEACHER */}
-        <Route element={<ProtectedRoute requiredLevel={SecurityLevels.TEACHER} />}>
-          <Route path="/moe/class-management" element={<ClassManagement />} />
-        </Route>
-
-        {/* Student Records - Requires TEACHER */}
-        <Route element={<ProtectedRoute requiredLevel={SecurityLevels.TEACHER} />}>
-          <Route path="/moe/student-records" element={<StudentRecords />} />
-        </Route>
-
-        {/* Reports - Requires TEACHER */}
-        <Route element={<ProtectedRoute requiredLevel={SecurityLevels.TEACHER} />}>
-          <Route path="/moe/reports" element={<Reports />} />
-        </Route>
-
-        {/* School Management - Requires SCHOOL_ADMIN */}
-        <Route element={<ProtectedRoute requiredLevel={SecurityLevels.SCHOOL_ADMIN} />}>
-          <Route path="/moe/school-management" element={<SchoolManagement />} />
-          <Route path="/moe/student-registration" element={<StudentRegistration />} />
-          <Route path="/moe/student-management" element={<StudentManagement />} />
-          <Route path="/moe/parent-management" element={<ParentManagement />} />
-          <Route path="/moe/parent-management/parent-details/:parentId" element={<ParentDetails />} />
-          <Route path="/moe/parent-management/add-parent" element={<AddParent />} />
-          <Route path="/moe/announcement-management" element={<AnnouncementManagement />} />
-          <Route path="/moe/teacher-management" element={<TeacherManagement />} />
-        </Route>
-
-        {/* District Reports - Requires MINISTRY_OFFICIAL */}
-        <Route element={<ProtectedRoute requiredLevel={SecurityLevels.MINISTRY_OFFICIAL} />}>
-          <Route path="/moe/district-reports" element={<DistrictReports />}>
-            <Route index element={<DistrictOverview />} />
-            <Route path="overview" element={<DistrictOverview />} />
-            <Route path="school-reports" element={<SchoolReports />} />
-            <Route path="student-reports" element={<StudentReports />} />
-            <Route path="teacher-reports" element={<TeacherReports />} />
-            <Route path="compliance-reports" element={<ComplianceReports />} />
-          </Route>
-        </Route>
-
-        {/* Database Tools - Requires DATABASE_ADMIN */}
-        <Route element={<ProtectedRoute requiredLevel={SecurityLevels.DATABASE_ADMIN} />}>
-          <Route path="/moe/database-tools" element={<DatabaseTools />} />
-          <Route path="/moe/ministry-employee-management" element={<MinistryEmployeeManagement />} />
-          <Route path="/moe/school-admin-management" element={<SchoolAdminManagement />} />
-        </Route>
-
-        {/* User Management - Requires SYSTEM_ADMIN */}
-        <Route element={<ProtectedRoute requiredLevel={SecurityLevels.SYSTEM_ADMIN} />}>
-          <Route path="/moe/user-management" element={<UserManagement />} />
-        </Route>
-
-        {/* System Settings - Requires SYSTEM_ADMIN */}
-        <Route element={<ProtectedRoute requiredLevel={SecurityLevels.SYSTEM_ADMIN} />}>
-          <Route path="/moe/system-settings" element={<SystemSettings />} />
-        </Route>
-
-        {/* Catch-all route */}
-        <Route path="*" element={<DefaultRoute />} />
-      </Routes>
-    </ErrorBoundary>
+    <Routes>
+      <Route path="/" element={<System />} />
+      <Route path="/system" element={<System />} />
+      <Route
+        path="/moe/dashboard"
+        element={isAuthenticated ? <MoeDashboard /> : <Navigate to="/system" />}
+      />
+      <Route
+        path="/moe/system-settings"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SYSTEM_ADMIN) ? (
+            <SystemSettings />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/school-management"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
+            <SchoolManagement />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/student-registration"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
+            <StudentRegistration />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/student-management"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
+            <StudentManagement />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/parent-management"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
+            <ParentManagement />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/parent-details"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
+            <ParentDetails />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/add-parent"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
+            <AddParent />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/announcement-management"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
+            <AnnouncementManagement />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/student-records"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
+            <StudentRecords />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/teacher-management"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
+            <TeacherManagement />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/reports"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
+            <Reports />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/student-profile"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.STUDENT) ? (
+            <StudentProfile />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/class-management"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
+            <ClassManagement />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/district-reports"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
+            <DistrictReports />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/district-overview"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
+            <DistrictOverview />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/school-reports"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
+            <SchoolReports />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/student-reports"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.PARENT) ? (
+            <StudentReports />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/teacher-reports"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
+            <TeacherReports />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/compliance-reports"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
+            <ComplianceReports />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/database-tools"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.DATABASE_ADMIN) ? (
+            <DatabaseTools />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/user-management"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SYSTEM_ADMIN) ? (
+            <UserManagement />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/ministry-employee-management"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
+            <MinistryEmployeeManagement />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route
+        path="/moe/school-admin-management"
+        element={
+          isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
+            <SchoolAdminManagement />
+          ) : (
+            <Navigate to="/system" />
+          )
+        }
+      />
+      <Route path="*" element={<Navigate to="/system" />} />
+    </Routes>
   );
 }
 
