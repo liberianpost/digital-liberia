@@ -19,7 +19,7 @@ const theme = createTheme({
   palette: {
     mode: 'light',
     background: {
-      default: '#ffffff',
+      default: '#f5f5f5',
     },
   },
 });
@@ -47,26 +47,26 @@ class ErrorBoundary extends Component {
 }
 
 function AppNavigator() {
-  const { user, loading } = useAuth() || { user: null, loading: true }; // Fallback for useAuth
+  const { user, loading } = useAuth() || { user: null, loading: true };
   const navigate = useNavigate();
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    console.log('AppNavigator useEffect - loading:', loading, 'user:', user);
+    console.log('App.jsx - AppNavigator useEffect - loading:', loading, 'user:', user);
     if (!loading) {
       try {
         if (user && user.securityLevel) {
           const defaultRoute = getDefaultRouteForLevel(user.securityLevel);
-          console.log('Navigating to default route:', defaultRoute);
+          console.log('App.jsx - Navigating to default route:', defaultRoute);
           navigate(defaultRoute, { replace: true });
         } else {
-          console.log('Navigating to /system (no user or invalid user)');
+          console.log('App.jsx - Navigating to /system (no user or invalid user)');
           navigate('/system', { replace: true });
         }
         setInitialized(true);
       } catch (error) {
-        console.error('Navigation error:', error);
-        setInitialized(true); // Proceed to render even if navigation fails
+        console.error('App.jsx - Navigation error:', error);
+        setInitialized(true);
       }
     }
   }, [user, loading, navigate]);
