@@ -8,12 +8,7 @@ export default defineConfig({
       jsxImportSource: '@emotion/react',
       babel: {
         plugins: [
-          ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }],
-          ['@emotion/babel-plugin', { 
-            autoLabel: 'dev-only',
-            sourceMap: true,
-            labelFormat: '[local]'
-          }]
+          '@emotion/babel-plugin', // Simplified configuration
         ],
       },
     }),
@@ -29,75 +24,40 @@ export default defineConfig({
     dedupe: [
       'react',
       'react-dom',
-      'react-router-dom',
       '@emotion/react',
       '@emotion/styled',
-      '@mui/material',
     ],
-  },
-  esbuild: {
-    loader: 'jsx',
-    include: /src\/.*\.(jsx?|tsx?)$/,
-    exclude: [],
-  },
-  build: {
-    sourcemap: true,
-    minify: 'esbuild',
-    target: 'esnext',
-    rollupOptions: {
-      output: {
-        assetFileNames: 'assets/[name]-[hash][extname]',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (
-              id.includes('react') ||
-              id.includes('react-dom') ||
-              id.includes('react-router-dom')
-            ) {
-              return 'vendor-react';
-            }
-            if (id.includes('@mui') || id.includes('emotion')) {
-              return 'vendor-mui-emotion';
-            }
-            return 'vendor';
-          }
-          if (id.includes('src/config')) return 'config';
-          if (id.includes('src/utils')) return 'utils';
-        },
-      },
-    },
-    chunkSizeWarningLimit: 1600,
-  },
-  server: {
-    port: 3005,
-    strictPort: false,
-    host: '0.0.0.0',
-    open: false,
-    hmr: {
-      overlay: true,
-      clientPort: 3005,
-    },
-    fs: {
-      strict: false,
-    },
   },
   optimizeDeps: {
     include: [
-      'react',
-      'react-dom',
-      'react-router-dom',
       '@emotion/react',
       '@emotion/styled',
       '@mui/material',
     ],
     esbuildOptions: {
-      target: 'esnext',
+      define: {
+        global: 'globalThis',
+      },
     },
+  },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'emotion': ['@emotion/react', '@emotion/styled'],
+          'mui': ['@mui/material'],
+        }
+      }
+    }
   },
   define: {
     'process.env': {},
+    global: 'globalThis',
   },
-  clearScreen: true,
-  logLevel: 'info',
+  server: {
+    port: 3005,
+  },
 });
