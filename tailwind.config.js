@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
   theme: {
     extend: {
@@ -17,7 +14,8 @@ module.exports = {
       },
       backgroundImage: {
         'gradient-blue': 'linear-gradient(270deg, #1e3a8a, #0f172a, #1e3a8a)',
-        'glass-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+        'glass-gradient':
+          'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
       },
       animation: {
         'background-fade': 'backgroundFade 20s ease infinite',
@@ -29,8 +27,8 @@ module.exports = {
           '50%': { 'background-position': '100% 50%' },
         },
         fadeInUp: {
-          'from': { opacity: '0', transform: 'translateY(20px)' },
-          'to': { opacity: '1', transform: 'translateY(0)' },
+          from: { opacity: '0', transform: 'translateY(20px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
         },
       },
       backdropBlur: {
@@ -40,20 +38,16 @@ module.exports = {
         xl: '24px',
       },
       boxShadow: {
-        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.36)',
+        glass: '0 8px 32px 0 rgba(0, 0, 0, 0.36)',
       },
     },
   },
   plugins: [
     require('@tailwindcss/forms'),
-    function({ addUtilities }) {
+    function ({ addUtilities }) {
       addUtilities({
-        '.backface-hidden': {
-          'backface-visibility': 'hidden',
-        },
-        '.preserve-3d': {
-          'transform-style': 'preserve-3d',
-        },
+        '.backface-hidden': { 'backface-visibility': 'hidden' },
+        '.preserve-3d': { 'transform-style': 'preserve-3d' },
       });
     },
   ],
