@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
-import { SecurityLevels, getRoleName, handleLoginSuccess } from '@utils/auth';
+import { SecurityLevels, handleLoginSuccess } from '@utils/auth';
 import { DashboardItems } from '@config/dashboardItems';
 
 // Navigation links
@@ -13,7 +13,7 @@ const navLinks = [
   { label: 'Liberian Post', to: '/liberian-post', color: 'bg-pink-500/80' },
 ];
 
-// Logos for carousel (use public/ paths for Vite)
+// Logos for carousel
 const logos = [
   '/logos/liberianpost.png',
   '/logos/digital.png',
@@ -162,7 +162,7 @@ const MoeLoginModal = ({ onClose }) => {
         const defaultRoute = handleLoginSuccess({
           username: formData.username,
           securityLevel: result.user?.securityLevel || SecurityLevels.STUDENT,
-        });
+        }) || '/moe/dashboard';
         navigate(defaultRoute, { replace: true });
       } else {
         setError(result.error || 'Invalid username or password');
@@ -193,6 +193,7 @@ const MoeLoginModal = ({ onClose }) => {
               src="/logos/moe.png"
               alt="MOE Logo"
               className="w-20 h-20 object-contain"
+              onError={() => console.error('Failed to load MOE logo')}
             />
           </div>
           {error && (
@@ -306,7 +307,7 @@ const System = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveLogo((prev) => (prev + 1) % logos.length);
-    }, 2000); // Slower transition for stability
+    }, 2000);
     return () => clearInterval(interval);
   }, []);
 
