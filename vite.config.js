@@ -5,11 +5,15 @@ import path from 'path';
 export default defineConfig({
   plugins: [
     react({
-      jsxRuntime: 'automatic',
+      jsxImportSource: '@emotion/react',
       babel: {
         plugins: [
           ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }],
-          ['@emotion', { autoLabel: 'dev-only', sourceMap: true }],
+          ['@emotion/babel-plugin', { 
+            autoLabel: 'dev-only',
+            sourceMap: true,
+            labelFormat: '[local]'
+          }]
         ],
       },
     }),
@@ -29,7 +33,7 @@ export default defineConfig({
       '@emotion/react',
       '@emotion/styled',
       '@mui/material',
-    ], // Prevent duplicate Emotion/MUI instances
+    ],
   },
   esbuild: {
     loader: 'jsx',
