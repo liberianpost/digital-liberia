@@ -30,7 +30,15 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['@emotion/react', '@emotion/styled', '@mui/material'],
+    include: [
+      '@emotion/react',
+      '@emotion/styled',
+      '@mui/material',
+      '@mui/material/styles',
+      '@mui/material/CircularProgress',
+      '@mui/material/Box',
+      '@mui/material/Typography',
+    ],
     esbuildOptions: {
       define: {
         global: 'globalThis',
@@ -44,5 +52,5 @@ export default defineConfig({
   server: {
     port: 3005,
   },
-  base: '/', // Ensure assets load correctly
+  base: '/',
 });
