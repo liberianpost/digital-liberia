@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { SecurityLevels, hasPermission } from '../utils/auth';
+import { useAuth } from '@context/AuthContext';
+import { SecurityLevels } from '@utils/securityLevels';
+import { hasPermission } from '@utils/auth';
 
 const DatabaseTools = () => {
   const { user } = useAuth();
@@ -9,32 +10,32 @@ const DatabaseTools = () => {
   const REQUIRED_SECURITY_LEVEL = SecurityLevels.DATABASE_ADMIN;
 
   useEffect(() => {
-    if (!user || !hasPermission(REQUIRED_SECURITY_LEVEL)) {
+    if (!user || !hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
       alert("Access denied. Requires DATABASE ADMIN privileges.");
       navigate(-1);
     }
   }, [user, navigate]);
 
   const handleMinistryManagement = () => {
-    if (hasPermission(REQUIRED_SECURITY_LEVEL)) {
+    if (hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
       navigate('/moe/ministry-employee-management');
     }
   };
 
   const handleSchoolAdminManagement = () => {
-    if (hasPermission(REQUIRED_SECURITY_LEVEL)) {
+    if (hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
       navigate('/moe/school-admin-management');
     }
   };
 
   const handleBackup = () => {
-    if (hasPermission(REQUIRED_SECURITY_LEVEL)) {
+    if (hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
       alert('Backup Database feature coming soon');
     }
   };
 
   const handleRestore = () => {
-    if (hasPermission(REQUIRED_SECURITY_LEVEL)) {
+    if (hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
       alert('Restore Database feature coming soon');
     }
   };
