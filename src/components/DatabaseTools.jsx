@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
 import { SecurityLevels } from '@utils/securityLevels';
 import { hasPermission } from '@utils/auth';
+import api from '@utils/api';
 
 const DatabaseTools = () => {
   const { user } = useAuth();
@@ -11,7 +12,7 @@ const DatabaseTools = () => {
 
   useEffect(() => {
     if (!user || !hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
-      alert("Access denied. Requires DATABASE ADMIN privileges.");
+      alert('Access denied. Requires DATABASE ADMIN privileges.');
       navigate(-1);
     }
   }, [user, navigate]);
@@ -28,21 +29,32 @@ const DatabaseTools = () => {
     }
   };
 
-  const handleBackup = () => {
+  const handleBackup = async () => {
     if (hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
-      alert('Backup Database feature coming soon');
+      try {
+        await api.post('/database/backup');
+        alert('Database backup initiated successfully.');
+      } catch (error) {
+        console.error('Error initiating backup:', error);
+        alert('Failed to initiate database backup.');
+      }
     }
   };
 
-  const handleRestore = () => {
+  const handleRestore = async () => {
     if (hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
-      alert('Restore Database feature coming soon');
+      try {
+        await api.post('/database/restore');
+        alert('Database restore initiated successfully.');
+      } catch (error) {
+        console.error('Error initiating restore:', error);
+        alert('Failed to initiate database restore.');
+      }
     }
   };
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Toolbar */}
       <div className="bg-white text-black p-4 shadow-md border-b border-gray-200">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center">
@@ -71,9 +83,7 @@ const DatabaseTools = () => {
         </div>
       </div>
 
-      {/* Scrollable Content Area */}
       <div className="overflow-y-auto h-[calc(100vh-4rem)] p-4 max-w-3xl mx-auto">
-        {/* Ministry of Education Management Card */}
         <div
           onClick={handleMinistryManagement}
           className="bg-white rounded-lg shadow-md mb-4 border border-gray-300 cursor-pointer hover:shadow-lg transition-shadow"
@@ -93,7 +103,6 @@ const DatabaseTools = () => {
           </div>
         </div>
 
-        {/* School Administrators Management Card */}
         <div
           onClick={handleSchoolAdminManagement}
           className="bg-white rounded-lg shadow-md mb-4 border border-gray-300 cursor-pointer hover:shadow-lg transition-shadow"
@@ -113,7 +122,6 @@ const DatabaseTools = () => {
           </div>
         </div>
 
-        {/* Database Tools Section */}
         <h3 className="mt-6 text-base font-bold text-black">Database Tools</h3>
         <button
           onClick={handleBackup}
