@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
-import { AuthProvider } from '@/context/AuthContext';
+import { AuthProvider } from '@context/AuthContext';
 import AppRoutes from './AppRoutes';
 import './index.css';
 
