@@ -67,6 +67,24 @@ const AppRoutes = () => {
         }
       />
       <Route
+        path="/app-settings"
+        element={
+          <ProtectedRoute>
+            {console.log('AppRoutes.jsx - Rendering AppSettings component')}
+            <div>AppSettings component placeholder</div>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/backup-settings"
+        element={
+          <ProtectedRoute>
+            {console.log('AppRoutes.jsx - Rendering BackupSettings component')}
+            <div>BackupSettings component placeholder</div>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/moe/student-registration"
         element={
           <ProtectedRoute>
@@ -226,6 +244,24 @@ const AppRoutes = () => {
           <ProtectedRoute>
             {console.log('AppRoutes.jsx - Rendering UserManagement component')}
             <UserManagement />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/moe/add-user"
+        element={
+          <ProtectedRoute>
+            {console.log('AppRoutes.jsx - Rendering AddUser component')}
+            <div>AddUser component placeholder</div>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/moe/user-details/:userId"
+        element={
+          <ProtectedRoute>
+            {console.log('AppRoutes.jsx - Rendering UserDetails component')}
+            <div>UserDetails component placeholder</div>
           </ProtectedRoute>
         }
       />
