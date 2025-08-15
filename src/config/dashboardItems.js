@@ -2,8 +2,9 @@ import { SecurityLevels } from '@utils/securityLevels';
 
 console.log('dashboardItems.js - Starting to load DashboardItems configuration');
 
+let DashboardItems;
 try {
-  export const DashboardItems = [
+  DashboardItems = [
     {
       id: 'my-profile',
       title: "My Profile",
@@ -78,5 +79,7 @@ try {
   console.log('dashboardItems.js - DashboardItems loaded successfully');
 } catch (error) {
   console.error('dashboardItems.js - Error loading DashboardItems:', error);
-  throw error;
+  DashboardItems = [];
 }
+
+export { DashboardItems };
