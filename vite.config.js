@@ -8,41 +8,41 @@ export default defineConfig({
       jsxImportSource: '@emotion/react',
       babel: {
         plugins: [
-          ['@emotion/babel-plugin', {
-            sourceMap: true,
-            autoLabel: 'dev-only',
-            labelFormat: '[local]'
-          }]
-        ]
-      }
-    })
+          [
+            '@emotion/babel-plugin',
+            {
+              sourceMap: true,
+              autoLabel: 'dev-only',
+              labelFormat: '[local]',
+            },
+          ],
+        ],
+      },
+    }),
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
-      '@context': path.resolve(__dirname, 'src/context'),
-      '@components': path.resolve(__dirname, 'src/components'),
-      '@utils': path.resolve(__dirname, 'src/utils'),
-      '@config': path.resolve(__dirname, 'src/config')
-    }
+      '@': path.resolve(__dirname, './src'),
+      '@context': path.resolve(__dirname, './src/context'),
+      '@components': path.resolve(__dirname, './src/components'),
+      '@utils': path.resolve(__dirname, './src/utils'),
+      '@config': path.resolve(__dirname, './src/config'),
+    },
   },
   optimizeDeps: {
-    include: [
-      '@emotion/react',
-      '@emotion/styled',
-      '@mui/material'
-    ],
+    include: ['@emotion/react', '@emotion/styled', '@mui/material'],
     esbuildOptions: {
       define: {
-        global: 'globalThis'
-      }
-    }
+        global: 'globalThis',
+      },
+    },
   },
   define: {
     global: 'globalThis',
-    'process.env': {}
+    'process.env': {},
   },
   server: {
-    port: 3005
-  }
+    port: 3005,
+  },
+  base: '/', // Ensure assets load correctly
 });
