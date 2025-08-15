@@ -45,9 +45,13 @@ export default defineConfig({
     port: 3001,
     strictPort: true,
     open: false,
-    host: true, // <-- expose to all network interfaces
+    host: '0.0.0.0',       // Expose to all interfaces
     hmr: {
-      overlay: true // <-- show full errors in browser
+      overlay: true,       // Show full errors in browser
+      clientPort: 3001     // Ensure HMR connects to correct port
+    },
+    fs: {
+      strict: false        // Allow serving files outside root if needed
     }
   },
   optimizeDeps: {
@@ -59,5 +63,9 @@ export default defineConfig({
     esbuildOptions: {
       target: 'esnext'
     }
-  }
+  },
+  define: {
+    'process.env': {}        // Avoid process.env issues in React
+  },
+  clearScreen: true          // Clears terminal to show latest errors
 });
