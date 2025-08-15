@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { SecurityLevels, hasPermission, getRoleName } from '../utils/auth';
+import { useAuth } from '@context/AuthContext';
+import { SecurityLevels } from '@utils/securityLevels';
+import { hasPermission, getRoleName } from '@utils/auth';
 
 const SystemSettings = () => {
   const { user, logout } = useAuth();
@@ -29,13 +30,13 @@ const SystemSettings = () => {
 
   const handleUserManagement = () => {
     checkAdminAccess(() => {
-      navigate("/user-management");
+      navigate("/moe/user-management");
     });
   };
 
   const handleDatabaseManagement = () => {
     checkAdminAccess(() => {
-      navigate("/database-management");
+      navigate("/moe/database-tools");
     });
   };
 
