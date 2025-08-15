@@ -45,8 +45,9 @@ export default defineConfig({
     port: 3001,
     strictPort: true,
     open: false,
+    host: true, // <-- expose to all network interfaces
     hmr: {
-      overlay: false
+      overlay: true // <-- show full errors in browser
     }
   },
   optimizeDeps: {
@@ -54,6 +55,9 @@ export default defineConfig({
       'react',
       'react-dom',
       'react-router-dom'
-    ]
+    ],
+    esbuildOptions: {
+      target: 'esnext'
+    }
   }
 });
