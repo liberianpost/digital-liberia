@@ -46,7 +46,7 @@ export default defineConfig({
               return 'vendor-react';
             }
             if (id.includes('@mui') || id.includes('emotion')) {
-              return 'vendor-mui-emotion'; // Group MUI and Emotion together
+              return 'vendor-mui-emotion';
             }
             return 'vendor';
           }
