@@ -37,7 +37,7 @@ class ErrorBoundary extends Component {
       return (
         <Box p={4}>
           <Typography color="error" variant="h6">
-            Something went wrong: {this.state.error?.message || 'Unknown error'}
+            Error: {this.state.error?.message || 'An unexpected error occurred'}
           </Typography>
         </Box>
       );
@@ -47,7 +47,7 @@ class ErrorBoundary extends Component {
 }
 
 function AppNavigator() {
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuth() || { user: null, loading: true }; // Fallback for useAuth
   const navigate = useNavigate();
   const [initialized, setInitialized] = useState(false);
 
@@ -55,17 +55,18 @@ function AppNavigator() {
     console.log('AppNavigator useEffect - loading:', loading, 'user:', user);
     if (!loading) {
       try {
-        if (user) {
+        if (user && user.securityLevel) {
           const defaultRoute = getDefaultRouteForLevel(user.securityLevel);
           console.log('Navigating to default route:', defaultRoute);
           navigate(defaultRoute, { replace: true });
         } else {
-          console.log('Navigating to /system (no user)');
+          console.log('Navigating to /system (no user or invalid user)');
           navigate('/system', { replace: true });
         }
         setInitialized(true);
       } catch (error) {
         console.error('Navigation error:', error);
+        setInitialized(true); // Proceed to render even if navigation fails
       }
     }
   }, [user, loading, navigate]);
