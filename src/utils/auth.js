@@ -13,6 +13,7 @@ export const SecurityLevels = {
 // Get current user's security level
 export function getCurrentSecurityLevel() {
   const user = JSON.parse(localStorage.getItem('moeAuth') || 'null');
+  console.log('auth.js - getCurrentSecurityLevel:', user?.securityLevel || SecurityLevels.STUDENT);
   return user?.securityLevel || SecurityLevels.STUDENT;
 }
 
@@ -21,7 +22,7 @@ export function hasPermission(requiredLevel, userLevel = getCurrentSecurityLevel
   const levels = Object.values(SecurityLevels);
   const requiredIndex = levels.indexOf(requiredLevel);
   const userIndex = levels.indexOf(userLevel);
-  console.log('hasPermission:', { requiredLevel, userLevel, hasAccess: userIndex >= requiredIndex });
+  console.log('auth.js - hasPermission:', { requiredLevel, userLevel, hasAccess: userIndex >= requiredIndex });
   return userIndex >= requiredIndex;
 }
 
@@ -41,7 +42,7 @@ export function getRoleName(level) {
 
 // Handle login success and redirect to default route
 export function handleLoginSuccess(userData, navigate) {
-  console.log('handleLoginSuccess:', userData);
+  console.log('auth.js - handleLoginSuccess:', userData);
   localStorage.setItem('moeAuth', JSON.stringify(userData));
   const defaultRoute = getDefaultRouteForLevel(userData.securityLevel);
   navigate(defaultRoute, { replace: true });
