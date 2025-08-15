@@ -3,7 +3,7 @@ import { useAuth } from './context/AuthContext';
 import { SecurityLevels, hasPermission } from './utils/auth';
 import { getDefaultRouteForLevel } from './utils/dashboardManager';
 
-// Import all components
+// Import components (stubbed missing ones for safety)
 import MoeDashboard from './components/MoeDashboard';
 import SystemSettings from './components/SystemSettings';
 import SchoolManagement from './components/SchoolManagement';
@@ -34,14 +34,32 @@ import Dssn from './Dssn';
 import Digitalliberia from './Digitalliberia';
 import Libpay from './Libpay';
 
+// Placeholder for UnauthorizedPage (was missing in original)
+const UnauthorizedPage = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">Access Denied</h1>
+      <p className="text-gray-600 mb-6">You don't have permission to access this page.</p>
+      <button
+        onClick={() => window.history.back()}
+        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+      >
+        Go Back
+      </button>
+    </div>
+  </div>
+);
+
 function ProtectedRoute({ children, requiredLevel }) {
   const { user } = useAuth();
-  
+
+  // Fallback if user is undefined or null
   if (!user) {
     return <Navigate to="/system" replace />;
   }
-  
-  if (requiredLevel && !hasPermission(requiredLevel)) {
+
+  // Check permission with fallback to prevent crashes
+  if (requiredLevel && !hasPermission(requiredLevel, user.securityLevel)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
@@ -50,10 +68,14 @@ function ProtectedRoute({ children, requiredLevel }) {
 
 function DefaultRoute() {
   const { user } = useAuth();
+
+  // Fallback for unauthenticated users
   if (!user) {
     return <Navigate to="/system" replace />;
   }
-  const defaultRoute = getDefaultRouteForLevel(user.securityLevel);
+
+  // Ensure defaultRoute is valid, fallback to /moe/dashboard
+  const defaultRoute = getDefaultRouteForLevel(user.securityLevel) || '/moe/dashboard';
   return <Navigate to={defaultRoute} replace />;
 }
 
@@ -68,7 +90,7 @@ function AppRoutes() {
       <Route path="/liberian-post" element={<div>Coming Soon</div>} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       
-      {/* Default redirect to user's default route */}
+      {/* Default redirect */}
       <Route path="/" element={<DefaultRoute />} />
 
       {/* MOE Dashboard - Accessible to all authenticated users */}
@@ -76,7 +98,7 @@ function AppRoutes() {
         <Route path="/moe/dashboard" element={<MoeDashboard />} />
       </Route>
 
-      {/* Student Profile - Accessible to all authenticated users */}
+      {/* Student Profile */}
       <Route element={<ProtectedRoute requiredLevel={SecurityLevels.STUDENT} />}>
         <Route path="/moe/student-profile" element={<StudentProfile />} />
       </Route>
