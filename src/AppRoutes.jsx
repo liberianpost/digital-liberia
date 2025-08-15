@@ -34,6 +34,7 @@ class ErrorBoundary extends Component {
   state = { hasError: false, error: null };
 
   static getDerivedStateFromError(error) {
+    console.error('AppRoutes.jsx - ErrorBoundary caught:', error, error.stack);
     return { hasError: true, error };
   }
 
@@ -44,6 +45,24 @@ class ErrorBoundary extends Component {
           <Typography color="error" variant="h6">
             Route Error: {this.state.error?.message || 'Failed to render component'}
           </Typography>
+          <Typography>
+            Check the console for details and try refreshing the page.
+          </Typography>
+          <Box mt={2}>
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#1976d2',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+              }}
+            >
+              Reload Page
+            </button>
+          </Box>
         </Box>
       );
     }
@@ -75,6 +94,7 @@ function AppRoutes() {
         path="/"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering System component')}
             <System />
           </ErrorBoundary>
         }
@@ -83,6 +103,7 @@ function AppRoutes() {
         path="/system"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering System component')}
             <System />
           </ErrorBoundary>
         }
@@ -91,6 +112,7 @@ function AppRoutes() {
         path="/moe/dashboard"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering MoeDashboard component')}
             {isAuthenticated ? <MoeDashboard /> : <Navigate to="/system" />}
           </ErrorBoundary>
         }
@@ -99,6 +121,7 @@ function AppRoutes() {
         path="/moe/system-settings"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering SystemSettings component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SYSTEM_ADMIN) ? (
               <SystemSettings />
             ) : (
@@ -111,6 +134,7 @@ function AppRoutes() {
         path="/moe/school-management"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering SchoolManagement component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
               <SchoolManagement />
             ) : (
@@ -123,6 +147,7 @@ function AppRoutes() {
         path="/moe/student-registration"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering StudentRegistration component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
               <StudentRegistration />
             ) : (
@@ -135,6 +160,7 @@ function AppRoutes() {
         path="/moe/student-management"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering StudentManagement component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
               <StudentManagement />
             ) : (
@@ -147,6 +173,7 @@ function AppRoutes() {
         path="/moe/parent-management"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering ParentManagement component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
               <ParentManagement />
             ) : (
@@ -159,6 +186,7 @@ function AppRoutes() {
         path="/moe/parent-details"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering ParentDetails component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
               <ParentDetails />
             ) : (
@@ -171,6 +199,7 @@ function AppRoutes() {
         path="/moe/add-parent"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering AddParent component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
               <AddParent />
             ) : (
@@ -183,6 +212,7 @@ function AppRoutes() {
         path="/moe/announcement-management"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering AnnouncementManagement component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
               <AnnouncementManagement />
             ) : (
@@ -195,6 +225,7 @@ function AppRoutes() {
         path="/moe/student-records"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering StudentRecords component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
               <StudentRecords />
             ) : (
@@ -207,6 +238,7 @@ function AppRoutes() {
         path="/moe/teacher-management"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering TeacherManagement component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
               <TeacherManagement />
             ) : (
@@ -219,6 +251,7 @@ function AppRoutes() {
         path="/moe/reports"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering Reports component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
               <Reports />
             ) : (
@@ -231,6 +264,7 @@ function AppRoutes() {
         path="/moe/student-profile"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering StudentProfile component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.STUDENT) ? (
               <StudentProfile />
             ) : (
@@ -243,6 +277,7 @@ function AppRoutes() {
         path="/moe/class-management"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering ClassManagement component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.TEACHER) ? (
               <ClassManagement />
             ) : (
@@ -255,6 +290,7 @@ function AppRoutes() {
         path="/moe/district-reports"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering DistrictReports component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
               <DistrictReports />
             ) : (
@@ -267,6 +303,7 @@ function AppRoutes() {
         path="/moe/district-overview"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering DistrictOverview component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
               <DistrictOverview />
             ) : (
@@ -279,6 +316,7 @@ function AppRoutes() {
         path="/moe/school-reports"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering SchoolReports component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
               <SchoolReports />
             ) : (
@@ -291,6 +329,7 @@ function AppRoutes() {
         path="/moe/student-reports"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering StudentReports component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.PARENT) ? (
               <StudentReports />
             ) : (
@@ -303,6 +342,7 @@ function AppRoutes() {
         path="/moe/teacher-reports"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering TeacherReports component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SCHOOL_ADMIN) ? (
               <TeacherReports />
             ) : (
@@ -315,6 +355,7 @@ function AppRoutes() {
         path="/moe/compliance-reports"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering ComplianceReports component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
               <ComplianceReports />
             ) : (
@@ -327,6 +368,7 @@ function AppRoutes() {
         path="/moe/database-tools"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering DatabaseTools component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.DATABASE_ADMIN) ? (
               <DatabaseTools />
             ) : (
@@ -339,6 +381,7 @@ function AppRoutes() {
         path="/moe/user-management"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering UserManagement component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.SYSTEM_ADMIN) ? (
               <UserManagement />
             ) : (
@@ -351,6 +394,7 @@ function AppRoutes() {
         path="/moe/ministry-employee-management"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering MinistryEmployeeManagement component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
               <MinistryEmployeeManagement />
             ) : (
@@ -363,6 +407,7 @@ function AppRoutes() {
         path="/moe/school-admin-management"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering SchoolAdminManagement component')}
             {isAuthenticated && hasPermission(user?.securityLevel, SecurityLevels.MINISTRY_OFFICIAL) ? (
               <SchoolAdminManagement />
             ) : (
@@ -375,6 +420,7 @@ function AppRoutes() {
         path="*"
         element={
           <ErrorBoundary>
+            {console.log('AppRoutes.jsx - Rendering fallback Navigate to /system')}
             <Navigate to="/system" />
           </ErrorBoundary>
         }
