@@ -4,21 +4,21 @@
 
 @layer base {
   body {
-    @apply bg-black text-white font-inter antialiased;
+    @apply bg-gray-100 text-gray-900 font-inter antialiased;
   }
 }
 
 @layer components {
   .bg-glass {
-    @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl shadow-lg;
+    @apply bg-white/10 backdrop-blur-lg border border-gray-200 rounded-xl shadow-lg;
   }
   
   .bg-glass-dark {
-    @apply bg-black/40 backdrop-blur-lg border border-white/20 rounded-xl shadow-xl;
+    @apply bg-gray-800/40 backdrop-blur-lg border border-gray-200 rounded-xl shadow-xl;
   }
   
   .logo-container {
-    @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 transition-all duration-500;
+    @apply bg-white/10 backdrop-blur-md border border-gray-200 rounded-2xl p-4 transition-all duration-500;
   }
 }
 
@@ -70,6 +70,6 @@
   
   /* Glass morphism effect */
   .glass-effect {
-    @apply bg-white/5 backdrop-blur-lg border border-white/10;
+    @apply bg-white/5 backdrop-blur-lg border border-gray-200;
   }
 }
