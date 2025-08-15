@@ -74,7 +74,6 @@ const sections = [
             <span className="font-semibold">Use Case:</span> Ideal for consumer-focused marketing campaigns to emphasize simplicity and versatility.
           </p>
         </div>
-
         <div>
           <h3 className="text-xl font-semibold mb-2 text-white">Connecting Liberia, Digitally and Seamlessly</h3>
           <p className="text-white">
@@ -87,7 +86,6 @@ const sections = [
             <span className="font-semibold">Use Case:</span> Suitable for corporate communications, partnerships, and investor pitches to highlight the company's role in unifying Liberia through technology.
           </p>
         </div>
-
         <div>
           <h3 className="text-xl font-semibold mb-2 text-white">Empowering Lives Through Technology</h3>
           <p className="text-white">
@@ -131,7 +129,6 @@ const sections = [
             </li>
           </ul>
         </div>
-        
         <div className="bg-white/5 p-4 rounded-lg border border-white/10 backdrop-blur-sm">
           <h4 className="font-bold text-lg mb-2">Government Integration</h4>
           <ul className="space-y-2">
@@ -153,7 +150,6 @@ const sections = [
             </li>
           </ul>
         </div>
-        
         <div className="bg-white/5 p-4 rounded-lg border border-white/10 backdrop-blur-sm">
           <h4 className="font-bold text-lg mb-2">Business Solutions</h4>
           <ul className="space-y-2">
@@ -175,7 +171,6 @@ const sections = [
             </li>
           </ul>
         </div>
-        
         <div className="bg-white/5 p-4 rounded-lg border border-white/10 backdrop-blur-sm">
           <h4 className="font-bold text-lg mb-2">Community Features</h4>
           <ul className="space-y-2">
@@ -199,6 +194,56 @@ const sections = [
         </div>
       </div>
     )
+  },
+  {
+    id: "contact",
+    title: "Contact Us",
+    bgColor: "bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-yellow-600/10",
+    borderColor: "border-amber-400/30",
+    content: (
+      <div className="text-white space-y-4">
+        <p className="text-lg">
+          Have questions or need support? Reach out to us through any of these channels:
+        </p>
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+          <h3 className="text-xl font-semibold mb-2 text-amber-200">Email:</h3>
+          <ul className="space-y-2">
+            <li className="flex items-center">
+              <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <a href="mailto:info@digitalliberia.com" className="hover:text-amber-300 transition-colors">info@digitalliberia.com</a>
+            </li>
+            <li className="flex items-center">
+              <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <a href="mailto:info@liberianpost.com" className="hover:text-amber-300 transition-colors">info@liberianpost.com</a>
+            </li>
+          </ul>
+        </div>
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+          <h3 className="text-xl font-semibold mb-2 text-amber-200">Phone:</h3>
+          <ul className="space-y-2">
+            <li className="flex items-center">
+              <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              <span>WhatsApp: <a href="https://wa.me/231888001077" className="hover:text-amber-300 transition-colors">+231 888 001 077</a></span>
+            </li>
+            <li className="flex items-center">
+              <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              <span>Call: <a href="tel:+231775055817" className="hover:text-amber-300 transition-colors">+231 775 055 817</a></span>
+            </li>
+          </ul>
+        </div>
+        <p className="text-sm text-white/70 mt-4">
+          Our team is available to assist you Monday through Friday, 8:00 AM to 5:00 PM GMT.
+        </p>
+      </div>
+    )
   }
 ];
 
@@ -215,10 +260,7 @@ export default function Digitalliberia() {
 
   return (
     <div className="relative min-h-screen w-full bg-slate-900 text-white font-inter overflow-x-hidden">
-      {/* Layer 1: Dark Background */}
       <div className="fixed inset-0 bg-slate-900 -z-50" />
-
-      {/* Centered Image Slideshow */}
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
         <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
           {logos.map((logo, index) => (
@@ -232,14 +274,16 @@ export default function Digitalliberia() {
                 src={logo}
                 alt={`Logo ${index}`}
                 className="max-w-full max-h-full object-contain"
+                onError={(e) => {
+                  e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"%3E%3Cpath d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/%3E%3C/svg%3E';
+                  console.error(`Digitalliberia.jsx - Failed to load logo: ${logo}`);
+                }}
               />
               <div className="absolute inset-0 bg-black/5" />
             </div>
           ))}
         </div>
       </div>
-
-      {/* Navigation */}
       <header className="fixed top-0 left-0 w-full z-50">
         <div className="bg-slate-900/80 backdrop-blur-md border-b border-slate-700/30">
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
@@ -260,7 +304,6 @@ export default function Digitalliberia() {
               ))}
             </nav>
           </div>
-
           <div className="w-full bg-gradient-to-b from-slate-900 to-transparent overflow-x-auto">
             <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
               {logos.map((logo, index) => (
@@ -268,7 +311,7 @@ export default function Digitalliberia() {
                   key={index}
                   className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
                     index === activeLogo 
-                      ? "scale-110 bg-white shadow-lg" 
+                      ? "scale-110 bg-white shadow-lg"
                       : "scale-100 bg-white/90"
                   }`}
                   style={{
@@ -279,6 +322,10 @@ export default function Digitalliberia() {
                     src={logo}
                     alt={`Logo ${index}`}
                     className="w-12 h-12 md:w-16 md:h-16 object-contain"
+                    onError={(e) => {
+                      e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"%3E%3Cpath d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/%3E%3C/svg%3E';
+                      console.error(`Digitalliberia.jsx - Failed to load logo: ${logo}`);
+                    }}
                   />
                 </div>
               ))}
@@ -286,8 +333,6 @@ export default function Digitalliberia() {
           </div>
         </div>
       </header>
-
-      {/* Content Sections */}
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
         {sections.map((section, index) => (
           <section
@@ -312,14 +357,11 @@ export default function Digitalliberia() {
           </section>
         ))}
       </main>
-
-      {/* Footer */}
       <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
         <div className="border-t border-slate-700/30 pt-6">
           © {new Date().getFullYear()} Digital Liberia. All rights reserved.
         </div>
       </footer>
-
       <style jsx global>{`
         @keyframes fadeInUp {
           from {
@@ -331,7 +373,6 @@ export default function Digitalliberia() {
             transform: translateY(0);
           }
         }
-        
         @keyframes heartbeat {
           0% { transform: scale(1); }
           25% { transform: scale(1.1); }
@@ -339,7 +380,6 @@ export default function Digitalliberia() {
           75% { transform: scale(1.1); }
           100% { transform: scale(1); }
         }
-        
         .overflow-x-auto {
           -ms-overflow-style: none;
           scrollbar-width: none;
