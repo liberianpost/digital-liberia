@@ -5,15 +5,16 @@ import { getDefaultRouteForLevel } from './utils/dashboardManager';
 import AppRoutes from './AppRoutes';
 import { CircularProgress, Box } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { CacheProvider } from '@emotion/react';
+import createCache from '@emotion/cache';
 
-// Keep these imports if they're used in your routes
-import Home from './Home';
-import System from './System';
-import Dssn from './Dssn';
-import Digitalliberia from './Digitalliberia';
-import Libpay from './Libpay';
+// Create Emotion cache
+const cache = createCache({
+  key: 'css',
+  prepend: true, // Ensures styles are injected correctly
+});
 
-// Create theme with proper defaults
+// Create MUI theme
 const theme = createTheme({
   palette: {
     mode: 'light',
@@ -42,10 +43,10 @@ function AppNavigator() {
 
   if (!initialized || loading) {
     return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
         minHeight="100vh"
         bgcolor="background.default"
       >
@@ -63,13 +64,15 @@ function AppNavigator() {
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <AuthProvider>
-        <BrowserRouter>
-          <AppNavigator />
-        </BrowserRouter>
-      </AuthProvider>
-    </ThemeProvider>
+    <CacheProvider value={cache}>
+      <ThemeProvider theme={theme}>
+        <AuthProvider>
+          <BrowserRouter>
+            <AppNavigator />
+          </BrowserRouter>
+        </AuthProvider>
+      </ThemeProvider>
+    </CacheProvider>
   );
 }
 
