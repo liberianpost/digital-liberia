@@ -1,5 +1,7 @@
 import { DashboardItems } from '@config/dashboardItems';
-import { SecurityLevels } from './auth';
+import { SecurityLevels } from './securityLevels';
+
+console.log('dashboardManager.js - Starting to load dashboardManager');
 
 const defaultRoutes = {
   [SecurityLevels.STUDENT]: '/moe/student-profile',
@@ -12,17 +14,29 @@ const defaultRoutes = {
 };
 
 export function getDefaultRouteForLevel(securityLevel) {
-  console.log('dashboardManager.js - getDefaultRouteForLevel called with:', securityLevel);
-  return defaultRoutes[securityLevel] || '/moe/dashboard';
+  try {
+    console.log('dashboardManager.js - getDefaultRouteForLevel called with:', securityLevel);
+    return defaultRoutes[securityLevel] || '/moe/dashboard';
+  } catch (error) {
+    console.error('dashboardManager.js - getDefaultRouteForLevel error:', error);
+    return '/moe/dashboard';
+  }
 }
 
 export function getAvailableDashboardItems(securityLevel) {
-  const currentLevel = securityLevel || SecurityLevels.STUDENT;
-  console.log('dashboardManager.js - getAvailableDashboardItems called with:', currentLevel);
-  return DashboardItems.filter((item) => {
-    const levels = Object.values(SecurityLevels);
-    const requiredIndex = levels.indexOf(item.requiredLevel);
-    const userIndex = levels.indexOf(currentLevel);
-    return userIndex >= requiredIndex;
-  });
+  try {
+    const currentLevel = securityLevel || SecurityLevels.STUDENT;
+    console.log('dashboardManager.js - getAvailableDashboardItems called with:', currentLevel);
+    return DashboardItems.filter((item) => {
+      const levels = Object.values(SecurityLevels);
+      const requiredIndex = levels.indexOf(item.requiredLevel);
+      const userIndex = levels.indexOf(currentLevel);
+      return userIndex >= requiredIndex;
+    });
+  } catch (error) {
+    console.error('dashboardManager.js - getAvailableDashboardItems error:', error);
+    return [];
+  }
 }
+
+console.log('dashboardManager.js - DashboardManager loaded successfully');
