@@ -9,8 +9,7 @@ export default defineConfig({
       babel: {
         plugins: [
           ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }],
-          // Add Emotion plugin to ensure proper CSS-in-JS handling
-          ['@emotion', { autoLabel: true, labelFormat: '[local]' }],
+          ['@emotion', { autoLabel: 'dev-only', sourceMap: true }], // Fixed autoLabel
         ],
       },
     }),
@@ -30,7 +29,7 @@ export default defineConfig({
     exclude: [],
   },
   build: {
-    sourcemap: true, // Enable source maps for debugging
+    sourcemap: true,
     minify: 'esbuild',
     target: 'esnext',
     rollupOptions: {
@@ -43,7 +42,7 @@ export default defineConfig({
               return 'vendor-react';
             }
             if (id.includes('@emotion') || id.includes('emotion')) {
-              return 'vendor-emotion'; // Separate Emotion chunk to avoid initialization issues
+              return 'vendor-emotion';
             }
             return 'vendor';
           }
@@ -51,7 +50,7 @@ export default defineConfig({
             return 'config';
           }
           if (id.includes('src/utils')) {
-            return 'utils'; // Separate utils to avoid circular dependencies
+            return 'utils';
           }
         },
       },
@@ -59,13 +58,13 @@ export default defineConfig({
     chunkSizeWarningLimit: 1600,
   },
   server: {
-    port: 3002, // Changed from 3001 to avoid conflicts
-    strictPort: false, // Allow Vite to pick another port if 3002 is in use
-    host: '0.0.0.0', // Allow localhost and network access
-    open: true, // Auto-open browser
+    port: 3004, // Changed to 3004
+    strictPort: false,
+    host: '0.0.0.0',
+    open: false,
     hmr: {
       overlay: true,
-      clientPort: 3002, // Match new port
+      clientPort: 3004,
     },
     fs: {
       strict: false,
@@ -81,5 +80,5 @@ export default defineConfig({
     'process.env': {},
   },
   clearScreen: true,
-  logLevel: 'info', // Verbose logging for debugging
+  logLevel: 'info',
 });
