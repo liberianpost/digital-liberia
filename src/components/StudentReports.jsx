@@ -1,240 +1,286 @@
-// src/components/StudentReports.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  Card,
-  CardContent,
-  Divider,
-  Fab,
-  Box,
-  Chip,
-  Grid,
-  LinearProgress
-} from '@mui/material';
-import {
-  ArrowBack as BackIcon,
-  FilterAlt as FilterIcon,
-  Refresh as RefreshIcon,
-  LocationOn as LocationIcon,
-  Share as ShareIcon
-} from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
+import { useAuth } from '@context/AuthContext';
+import { SecurityLevels } from '@utils/securityLevels';
+import { hasPermission } from '@utils/auth';
+import api from '@utils/api';
 
-// Sample data
-const counties = [
-  {
-    name: "Montserrado",
-    totalStudents: 215000,
-    femalePercentage: 48,
-    malePercentage: 52,
-    primaryStudents: 120000,
-    secondaryStudents: 95000
-  },
-  {
-    name: "Bomi",
-    totalStudents: 45000,
-    femalePercentage: 47,
-    malePercentage: 53,
-    primaryStudents: 25000,
-    secondaryStudents: 20000
-  }
-  // Add other counties as needed
-];
-
-const StatCard = styled(Card)(({ theme, bgcolor }) => ({
-  backgroundColor: bgcolor,
-  color: theme.palette.getContrastText(bgcolor),
-  textAlign: 'center',
-  padding: theme.spacing(2),
-  flex: 1,
-  margin: theme.spacing(0, 0.5)
-}));
-
-export default function StudentReports() {
+const StudentReports = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const REQUIRED_SECURITY_LEVEL = SecurityLevels.DISTRICT_ADMIN;
+  const [counties, setCounties] = useState([]);
+  const [summary, setSummary] = useState({
+    totalStudents: 0,
+    femalePercentage: 0,
+    malePercentage: 0
+  });
   const [selectedCounty, setSelectedCounty] = useState('all');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user || !hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
+      alert('Access denied. Requires DISTRICT ADMIN privileges.');
+      navigate('/moe/dashboard', { replace: true });
+    } else {
+      setLoading(true);
+      Promise.all([
+        api.get('/student-reports/counties'),
+        api.get('/student-reports/summary')
+      ])
+        .then(([countiesResponse, summaryResponse]) => {
+          setCounties(countiesResponse.data);
+          setSummary(summaryResponse.data);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Error fetching student reports:', error);
+          alert('Failed to load student reports.');
+          setLoading(false);
+        });
+    }
+  }, [user, navigate]);
 
   const handleCountyFilter = (county) => {
     setSelectedCounty(county);
-    // Here you would typically filter data
+    // Implement client-side filtering if needed
   };
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setLoading(true);
-    // Simulate data refresh
-    setTimeout(() => setLoading(false), 1000);
+    try {
+      const [countiesResponse, summaryResponse] = await Promise.all([
+        api.get('/student-reports/counties'),
+        api.get('/student-reports/summary')
+      ]);
+      setCounties(countiesResponse.data);
+      setSummary(summaryResponse.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error refreshing student reports:', error);
+      alert('Failed to refresh student reports.');
+      setLoading(false);
+    }
   };
 
-  const handleExport = () => {
-    // Implement export functionality
-    console.log("Export clicked");
+  const handleExport = async () => {
+    try {
+      await api.post('/student-reports/export', { county: selectedCounty });
+      alert('Export initiated.');
+    } catch (error) {
+      console.error('Error exporting student reports:', error);
+      alert('Failed to export student reports.');
+    }
   };
 
   const handleCountyClick = (countyName) => {
-    // Navigate to district view or expand county card
     console.log(`Clicked on ${countyName}`);
+    // Navigate to district view if implemented
   };
 
   const handleFilterClick = () => {
-    // Show filter dialog
-    console.log("Filter clicked");
+    console.log('Filter clicked');
+    // Implement filter dialog if needed
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-4/5 bg-gray-200 rounded-full h-2">
+          <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '50%' }}></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      {/* App Bar */}
-      <AppBar position="static" elevation={4} sx={{ backgroundColor: 'white' }}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={() => navigate(-1)}
-            sx={{ mr: 2, color: 'primary.main' }}
-          >
-            <BackIcon />
-          </IconButton>
-          <Typography 
-            variant="h6" 
-            component="div" 
-            sx={{ flexGrow: 1, color: 'primary.main' }}
-          >
-            Liberia Student Reports
-          </Typography>
-          <IconButton color="inherit" onClick={handleFilterClick} sx={{ color: 'primary.main' }}>
-            <FilterIcon />
-          </IconButton>
-          <IconButton color="inherit" onClick={handleRefresh} sx={{ color: 'primary.main' }}>
-            <RefreshIcon />
-          </IconButton>
-        </Toolbar>
-
-        {/* County Filter Chips */}
-        <Box sx={{ px: 2, pb: 1, display: 'flex', overflowX: 'auto' }}>
-          <Chip
-            label="All Liberia"
-            variant={selectedCounty === 'all' ? 'filled' : 'outlined'}
-            onClick={() => handleCountyFilter('all')}
-            color="primary"
-            sx={{ mr: 1 }}
-          />
-          {counties.map((county) => (
-            <Chip
-              key={county.name}
-              label={county.name}
-              variant={selectedCounty === county.name.toLowerCase() ? 'filled' : 'outlined'}
-              onClick={() => handleCountyFilter(county.name.toLowerCase())}
-              color="primary"
-              sx={{ mr: 1 }}
-            />
-          ))}
-        </Box>
-      </AppBar>
-
-      {/* Main Content */}
-      <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
-        {loading ? (
-          <LinearProgress />
-        ) : (
-          <>
-            {/* Summary Card */}
-            <Card sx={{ mb: 3, borderRadius: 2 }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 1, color: 'primary.main' }}>
-                  Liberia Student Summary
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  <StatCard bgcolor="#2196F3">
-                    <Typography variant="h5">215,000</Typography>
-                    <Typography variant="body2">Total Students</Typography>
-                  </StatCard>
-                  <StatCard bgcolor="#E91E63">
-                    <Typography variant="h5">48%</Typography>
-                    <Typography variant="body2">Female</Typography>
-                  </StatCard>
-                  <StatCard bgcolor="#3F51B5">
-                    <Typography variant="h5">52%</Typography>
-                    <Typography variant="body2">Male</Typography>
-                  </StatCard>
-                </Box>
-              </CardContent>
-            </Card>
-
-            {/* Geographic Hierarchy Section */}
-            <Typography variant="h6" sx={{ mb: 2, color: 'text.primary' }}>
-              Reports by Location
-            </Typography>
-
-            {/* County Cards */}
-            {counties.map((county) => (
-              <Card 
-                key={county.name}
-                sx={{ mb: 2, borderRadius: 2, cursor: 'pointer' }}
-                onClick={() => handleCountyClick(county.name)}
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white text-black p-4 shadow-md border-b border-gray-200">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div className="flex items-center">
+            <button
+              onClick={() => navigate(-1)}
+              className="mr-4 text-black"
+              aria-label="Go back"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <LocationIcon color="primary" sx={{ mr: 1 }} />
-                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                      {county.name} County
-                    </Typography>
-                    <Box sx={{ flexGrow: 1 }} />
-                    <Typography variant="body2" color="text.secondary">
-                      {county.totalStudents.toLocaleString()} Students
-                    </Typography>
-                  </Box>
-                  
-                  <Grid container spacing={2} sx={{ mt: 1 }}>
-                    <Grid item xs={6}>
-                      <Typography variant="body2">Primary Students</Typography>
-                      <Typography variant="h6">
-                        {county.primaryStudents.toLocaleString()}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="body2">Secondary Students</Typography>
-                      <Typography variant="h6">
-                        {county.secondaryStudents.toLocaleString()}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="body2">Female</Typography>
-                      <Typography variant="h6">
-                        {county.femalePercentage}%
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="body2">Male</Typography>
-                      <Typography variant="h6">
-                        {county.malePercentage}%
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            ))}
-          </>
-        )}
-      </Box>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+            </button>
+            <h1 className="text-xl font-bold">Liberia Student Reports</h1>
+            <div className="ml-4 flex space-x-2">
+              <button
+                onClick={handleFilterClick}
+                className="text-gray-800 hover:text-gray-600"
+                aria-label="Filter"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={handleRefresh}
+                className="text-gray-800 hover:text-gray-600"
+                aria-label="Refresh"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="mt-2 px-4 flex overflow-x-auto max-w-7xl mx-auto">
+          <button
+            onClick={() => handleCountyFilter('all')}
+            className={`px-3 py-1 text-sm rounded mr-2 ${
+              selectedCounty === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'
+            } hover:bg-blue-500 hover:text-white transition-colors`}
+          >
+            All Liberia
+          </button>
+          {counties.map((county) => (
+            <button
+              key={county.name}
+              onClick={() => handleCountyFilter(county.name.toLowerCase())}
+              className={`px-3 py-1 text-sm rounded mr-2 ${
+                selectedCounty === county.name.toLowerCase() ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'
+              } hover:bg-blue-500 hover:text-white transition-colors`}
+            >
+              {county.name}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      {/* Export FAB */}
-      <Fab
-        color="primary"
-        aria-label="export"
-        onClick={handleExport}
-        sx={{ 
-          position: 'fixed',
-          bottom: 16,
-          right: 16
-        }}
-      >
-        <ShareIcon />
-      </Fab>
-    </Box>
+      <div className="p-4 max-w-7xl mx-auto">
+        <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+          <h2 className="text-lg font-bold text-gray-800">Liberia Student Summary</h2>
+          <hr className="my-2" />
+          <div className="flex flex-wrap gap-2">
+            <div className="flex-1 bg-blue-500 text-white rounded-lg p-4 text-center min-w-[150px]">
+              <p className="text-2xl font-bold">{summary.totalStudents.toLocaleString()}</p>
+              <p className="text-sm">Total Students</p>
+            </div>
+            <div className="flex-1 bg-pink-500 text-white rounded-lg p-4 text-center min-w-[150px]">
+              <p className="text-2xl font-bold">{summary.femalePercentage}%</p>
+              <p className="text-sm">Female</p>
+            </div>
+            <div className="flex-1 bg-indigo-500 text-white rounded-lg p-4 text-center min-w-[150px]">
+              <p className="text-2xl font-bold">{summary.malePercentage}%</p>
+              <p className="text-sm">Male</p>
+            </div>
+          </div>
+        </div>
+
+        <h2 className="text-lg font-bold text-gray-800 mb-2">Reports by Location</h2>
+        {counties.map((county) => (
+          <div
+            key={county.name}
+            onClick={() => handleCountyClick(county.name)}
+            className="bg-white rounded-lg shadow-md p-4 mb-2 cursor-pointer hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center mb-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-blue-600 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              <h3 className="text-base font-bold text-gray-800">{county.name} County</h3>
+              <div className="flex-grow" />
+              <p className="text-sm text-gray-600">{county.totalStudents.toLocaleString()} Students</p>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <p className="text-sm text-gray-600">Primary Students</p>
+                <p className="text-base font-bold">{county.primaryStudents.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Secondary Students</p>
+                <p className="text-base font-bold">{county.secondaryStudents.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Female</p>
+                <p className="text-base font-bold">{county.femalePercentage}%</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Male</p>
+                <p className="text-base font-bold">{county.malePercentage}%</p>
+              </div>
+            </div>
+          </div>
+        ))}
+        <button
+          onClick={handleExport}
+          className="fixed bottom-4 right-4 bg-blue-600 text-white rounded-full p-4 shadow-lg hover:bg-blue-700 transition-colors"
+          aria-label="Export"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
   );
-}
+};
+
+export default StudentReports;
