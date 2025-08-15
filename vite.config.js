@@ -22,6 +22,14 @@ export default defineConfig({
       '@utils': path.resolve(__dirname, 'src/utils'),
       '@config': path.resolve(__dirname, 'src/config'),
     },
+    dedupe: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@emotion/react',
+      '@emotion/styled',
+      '@mui/material',
+    ], // Prevent duplicate Emotion/MUI instances
   },
   esbuild: {
     loader: 'jsx',
