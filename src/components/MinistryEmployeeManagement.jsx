@@ -1,39 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { SecurityLevels, hasPermission } from '../utils/auth';
+import { useAuth } from '@context/AuthContext';
+import { SecurityLevels } from '@utils/securityLevels';
+import { hasPermission } from '@utils/auth';
+import api from '@utils/api';
 
 const MinistryEmployeeManagement = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-
   const REQUIRED_SECURITY_LEVEL = SecurityLevels.DATABASE_ADMIN;
+  const [employees, setEmployees] = useState([]);
 
-  // Check permissions and redirect if unauthorized
-  if (!hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
-    alert("Access denied. Requires DATABASE ADMIN privileges.");
-    navigate(-1);
-    return null;
-  }
+  useEffect(() => {
+    if (!user || !hasPermission(REQUIRED_SECURITY_LEVEL, user?.securityLevel)) {
+      alert('Access denied. Requires DATABASE ADMIN privileges.');
+      navigate(-1);
+    } else {
+      api.get('/employees')
+        .then(response => setEmployees(response.data))
+        .catch(error => {
+          console.error('Error fetching employees:', error);
+          alert('Failed to load employees.');
+        });
+    }
+  }, [user, navigate]);
 
-  // Dummy employee data (replace with actual data from API/ViewModel)
-  const [employees] = useState([
-    { name: 'John Doe', position: 'Director', status: 'Active' },
-    { name: 'Jane Smith', position: 'Deputy Director', status: 'Active' },
-    { name: 'Robert Johnson', position: 'Accountant', status: 'Suspended' },
-  ]);
-
-  const handleAddEmployee = () => {
-    alert('Add New Employee feature coming soon');
+  const handleAddEmployee = async () => {
+    try {
+      await api.post('/employees/add');
+      alert('Add New Employee feature initiated.');
+    } catch (error) {
+      console.error('Error adding employee:', error);
+      alert('Failed to initiate add employee.');
+    }
   };
 
-  const handleEmployeeAction = (employee, action) => {
-    alert(`${action} employee ${employee.name} feature coming soon`);
+  const handleEmployeeAction = async (employee, action) => {
+    try {
+      await api.post(`/employees/${employee.id}/${action.toLowerCase()}`);
+      alert(`${action} employee ${employee.name} initiated.`);
+    } catch (error) {
+      console.error(`Error performing ${action} on employee:`, error);
+      alert(`Failed to ${action.toLowerCase()} employee ${employee.name}.`);
+    }
   };
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Toolbar */}
       <div className="bg-white text-black p-4 shadow-md border-b border-gray-200">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center">
@@ -62,9 +75,7 @@ const MinistryEmployeeManagement = () => {
         </div>
       </div>
 
-      {/* Content Area */}
       <div className="p-4 max-w-3xl mx-auto">
-        {/* Header Card */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
           <h2 className="text-lg font-bold text-black">Ministry Employee Management</h2>
           <p className="mt-1 text-sm text-gray-600">Manage all ministry employees</p>
@@ -90,22 +101,24 @@ const MinistryEmployeeManagement = () => {
           </button>
         </div>
 
-        {/* Employee List */}
         <div className="space-y-2">
-          {employees.map((employee, index) => (
-            <EmployeeCard
-              key={index}
-              employee={employee}
-              onAction={handleEmployeeAction}
-            />
-          ))}
+          {employees.length === 0 ? (
+            <p className="text-gray-500 text-center">No employees available.</p>
+          ) : (
+            employees.map((employee, index) => (
+              <EmployeeCard
+                key={index}
+                employee={employee}
+                onAction={handleEmployeeAction}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-// EmployeeCard component to replace MinistryEmployeeAdapter
 const EmployeeCard = ({ employee, onAction }) => {
   const getStatusStyles = (status) => {
     switch (status.toLowerCase()) {
@@ -126,6 +139,10 @@ const EmployeeCard = ({ employee, onAction }) => {
             src="/logos/person.png"
             alt="Employee icon"
             className="w-10 h-10 object-contain"
+            onError={(e) => {
+              console.error('Failed to load employee icon');
+              e.target.src = 'https://via.placeholder.com/40?text=Person';
+            }}
           />
           <div className="ml-4">
             <h3 className="text-base font-bold text-black">{employee.name}</h3>
