@@ -1,5 +1,7 @@
 import { SecurityLevels } from '@/utils/auth';
 
+console.log('dashboardItems.js - Loaded DashboardItems configuration');
+
 export const DashboardItems = [
   {
     id: 'my-profile',
