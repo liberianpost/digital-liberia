@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, Component } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
 import { SecurityLevels, hasPermission } from '@utils/auth';
 import System from './System';
