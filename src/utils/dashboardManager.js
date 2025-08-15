@@ -17,7 +17,7 @@ export function getDefaultRouteForLevel(securityLevel) {
 
 export function getAvailableDashboardItems(securityLevel) {
   const currentLevel = securityLevel || SecurityLevels.STUDENT;
-  return DashboardItems.filter(item => {
+  return DashboardItems.filter((item) => {
     const levels = Object.values(SecurityLevels);
     const requiredIndex = levels.indexOf(item.requiredLevel);
     const userIndex = levels.indexOf(currentLevel);
