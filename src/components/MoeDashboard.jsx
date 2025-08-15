@@ -9,17 +9,17 @@ class ErrorBoundary extends Component {
   state = { error: null };
 
   static getDerivedStateFromError(error) {
+    console.error('MoeDashboard.jsx - ErrorBoundary caught:', error, error.stack);
     return { error };
   }
 
   render() {
     if (this.state.error) {
-      console.error('MoeDashboard ErrorBoundary caught:', this.state.error);
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
             <h1 className="text-2xl font-bold mb-4">Something Went Wrong</h1>
-            <p className="text-red-600 mb-6">{this.state.error.message}</p>
+            <p className="text-red-600 mb-6">{this.state.error.message || 'An unexpected error occurred'}</p>
             <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -35,39 +35,55 @@ class ErrorBoundary extends Component {
 }
 
 const MoeDashboard = () => {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout } = useAuth() || { user: null, loading: true };
   const navigate = useNavigate();
   const location = useLocation();
   const [currentDate] = useState(new Date());
 
   useEffect(() => {
+    console.log('MoeDashboard.jsx - useEffect - user:', user, 'loading:', loading, 'location:', location.pathname);
     if (loading) return;
     if (!user) {
-      console.log('MoeDashboard: No user, redirecting to /system');
+      console.log('MoeDashboard.jsx - No user, redirecting to /system');
       navigate('/system', { replace: true });
     } else {
-      const defaultRoute = getDefaultRouteForLevel(user.securityLevel);
-      if (location.pathname === '/moe/dashboard') {
-        console.log(`MoeDashboard: Redirecting to ${defaultRoute} for ${user.securityLevel}`);
-        navigate(defaultRoute, { replace: true });
+      try {
+        const defaultRoute = getDefaultRouteForLevel(user.securityLevel);
+        if (location.pathname === '/moe/dashboard') {
+          console.log(`MoeDashboard.jsx - Redirecting to ${defaultRoute} for ${user.securityLevel}`);
+          navigate(defaultRoute, { replace: true });
+        }
+      } catch (error) {
+        console.error('MoeDashboard.jsx - Navigation error:', error);
       }
     }
   }, [user, loading, navigate, location.pathname]);
 
-  const availableItems = getAvailableDashboardItems(user?.securityLevel);
+  let availableItems = [];
+  try {
+    availableItems = getAvailableDashboardItems(user?.securityLevel);
+    console.log('MoeDashboard.jsx - Available items:', availableItems);
+  } catch (error) {
+    console.error('MoeDashboard.jsx - Error fetching available items:', error);
+  }
 
   const handleCardClick = (path) => {
-    console.log('Navigating to:', path);
+    console.log('MoeDashboard.jsx - Navigating to:', path);
     navigate(path);
   };
 
   const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    try {
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch (error) {
+      console.error('MoeDashboard.jsx - Error formatting date:', error);
+      return 'Date unavailable';
+    }
   };
 
   if (loading) {
@@ -114,7 +130,10 @@ const MoeDashboard = () => {
                 src="/logos/moe.png"
                 alt="MOE Logo"
                 className="w-16 h-16"
-                onError={() => console.error('Failed to load MOE logo')}
+                onError={(e) => {
+                  console.error('MoeDashboard.jsx - Failed to load MOE logo');
+                  e.target.src = 'https://via.placeholder.com/64?text=MOE';
+                }}
               />
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">
@@ -125,7 +144,7 @@ const MoeDashboard = () => {
             </div>
             <button
               onClick={() => {
-                console.log('Logging out:', user);
+                console.log('MoeDashboard.jsx - Logging out:', user);
                 logout();
                 navigate('/system', { replace: true });
               }}
