@@ -11,7 +11,7 @@ import createCache from '@emotion/cache';
 // Create Emotion cache
 const cache = createCache({
   key: 'css',
-  prepend: true, // Ensures styles are injected correctly
+  prepend: true,
 });
 
 // Create MUI theme
