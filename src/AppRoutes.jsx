@@ -1,452 +1,234 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from './Home';
-import System from '@components/System';
-import Dssn from './Dssn';
-import Libpay from './Libpay';
-import Digitalliberia from './Digitalliberia';
-import MoeDashboard from '@components/MoeDashboard';
 import ProtectedRoute from '@components/ProtectedRoute';
-import StudentProfile from '@components/StudentProfile';
-import SystemSettings from '@components/SystemSettings';
-import StudentRegistration from '@components/StudentRegistration';
-import StudentReports from '@components/StudentReports';
-import ClassManagement from '@components/ClassManagement';
-import StudentRecords from '@components/StudentRecords';
-import SchoolManagement from '@components/SchoolManagement';
-import TeacherManagement from '@components/TeacherManagement';
-import DistrictReports from '@components/DistrictReports';
-import DistrictOverview from '@components/DistrictOverview';
-import DatabaseTools from '@components/DatabaseTools';
-import UserManagement from '@components/UserManagement';
-import AddParent from '@components/AddParent';
-import AnnouncementManagement from '@components/AnnouncementManagement';
-import ComplianceReports from '@components/ComplianceReports';
-import MinistryEmployeeManagement from '@components/MinistryEmployeeManagement';
-import ParentDetails from '@components/ParentDetails';
-import ParentManagement from '@components/ParentManagement';
-import Reports from '@components/Reports';
-import SchoolAdminManagement from '@components/SchoolAdminManagement';
-import SchoolReports from '@components/SchoolReports';
-import TeacherReports from '@components/TeacherReports';
+import LoadingFallback from '@components/LoadingFallback';
 
-const ProtectedRouteWithLogging = ({ children }) => {
-  console.log('ProtectedRoute - Checking authentication');
-  return <ProtectedRoute>{children}</ProtectedRoute>;
-};
+// Lazy load all components
+const System = React.lazy(() => import('@components/System'));
+const Dssn = React.lazy(() => import('./Dssn'));
+const Libpay = React.lazy(() => import('./Libpay'));
+const Digitalliberia = React.lazy(() => import('./Digitalliberia'));
+const MoeDashboard = React.lazy(() => import('@components/MoeDashboard'));
+const StudentProfile = React.lazy(() => import('@components/StudentProfile'));
+const SystemSettings = React.lazy(() => import('@components/SystemSettings'));
+const StudentRegistration = React.lazy(() => import('@components/StudentRegistration'));
+const StudentReports = React.lazy(() => import('@components/StudentReports'));
+const ClassManagement = React.lazy(() => import('@components/ClassManagement'));
+const StudentRecords = React.lazy(() => import('@components/StudentRecords'));
+const SchoolManagement = React.lazy(() => import('@components/SchoolManagement'));
+const TeacherManagement = React.lazy(() => import('@components/TeacherManagement'));
+const DistrictReports = React.lazy(() => import('@components/DistrictReports'));
+const DistrictOverview = React.lazy(() => import('@components/DistrictOverview'));
+const DatabaseTools = React.lazy(() => import('@components/DatabaseTools'));
+const UserManagement = React.lazy(() => import('@components/UserManagement'));
+const AddParent = React.lazy(() => import('@components/AddParent'));
+const AnnouncementManagement = React.lazy(() => import('@components/AnnouncementManagement'));
+const ComplianceReports = React.lazy(() => import('@components/ComplianceReports'));
+const MinistryEmployeeManagement = React.lazy(() => import('@components/MinistryEmployeeManagement'));
+const ParentDetails = React.lazy(() => import('@components/ParentDetails'));
+const ParentManagement = React.lazy(() => import('@components/ParentManagement'));
+const Reports = React.lazy(() => import('@components/Reports'));
+const SchoolAdminManagement = React.lazy(() => import('@components/SchoolAdminManagement'));
+const SchoolReports = React.lazy(() => import('@components/SchoolReports'));
+const TeacherReports = React.lazy(() => import('@components/TeacherReports'));
+
+const ProtectedRouteWithSuspense = ({ children }) => (
+  <ProtectedRoute>
+    <Suspense fallback={<LoadingFallback />}>
+      {children}
+    </Suspense>
+  </ProtectedRoute>
+);
 
 const AppRoutes = () => {
-  console.log('AppRoutes.jsx - Rendering AppRoutes component');
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <div>
-            {console.log('AppRoutes.jsx - Rendering Home component')}
-            <Home />
-          </div>
-        }
+      <Route path="/" element={<Home />} />
+      <Route path="/system" element={<System />} />
+      <Route path="/dssn" element={<Dssn />} />
+      <Route path="/libpay" element={<Libpay />} />
+      <Route path="/digital-liberia" element={<Digitalliberia />} />
+      <Route 
+        path="/liberian-post" 
+        element={<div>LiberianPost component placeholder</div>} 
       />
-      <Route
-        path="/system"
-        element={
-          <div>
-            {console.log('AppRoutes.jsx - Rendering System component')}
-            <System />
-          </div>
-        }
-      />
-      <Route
-        path="/dssn"
-        element={
-          <div>
-            {console.log('AppRoutes.jsx - Rendering Dssn component')}
-            <Dssn />
-          </div>
-        }
-      />
-      <Route
-        path="/libpay"
-        element={
-          <div>
-            {console.log('AppRoutes.jsx - Rendering Libpay component')}
-            <Libpay />
-          </div>
-        }
-      />
-      <Route
-        path="/digital-liberia"
-        element={
-          <div>
-            {console.log('AppRoutes.jsx - Rendering Digitalliberia component')}
-            <Digitalliberia />
-          </div>
-        }
-      />
-      <Route
-        path="/liberian-post"
-        element={
-          <div>
-            {console.log('AppRoutes.jsx - Rendering LiberianPost component')}
-            <div>LiberianPost component placeholder</div>
-          </div>
-        }
-      />
-      <Route
-        path="/moe/dashboard"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering MoeDashboard component')}
-              <MoeDashboard />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/student-profile/:studentId"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering StudentProfile component')}
-              <StudentProfile />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/system-settings"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering SystemSettings component')}
-              <SystemSettings />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/app-settings"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering AppSettings component')}
-              <div>AppSettings component placeholder</div>
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/backup-settings"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering BackupSettings component')}
-              <div>BackupSettings component placeholder</div>
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/student-registration"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering StudentRegistration component')}
-              <StudentRegistration />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/student-reports"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering StudentReports component')}
-              <StudentReports />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/class-management"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering ClassManagement component')}
-              <ClassManagement />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/add-class"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering AddClass component')}
-              <div>AddClass component placeholder</div>
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/student-records"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering StudentRecords component')}
-              <StudentRecords />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/school-management"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering SchoolManagement component')}
-              <SchoolManagement />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/teacher-management"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering TeacherManagement component')}
-              <TeacherManagement />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/teacher-details/:teacherId"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering TeacherDetails component')}
-              <div>TeacherDetails component placeholder</div>
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/district-reports"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering DistrictReports component')}
-              <DistrictReports />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      >
-        <Route
-          path="overview"
-          element={
-            <div>
-              {console.log('AppRoutes.jsx - Rendering DistrictOverview component')}
-              <DistrictOverview />
-            </div>
-          }
-        />
-        <Route
-          path="school-reports"
-          element={
-            <div>
-              {console.log('AppRoutes.jsx - Rendering SchoolReports component')}
-              <SchoolReports />
-            </div>
-          }
-        />
-        <Route
-          path="student-reports"
-          element={
-            <div>
-              {console.log('AppRoutes.jsx - Rendering StudentReports component')}
-              <StudentReports />
-            </div>
-          }
-        />
-        <Route
-          path="teacher-reports"
-          element={
-            <div>
-              {console.log('AppRoutes.jsx - Rendering TeacherReports component')}
-              <TeacherReports />
-            </div>
-          }
-        />
-        <Route
-          path="compliance-reports"
-          element={
-            <div>
-              {console.log('AppRoutes.jsx - Rendering ComplianceReports component')}
-              <ComplianceReports />
-            </div>
-          }
-        />
+
+      {/* Protected Routes */}
+      <Route path="/moe/dashboard" element={
+        <ProtectedRouteWithSuspense>
+          <MoeDashboard />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/student-profile/:studentId" element={
+        <ProtectedRouteWithSuspense>
+          <StudentProfile />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/system-settings" element={
+        <ProtectedRouteWithSuspense>
+          <SystemSettings />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/app-settings" element={
+        <ProtectedRouteWithSuspense>
+          <div>AppSettings component placeholder</div>
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/backup-settings" element={
+        <ProtectedRouteWithSuspense>
+          <div>BackupSettings component placeholder</div>
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/student-registration" element={
+        <ProtectedRouteWithSuspense>
+          <StudentRegistration />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/student-reports" element={
+        <ProtectedRouteWithSuspense>
+          <StudentReports />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/class-management" element={
+        <ProtectedRouteWithSuspense>
+          <ClassManagement />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/add-class" element={
+        <ProtectedRouteWithSuspense>
+          <div>AddClass component placeholder</div>
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/student-records" element={
+        <ProtectedRouteWithSuspense>
+          <StudentRecords />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/school-management" element={
+        <ProtectedRouteWithSuspense>
+          <SchoolManagement />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/teacher-management" element={
+        <ProtectedRouteWithSuspense>
+          <TeacherManagement />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/teacher-details/:teacherId" element={
+        <ProtectedRouteWithSuspense>
+          <div>TeacherDetails component placeholder</div>
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/district-reports" element={
+        <ProtectedRouteWithSuspense>
+          <DistrictReports />
+        </ProtectedRouteWithSuspense>
+      }>
+        <Route path="overview" element={<DistrictOverview />} />
+        <Route path="school-reports" element={<SchoolReports />} />
+        <Route path="student-reports" element={<StudentReports />} />
+        <Route path="teacher-reports" element={<TeacherReports />} />
+        <Route path="compliance-reports" element={<ComplianceReports />} />
       </Route>
-      <Route
-        path="/moe/database-tools"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering DatabaseTools component')}
-              <DatabaseTools />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/ministry-employee-management"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering MinistryEmployeeManagement component')}
-              <MinistryEmployeeManagement />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/school-admin-management"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering SchoolAdminManagement component')}
-              <SchoolAdminManagement />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/user-management"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering UserManagement component')}
-              <UserManagement />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/add-user"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering AddUser component')}
-              <div>AddUser component placeholder</div>
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/user-details/:userId"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering UserDetails component')}
-              <div>UserDetails component placeholder</div>
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/add-parent"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering AddParent component')}
-              <AddParent />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/parent-details/:parentId"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering ParentDetails component')}
-              <ParentDetails />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/parent-management"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering ParentManagement component')}
-              <ParentManagement />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/reports"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering Reports component')}
-              <Reports />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/announcement-management"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering AnnouncementManagement component')}
-              <AnnouncementManagement />
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/add-announcement"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering AddAnnouncement component')}
-              <div>AddAnnouncement component placeholder</div>
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/announcement-details"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering AnnouncementDetails component')}
-              <div>AnnouncementDetails component placeholder</div>
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
-      <Route
-        path="/moe/student-management"
-        element={
-          <ProtectedRouteWithLogging>
-            <div>
-              {console.log('AppRoutes.jsx - Rendering StudentManagement component')}
-              <div>StudentManagement component placeholder</div>
-            </div>
-          </ProtectedRouteWithLogging>
-        }
-      />
+
+      <Route path="/moe/database-tools" element={
+        <ProtectedRouteWithSuspense>
+          <DatabaseTools />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/ministry-employee-management" element={
+        <ProtectedRouteWithSuspense>
+          <MinistryEmployeeManagement />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/school-admin-management" element={
+        <ProtectedRouteWithSuspense>
+          <SchoolAdminManagement />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/user-management" element={
+        <ProtectedRouteWithSuspense>
+          <UserManagement />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/add-user" element={
+        <ProtectedRouteWithSuspense>
+          <div>AddUser component placeholder</div>
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/user-details/:userId" element={
+        <ProtectedRouteWithSuspense>
+          <div>UserDetails component placeholder</div>
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/add-parent" element={
+        <ProtectedRouteWithSuspense>
+          <AddParent />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/parent-details/:parentId" element={
+        <ProtectedRouteWithSuspense>
+          <ParentDetails />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/parent-management" element={
+        <ProtectedRouteWithSuspense>
+          <ParentManagement />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/reports" element={
+        <ProtectedRouteWithSuspense>
+          <Reports />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/announcement-management" element={
+        <ProtectedRouteWithSuspense>
+          <AnnouncementManagement />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/add-announcement" element={
+        <ProtectedRouteWithSuspense>
+          <div>AddAnnouncement component placeholder</div>
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/announcement-details" element={
+        <ProtectedRouteWithSuspense>
+          <div>AnnouncementDetails component placeholder</div>
+        </ProtectedRouteWithSuspense>
+      } />
+
+      <Route path="/moe/student-management" element={
+        <ProtectedRouteWithSuspense>
+          <div>StudentManagement component placeholder</div>
+        </ProtectedRouteWithSuspense>
+      } />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
