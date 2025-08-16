@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
-import { SecurityLevels, getRoleName } from '@utils/securityLevels';
+import { SecurityLevels } from '@utils/securityLevels';
+import { getRoleName } from '@utils/auth';
 import { hasPermission } from '@utils/auth';
 
 const SystemSettings = () => {
