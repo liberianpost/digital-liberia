@@ -11,33 +11,88 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Favicon -->
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/manifest.webmanifest">
+    <!-- Favicon (use relative paths) -->
+    <link rel="icon" href="./favicon.ico" sizes="any">
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <link rel="manifest" href="./manifest.webmanifest">
 
-    <!-- CSS should load before JS -->
-    <link rel="stylesheet" href="/assets/main.css">
+    <!-- Vite will inject CSS automatically -->
   </head>
   <body>
     <div id="root">
-      <!-- Loading state that disappears when React mounts -->
-      <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; background: #fff;">
-        <div>Loading application...</div>
+      <!-- Enhanced loading state -->
+      <div style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #ffffff;
+        font-family: 'Inter', sans-serif;
+        z-index: 1000;
+      ">
+        <div style="text-align: center">
+          <div style="margin-bottom: 1rem; font-size: 1.25rem; font-weight: 500">
+            Loading Digital Liberia...
+          </div>
+          <div style="width: 100px; height: 4px; background: #e5e7eb; margin: 0 auto">
+            <div style="width: 0; height: 100%; background: #2563eb; animation: loading 1.5s infinite"></div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Modern script loading -->
-    <script src="/assets/main.js" type="module"></script>
-
+    <!-- Vite will inject the script tag here automatically -->
+    
     <noscript>
-      <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; background: #fff; z-index: 9999;">
-        <div style="text-align: center; padding: 2rem;">
-          <h1 style="font-size: 1.5rem; margin-bottom: 1rem;">JavaScript Required</h1>
-          <p>This application requires JavaScript to function properly.</p>
+      <div style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #ffffff;
+        z-index: 9999;
+        font-family: 'Inter', sans-serif;
+      ">
+        <div style="text-align: center; padding: 2rem; max-width: 500px;">
+          <h1 style="font-size: 1.5rem; margin-bottom: 1rem; color: #dc2626;">
+            JavaScript Required
+          </h1>
+          <p style="margin-bottom: 1.5rem;">
+            This application requires JavaScript to function properly. Please enable JavaScript in your browser settings.
+          </p>
+          <button 
+            onclick="window.location.reload()" 
+            style="
+              padding: 0.5rem 1rem;
+              background: #2563eb;
+              color: white;
+              border: none;
+              border-radius: 0.25rem;
+              font-family: inherit;
+              cursor: pointer;
+            "
+          >
+            Reload Page
+          </button>
         </div>
       </div>
     </noscript>
+
+    <style>
+      @keyframes loading {
+        0% { width: 0; margin-left: 0 }
+        50% { width: 100%; margin-left: 0 }
+        100% { width: 0; margin-left: 100% }
+      }
+    </style>
   </body>
 </html>
