@@ -65,7 +65,7 @@ const AppRoutes = () => {
         path="/libpay"
         element={
           <>
-            {console.log('AppRoutes.jsx - Rendering LibPay component')}
+            {console.log('AppRoutes.jsx - Rendering Libpay component')}
             <LibPay />
           </>
         }
