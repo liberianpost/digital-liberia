@@ -1,30 +1,38 @@
-import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 const navLinks = [
-  { label: "Home", to: "/", color: "bg-blue-500/80" },
-  { label: "System", to: "/system", color: "bg-green-500/80" },
-  { label: "Digital Liberia", to: "/digital-liberia", color: "bg-purple-500/80" },
-  { label: "LibPay", to: "/libpay", color: "bg-yellow-500/80" },
-  { label: "Liberian Post", to: "/liberian-post", color: "bg-pink-500/80" }
+  { label: 'Home', to: '/', color: 'bg-blue-500/80' },
+  { label: 'System', to: '/system', color: 'bg-green-500/80' },
+  { label: 'Digital Liberia', to: '/digital-liberia', color: 'bg-purple-500/80' },
+  { label: 'LibPay', to: '/libpay', color: 'bg-yellow-500/80' },
+  { label: 'Liberian Post', to: '/liberian-post', color: 'bg-pink-500/80' },
 ];
 
 const logos = [
-  "/logos/liberianpost.png",
-  "/logos/digital.png",
-  "/logos/libmusic.png",
-  "/logos/libconnectsit.png",
-  "/logos/libpaysit.png",
-  "/logos/seal of liberia.png",
-  "/logos/liberia.png"
+  '/logos/liberianpost.png',
+  '/logos/digital.png',
+  '/logos/libmusic.png',
+  '/logos/libconnectsit.png',
+  '/logos/libpaysit.png',
+  '/logos/seal of liberia.png',
+  '/logos/liberia.png',
+];
+
+const backgroundImages = [
+  '/backgrounds/bg1.jpg',
+  '/backgrounds/bg2.jpg',
+  '/backgrounds/bg3.jpg',
+  '/backgrounds/bg4.jpg',
+  '/backgrounds/bg5.jpg',
 ];
 
 const sections = [
   {
-    id: "overview",
-    title: "LibPay Payment Gateway",
-    bgColor: "bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-indigo-600/10",
-    borderColor: "border-cyan-400/30",
+    id: 'overview',
+    title: 'LibPay Payment Gateway',
+    bgColor: 'bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-indigo-600/10',
+    borderColor: 'border-cyan-400/30',
     content: (
       <>
         <p className="text-white mb-4">
@@ -42,13 +50,13 @@ const sections = [
           </p>
         </div>
       </>
-    )
+    ),
   },
   {
-    id: "modules",
-    title: "Product Modules",
-    bgColor: "bg-gradient-to-br from-purple-500/10 via-fuchsia-500/10 to-pink-600/10",
-    borderColor: "border-purple-400/30",
+    id: 'modules',
+    title: 'Product Modules',
+    bgColor: 'bg-gradient-to-br from-purple-500/10 via-fuchsia-500/10 to-pink-600/10',
+    borderColor: 'border-purple-400/30',
     content: (
       <div className="space-y-8">
         <div>
@@ -60,7 +68,6 @@ const sections = [
             <li>Controls: limits, velocity rules, geofencing, 2FA</li>
           </ul>
         </div>
-
         <div>
           <h3 className="text-xl font-semibold mb-2 text-white">Payment Gateway (Online)</h3>
           <ul className="list-disc pl-6 space-y-2 text-white">
@@ -69,7 +76,6 @@ const sections = [
             <li>FX handling: auto-choose payer currency (USD/LRD); optional DCC; regulated rate source</li>
           </ul>
         </div>
-
         <div>
           <h3 className="text-xl font-semibold mb-2 text-white">LibPay POS (In‑Person)</h3>
           <ul className="list-disc pl-6 space-y-2 text-white">
@@ -80,13 +86,13 @@ const sections = [
           </ul>
         </div>
       </div>
-    )
+    ),
   },
   {
-    id: "flows",
-    title: "Payment Flows Architecture",
-    bgColor: "bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-red-600/10",
-    borderColor: "border-amber-400/30",
+    id: 'flows',
+    title: 'Payment Flows Architecture',
+    bgColor: 'bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-red-600/10',
+    borderColor: 'border-amber-400/30',
     content: (
       <div className="space-y-8">
         <div className="bg-black/50 p-4 rounded-lg border border-amber-400/30">
@@ -98,7 +104,6 @@ const sections = [
             <li>Settlement: T+0 internal ledger</li>
           </ul>
         </div>
-
         <div className="bg-black/50 p-4 rounded-lg border border-amber-400/30">
           <h3 className="text-lg font-semibold mb-2 text-white">B2C (Business‑to‑Consumer)</h3>
           <ul className="list-disc pl-6 space-y-2 text-white">
@@ -108,7 +113,6 @@ const sections = [
             <li>Compliance: KYC checks, AML rules</li>
           </ul>
         </div>
-
         <div className="bg-black/50 p-4 rounded-lg border border-amber-400/30">
           <h3 className="text-lg font-semibold mb-2 text-white">B2B (Business‑to‑Business)</h3>
           <ul className="list-disc pl-6 space-y-2 text-white">
@@ -118,13 +122,13 @@ const sections = [
           </ul>
         </div>
       </div>
-    )
+    ),
   },
   {
-    id: "security",
-    title: "Security & Compliance",
-    bgColor: "bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-green-600/10",
-    borderColor: "border-emerald-400/30",
+    id: 'security',
+    title: 'Security & Compliance',
+    bgColor: 'bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-green-600/10',
+    borderColor: 'border-emerald-400/30',
     content: (
       <div className="space-y-6">
         <div className="bg-black/50 p-4 rounded-lg border border-emerald-400/30">
@@ -136,7 +140,6 @@ const sections = [
             <li>PCI PTS certified POS hardware</li>
           </ul>
         </div>
-
         <div className="bg-black/50 p-4 rounded-lg border border-emerald-400/30">
           <h3 className="text-lg font-semibold mb-2 text-white">Compliance Framework</h3>
           <ul className="list-disc pl-6 space-y-2 text-white">
@@ -147,40 +150,81 @@ const sections = [
           </ul>
         </div>
       </div>
-    )
-  }
+    ),
+  },
 ];
+
+const GoogleStorageImage = ({ src, alt, className }) => {
+  const [error, setError] = useState(false);
+
+  if (!src || error) {
+    return (
+      <div className={`${className} bg-gray-800/50 flex items-center justify-center rounded-lg text-red-400 text-sm`}>
+        {error ? `Failed to load image: ${src}` : 'No image available'}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={`${className} object-contain max-w-full max-h-full`}
+      loading="lazy"
+      onError={(e) => {
+        console.error(`Libpay.jsx - Failed to load image: ${src}`);
+        setError(true);
+      }}
+    />
+  );
+};
 
 export default function Libpay() {
   const location = useLocation();
   const [activeLogo, setActiveLogo] = useState(0);
+  const [bgIndex, setBgIndex] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveLogo(prev => (prev + 1) % logos.length);
+    console.log('Libpay.jsx - Setting up background interval');
+    const bgInterval = setInterval(() => {
+      setBgIndex((prev) => (prev + 1) % backgroundImages.length);
+    }, 5000);
+    return () => {
+      console.log('Libpay.jsx - Clearing background interval');
+      clearInterval(bgInterval);
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log('Libpay.jsx - Setting up logo interval');
+    const logoInterval = setInterval(() => {
+      setActiveLogo((prev) => (prev + 1) % logos.length);
     }, 600);
-    return () => clearInterval(interval);
+    return () => {
+      console.log('Libpay.jsx - Clearing logo interval');
+      clearInterval(logoInterval);
+    };
   }, []);
 
   return (
     <div className="relative min-h-screen w-full bg-gray-900 text-white font-inter overflow-x-hidden">
-      {/* Cyberpunk-inspired background gradient */}
       <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 -z-50" />
-      
-      {/* Animated grid overlay */}
       <div className="fixed inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==')] opacity-20 -z-40" />
+      <div
+        className="fixed inset-0 bg-cover bg-center transition-opacity duration-1000 mix-blend-soft-light opacity-15 -z-20"
+        style={{ backgroundImage: `url(${backgroundImages[bgIndex]})` }}
+      />
 
-      {/* Centered Image Slideshow */}
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
         <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
           {logos.map((logo, index) => (
             <div
               key={index}
               className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
-                index === activeLogo ? "opacity-100" : "opacity-0"
+                index === activeLogo ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <img
+              <GoogleStorageImage
                 src={logo}
                 alt={`Logo ${index}`}
                 className="max-w-full max-h-full object-contain"
@@ -191,19 +235,16 @@ export default function Libpay() {
         </div>
       </div>
 
-      {/* Navigation */}
       <header className="fixed top-0 left-0 w-full z-50">
         <div className="bg-gray-900/90 backdrop-blur-md border-b border-purple-500/30">
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
             <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
-              {navLinks.map(link => (
+              {navLinks.map((link) => (
                 <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
-                  <Link 
-                    to={link.to} 
+                  <Link
+                    to={link.to}
                     className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
-                      location.pathname === link.to 
-                        ? "text-red-500" 
-                        : "text-white hover:text-blue-300"
+                      location.pathname === link.to ? 'text-red-500' : 'text-white hover:text-blue-300'
                     }`}
                   >
                     {link.label}
@@ -212,22 +253,17 @@ export default function Libpay() {
               ))}
             </nav>
           </div>
-
           <div className="w-full bg-gradient-to-b from-gray-900 to-transparent overflow-x-auto">
             <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
               {logos.map((logo, index) => (
-                <div 
+                <div
                   key={index}
                   className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
-                    index === activeLogo 
-                      ? "scale-110 bg-white shadow-lg" 
-                      : "scale-100 bg-white/90"
+                    index === activeLogo ? 'scale-110 bg-white shadow-lg' : 'scale-100 bg-white/90'
                   }`}
-                  style={{
-                    animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none'
-                  }}
+                  style={{ animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none' }}
                 >
-                  <img
+                  <GoogleStorageImage
                     src={logo}
                     alt={`Logo ${index}`}
                     className="w-12 h-12 md:w-16 md:h-16 object-contain"
@@ -239,7 +275,6 @@ export default function Libpay() {
         </div>
       </header>
 
-      {/* Content Sections */}
       <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
         {sections.map((section, index) => (
           <section
@@ -247,7 +282,7 @@ export default function Libpay() {
             className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12"
             style={{
               animation: `fadeInUp 0.5s ease-out ${index * 0.1}s forwards`,
-              opacity: 0
+              opacity: 0,
             }}
           >
             <div className={`${section.bgColor} backdrop-blur-lg rounded-xl border ${section.borderColor} p-6 md:p-8 shadow-lg relative overflow-hidden`}>
@@ -256,19 +291,16 @@ export default function Libpay() {
                 <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
                   {section.title}
                 </h2>
-                <div className="text-white">
-                  {section.content}
-                </div>
+                <div className="text-white">{section.content}</div>
               </div>
             </div>
           </section>
         ))}
       </main>
 
-      {/* Footer */}
       <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
         <div className="border-t border-purple-500/30 pt-6">
-          © {new Date().getFullYear()} Digital Liberia. All rights reserved.
+          © {new Date().getFullYear()} LibPay. All rights reserved.
         </div>
       </footer>
 
@@ -283,15 +315,23 @@ export default function Libpay() {
             transform: translateY(0);
           }
         }
-        
         @keyframes heartbeat {
-          0% { transform: scale(1); }
-          25% { transform: scale(1.1); }
-          50% { transform: scale(1); }
-          75% { transform: scale(1.1); }
-          100% { transform: scale(1); }
+          0% {
+            transform: scale(1);
+          }
+          25% {
+            transform: scale(1.1);
+          }
+          50% {
+            transform: scale(1);
+          }
+          75% {
+            transform: scale(1.1);
+          }
+          100% {
+            transform: scale(1);
+          }
         }
-        
         .overflow-x-auto {
           -ms-overflow-style: none;
           scrollbar-width: none;
