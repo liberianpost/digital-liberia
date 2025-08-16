@@ -4,67 +4,64 @@ import Home from './Home';
 import ProtectedRoute from '@components/ProtectedRoute';
 import LoadingFallback from '@components/LoadingFallback';
 
-// 🔍 Debug wrapper for lazy imports (prevents blank screen and logs the real cause)
+// Enhanced debugLazy with better error handling
 function debugLazy(importFn, name) {
-  return React.lazy(() =>
-    importFn()
-      .then((mod) => {
-        if (!mod || !('default' in mod)) {
-          console.error(`⚠️ Module "${name}" loaded but has NO default export.`, mod);
-          return {
-            default: () => (
-              <div style={{ padding: 16 }}>
-                Module "<strong>{name}</strong>" is missing a <code>default export</code>.
-              </div>
-            ),
-          };
-        }
-        return mod;
-      })
-      .catch((err) => {
-        console.error(`❌ Failed to load "${name}"`, err);
+  return React.lazy(async () => {
+    try {
+      const module = await importFn();
+      
+      if (!module?.default) {
+        console.error(`🚨 Module "${name}" has no default export`, module);
         return {
           default: () => (
-            <div style={{ padding: 16 }}>
-              Error loading "<strong>{name}</strong>". Check console for details.
+            <div className="p-4 text-red-600">
+              <p>Component <strong>{name}</strong> is missing a default export</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="mt-2 px-3 py-1 bg-blue-500 text-white rounded"
+              >
+                Reload
+              </button>
             </div>
-          ),
+          )
         };
-      })
-  );
+      }
+      return module;
+    } catch (error) {
+      console.error(`🔥 Failed to load "${name}"`, error);
+      return {
+        default: () => (
+          <div className="p-4 text-red-600">
+            <p>Failed to load <strong>{name}</strong></p>
+            <pre className="text-xs mt-2 p-2 bg-gray-100 overflow-x-auto">
+              {error.message}
+            </pre>
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-2 px-3 py-1 bg-blue-500 text-white rounded"
+            >
+              Retry
+            </button>
+          </div>
+        )
+      };
+    }
+  });
 }
 
-// Lazy load all components (wrapped with debugLazy)
-const System = debugLazy(() => import('@components/System'), 'System (@components/System)');
-const Dssn = debugLazy(() => import('./Dssn'), 'Dssn (./Dssn)');
-const Libpay = debugLazy(() => import('./Libpay'), 'Libpay (./Libpay)');
-const Digitalliberia = debugLazy(() => import('./Digitalliberia'), 'Digitalliberia (./Digitalliberia)');
-const MoeDashboard = debugLazy(() => import('@components/MoeDashboard'), 'MoeDashboard (@components/MoeDashboard)');
-const StudentProfile = debugLazy(() => import('@components/StudentProfile'), 'StudentProfile (@components/StudentProfile)');
-const SystemSettings = debugLazy(() => import('@components/SystemSettings'), 'SystemSettings (@components/SystemSettings)');
-const StudentRegistration = debugLazy(() => import('@components/StudentRegistration'), 'StudentRegistration (@components/StudentRegistration)');
-const StudentReports = debugLazy(() => import('@components/StudentReports'), 'StudentReports (@components/StudentReports)');
-const ClassManagement = debugLazy(() => import('@components/ClassManagement'), 'ClassManagement (@components/ClassManagement)');
-const StudentRecords = debugLazy(() => import('@components/StudentRecords'), 'StudentRecords (@components/StudentRecords)');
-const SchoolManagement = debugLazy(() => import('@components/SchoolManagement'), 'SchoolManagement (@components/SchoolManagement)');
-const TeacherManagement = debugLazy(() => import('@components/TeacherManagement'), 'TeacherManagement (@components/TeacherManagement)');
-const DistrictReports = debugLazy(() => import('@components/DistrictReports'), 'DistrictReports (@components/DistrictReports)');
-const DistrictOverview = debugLazy(() => import('@components/DistrictOverview'), 'DistrictOverview (@components/DistrictOverview)');
-const DatabaseTools = debugLazy(() => import('@components/DatabaseTools'), 'DatabaseTools (@components/DatabaseTools)');
-const UserManagement = debugLazy(() => import('@components/UserManagement'), 'UserManagement (@components/UserManagement)');
-const AddParent = debugLazy(() => import('@components/AddParent'), 'AddParent (@components/AddParent)');
-const AnnouncementManagement = debugLazy(() => import('@components/AnnouncementManagement'), 'AnnouncementManagement (@components/AnnouncementManagement)');
-const ComplianceReports = debugLazy(() => import('@components/ComplianceReports'), 'ComplianceReports (@components/ComplianceReports)');
-const MinistryEmployeeManagement = debugLazy(() => import('@components/MinistryEmployeeManagement'), 'MinistryEmployeeManagement (@components/MinistryEmployeeManagement)');
-const ParentDetails = debugLazy(() => import('@components/ParentDetails'), 'ParentDetails (@components/ParentDetails)');
-const ParentManagement = debugLazy(() => import('@components/ParentManagement'), 'ParentManagement (@components/ParentManagement)');
-const Reports = debugLazy(() => import('@components/Reports'), 'Reports (@components/Reports)');
-const SchoolAdminManagement = debugLazy(() => import('@components/SchoolAdminManagement'), 'SchoolAdminManagement (@components/SchoolAdminManagement)');
-const SchoolReports = debugLazy(() => import('@components/SchoolReports'), 'SchoolReports (@components/SchoolReports)');
-const TeacherReports = debugLazy(() => import('@components/TeacherReports'), 'TeacherReports (@components/TeacherReports)');
+// Lazy load only essential components first
+const System = debugLazy(() => import('@components/System'), 'System');
+const Dssn = debugLazy(() => import('./Dssn'), 'Dssn');
+const Libpay = debugLazy(() => import('./Libpay'), 'Libpay');
+const Digitalliberia = debugLazy(() => import('./Digitalliberia'), 'Digitalliberia');
 
-const ProtectedRouteWithSuspense = ({ children }) => (
-  <ProtectedRoute>
+// Protected components (load these only when needed)
+const MoeDashboard = debugLazy(() => import('@components/MoeDashboard'), 'MoeDashboard');
+const StudentProfile = debugLazy(() => import('@components/StudentProfile'), 'StudentProfile');
+const SystemSettings = debugLazy(() => import('@components/SystemSettings'), 'SystemSettings');
+
+const ProtectedRouteWithSuspense = ({ children, requiredLevel }) => (
+  <ProtectedRoute requiredLevel={requiredLevel}>
     <Suspense fallback={<LoadingFallback />}>
       {children}
     </Suspense>
@@ -80,192 +77,49 @@ const SuspenseWrapper = ({ children }) => (
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Public Routes */}
       <Route path="/" element={<Home />} />
-      
-      {/* Public Lazy Routes */}
       <Route path="/system" element={<SuspenseWrapper><System /></SuspenseWrapper>} />
       <Route path="/dssn" element={<SuspenseWrapper><Dssn /></SuspenseWrapper>} />
       <Route path="/libpay" element={<SuspenseWrapper><Libpay /></SuspenseWrapper>} />
       <Route path="/digital-liberia" element={<SuspenseWrapper><Digitalliberia /></SuspenseWrapper>} />
-      <Route path="/liberian-post" element={<div>LiberianPost component placeholder</div>} />
+      <Route path="/liberian-post" element={<div className="p-4">LiberianPost (Coming Soon)</div>} />
 
-      {/* Protected Routes */}
+      {/* Protected MOE Routes */}
       <Route path="/moe/dashboard" element={
-        <ProtectedRouteWithSuspense>
+        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.MINISTRY_EMPLOYEE}>
           <MoeDashboard />
         </ProtectedRouteWithSuspense>
       } />
 
       <Route path="/moe/student-profile/:studentId" element={
-        <ProtectedRouteWithSuspense>
+        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SCHOOL_ADMIN}>
           <StudentProfile />
         </ProtectedRouteWithSuspense>
       } />
 
       <Route path="/moe/system-settings" element={
-        <ProtectedRouteWithSuspense>
+        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SYSTEM_ADMIN}>
           <SystemSettings />
         </ProtectedRouteWithSuspense>
       } />
 
-      <Route path="/app-settings" element={
-        <ProtectedRouteWithSuspense>
-          <div>AppSettings component placeholder</div>
-        </ProtectedRouteWithSuspense>
+      {/* Fallback Routes */}
+      <Route path="/404" element={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center p-8 max-w-md">
+            <h1 className="text-2xl font-bold mb-4">Page Not Found</h1>
+            <button 
+              onClick={() => window.location.href = '/'}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Return Home
+            </button>
+          </div>
+        </div>
       } />
-
-      <Route path="/backup-settings" element={
-        <ProtectedRouteWithSuspense>
-          <div>BackupSettings component placeholder</div>
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/student-registration" element={
-        <ProtectedRouteWithSuspense>
-          <StudentRegistration />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/student-reports" element={
-        <ProtectedRouteWithSuspense>
-          <StudentReports />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/class-management" element={
-        <ProtectedRouteWithSuspense>
-          <ClassManagement />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/add-class" element={
-        <ProtectedRouteWithSuspense>
-          <div>AddClass component placeholder</div>
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/student-records" element={
-        <ProtectedRouteWithSuspense>
-          <StudentRecords />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/school-management" element={
-        <ProtectedRouteWithSuspense>
-          <SchoolManagement />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/teacher-management" element={
-        <ProtectedRouteWithSuspense>
-          <TeacherManagement />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/teacher-details/:teacherId" element={
-        <ProtectedRouteWithSuspense>
-          <div>TeacherDetails component placeholder</div>
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/district-reports" element={
-        <ProtectedRouteWithSuspense>
-          <DistrictReports />
-        </ProtectedRouteWithSuspense>
-      }>
-        <Route path="overview" element={<SuspenseWrapper><DistrictOverview /></SuspenseWrapper>} />
-        <Route path="school-reports" element={<SuspenseWrapper><SchoolReports /></SuspenseWrapper>} />
-        <Route path="student-reports" element={<SuspenseWrapper><StudentReports /></SuspenseWrapper>} />
-        <Route path="teacher-reports" element={<SuspenseWrapper><TeacherReports /></SuspenseWrapper>} />
-        <Route path="compliance-reports" element={<SuspenseWrapper><ComplianceReports /></SuspenseWrapper>} />
-      </Route>
-
-      <Route path="/moe/database-tools" element={
-        <ProtectedRouteWithSuspense>
-          <DatabaseTools />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/ministry-employee-management" element={
-        <ProtectedRouteWithSuspense>
-          <MinistryEmployeeManagement />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/school-admin-management" element={
-        <ProtectedRouteWithSuspense>
-          <SchoolAdminManagement />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/user-management" element={
-        <ProtectedRouteWithSuspense>
-          <UserManagement />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/add-user" element={
-        <ProtectedRouteWithSuspense>
-          <div>AddUser component placeholder</div>
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/user-details/:userId" element={
-        <ProtectedRouteWithSuspense>
-          <div>UserDetails component placeholder</div>
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/add-parent" element={
-        <ProtectedRouteWithSuspense>
-          <AddParent />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/parent-details/:parentId" element={
-        <ProtectedRouteWithSuspense>
-          <ParentDetails />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/parent-management" element={
-        <ProtectedRouteWithSuspense>
-          <ParentManagement />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/reports" element={
-        <ProtectedRouteWithSuspense>
-          <Reports />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/announcement-management" element={
-        <ProtectedRouteWithSuspense>
-          <AnnouncementManagement />
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/add-announcement" element={
-        <ProtectedRouteWithSuspense>
-          <div>AddAnnouncement component placeholder</div>
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/announcement-details" element={
-        <ProtectedRouteWithSuspense>
-          <div>AnnouncementDetails component placeholder</div>
-        </ProtectedRouteWithSuspense>
-      } />
-
-      <Route path="/moe/student-management" element={
-        <ProtectedRouteWithSuspense>
-          <div>StudentManagement component placeholder</div>
-        </ProtectedRouteWithSuspense>
-      } />
-
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      
+      <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
   );
 };
