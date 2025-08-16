@@ -35,22 +35,48 @@ export default defineConfig({
       '@emotion/styled',
       '@mui/material',
       '@mui/material/styles',
-      '@mui/material/CircularProgress',
-      '@mui/material/Box',
-      '@mui/material/Typography',
     ],
+    exclude: ['js-big-decimal'],
   },
   define: {
-    'process.env': {}, // Ensure compatibility with libraries expecting process.env
+    'process.env': process.env,
   },
-  envPrefix: 'VITE_', // Explicitly set to ensure VITE_ variables are loaded
+  envPrefix: ['VITE_', 'REACT_APP_'],
   server: {
     port: 3005,
+    host: true,
+    strictPort: true,
+    proxy: {
+      '/api': {
+        target: 'https://libpayapp.liberianpost.com:8081',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
+      },
+    },
   },
-  base: '/',
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+    sourcemap: true,
+    chunkSizeWarningLimit: 1600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          mui: ['@mui/material', '@emotion/react', '@emotion/styled'],
+          auth: ['@context/AuthContext', '@utils/auth'],
+        },
+      },
+    },
+  },
   css: {
     postcss: {
       plugins: [require('tailwindcss'), require('autoprefixer')],
     },
+    modules: {
+      localsConvention: 'camelCaseOnly',
+    },
   },
+  base: './',
 });
