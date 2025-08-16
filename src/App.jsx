@@ -7,8 +7,16 @@ class ErrorBoundary extends Component {
   state = { error: null };
 
   static getDerivedStateFromError(error) {
-    console.error('App.jsx - ErrorBoundary caught:', error, error.stack);
+    console.error('App.jsx - ErrorBoundary caught:', {
+      message: error.message,
+      stack: error.stack,
+      componentStack: error.componentStack
+    });
     return { error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('App.jsx - Component error:', error, errorInfo);
   }
 
   render() {
