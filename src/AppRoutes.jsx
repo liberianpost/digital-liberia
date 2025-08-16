@@ -4,9 +4,10 @@ import Home from './Home';
 import ProtectedRoute from '@components/ProtectedRoute';
 import LoadingFallback from '@components/LoadingFallback';
 
-// Enhanced debugLazy with better error handling
+// Enhanced debugLazy with better error handling and logging
 function debugLazy(importFn, name) {
   return React.lazy(async () => {
+    console.log(`🌀 Attempting to load module: ${name}`);
     try {
       const module = await importFn();
       
@@ -26,6 +27,7 @@ function debugLazy(importFn, name) {
           )
         };
       }
+      console.log(`✅ Successfully loaded module: ${name}`);
       return module;
     } catch (error) {
       console.error(`🔥 Failed to load "${name}"`, error);
@@ -49,17 +51,32 @@ function debugLazy(importFn, name) {
   });
 }
 
-// Lazy load only essential components first
+// ====================
+// Core Components (Loaded first)
+// ====================
 const System = debugLazy(() => import('@components/System'), 'System');
 const Dssn = debugLazy(() => import('./Dssn'), 'Dssn');
 const Libpay = debugLazy(() => import('./Libpay'), 'Libpay');
 const Digitalliberia = debugLazy(() => import('./Digitalliberia'), 'Digitalliberia');
 
-// Protected components (load these only when needed)
-const MoeDashboard = debugLazy(() => import('@components/MoeDashboard'), 'MoeDashboard');
-const StudentProfile = debugLazy(() => import('@components/StudentProfile'), 'StudentProfile');
-const SystemSettings = debugLazy(() => import('@components/SystemSettings'), 'SystemSettings');
+// ====================
+// MOE Education Components (Lazy loaded)
+// ====================
+const MoeDashboard = debugLazy(() => import('@components/moe/MoeDashboard'), 'MoeDashboard');
+const SchoolManagement = debugLazy(() => import('@components/moe/SchoolManagement'), 'SchoolManagement');
+const StudentProfile = debugLazy(() => import('@components/moe/StudentProfile'), 'StudentProfile');
+const SystemSettings = debugLazy(() => import('@components/moe/SystemSettings'), 'SystemSettings');
+const StudentRecords = debugLazy(() => import('@components/moe/StudentRecords'), 'StudentRecords');
+const TeacherManagement = debugLazy(() => import('@components/moe/TeacherManagement'), 'TeacherManagement');
+const Reports = debugLazy(() => import('@components/moe/Reports'), 'Reports');
+const ClassManagement = debugLazy(() => import('@components/moe/ClassManagement'), 'ClassManagement');
+const DistrictReports = debugLazy(() => import('@components/moe/DistrictReports'), 'DistrictReports');
+const DatabaseTools = debugLazy(() => import('@components/moe/DatabaseTools'), 'DatabaseTools');
+const UserManagement = debugLazy(() => import('@components/moe/UserManagement'), 'UserManagement');
 
+// ====================
+// Wrapper Components
+// ====================
 const ProtectedRouteWithSuspense = ({ children, requiredLevel }) => (
   <ProtectedRoute requiredLevel={requiredLevel}>
     <Suspense fallback={<LoadingFallback />}>
@@ -77,7 +94,9 @@ const SuspenseWrapper = ({ children }) => (
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* ==================== */}
       {/* Public Routes */}
+      {/* ==================== */}
       <Route path="/" element={<Home />} />
       <Route path="/system" element={<SuspenseWrapper><System /></SuspenseWrapper>} />
       <Route path="/dssn" element={<SuspenseWrapper><Dssn /></SuspenseWrapper>} />
@@ -85,26 +104,88 @@ const AppRoutes = () => {
       <Route path="/digital-liberia" element={<SuspenseWrapper><Digitalliberia /></SuspenseWrapper>} />
       <Route path="/liberian-post" element={<div className="p-4">LiberianPost (Coming Soon)</div>} />
 
+      {/* ==================== */}
       {/* Protected MOE Routes */}
+      {/* ==================== */}
+      {/* Main Dashboard */}
       <Route path="/moe/dashboard" element={
         <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.MINISTRY_EMPLOYEE}>
           <MoeDashboard />
         </ProtectedRouteWithSuspense>
       } />
 
+      {/* School Management */}
+      <Route path="/moe/school-management" element={
+        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SCHOOL_ADMIN}>
+          <SchoolManagement />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      {/* Student Management */}
       <Route path="/moe/student-profile/:studentId" element={
         <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SCHOOL_ADMIN}>
           <StudentProfile />
         </ProtectedRouteWithSuspense>
       } />
 
+      <Route path="/moe/student-records" element={
+        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SCHOOL_ADMIN}>
+          <StudentRecords />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      {/* Teacher Management */}
+      <Route path="/moe/teacher-management" element={
+        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SCHOOL_ADMIN}>
+          <TeacherManagement />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      {/* Reports */}
+      <Route path="/moe/reports" element={
+        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.MINISTRY_EMPLOYEE}>
+          <Reports />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      {/* System Settings */}
       <Route path="/moe/system-settings" element={
         <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SYSTEM_ADMIN}>
           <SystemSettings />
         </ProtectedRouteWithSuspense>
       } />
 
+      {/* Class Management */}
+      <Route path="/moe/class-management" element={
+        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SCHOOL_ADMIN}>
+          <ClassManagement />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      {/* District Reports */}
+      <Route path="/moe/district-reports" element={
+        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.MINISTRY_EMPLOYEE}>
+          <DistrictReports />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      {/* Database Tools */}
+      <Route path="/moe/database-tools" element={
+        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SYSTEM_ADMIN}>
+          <DatabaseTools />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      {/* User Management */}
+      <Route path="/moe/user-management" element={
+        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SYSTEM_ADMIN}>
+          <UserManagement />
+        </ProtectedRouteWithSuspense>
+      } />
+
+      {/* ==================== */}
       {/* Fallback Routes */}
+      {/* ==================== */}
       <Route path="/404" element={
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center p-8 max-w-md">
