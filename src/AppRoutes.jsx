@@ -4,34 +4,64 @@ import Home from './Home';
 import ProtectedRoute from '@components/ProtectedRoute';
 import LoadingFallback from '@components/LoadingFallback';
 
-// Lazy load all components
-const System = React.lazy(() => import('@components/System'));
-const Dssn = React.lazy(() => import('./Dssn'));
-const Libpay = React.lazy(() => import('./Libpay'));
-const Digitalliberia = React.lazy(() => import('./Digitalliberia'));
-const MoeDashboard = React.lazy(() => import('@components/MoeDashboard'));
-const StudentProfile = React.lazy(() => import('@components/StudentProfile'));
-const SystemSettings = React.lazy(() => import('@components/SystemSettings'));
-const StudentRegistration = React.lazy(() => import('@components/StudentRegistration'));
-const StudentReports = React.lazy(() => import('@components/StudentReports'));
-const ClassManagement = React.lazy(() => import('@components/ClassManagement'));
-const StudentRecords = React.lazy(() => import('@components/StudentRecords'));
-const SchoolManagement = React.lazy(() => import('@components/SchoolManagement'));
-const TeacherManagement = React.lazy(() => import('@components/TeacherManagement'));
-const DistrictReports = React.lazy(() => import('@components/DistrictReports'));
-const DistrictOverview = React.lazy(() => import('@components/DistrictOverview'));
-const DatabaseTools = React.lazy(() => import('@components/DatabaseTools'));
-const UserManagement = React.lazy(() => import('@components/UserManagement'));
-const AddParent = React.lazy(() => import('@components/AddParent'));
-const AnnouncementManagement = React.lazy(() => import('@components/AnnouncementManagement'));
-const ComplianceReports = React.lazy(() => import('@components/ComplianceReports'));
-const MinistryEmployeeManagement = React.lazy(() => import('@components/MinistryEmployeeManagement'));
-const ParentDetails = React.lazy(() => import('@components/ParentDetails'));
-const ParentManagement = React.lazy(() => import('@components/ParentManagement'));
-const Reports = React.lazy(() => import('@components/Reports'));
-const SchoolAdminManagement = React.lazy(() => import('@components/SchoolAdminManagement'));
-const SchoolReports = React.lazy(() => import('@components/SchoolReports'));
-const TeacherReports = React.lazy(() => import('@components/TeacherReports'));
+// 🔍 Debug wrapper for lazy imports (prevents blank screen and logs the real cause)
+function debugLazy(importFn, name) {
+  return React.lazy(() =>
+    importFn()
+      .then((mod) => {
+        if (!mod || !('default' in mod)) {
+          console.error(`⚠️ Module "${name}" loaded but has NO default export.`, mod);
+          return {
+            default: () => (
+              <div style={{ padding: 16 }}>
+                Module "<strong>{name}</strong>" is missing a <code>default export</code>.
+              </div>
+            ),
+          };
+        }
+        return mod;
+      })
+      .catch((err) => {
+        console.error(`❌ Failed to load "${name}"`, err);
+        return {
+          default: () => (
+            <div style={{ padding: 16 }}>
+              Error loading "<strong>{name}</strong>". Check console for details.
+            </div>
+          ),
+        };
+      })
+  );
+}
+
+// Lazy load all components (wrapped with debugLazy)
+const System = debugLazy(() => import('@components/System'), 'System (@components/System)');
+const Dssn = debugLazy(() => import('./Dssn'), 'Dssn (./Dssn)');
+const Libpay = debugLazy(() => import('./Libpay'), 'Libpay (./Libpay)');
+const Digitalliberia = debugLazy(() => import('./Digitalliberia'), 'Digitalliberia (./Digitalliberia)');
+const MoeDashboard = debugLazy(() => import('@components/MoeDashboard'), 'MoeDashboard (@components/MoeDashboard)');
+const StudentProfile = debugLazy(() => import('@components/StudentProfile'), 'StudentProfile (@components/StudentProfile)');
+const SystemSettings = debugLazy(() => import('@components/SystemSettings'), 'SystemSettings (@components/SystemSettings)');
+const StudentRegistration = debugLazy(() => import('@components/StudentRegistration'), 'StudentRegistration (@components/StudentRegistration)');
+const StudentReports = debugLazy(() => import('@components/StudentReports'), 'StudentReports (@components/StudentReports)');
+const ClassManagement = debugLazy(() => import('@components/ClassManagement'), 'ClassManagement (@components/ClassManagement)');
+const StudentRecords = debugLazy(() => import('@components/StudentRecords'), 'StudentRecords (@components/StudentRecords)');
+const SchoolManagement = debugLazy(() => import('@components/SchoolManagement'), 'SchoolManagement (@components/SchoolManagement)');
+const TeacherManagement = debugLazy(() => import('@components/TeacherManagement'), 'TeacherManagement (@components/TeacherManagement)');
+const DistrictReports = debugLazy(() => import('@components/DistrictReports'), 'DistrictReports (@components/DistrictReports)');
+const DistrictOverview = debugLazy(() => import('@components/DistrictOverview'), 'DistrictOverview (@components/DistrictOverview)');
+const DatabaseTools = debugLazy(() => import('@components/DatabaseTools'), 'DatabaseTools (@components/DatabaseTools)');
+const UserManagement = debugLazy(() => import('@components/UserManagement'), 'UserManagement (@components/UserManagement)');
+const AddParent = debugLazy(() => import('@components/AddParent'), 'AddParent (@components/AddParent)');
+const AnnouncementManagement = debugLazy(() => import('@components/AnnouncementManagement'), 'AnnouncementManagement (@components/AnnouncementManagement)');
+const ComplianceReports = debugLazy(() => import('@components/ComplianceReports'), 'ComplianceReports (@components/ComplianceReports)');
+const MinistryEmployeeManagement = debugLazy(() => import('@components/MinistryEmployeeManagement'), 'MinistryEmployeeManagement (@components/MinistryEmployeeManagement)');
+const ParentDetails = debugLazy(() => import('@components/ParentDetails'), 'ParentDetails (@components/ParentDetails)');
+const ParentManagement = debugLazy(() => import('@components/ParentManagement'), 'ParentManagement (@components/ParentManagement)');
+const Reports = debugLazy(() => import('@components/Reports'), 'Reports (@components/Reports)');
+const SchoolAdminManagement = debugLazy(() => import('@components/SchoolAdminManagement'), 'SchoolAdminManagement (@components/SchoolAdminManagement)');
+const SchoolReports = debugLazy(() => import('@components/SchoolReports'), 'SchoolReports (@components/SchoolReports)');
+const TeacherReports = debugLazy(() => import('@components/TeacherReports'), 'TeacherReports (@components/TeacherReports)');
 
 const ProtectedRouteWithSuspense = ({ children }) => (
   <ProtectedRoute>
