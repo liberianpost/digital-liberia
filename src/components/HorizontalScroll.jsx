@@ -1,23 +1,24 @@
-// src/components/HorizontalScroll.js
 import React from 'react';
-import { Box } from '@mui/material';
 
-export function HorizontalScroll({ children }) {
+const HorizontalScroll = ({ children }) => {
+  console.log('HorizontalScroll.jsx - Rendering children:', children);
+
   return (
-    <Box sx={{
-      display: 'flex',
-      overflowX: 'auto',
-      py: 1,
-      px: 1,
-      '&::-webkit-scrollbar': {
-        height: '6px',
-      },
-      '&::-webkit-scrollbar-thumb': {
-        backgroundColor: 'rgba(0,0,0,0.2)',
-        borderRadius: '3px',
-      },
-    }}>
-      {children}
-    </Box>
+    <div className="w-full overflow-x-auto">
+      <div className="flex space-x-4 p-4 w-max">
+        {children}
+      </div>
+      <style jsx global>{`
+        .overflow-x-auto {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .overflow-x-auto::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+    </div>
   );
-}
+};
+
+export default HorizontalScroll;
