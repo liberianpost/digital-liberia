@@ -8,11 +8,6 @@ import { AuthProvider } from '@context/AuthContext';
 import App from './App';
 import './index.css';
 
-// Load Tailwind CSS via CDN
-const tailwindScript = document.createElement('script');
-tailwindScript.src = 'https://cdn.tailwindcss.com';
-document.head.appendChild(tailwindScript);
-
 // Verify Inter font
 const fontLink = document.createElement('link');
 fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap';
