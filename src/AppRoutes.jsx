@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from './Home';
 import System from '@components/System';
 import Dssn from './Dssn';
-import LibPay from './LibPay';
+import Libpay from './Libpay';
 import Digitalliberia from './Digitalliberia';
 import MoeDashboard from '@components/MoeDashboard';
 import ProtectedRoute from '@components/ProtectedRoute';
