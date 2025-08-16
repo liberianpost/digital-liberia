@@ -41,18 +41,23 @@ const ProtectedRouteWithSuspense = ({ children }) => (
   </ProtectedRoute>
 );
 
+const SuspenseWrapper = ({ children }) => (
+  <Suspense fallback={<LoadingFallback />}>
+    {children}
+  </Suspense>
+);
+
 const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/system" element={<System />} />
-      <Route path="/dssn" element={<Dssn />} />
-      <Route path="/libpay" element={<Libpay />} />
-      <Route path="/digital-liberia" element={<Digitalliberia />} />
-      <Route 
-        path="/liberian-post" 
-        element={<div>LiberianPost component placeholder</div>} 
-      />
+      
+      {/* Public Lazy Routes */}
+      <Route path="/system" element={<SuspenseWrapper><System /></SuspenseWrapper>} />
+      <Route path="/dssn" element={<SuspenseWrapper><Dssn /></SuspenseWrapper>} />
+      <Route path="/libpay" element={<SuspenseWrapper><Libpay /></SuspenseWrapper>} />
+      <Route path="/digital-liberia" element={<SuspenseWrapper><Digitalliberia /></SuspenseWrapper>} />
+      <Route path="/liberian-post" element={<div>LiberianPost component placeholder</div>} />
 
       {/* Protected Routes */}
       <Route path="/moe/dashboard" element={
@@ -138,11 +143,11 @@ const AppRoutes = () => {
           <DistrictReports />
         </ProtectedRouteWithSuspense>
       }>
-        <Route path="overview" element={<DistrictOverview />} />
-        <Route path="school-reports" element={<SchoolReports />} />
-        <Route path="student-reports" element={<StudentReports />} />
-        <Route path="teacher-reports" element={<TeacherReports />} />
-        <Route path="compliance-reports" element={<ComplianceReports />} />
+        <Route path="overview" element={<SuspenseWrapper><DistrictOverview /></SuspenseWrapper>} />
+        <Route path="school-reports" element={<SuspenseWrapper><SchoolReports /></SuspenseWrapper>} />
+        <Route path="student-reports" element={<SuspenseWrapper><StudentReports /></SuspenseWrapper>} />
+        <Route path="teacher-reports" element={<SuspenseWrapper><TeacherReports /></SuspenseWrapper>} />
+        <Route path="compliance-reports" element={<SuspenseWrapper><ComplianceReports /></SuspenseWrapper>} />
       </Route>
 
       <Route path="/moe/database-tools" element={
@@ -229,6 +234,7 @@ const AppRoutes = () => {
         </ProtectedRouteWithSuspense>
       } />
 
+      {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
