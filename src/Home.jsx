@@ -1,331 +1,159 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import LoadingFallback from '@components/LoadingFallback';
 
-const navLinks = [
-  { label: "Home", to: "/", color: "bg-blue-500/80" },
-  { label: "System", to: "/system", color: "bg-green-500/80" },
-  { label: "Digital Liberia", to: "/digital-liberia", color: "bg-purple-500/80" },
-  { label: "LibPay", to: "/libpay", color: "bg-yellow-500/80" },
-  { label: "Liberian Post", to: "/liberian-post", color: "bg-pink-500/80" }
-];
-
-const logos = [
-  "/logos/liberianpost.png",
-  "/logos/digital.png",
-  "/logos/libmusic.png",
-  "/logos/libconnectsit.png",
-  "/logos/libpaysit.png",
-  "/logos/seal of liberia.png",
-  "/logos/liberia.png"
-];
-
-const sections = [
-  {
-    id: "intro",
-    title: "Welcome to Digital Liberia",
-    bgColor: "bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-600/10",
-    borderColor: "border-blue-400/30",
-    content: (
-      <>
-        <p className="text-white">
-          Digital Liberia is a <span className="font-semibold">bold, nation-scale digital ecosystem</span> that aims to digitally transform governance, commerce, and everyday life in Liberia.
-        </p>
-        <p className="mt-4 text-white">
-          By unifying services into a single mobile platform, Digital Liberia serves citizens, businesses, and institutions with tools to interact securely, efficiently, and transparently—laying the foundation for a digitally empowered economy.
-        </p>
-        <div className="mt-6">
-          <div className="inline-flex items-center bg-yellow-500/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-yellow-400/30 hover:bg-yellow-500/50 transition-colors">
-            <Link to="/digital-liberia" className="text-yellow-100 hover:text-white transition-colors">
-              To know more about 
-              <span className="font-semibold ml-1">Digital Liberia</span>
-            </Link>
-            <span className="ml-2 text-yellow-100">→</span>
-          </div>
-        </div>
-      </>
-    )
-  },
-  {
-    id: "ecosystem",
-    title: "Ecosystem Components",
-    bgColor: "bg-gradient-to-br from-green-500/10 via-teal-500/10 to-emerald-600/10",
-    borderColor: "border-green-400/30",
-    content: (
-      <div className="space-y-12 text-white text-left">
-        <article>
-          <h3 className="text-2xl font-semibold mb-2">1. National Database Management System (NDMS)</h3>
-          <p>A secure, centralized, and intelligent national data backbone to:</p>
-          <ul className="list-disc pl-6 mt-2">
-            <li>Store/manage personal, institutional, and commercial data</li>
-            <li>Enable access control across all government ministries</li>
-            <li>Provide real-time data and analytics dashboards</li>
-          </ul>
-          <div className="mt-4">
-            <div className="inline-flex items-center bg-yellow-500/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-yellow-400/30 hover:bg-yellow-500/50 transition-colors">
-              <Link to="/system" className="text-yellow-100 hover:text-white transition-colors">
-                Learn more about the 
-                <span className="font-semibold ml-1">NDMS system</span>
-              </Link>
-              <span className="ml-2 text-yellow-100">→</span>
-            </div>
-          </div>
-        </article>
-        <article className="mt-8">
-          <h3 className="text-2xl font-semibold mb-2">2. LibPay</h3>
-          <p>A payment gateway solution that is fast, reliable, efficient and secure for all financial transactions in Liberia.</p>
-          <div className="mt-2">
-            <div className="inline-flex items-center bg-yellow-500/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-yellow-400/30 hover:bg-yellow-500/50 transition-colors">
-              <Link to="/libpay" className="text-yellow-100 hover:text-white transition-colors">
-                Discover more about 
-                <span className="font-semibold ml-1">LibPay</span>
-              </Link>
-              <span className="ml-2 text-yellow-100">→</span>
-            </div>
-          </div>
-        </article>
-      </div>
-    )
-  },
-  {
-    id: "vision",
-    title: "Vision & Mission",
-    bgColor: "bg-gradient-to-br from-purple-500/10 via-indigo-500/10 to-blue-600/10",
-    borderColor: "border-purple-400/30",
-    content: (
-      <>
-        <p className="mb-4 italic text-white text-lg">
-          <strong>Vision:</strong> To become the digital backbone of Liberia—empowering people and the economy.
-        </p>
-        <p className="italic text-white text-lg">
-          <strong>Mission:</strong> Deliver a secure platform for transparent governance and accessible services.
-        </p>
-      </>
-    )
-  },
-  {
-    id: "problem",
-    title: "Problem Statement & Solution",
-    bgColor: "bg-gradient-to-br from-rose-500/10 via-red-500/10 to-orange-600/10",
-    borderColor: "border-rose-400/30",
-    content: (
-      <div className="space-y-6">
-        <div>
-          <h3 className="text-xl font-semibold mb-2">The Problem:</h3>
-          <p className="text-white">
-            For decades, Liberia has struggled with fragmented, paper-based records, weak identification systems and lack of centralized data. These limitations have impacted Government Services delivery, electoral credibility, healthcare access, educational tracking, social welfare distribution, and national security. This identity vacuum has made it nearly impossible to develop strong, inclusive digital or physical infrastructure.
-          </p>
-        </div>
-        <div>
-          <h3 className="text-xl font-semibold mb-2">Digital Liberia is Here to Fix That:</h3>
-          <p className="text-white">
-            At the heart of our system lies a Digital Social Security Number (DSSN) - a unique, immutable identifier assigned to every individual within or outside Liberia's borders. Whether you are a Liberian citizen, resident or foreign national within Liberia, the DSSN is your digital identity - a gateway to services, recognition and inclusion.
-          </p>
-          <div className="mt-4">
-            <div className="inline-flex items-center bg-yellow-500/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-yellow-400/30 hover:bg-yellow-500/50 transition-colors">
-              <Link to="/dssn" className="text-yellow-100 hover:text-white transition-colors">
-                Explore 
-                <span className="font-semibold ml-1">DSSN</span>
-              </Link>
-              <span className="ml-2 text-yellow-100">→</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  },
-  {
-    id: "contact",
-    title: "Contact Us",
-    bgColor: "bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-yellow-600/10",
-    borderColor: "border-amber-400/30",
-    content: (
-      <div className="text-white space-y-4">
-        <p className="text-lg">
-          Have questions or need support? Reach out to us through any of these channels:
-        </p>
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-          <h3 className="text-xl font-semibold mb-2 text-amber-200">Email:</h3>
-          <ul className="space-y-2">
-            <li className="flex items-center">
-              <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              <a href="mailto:info@digitalliberia.com" className="hover:text-amber-300 transition-colors">info@digitalliberia.com</a>
-            </li>
-            <li className="flex items-center">
-              <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              <a href="mailto:info@liberianpost.com" className="hover:text-amber-300 transition-colors">info@liberianpost.com</a>
-            </li>
-          </ul>
-        </div>
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-          <h3 className="text-xl font-semibold mb-2 text-amber-200">Phone:</h3>
-          <ul className="space-y-2">
-            <li className="flex items-center">
-              <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              <span>WhatsApp: <a href="https://wa.me/231888001077" className="hover:text-amber-300 transition-colors">+231 888 001 077</a></span>
-            </li>
-            <li className="flex items-center">
-              <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              <span>Call: <a href="tel:+231775055817" className="hover:text-amber-300 transition-colors">+231 775 055 817</a></span>
-            </li>
-          </ul>
-        </div>
-        <p className="text-sm text-white/70 mt-4">
-          Our team is available to assist you Monday through Friday, 8:00 AM to 5:00 PM GMT.
-        </p>
-      </div>
-    )
-  }
-];
-
-export default function Home() {
+const Home = () => {
   const location = useLocation();
   const [activeLogo, setActiveLogo] = useState(0);
+  const [logosLoaded, setLogosLoaded] = useState(false);
 
+  // Logo configuration
+  const logos = [
+    "/logos/liberianpost.png",
+    "/logos/digital.png",
+    "/logos/libmusic.png",
+    "/logos/libconnectsit.png",
+    "/logos/libpaysit.png",
+    "/logos/seal_of_liberia.png",
+    "/logos/liberia.png"
+  ];
+
+  // Navigation links
+  const navLinks = [
+    { label: "Home", to: "/", color: "bg-blue-500/80" },
+    { label: "System", to: "/system", color: "bg-green-500/80" },
+    { label: "Digital Liberia", to: "/digital-liberia", color: "bg-purple-500/80" },
+    { label: "LibPay", to: "/libpay", color: "bg-yellow-500/80" },
+    { label: "Liberian Post", to: "/liberian-post", color: "bg-pink-500/80" }
+  ];
+
+  // Preload all logos
   useEffect(() => {
+    const loadImages = async () => {
+      const promises = logos.map(src => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.src = src;
+          img.onload = resolve;
+          img.onerror = () => {
+            console.error(`Failed to load logo: ${src}`);
+            resolve(); // Resolve even if error to prevent blocking
+          };
+        });
+      });
+
+      await Promise.all(promises);
+      setLogosLoaded(true);
+    };
+
+    loadImages();
+
     const interval = setInterval(() => {
       setActiveLogo(prev => (prev + 1) % logos.length);
-    }, 600);
+    }, 3000);
+
     return () => clearInterval(interval);
   }, []);
 
+  if (!logosLoaded) {
+    return <LoadingFallback />;
+  }
+
   return (
     <div className="relative min-h-screen w-full bg-blue-950 text-white font-inter overflow-x-hidden">
-      <div className="fixed inset-0 bg-blue-950 -z-50" />
-      <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
-        <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
-          {logos.map((logo, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
-                index === activeLogo ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <img
-                src={logo}
-                alt={`Logo ${index}`}
-                className="max-w-full max-h-full object-contain"
-                onError={(e) => {
-                  e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"%3E%3Cpath d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/%3E%3C/svg%3E';
-                  console.error(`Home.jsx - Failed to load logo: ${logo}`);
-                }}
-              />
-              <div className="absolute inset-0 bg-black/5" />
-            </div>
-          ))}
-        </div>
-      </div>
-      <header className="fixed top-0 left-0 w-full z-50">
-        <div className="bg-blue-950/80 backdrop-blur-md border-b border-blue-700/30">
-          <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
-            <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
-              {navLinks.map(link => (
-                <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
-                  <Link 
-                    to={link.to} 
-                    className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
-                      location.pathname === link.to 
-                        ? "text-red-500" 
-                        : "text-white hover:text-blue-300"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                </div>
-              ))}
-            </nav>
-          </div>
-          <div className="w-full bg-gradient-to-b from-blue-950 to-transparent overflow-x-auto">
-            <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
-              {logos.map((logo, index) => (
-                <div 
-                  key={index}
-                  className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
-                    index === activeLogo 
-                      ? "scale-110 bg-white shadow-lg"
-                      : "scale-100 bg-white/90"
-                  }`}
-                  style={{
-                    animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none'
-                  }}
-                >
-                  <img
-                    src={logo}
-                    alt={`Logo ${index}`}
-                    className="w-12 h-12 md:w-16 md:h-16 object-contain"
-                    onError={(e) => {
-                      e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"%3E%3Cpath d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/%3E%3C/svg%3E';
-                      console.error(`Home.jsx - Failed to load logo: ${logo}`);
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* Header */}
+      <header className="fixed top-0 left-0 w-full z-50 bg-blue-950/80 backdrop-blur-md border-b border-blue-700/30">
+        <div className="flex flex-col items-center">
+          <nav className="flex space-x-2 md:space-x-4 p-4 overflow-x-auto w-full justify-center">
+            {navLinks.map(link => (
+              <Link 
+                key={link.to}
+                to={link.to}
+                className={`flex-shrink-0 px-4 py-2 rounded-lg transition-colors ${
+                  link.color
+                } ${
+                  location.pathname === link.to 
+                    ? "ring-2 ring-white shadow-lg" 
+                    : "hover:opacity-90"
+                }`}
+              >
+                <span className="font-bold text-white">
+                  {link.label}
+                </span>
+              </Link>
+            ))}
+          </nav>
         </div>
       </header>
-      <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
-        {sections.map((section, index) => (
-          <section
-            key={section.id}
-            className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12"
-            style={{
-              animation: `fadeInUp 0.5s ease-out ${index * 0.1}s forwards`,
-              opacity: 0
-            }}
-          >
-            <div className={`${section.bgColor} backdrop-blur-lg rounded-xl border ${section.borderColor} p-6 md:p-8 shadow-lg relative overflow-hidden`}>
-              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
-              <div className="relative">
-                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
-                  {section.title}
-                </h2>
-                <div className="text-white">
-                  {section.content}
-                </div>
+
+      {/* Main Content */}
+      <main className="pt-24 pb-12 px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Hero Section */}
+          <section className="text-center py-12">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              Welcome to Digital Liberia
+            </h1>
+            <p className="text-xl max-w-3xl mx-auto">
+              Transforming Liberia through digital innovation and connectivity
+            </p>
+          </section>
+
+          {/* Logo Carousel */}
+          <div className="my-12">
+            <div className="flex justify-center">
+              <img 
+                src={logos[activeLogo]} 
+                alt="Digital Liberia Partner Logo"
+                className="h-32 object-contain"
+                onError={(e) => {
+                  e.target.src = '/placeholder-logo.png';
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Content Sections */}
+          <section className="my-12 bg-blue-900/20 p-8 rounded-xl backdrop-blur-sm">
+            <h2 className="text-2xl font-bold mb-4">Our Ecosystem</h2>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-white/5 p-6 rounded-lg">
+                <h3 className="text-xl font-semibold mb-3">National Database</h3>
+                <p>
+                  Secure, centralized data management for all government services
+                </p>
+                <Link 
+                  to="/system" 
+                  className="inline-block mt-4 px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
+                >
+                  Learn More
+                </Link>
+              </div>
+              <div className="bg-white/5 p-6 rounded-lg">
+                <h3 className="text-xl font-semibold mb-3">LibPay</h3>
+                <p>
+                  Liberia's premier digital payment solution
+                </p>
+                <Link 
+                  to="/libpay" 
+                  className="inline-block mt-4 px-4 py-2 bg-yellow-600 rounded hover:bg-yellow-700"
+                >
+                  Discover LibPay
+                </Link>
               </div>
             </div>
           </section>
-        ))}
+        </div>
       </main>
-      <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
-        <div className="border-t border-blue-700/30 pt-6">
-          © {new Date().getFullYear()} Digital Liberia. All rights reserved.
+
+      {/* Footer */}
+      <footer className="py-6 text-center text-white/70 border-t border-blue-800">
+        <div className="container mx-auto px-4">
+          <p>© {new Date().getFullYear()} Digital Liberia. All rights reserved.</p>
         </div>
       </footer>
-      <style jsx global>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes heartbeat {
-          0% { transform: scale(1); }
-          25% { transform: scale(1.1); }
-          50% { transform: scale(1); }
-          75% { transform: scale(1.1); }
-          100% { transform: scale(1); }
-        }
-        .overflow-x-auto {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .overflow-x-auto::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </div>
   );
-}
+};
+
+export default Home;
