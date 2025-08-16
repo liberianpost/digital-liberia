@@ -1,7 +1,8 @@
 import React, { useState, useEffect, Component } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
-import { SecurityLevels, handleLoginSuccess } from '@utils/securityLevels';
+import { SecurityLevels } from '@utils/securityLevels';
+import { handleLoginSuccess } from '@utils/auth';
 
 // Error Boundary Component
 class ErrorBoundary extends Component {
