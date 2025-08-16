@@ -21,13 +21,29 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@context': path.resolve(__dirname, './src/context'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@utils': path.resolve(__dirname, './src/utils'),
-      '@config': path.resolve(__dirname, './src/config'),
-    },
+    alias: [
+      {
+        find: '@',
+        replacement: path.resolve(__dirname, 'src')
+      },
+      {
+        find: '@context',
+        replacement: path.resolve(__dirname, 'src/context')
+      },
+      {
+        find: '@components',
+        replacement: path.resolve(__dirname, 'src/components')
+      },
+      {
+        find: '@utils',
+        replacement: path.resolve(__dirname, 'src/utils')
+      },
+      {
+        find: '@config',
+        replacement: path.resolve(__dirname, 'src/config')
+      }
+    ],
+    extensions: ['.js', '.jsx', '.json']
   },
   optimizeDeps: {
     include: [
@@ -39,7 +55,8 @@ export default defineConfig({
     exclude: ['js-big-decimal'],
   },
   define: {
-    'process.env': process.env,
+    'process.env': {},
+    'import.meta.env': JSON.stringify(process.env)
   },
   envPrefix: ['VITE_', 'REACT_APP_'],
   server: {
@@ -65,7 +82,7 @@ export default defineConfig({
         manualChunks: {
           react: ['react', 'react-dom', 'react-router-dom'],
           mui: ['@mui/material', '@emotion/react', '@emotion/styled'],
-          auth: ['@context/AuthContext', '@utils/auth'],
+          auth: ['@/context/AuthContext', '@/utils/auth'],
         },
       },
     },
@@ -78,5 +95,5 @@ export default defineConfig({
       localsConvention: 'camelCaseOnly',
     },
   },
-  base: './',
+  base: '/',
 });
