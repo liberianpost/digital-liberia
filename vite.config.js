@@ -7,11 +7,19 @@ export default defineConfig({
     react({
       jsxImportSource: '@emotion/react',
       babel: {
-        plugins: ['@emotion/babel-plugin']
+        plugins: [
+          [
+            '@emotion/babel-plugin',
+            {
+              sourceMap: true,
+              autoLabel: 'dev-only',
+              labelFormat: '[local]',
+              cssPropOptimization: true
+            }
+          ]
+        ]
       },
-      // Fix for Fast Refresh issues
       fastRefresh: true,
-      // Ensure JSX runtime is properly configured
       jsxRuntime: 'automatic'
     }),
   ],
@@ -20,19 +28,17 @@ export default defineConfig({
       { find: '@', replacement: path.resolve(__dirname, 'src') },
       { find: '@context', replacement: path.resolve(__dirname, 'src/context') },
       { find: '@components', replacement: path.resolve(__dirname, 'src/components') },
-      // Simplified alias configuration
-      ...['utils', 'config', 'hooks', 'pages'].map(dir => ({
-        find: `@${dir}`,
-        replacement: path.resolve(__dirname, `src/${dir}`)
-      }))
+      { find: '@utils', replacement: path.resolve(__dirname, 'src/utils') },
+      { find: '@config', replacement: path.resolve(__dirname, 'src/config') },
+      { find: '@assets', replacement: path.resolve(__dirname, 'src/assets') }
     ],
-    extensions: ['.js', '.jsx', '.json', '.mjs']
+    extensions: ['.js', '.jsx', '.json', '.ts', '.tsx']
   },
   server: {
     port: 3005,
     host: true,
     strictPort: true,
-    // Added headers to fix common CORS issues
+    open: true,
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp'
@@ -42,27 +48,33 @@ export default defineConfig({
         target: 'https://libpayapp.liberianpost.com:8081',
         changeOrigin: true,
         secure: false,
-        rewrite: path => path.replace(/^\/api/, '')
+        rewrite: (path) => path.replace(/^\/api/, ''),
+        ws: true
       }
     },
-    // Enable HMR fixes
     hmr: {
-      overlay: false
+      overlay: false,
+      clientPort: 3005
     }
   },
   build: {
     outDir: 'dist',
     emptyOutDir: true,
-    sourcemap: 'hidden',
-    // Critical for chunk loading
+    sourcemap: process.env.NODE_ENV !== 'production',
+    minify: 'terser',
+    assetsDir: 'assets',
     manifest: true,
+    chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
-        entryFileNames: `assets/[name].[hash].js`,
-        chunkFileNames: `assets/[name].[hash].js`,
-        assetFileNames: `assets/[name].[hash].[ext]`,
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash][extname]',
         manualChunks(id) {
           if (id.includes('node_modules')) {
+            if (id.includes('@mui') || id.includes('@emotion')) {
+              return 'vendor-mui';
+            }
             return 'vendor';
           }
         }
@@ -70,22 +82,29 @@ export default defineConfig({
     }
   },
   css: {
+    devSourcemap: true,
     postcss: {
-      plugins: [require('tailwindcss'), require('autoprefixer')]
+      plugins: [
+        require('tailwindcss'),
+        require('autoprefixer'),
+        require('postcss-combine-media-query'),
+        require('postcss-combine-duplicated-selectors')({
+          removeDuplicatedProperties: true
+        })
+      ]
     },
-    // Fix for CSS modules
     modules: {
-      generateScopedName: '[name]__[local]___[hash:base64:5]'
+      generateScopedName: '[name]__[local]___[hash:base64:5]',
+      localsConvention: 'camelCaseOnly'
     }
   },
-  // Critical base configuration
   base: './',
-  // Environment handling
   define: {
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-    'import.meta.env.MODE': JSON.stringify(process.env.NODE_ENV || 'development')
+    'process.env': process.env,
+    'import.meta.env.MODE': JSON.stringify(process.env.NODE_ENV || 'development'),
+    'import.meta.env.PROD': JSON.stringify(process.env.NODE_ENV === 'production'),
+    'import.meta.env.DEV': JSON.stringify(process.env.NODE_ENV !== 'production')
   },
-  // Optimizations
   optimizeDeps: {
     include: [
       'react',
@@ -93,13 +112,24 @@ export default defineConfig({
       'react-router-dom',
       '@emotion/react',
       '@emotion/styled',
-      '@mui/material'
+      '@mui/material',
+      '@mui/icons-material'
     ],
+    exclude: ['js-big-decimal'],
     esbuildOptions: {
-      // Node.js global for browser
       define: {
         global: 'globalThis'
-      }
+      },
+      plugins: [
+        {
+          name: 'fix-emotion-react',
+          setup(build) {
+            build.onResolve({ filter: /@emotion\/react\/jsx-runtime/ }, () => {
+              return { path: require.resolve('@emotion/react/jsx-runtime') };
+            });
+          }
+        }
+      ]
     }
   }
 });
