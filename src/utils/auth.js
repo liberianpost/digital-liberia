@@ -1,59 +1,125 @@
 import { getDefaultRouteForLevel } from './dashboardManager';
-import { SecurityLevels } from './securityLevels';
+import { 
+  SecurityLevels,
+  getSecurityLevelValue,
+  getSecurityLevelRank,
+  getSecurityLevelDisplayName
+} from './securityLevels';
 
-console.log('auth.js - Starting to load auth utilities');
+console.log('auth.js - Initializing auth utilities');
 
+// Enhanced auth state management
 export function getCurrentSecurityLevel() {
   try {
     const user = JSON.parse(localStorage.getItem('moeAuth') || 'null');
-    const level = user?.securityLevel || SecurityLevels.STUDENT;
-    console.log('auth.js - getCurrentSecurityLevel:', level);
+    const level = user?.securityLevel ? getSecurityLevelValue(user.securityLevel) : SecurityLevels.STUDENT.value;
+    
+    console.log('auth.js - Current security level:', {
+      storedLevel: user?.securityLevel,
+      resolvedLevel: level
+    });
+    
     return level;
   } catch (error) {
-    console.error('auth.js - getCurrentSecurityLevel error:', error);
-    return SecurityLevels.STUDENT;
+    console.error('auth.js - Error in getCurrentSecurityLevel:', {
+      error: error.message,
+      stack: error.stack
+    });
+    return SecurityLevels.STUDENT.value;
   }
 }
 
 export function hasPermission(requiredLevel, userLevel = getCurrentSecurityLevel()) {
   try {
-    const levels = Object.values(SecurityLevels);
-    const requiredIndex = levels.indexOf(requiredLevel);
-    const userIndex = levels.indexOf(userLevel);
-    const hasAccess = userIndex >= requiredIndex;
-    console.log('auth.js - hasPermission:', { requiredLevel, userLevel, hasAccess });
+    const requiredRank = getSecurityLevelRank(requiredLevel);
+    const userRank = getSecurityLevelRank(userLevel);
+    const hasAccess = userRank >= requiredRank;
+    
+    console.log('auth.js - Permission check:', {
+      requiredLevel,
+      requiredRank,
+      userLevel,
+      userRank,
+      hasAccess
+    });
+    
     return hasAccess;
   } catch (error) {
-    console.error('auth.js - hasPermission error:', error);
+    console.error('auth.js - Error in hasPermission:', {
+      error: error.message,
+      stack: error.stack,
+      requiredLevel,
+      userLevel
+    });
     return false;
   }
 }
 
 export function getRoleName(level) {
-  const roles = {
-    [SecurityLevels.STUDENT]: 'Student',
-    [SecurityLevels.PARENT]: 'Parent',
-    [SecurityLevels.TEACHER]: 'Teacher',
-    [SecurityLevels.SCHOOL_ADMIN]: 'School Admin',
-    [SecurityLevels.MINISTRY_OFFICIAL]: 'Ministry Official',
-    [SecurityLevels.DATABASE_ADMIN]: 'Database Admin',
-    [SecurityLevels.SYSTEM_ADMIN]: 'System Admin',
-  };
-  const roleName = roles[level] || 'Unknown Role';
-  console.log('auth.js - getRoleName:', { level, roleName });
-  return roleName;
+  try {
+    const displayName = getSecurityLevelDisplayName(level);
+    console.log('auth.js - Role name resolved:', { level, displayName });
+    return displayName;
+  } catch (error) {
+    console.error('auth.js - Error in getRoleName:', {
+      error: error.message,
+      stack: error.stack,
+      inputLevel: level
+    });
+    return 'Unknown Role';
+  }
 }
 
 export function handleLoginSuccess(userData, navigate) {
   try {
-    console.log('auth.js - handleLoginSuccess:', userData);
-    localStorage.setItem('moeAuth', JSON.stringify(userData));
-    const defaultRoute = getDefaultRouteForLevel(userData.securityLevel);
-    navigate(defaultRoute, { replace: true });
+    if (!userData?.securityLevel) {
+      throw new Error('Invalid user data - missing securityLevel');
+    }
+
+    console.log('auth.js - Processing login success:', {
+      userId: userData.id,
+      username: userData.username,
+      securityLevel: userData.securityLevel
+    });
+
+    // Validate and normalize security level
+    const validatedLevel = getSecurityLevelValue(userData.securityLevel);
+    const normalizedUserData = {
+      ...userData,
+      securityLevel: validatedLevel
+    };
+
+    localStorage.setItem('moeAuth', JSON.stringify(normalizedUserData));
+    
+    const defaultRoute = getDefaultRouteForLevel(validatedLevel);
+    console.log('auth.js - Navigating to:', defaultRoute);
+    
+    navigate(defaultRoute, { 
+      replace: true,
+      state: { fromLogin: true }
+    });
   } catch (error) {
-    console.error('auth.js - handleLoginSuccess error:', error);
+    console.error('auth.js - Error in handleLoginSuccess:', {
+      error: error.message,
+      stack: error.stack,
+      userData: {
+        id: userData?.id,
+        username: userData?.username,
+        securityLevel: userData?.securityLevel
+      }
+    });
     throw error;
   }
 }
 
-console.log('auth.js - Auth utilities loaded successfully');
+// Additional utility function
+export function clearAuthData() {
+  try {
+    console.log('auth.js - Clearing authentication data');
+    localStorage.removeItem('moeAuth');
+  } catch (error) {
+    console.error('auth.js - Error clearing auth data:', error);
+  }
+}
+
+console.log('auth.js - Initialization complete');
