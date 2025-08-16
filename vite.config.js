@@ -22,26 +22,11 @@ export default defineConfig({
   ],
   resolve: {
     alias: [
-      {
-        find: '@',
-        replacement: path.resolve(__dirname, 'src')
-      },
-      {
-        find: '@context',
-        replacement: path.resolve(__dirname, 'src/context')
-      },
-      {
-        find: '@components',
-        replacement: path.resolve(__dirname, 'src/components')
-      },
-      {
-        find: '@utils',
-        replacement: path.resolve(__dirname, 'src/utils')
-      },
-      {
-        find: '@config',
-        replacement: path.resolve(__dirname, 'src/config')
-      }
+      { find: '@', replacement: path.resolve(__dirname, 'src') },
+      { find: '@context', replacement: path.resolve(__dirname, 'src/context') },
+      { find: '@components', replacement: path.resolve(__dirname, 'src/components') },
+      { find: '@utils', replacement: path.resolve(__dirname, 'src/utils') },
+      { find: '@config', replacement: path.resolve(__dirname, 'src/config') }
     ],
     extensions: ['.js', '.jsx', '.json']
   },
@@ -82,7 +67,7 @@ export default defineConfig({
         manualChunks: {
           react: ['react', 'react-dom', 'react-router-dom'],
           mui: ['@mui/material', '@emotion/react', '@emotion/styled'],
-          auth: ['@/context/AuthContext', '@/utils/auth'],
+          auth: ['@context/AuthContext', '@utils/auth'],
         },
       },
     },
