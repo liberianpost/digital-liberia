@@ -1,23 +1,19 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import tailwindcss from 'tailwindcss';
-import autoprefixer from 'autoprefixer';
 
 export default defineConfig({
   plugins: [react()],
-  css: {
-    postcss: {
-      plugins: [
-        tailwindcss(),
-        autoprefixer()
-      ]
-    }
-  },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src')
-    }
+    alias: [
+      { find: '@', replacement: path.resolve(__dirname, 'src') },
+      { find: '@context', replacement: path.resolve(__dirname, 'src/context') },
+      { find: '@components', replacement: path.resolve(__dirname, 'src/components') },
+      { find: '@utils', replacement: path.resolve(__dirname, 'src/utils') }, // Add this line
+      { find: '@config', replacement: path.resolve(__dirname, 'src/config') },
+      { find: '@assets', replacement: path.resolve(__dirname, 'src/assets') }
+    ],
+    extensions: ['.js', '.jsx']
   },
   build: {
     outDir: 'dist'
