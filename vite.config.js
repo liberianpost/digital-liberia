@@ -27,9 +27,7 @@ export default defineConfig({
   css: {
     postcss: {
       plugins: [
-        tailwindcss({
-          config: './tailwind.config.js'
-        }),
+        tailwindcss({ config: './tailwind.config.js' }),
         autoprefixer
       ]
     },
@@ -41,7 +39,7 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     emptyOutDir: true,
-    sourcemap: false, // Disable sourcemaps for production
+    sourcemap: false,
     rollupOptions: {
       input: path.resolve(__dirname, 'src/main.jsx'),
       output: {
