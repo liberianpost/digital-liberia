@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import LoadingFallback from '@components/LoadingFallback';
 
 const navLinks = [
   { label: "Home", to: "/", color: "bg-blue-500/80" },
