@@ -8,7 +8,6 @@
 
     <!-- Preload critical resources -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style">
-    <link rel="preload" href="./assets/main.css" as="style">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,11 +21,13 @@
 
     <!-- Theme Color -->
     <meta name="theme-color" content="#ffffff">
+    
+    <!-- Vite will inject CSS here -->
   </head>
   <body>
     <div id="root">
-      <!-- Loading state -->
-      <div style="
+      <!-- Loading state with ID for removal -->
+      <div id="app-loading" style="
         position: fixed;
         top: 0;
         left: 0;
@@ -95,5 +96,7 @@
       }
       body { margin: 0; font-family: 'Inter', sans-serif; }
     </style>
+    
+    <!-- Vite will inject scripts here -->
   </body>
 </html>
