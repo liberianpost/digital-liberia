@@ -2,29 +2,31 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'https://libpayapp.liberianpost.com:8081/api',
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
+  withCredentials: true
 });
 
-// Add CORS headers for all requests
+// Add request interceptor for CORS
 api.interceptors.request.use(config => {
-  config.headers['Access-Control-Allow-Origin'] = '*';
-  config.headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,PATCH,OPTIONS';
-  config.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
+  // Don't set Access-Control-Allow-Origin here - that's a response header
+  config.headers['Content-Type'] = 'application/json';
   return config;
 });
 
-export const moeLogin = async (credentials) => {
-  try {
-    const response = await api.post('/auth/moe_login', credentials);
-    return response.data;
-  } catch (error) {
-    console.error('Login error:', error);
-    throw error;
+// Add response interceptor
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response) {
+      // Server responded with error status
+      return Promise.reject(error.response.data);
+    } else if (error.request) {
+      // Request was made but no response
+      return Promise.reject({ message: 'Network error. Please check your connection.' });
+    } else {
+      // Something else happened
+      return Promise.reject({ message: 'An unexpected error occurred' });
+    }
   }
-};
+);
 
 export default api;
