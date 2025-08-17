@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
 import { SecurityLevels } from '@utils/securityLevels';
 import { hasPermission } from '@utils/auth';
-import api from '../api';
 
 const TabPanel = ({ children, value, index }) => {
   return (
