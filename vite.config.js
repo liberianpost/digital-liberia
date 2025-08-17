@@ -41,10 +41,7 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: false,
     rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, 'src/main.jsx'),
-        index: path.resolve(__dirname, 'index.html')
-      },
+      input: path.resolve(__dirname, 'index.html'),
       output: {
         assetFileNames: 'assets/[name]-[hash][extname]',
         chunkFileNames: 'assets/[name]-[hash].js',
@@ -52,7 +49,7 @@ export default defineConfig({
       }
     }
   },
-  base: './', // Changed to relative path for Firebase
+  base: './',
   server: {
     port: 3005,
     host: true,
