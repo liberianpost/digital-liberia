@@ -1,20 +1,25 @@
 import axios from 'axios';
 
-console.log('api.js - Initializing API with URL:', import.meta.env.VITE_API_URL);
-
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://libpayapp.liberianpost.com:8081/api',
-  withCredentials: true
+  baseURL: 'https://libpayapp.liberianpost.com:8081/api',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
 });
 
-// Add this new function for MOE login
+// Add CORS headers for all requests
+api.interceptors.request.use(config => {
+  config.headers['Access-Control-Allow-Origin'] = '*';
+  config.headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,PATCH,OPTIONS';
+  config.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
+  return config;
+});
+
 export const moeLogin = async (credentials) => {
   try {
-    const response = await api.post('/auth/moe_login', credentials, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    const response = await api.post('/auth/moe_login', credentials);
     return response.data;
   } catch (error) {
     console.error('Login error:', error);
