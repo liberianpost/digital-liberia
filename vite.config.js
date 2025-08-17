@@ -1,16 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import tailwindcss from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
 
 export default defineConfig({
-  plugins: [
-    react({
-      jsxImportSource: '@emotion/react',
-      babel: {
-        plugins: ['@emotion/babel-plugin']
-      }
-    })
-  ],
+  plugins: [react()],
   resolve: {
     alias: [
       { find: '@', replacement: path.resolve(__dirname, 'src') },
@@ -20,41 +15,17 @@ export default defineConfig({
       { find: '@config', replacement: path.resolve(__dirname, 'src/config') },
       { find: '@assets', replacement: path.resolve(__dirname, 'src/assets') }
     ],
-    extensions: ['.js', '.jsx', '.json', '.ts', '.tsx']
+    extensions: ['.js', '.jsx']
   },
-  server: {
-    port: 3005,
-    host: true,
-    strictPort: true,
-    proxy: {
-      '/api': {
-        target: 'https://libpayapp.liberianpost.com:8081',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      }
+  css: {
+    postcss: {
+      plugins: [tailwindcss, autoprefixer]
     }
   },
   build: {
     outDir: 'dist',
-    emptyOutDir: true,
-    sourcemap: process.env.NODE_ENV !== 'production',
     assetsDir: 'assets',
-    rollupOptions: {
-      output: {
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash][extname]'
-      }
-    }
-  },
-  css: {
-    postcss: {
-      plugins: [
-        require('tailwindcss'),
-        require('autoprefixer')
-      ]
-    }
+    emptyOutDir: true
   },
   base: './'
 });
