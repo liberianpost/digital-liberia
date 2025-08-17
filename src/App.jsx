@@ -1,17 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppRoutes from './AppRoutes';
 import { AuthProvider } from '@/context/AuthContext';
+import LoadingFallback from '@components/LoadingFallback';
 
 const App = () => {
-  React.useEffect(() => {
-    if (import.meta.env.DEV) {
-      console.log('[App] Initializing application');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Ensure home route loads by default
+    if (window.location.pathname === '/') {
+      navigate('/', { replace: true });
     }
-  }, []);
+
+    // Debug log
+    console.log('App initialized - current path:', window.location.pathname);
+  }, [navigate]);
 
   return (
     <AuthProvider>
-      <AppRoutes />
+      <React.Suspense fallback={<LoadingFallback fullScreen />}>
+        <AppRoutes />
+      </React.Suspense>
     </AuthProvider>
   );
 };
