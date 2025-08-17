@@ -4,7 +4,7 @@ import AppRoutes from './AppRoutes';
 import { AuthProvider } from '@/context/AuthContext';
 import LoadingFallback from '@components/LoadingFallback';
 
-const App = () => {
+const App = ({ onMount }) => {  // Add prop destructuring here
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,7 +15,12 @@ const App = () => {
 
     // Debug log
     console.log('App initialized - current path:', window.location.pathname);
-  }, [navigate]);
+
+    // Call the onMount function if provided (this removes the loading screen)
+    if (onMount) {
+      onMount();
+    }
+  }, [navigate, onMount]);  // Add onMount to dependencies
 
   return (
     <AuthProvider>
