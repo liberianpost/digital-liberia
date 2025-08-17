@@ -4,6 +4,7 @@ import { useAuth } from "@context/AuthContext";
 import { SecurityLevels } from '@utils/securityLevels';
 import { handleLoginSuccess } from '@utils/auth';
 import { DashboardItems } from "@/config/dashboardItems";
+import axios from 'axios';
 
 const navLinks = [
   { label: "Home", to: "/", color: "bg-blue-500/80" },
