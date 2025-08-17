@@ -168,27 +168,42 @@ const MoeLoginModal = ({ onClose }) => {
   setLoading(true);
 
   try {
-    const response = await api.post('/auth/moe_login', {
+    const response = await moeLogin({
       username: formData.username.trim(),
       password: formData.password
     });
 
-    if (response.data.success) {
-      const result = await login(formData);
-      if (result.success) {
-        localStorage.setItem("MOE_LOGGED_IN", "true");
-        localStorage.setItem("MOE_USERNAME", formData.username);
-        onClose();
-        navigate("/moe-dashboard");
-      } else {
-        setError(result.error || "Login processing failed");
-      }
+    if (response.data.success && response.data.data) {
+      const { userId, username, securityLevel } = response.data.data;
+      
+      // Equivalent to Android's SharedPreferences
+      localStorage.setItem("MOE_USER_ID", userId);
+      localStorage.setItem("MOE_USERNAME", username);
+      localStorage.setItem("MOE_SECURITY_LEVEL", securityLevel);
+      localStorage.setItem("MOE_LOGGED_IN", "true");
+
+      onClose();
+      navigate("/moe-dashboard");
     } else {
-      setError(response.data.message || "Invalid credentials");
+      setError(response.data.message || "Login succeeded but no user details received");
     }
-  } catch (err) {
-    console.error("Login error:", err);
-    setError(err.message || "Login failed. Please try again.");
+  } catch (error) {
+    if (error.response) {
+      switch (error.response.status) {
+        case 401:
+          setError("Invalid username or password");
+          break;
+        case 500:
+          setError("Server error. Please try again later.");
+          break;
+        default:
+          setError(`Error: ${error.response.status}`);
+      }
+    } else if (error.request) {
+      setError("Network error. Please check your connection.");
+    } else {
+      setError("An unexpected error occurred");
+    }
   } finally {
     setLoading(false);
   }
