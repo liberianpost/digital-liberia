@@ -6,6 +6,13 @@ import createCache from '@emotion/cache';
 import App from './App';
 import './index.css';
 
+// Remove loading screen before React mounts
+const loadingElement = document.getElementById('app-loading');
+if (loadingElement) {
+  loadingElement.style.opacity = '0';
+  setTimeout(() => loadingElement.remove(), 500);
+}
+
 // Emotion cache configuration
 const cache = createCache({
   key: 'css',
@@ -45,48 +52,6 @@ if (!container) {
   throw new Error('Root element not found');
 }
 
-// Error boundary fallback
-const Fallback = ({ error, resetError }) => (
-  <div style={{
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    background: '#fff',
-    padding: '2rem',
-    flexDirection: 'column'
-  }}>
-    <h1 style={{ color: '#dc2626', marginBottom: '1rem' }}>Application Error</h1>
-    <pre style={{
-      background: '#f5f5f5',
-      padding: '1rem',
-      borderRadius: '0.25rem',
-      maxWidth: '800px',
-      overflowX: 'auto'
-    }}>
-      {error.toString()}
-    </pre>
-    <button 
-      onClick={resetError}
-      style={{
-        marginTop: '1rem',
-        padding: '0.5rem 1rem',
-        background: '#2563eb',
-        color: 'white',
-        border: 'none',
-        borderRadius: '0.25rem',
-        cursor: 'pointer'
-      }}
-    >
-      Try Again
-    </button>
-  </div>
-);
-
 // Root render
 const root = createRoot(container);
 root.render(
@@ -98,3 +63,7 @@ root.render(
     </CacheProvider>
   </React.StrictMode>
 );
+
+// Debugging logs
+console.log('App mounted successfully');
+console.log('CSS loaded:', document.querySelector('link[rel="stylesheet"]') ? 'Yes' : 'No');
