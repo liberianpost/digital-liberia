@@ -6,22 +6,27 @@
     <title>Digital Liberia</title>
     <meta name="description" content="Liberia's integrated digital platform for government services and payments">
 
-    <!-- Preconnect and fonts -->
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style">
+    <link rel="preload" href="./assets/main.css" as="style">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Favicon (use relative paths) -->
+    <!-- Favicon -->
     <link rel="icon" href="./favicon.ico" sizes="any">
     <link rel="icon" href="./icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="./apple-touch-icon.png">
     <link rel="manifest" href="./manifest.webmanifest">
 
-    <!-- Vite will inject CSS automatically -->
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#ffffff">
   </head>
   <body>
     <div id="root">
-      <!-- Enhanced loading state -->
+      <!-- Loading state -->
       <div style="
         position: fixed;
         top: 0;
@@ -46,8 +51,6 @@
       </div>
     </div>
 
-    <!-- Vite will inject the script tag here automatically -->
-    
     <noscript>
       <div style="
         position: fixed;
@@ -60,14 +63,13 @@
         align-items: center;
         background: #ffffff;
         z-index: 9999;
-        font-family: 'Inter', sans-serif;
       ">
         <div style="text-align: center; padding: 2rem; max-width: 500px;">
           <h1 style="font-size: 1.5rem; margin-bottom: 1rem; color: #dc2626;">
             JavaScript Required
           </h1>
           <p style="margin-bottom: 1.5rem;">
-            This application requires JavaScript to function properly. Please enable JavaScript in your browser settings.
+            This application requires JavaScript to function properly.
           </p>
           <button 
             onclick="window.location.reload()" 
@@ -77,7 +79,6 @@
               color: white;
               border: none;
               border-radius: 0.25rem;
-              font-family: inherit;
               cursor: pointer;
             "
           >
@@ -93,6 +94,7 @@
         50% { width: 100%; margin-left: 0 }
         100% { width: 0; margin-left: 100% }
       }
+      body { margin: 0; font-family: 'Inter', sans-serif; }
     </style>
   </body>
 </html>
