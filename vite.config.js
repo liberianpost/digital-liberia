@@ -2,6 +2,18 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
+// External PostCSS configuration
+const postcssConfig = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+    'postcss-combine-media-query': {},
+    'postcss-combine-duplicated-selectors': {
+      removeDuplicatedProperties: true
+    }
+  }
+};
+
 export default defineConfig({
   plugins: [
     react({
@@ -18,10 +30,8 @@ export default defineConfig({
             }
           ]
         ]
-      },
-      fastRefresh: true,
-      jsxRuntime: 'automatic'
-    }),
+      }
+    })
   ],
   resolve: {
     alias: [
@@ -38,7 +48,6 @@ export default defineConfig({
     port: 3005,
     host: true,
     strictPort: true,
-    open: true,
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp'
@@ -48,23 +57,15 @@ export default defineConfig({
         target: 'https://libpayapp.liberianpost.com:8081',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-        ws: true
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
-    },
-    hmr: {
-      overlay: false,
-      clientPort: 3005
     }
   },
   build: {
     outDir: 'dist',
     emptyOutDir: true,
     sourcemap: process.env.NODE_ENV !== 'production',
-    minify: 'terser',
     assetsDir: 'assets',
-    manifest: true,
-    chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
         entryFileNames: 'assets/[name]-[hash].js',
@@ -82,28 +83,15 @@ export default defineConfig({
     }
   },
   css: {
-    devSourcemap: true,
-    postcss: {
-      plugins: [
-        require('tailwindcss'),
-        require('autoprefixer'),
-        require('postcss-combine-media-query'),
-        require('postcss-combine-duplicated-selectors')({
-          removeDuplicatedProperties: true
-        })
-      ]
-    },
+    postcss: postcssConfig,
     modules: {
-      generateScopedName: '[name]__[local]___[hash:base64:5]',
-      localsConvention: 'camelCaseOnly'
+      generateScopedName: '[name]__[local]___[hash:base64:5]'
     }
   },
   base: './',
   define: {
-    'process.env': process.env,
-    'import.meta.env.MODE': JSON.stringify(process.env.NODE_ENV || 'development'),
-    'import.meta.env.PROD': JSON.stringify(process.env.NODE_ENV === 'production'),
-    'import.meta.env.DEV': JSON.stringify(process.env.NODE_ENV !== 'production')
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+    'import.meta.env.MODE': JSON.stringify(process.env.NODE_ENV || 'development')
   },
   optimizeDeps: {
     include: [
@@ -112,24 +100,12 @@ export default defineConfig({
       'react-router-dom',
       '@emotion/react',
       '@emotion/styled',
-      '@mui/material',
-      '@mui/icons-material'
+      '@mui/material'
     ],
-    exclude: ['js-big-decimal'],
     esbuildOptions: {
       define: {
         global: 'globalThis'
-      },
-      plugins: [
-        {
-          name: 'fix-emotion-react',
-          setup(build) {
-            build.onResolve({ filter: /@emotion\/react\/jsx-runtime/ }, () => {
-              return { path: require.resolve('@emotion/react/jsx-runtime') };
-            });
-          }
-        }
-      ]
+      }
     }
   }
 });
