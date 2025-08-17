@@ -3,7 +3,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
 import { SecurityLevels } from '@utils/securityLevels';
 import { hasPermission } from '@utils/auth';
-import api from '../api';
 
 const navLinks = [
   { label: 'Home', to: '/', color: 'bg-blue-500/80' },
