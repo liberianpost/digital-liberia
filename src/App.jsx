@@ -4,23 +4,19 @@ import AppRoutes from './AppRoutes';
 import { AuthProvider } from '@/context/AuthContext';
 import LoadingFallback from '@components/LoadingFallback';
 
-const App = ({ onMount }) => {  // Add prop destructuring here
+const App = ({ onMount }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Ensure home route loads by default
     if (window.location.pathname === '/') {
       navigate('/', { replace: true });
     }
-
-    // Debug log
     console.log('App initialized - current path:', window.location.pathname);
-
-    // Call the onMount function if provided (this removes the loading screen)
     if (onMount) {
+      console.log('Calling onMount to remove loading screen');
       onMount();
     }
-  }, [navigate, onMount]);  // Add onMount to dependencies
+  }, [navigate, onMount]);
 
   return (
     <AuthProvider>
