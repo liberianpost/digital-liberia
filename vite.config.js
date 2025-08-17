@@ -43,7 +43,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'src/main.jsx'),
-        index: path.resolve(__dirname, 'public/index.html')
+        index: path.resolve(__dirname, 'index.html')
       },
       output: {
         assetFileNames: 'assets/[name]-[hash][extname]',
@@ -52,7 +52,7 @@ export default defineConfig({
       }
     }
   },
-  base: '/', // Ensure correct base path for Firebase Hosting
+  base: './', // Changed to relative path for Firebase
   server: {
     port: 3005,
     host: true,
