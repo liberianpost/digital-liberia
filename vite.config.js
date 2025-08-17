@@ -26,7 +26,12 @@ export default defineConfig({
   },
   css: {
     postcss: {
-      plugins: [tailwindcss, autoprefixer]
+      plugins: [
+        tailwindcss({
+          config: './tailwind.config.js'
+        }),
+        autoprefixer
+      ]
     },
     modules: {
       localsConvention: 'camelCaseOnly'
@@ -36,14 +41,13 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     emptyOutDir: true,
-    sourcemap: process.env.NODE_ENV !== 'production',
-    manifest: true,
+    sourcemap: false, // Disable sourcemaps for production
     rollupOptions: {
-      input: '/src/main.jsx', // Explicit entry point
+      input: path.resolve(__dirname, 'src/main.jsx'),
       output: {
-        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash][extname]',
         chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash][extname]'
+        entryFileNames: 'assets/[name]-[hash].js'
       }
     }
   },
