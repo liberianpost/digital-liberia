@@ -37,6 +37,7 @@ export default defineConfig({
     assetsDir: 'assets',
     emptyOutDir: true,
     sourcemap: process.env.NODE_ENV !== 'production',
+    manifest: true,
     rollupOptions: {
       input: '/src/main.jsx', // Explicit entry point
       output: {
