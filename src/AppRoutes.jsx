@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from './Home';
 import ProtectedRoute from '@components/ProtectedRoute';
 import LoadingFallback from '@components/LoadingFallback';
+import { SecurityLevels } from '@utils/securityLevels';
 
 // Enhanced debugLazy with better error handling and logging
 function debugLazy(importFn, name) {
