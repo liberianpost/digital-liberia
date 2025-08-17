@@ -1,30 +1,36 @@
 import axios from 'axios';
-import { setupCache } from 'axios-cache-interceptor';
 
-// Create a cookie manager equivalent to Android's JavaNetCookieJar
-const axiosInstance = axios.create({
+// Create axios instance with same configuration as Android app
+const api = axios.create({
   baseURL: 'https://libpayapp.liberianpost.com:8081/',
-  withCredentials: true, // This handles cookies automatically
-  timeout: 30000, // 30 seconds timeout
+  withCredentials: true, // Equivalent to JavaNetCookieJar
+  timeout: 30000, // 30 seconds timeout like Android
 });
 
-// Add logging interceptor (equivalent to HttpLoggingInterceptor)
-axiosInstance.interceptors.request.use(config => {
+// Add request logging
+api.interceptors.request.use(config => {
   console.log('Request:', config.method?.toUpperCase(), config.url);
+  if (config.data) {
+    console.log('Request Data:', config.data);
+  }
   return config;
 });
 
-axiosInstance.interceptors.response.use(response => {
+// Add response logging
+api.interceptors.response.use(response => {
   console.log('Response:', response.status, response.data);
   return response;
 }, error => {
-  console.error('Error:', error.response?.status, error.message);
+  if (error.response) {
+    console.error('Error Response:', error.response.status, error.response.data);
+  } else {
+    console.error('Error:', error.message);
+  }
   return Promise.reject(error);
 });
 
-// Create cached version if needed
-export const api = setupCache(axiosInstance);
-
-// Specific endpoints
+// Specific endpoints to match Android interface
 export const moeLogin = (credentials) => 
   api.post('api/auth/moe_login', credentials);
+
+export default api;
