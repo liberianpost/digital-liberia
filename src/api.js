@@ -1,32 +1,30 @@
 import axios from 'axios';
+import { setupCache } from 'axios-cache-interceptor';
 
-const api = axios.create({
-  baseURL: 'https://libpayapp.liberianpost.com:8081/api',
-  withCredentials: true
+// Create a cookie manager equivalent to Android's JavaNetCookieJar
+const axiosInstance = axios.create({
+  baseURL: 'https://libpayapp.liberianpost.com:8081/',
+  withCredentials: true, // This handles cookies automatically
+  timeout: 30000, // 30 seconds timeout
 });
 
-// Add request interceptor for CORS
-api.interceptors.request.use(config => {
-  // Don't set Access-Control-Allow-Origin here - that's a response header
-  config.headers['Content-Type'] = 'application/json';
+// Add logging interceptor (equivalent to HttpLoggingInterceptor)
+axiosInstance.interceptors.request.use(config => {
+  console.log('Request:', config.method?.toUpperCase(), config.url);
   return config;
 });
 
-// Add response interceptor
-api.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response) {
-      // Server responded with error status
-      return Promise.reject(error.response.data);
-    } else if (error.request) {
-      // Request was made but no response
-      return Promise.reject({ message: 'Network error. Please check your connection.' });
-    } else {
-      // Something else happened
-      return Promise.reject({ message: 'An unexpected error occurred' });
-    }
-  }
-);
+axiosInstance.interceptors.response.use(response => {
+  console.log('Response:', response.status, response.data);
+  return response;
+}, error => {
+  console.error('Error:', error.response?.status, error.message);
+  return Promise.reject(error);
+});
 
-export default api;
+// Create cached version if needed
+export const api = setupCache(axiosInstance);
+
+// Specific endpoints
+export const moeLogin = (credentials) => 
+  api.post('api/auth/moe_login', credentials);
