@@ -168,25 +168,12 @@ const MoeLoginModal = ({ onClose }) => {
   setLoading(true);
 
   try {
-    // Direct API call with proper CORS handling
-    const response = await axios.post(
-      'https://libpayapp.liberianpost.com:8081/api/auth/moe_login',
-      {
-        username: formData.username.trim(),
-        password: formData.password
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        },
-        withCredentials: true
-      }
-    );
+    const response = await api.post('/auth/moe_login', {
+      username: formData.username.trim(),
+      password: formData.password
+    });
 
-    if (response.data && response.data.success) {
-      // Handle successful login
+    if (response.data.success) {
       const result = await login(formData);
       if (result.success) {
         localStorage.setItem("MOE_LOGGED_IN", "true");
@@ -197,26 +184,16 @@ const MoeLoginModal = ({ onClose }) => {
         setError(result.error || "Login processing failed");
       }
     } else {
-      setError(response.data?.message || "Invalid credentials");
+      setError(response.data.message || "Invalid credentials");
     }
   } catch (err) {
     console.error("Login error:", err);
-    if (err.code === "ERR_NETWORK") {
-      setError("Network error. Please check your connection.");
-    } else if (err.response) {
-      if (err.response.status === 500) {
-        setError("Server error. Please try again later.");
-      } else {
-        setError(err.response.data?.message || "Login failed");
-      }
-    } else {
-      setError("An unexpected error occurred");
-    }
+    setError(err.message || "Login failed. Please try again.");
   } finally {
     setLoading(false);
   }
 };
-
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-md overflow-hidden shadow-xl">
