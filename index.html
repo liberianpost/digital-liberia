@@ -4,22 +4,85 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Digital Liberia</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="description" content="Liberia's integrated digital platform for government services and payments">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="/assets/main-Dhr6MSFo.css">
   </head>
-  <body class="bg-black text-white font-inter">
+  <body>
+    <div id="app-loading" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #ffffff;
+      font-family: 'Inter', sans-serif;
+      z-index: 1000;
+    ">
+      <div style="text-align: center">
+        <div style="margin-bottom: 1rem; font-size: 1.25rem; font-weight: 500">
+          Loading Digital Liberia...
+        </div>
+        <div style="width: 100px; height: 4px; background: #e5e7eb; margin: 0 auto">
+          <div style="width: 0; height: 100%; background: #2563eb; animation: loading 1.5s infinite"></div>
+        </div>
+      </div>
+    </div>
     <div id="root"></div>
-
-    <!-- Vite automatically bundles and injects JS -->
-    <script type="module" src="/src/main.jsx"></script>
+    <noscript>
+      <div style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #ffffff;
+        z-index: 9999;
+      ">
+        <div style="text-align: center; padding: 2rem; max-width: 500px;">
+          <h1 style="font-size: 1.5rem; margin-bottom: 1rem; color: #dc2626;">
+            JavaScript Required
+          </h1>
+          <p style="margin-bottom: 1.5rem;">
+            This application requires JavaScript to function properly.
+          </p>
+          <button 
+            onclick="window.location.reload()" 
+            style="
+              padding: 0.5rem 1rem;
+              background: #2563eb;
+              color: white;
+              border: none;
+              border-radius: 0.25rem;
+              cursor: pointer;
+            "
+          >
+            Reload Page
+          </button>
+        </div>
+      </div>
+    </noscript>
+    <style>
+      @keyframes loading {
+        0% { width: 0; margin-left: 0 }
+        50% { width: 100%; margin-left: 0 }
+        100% { width: 0; margin-left: 100% }
+      }
+      body { margin: 0; font-family: 'Inter', sans-serif; }
+    </style>
+    <script type="module" src="/assets/main-BLlGCqK8.js"></script>
   </body>
 </html>
