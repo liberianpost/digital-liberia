@@ -6,26 +6,31 @@ import createCache from '@emotion/cache';
 import App from './App';
 import './index.css';
 
-// Emotion cache configuration
 const cache = createCache({
   key: 'css',
   prepend: true,
   speedy: process.env.NODE_ENV === 'production'
 });
 
-// Remove loading screen function
 const removeLoadingScreen = () => {
+  console.log('Attempting to remove loading screen');
   const loadingElement = document.getElementById('app-loading');
   if (loadingElement) {
+    console.log('Found app-loading element, removing...');
     loadingElement.style.transition = 'opacity 0.3s ease';
     loadingElement.style.opacity = '0';
-    setTimeout(() => loadingElement.remove(), 300);
+    setTimeout(() => {
+      console.log('Removing app-loading element from DOM');
+      loadingElement.remove();
+    }, 300);
+  } else {
+    console.error('app-loading element not found');
   }
 };
 
-// Root element verification
 const container = document.getElementById('root');
 if (!container) {
+  console.error('Root element not found');
   document.body.innerHTML = `
     <div style="
       position: fixed;
@@ -54,7 +59,7 @@ if (!container) {
   throw new Error('Missing root element');
 }
 
-// Root render
+console.log('React app starting to mount');
 const root = createRoot(container);
 root.render(
   <React.StrictMode>
@@ -65,6 +70,4 @@ root.render(
     </CacheProvider>
   </React.StrictMode>
 );
-
-// Debug mount
-console.log('React application mounted');
+console.log('React app mounted');
