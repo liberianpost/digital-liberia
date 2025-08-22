@@ -110,13 +110,14 @@ const quickAccessServices = [
   { id: "tax-services", name: "Tax Services" }
 ];
 
-// DSSN Challenge Modal Component
+// DSSN Challenge Modal Component - This replaces the MoeLoginModal for DSSN verification
 const DSSNChallengeModal = ({ onClose, onSuccess }) => {
   const [dssn, setDssn] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [challengeId, setChallengeId] = useState(null);
   const [polling, setPolling] = useState(false);
+  const [pollInterval, setPollInterval] = useState(null);
 
   const requestDSSNChallenge = async (dssn) => {
     try {
@@ -128,15 +129,26 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
     }
   };
 
-  const pollChallengeStatus = async (userId) => {
+  const pollChallengeStatus = async (challengeId) => {
     try {
-      const response = await api.get(`/gov-services/pending/${userId}`);
+      // We need to adjust this to use challengeId instead of userId
+      // Based on the backend, we might need to modify the endpoint
+      const response = await api.get(`/gov-services/status/${challengeId}`);
       return response.data;
     } catch (error) {
       console.error('Error polling challenge status:', error);
       throw error;
     }
   };
+
+  useEffect(() => {
+    // Clean up interval on component unmount
+    return () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
+    };
+  }, [pollInterval]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -147,24 +159,23 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
       const response = await requestDSSNChallenge(dssn);
       setChallengeId(response.challengeId);
       setPolling(true);
+      setLoading(false);
       
       // Start polling for challenge status
       const interval = setInterval(async () => {
         try {
-          // We need to get the userId from the challenge response or from the user data
-          // For now, we'll assume the backend returns userId in the challenge response
-          const statusResponse = await pollChallengeStatus(response.userId || 'temp-user-id');
+          const statusResponse = await pollChallengeStatus(response.challengeId);
           
-          if (statusResponse.pending === false) {
+          if (statusResponse.status === 'approved') {
             clearInterval(interval);
             setPolling(false);
-            
-            if (statusResponse.challenge && statusResponse.challenge.status === 'approved') {
-              onSuccess(statusResponse.challenge.govToken);
-            } else {
-              setError("Challenge was denied or expired");
-            }
+            onSuccess(statusResponse.govToken);
+          } else if (statusResponse.status === 'denied') {
+            clearInterval(interval);
+            setPolling(false);
+            setError("Challenge was denied");
           }
+          // If still pending, continue polling
         } catch (error) {
           console.error('Error polling challenge status:', error);
           clearInterval(interval);
@@ -173,8 +184,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
         }
       }, 3000); // Poll every 3 seconds
 
-      // Cleanup interval on component unmount
-      return () => clearInterval(interval);
+      setPollInterval(interval);
     } catch (error) {
       setError(error.response?.data?.error || "Failed to initiate DSSN challenge");
       setLoading(false);
@@ -185,7 +195,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-md overflow-hidden shadow-xl">
         <div className="bg-blue-600 p-4 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-white">DSSN Verification</h2>
+          <h2 className="text-xl font-bold text-white">Ministry of Education - DSSN Verification</h2>
           <button 
             onClick={onClose}
             className="text-white text-2xl hover:text-gray-200"
@@ -198,8 +208,8 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
         <div className="p-6">
           <div className="flex justify-center mb-6">
             <img 
-              src="/logos/digital.png" 
-              alt="DSSN Logo" 
+              src="/logos/moe.png" 
+              alt="MOE Logo" 
               className="w-20 h-20 object-contain"
             />
           </div>
@@ -210,7 +220,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
             </div>
           )}
           
-          {challengeId && polling ? (
+          {polling ? (
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Waiting for Mobile Approval</h3>
@@ -235,6 +245,9 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
                   autoFocus
                   disabled={loading}
                 />
+                <p className="text-sm text-gray-500 mt-1">
+                  Enter your DSSN and approve the request on your mobile app
+                </p>
               </div>
               
               <button
@@ -252,247 +265,18 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
                     </svg>
                     Verifying...
                   </>
-                ) : 'Verify DSSN'}
+                ) : 'Verify with DSSN'}
               </button>
             </form>
           )}
+
+          <div className="mt-4 text-center text-sm border-t border-gray-200 pt-4">
+            <p className="text-gray-600">
+              Don't have the mobile app? <a href="#" className="text-blue-600 hover:underline">Download it here</a>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-const MoeLoginModal = ({ onClose }) => {
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    username: "",
-    password: ""
-  });
-  const [errors, setErrors] = useState({
-    username: "",
-    password: ""
-  });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showDSSNChallenge, setShowDSSNChallenge] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ""
-      }));
-    }
-  };
-
-  const validateInputs = () => {
-    let valid = true;
-    const newErrors = {
-      username: "",
-      password: ""
-    };
-
-    if (!formData.username.trim()) {
-      newErrors.username = "Username is required";
-      valid = false;
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
-
-  const handleDSSNSuccess = (govToken) => {
-    // Store the gov token for later use
-    localStorage.setItem("MOE_GOV_TOKEN", govToken);
-    // Continue with regular login
-    handleRegularLogin();
-  };
-
-  const handleRegularLogin = async () => {
-    setError("");
-    
-    if (!validateInputs()) return;
-
-    setLoading(true);
-
-    try {
-      const govToken = localStorage.getItem("MOE_GOV_TOKEN");
-      const response = await api.post('/moe/login', {
-        username: formData.username.trim(),
-        password: formData.password,
-        govToken: govToken || undefined
-      });
-
-      if (response.data.success && response.data.data) {
-        const { userId, username, securityLevel } = response.data.data;
-        
-        // Equivalent to Android's SharedPreferences
-        localStorage.setItem("MOE_USER_ID", userId);
-        localStorage.setItem("MOE_USERNAME", username);
-        localStorage.setItem("MOE_SECURITY_LEVEL", securityLevel);
-        localStorage.setItem("MOE_LOGGED_IN", "true");
-        
-        // Clean up gov token
-        localStorage.removeItem("MOE_GOV_TOKEN");
-
-        onClose();
-        navigate("/moe-dashboard");
-      } else {
-        setError(response.data.message || "Login succeeded but no user details received");
-      }
-    } catch (error) {
-      if (error.response) {
-        switch (error.response.status) {
-          case 401:
-            setError("Invalid username or password");
-            break;
-          case 403:
-            setError("DSSN verification required");
-            setShowDSSNChallenge(true);
-            break;
-          case 500:
-            setError("Server error. Please try again later.");
-            break;
-          default:
-            setError(`Error: ${error.response.status}`);
-        }
-      } else if (error.request) {
-        setError("Network error. Please check your connection.");
-      } else {
-        setError("An unexpected error occurred");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    handleRegularLogin();
-  };
-  
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-      {showDSSNChallenge ? (
-        <DSSNChallengeModal 
-          onClose={() => setShowDSSNChallenge(false)}
-          onSuccess={handleDSSNSuccess}
-        />
-      ) : (
-        <div className="bg-white rounded-lg w-full max-w-md overflow-hidden shadow-xl">
-          <div className="bg-blue-600 p-4 flex justify-between items-center">
-            <h2 className="text-xl font-bold text-white">Ministry of Education</h2>
-            <button 
-              onClick={onClose}
-              className="text-white text-2xl hover:text-gray-200"
-            >
-              &times;
-            </button>
-          </div>
-          
-          <div className="p-6">
-            <div className="flex justify-center mb-6">
-              <img 
-                src="/logos/moe.png" 
-                alt="MOE Logo" 
-                className="w-20 h-20 object-contain"
-              />
-            </div>
-            
-            {error && (
-              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
-                {error}
-              </div>
-            )}
-            
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-gray-900 mb-2 font-medium">Username</label>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 ${
-                    errors.username ? "border-red-500" : "border-gray-300"
-                  }`}
-                  placeholder="Enter your username"
-                  required
-                  autoFocus
-                />
-                {errors.username && (
-                  <p className="mt-1 text-sm text-red-600">{errors.username}</p>
-                )}
-              </div>
-              
-              <div className="mb-6">
-                <label className="block text-gray-900 mb-2 font-medium">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 ${
-                    errors.password ? "border-red-500" : "border-gray-300"
-                  }`}
-                  placeholder="Enter your password"
-                  required
-                />
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-                )}
-              </div>
-              
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full py-3 px-4 rounded-md text-white font-semibold ${
-                  loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
-                } transition-colors flex items-center justify-center`}
-              >
-                {loading ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Processing...
-                  </>
-                ) : 'Login'}
-              </button>
-            </form>
-
-            <div className="mt-4 flex justify-center space-x-4 text-sm border-t border-gray-200 pt-4">
-              <button
-                type="button"
-                onClick={() => alert("Forgot password feature coming soon")}
-                className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
-              >
-                Forgot Password?
-              </button>
-              <span className="text-gray-400">|</span>
-              <button
-                type="button"
-                onClick={() => alert("Registration feature coming soon")}
-                className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
-              >
-                Create Account
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -608,7 +392,7 @@ const System = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeLogo, setActiveLogo] = useState(0);
-  const [showMoeLogin, setShowMoeLogin] = useState(false);
+  const [showDSSNLogin, setShowDSSNLogin] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -628,13 +412,35 @@ const System = () => {
     }
   }, [user, navigate]);
 
+  const handleDSSNSuccess = async (govToken) => {
+    try {
+      // Use the govToken to complete the MOE login
+      const response = await api.post('/moe/login-dssn', { govToken });
+      
+      if (response.data.success && response.data.data) {
+        const { userId, username, securityLevel } = response.data.data;
+        
+        localStorage.setItem("MOE_USER_ID", userId);
+        localStorage.setItem("MOE_USERNAME", username);
+        localStorage.setItem("MOE_SECURITY_LEVEL", securityLevel);
+        localStorage.setItem("MOE_LOGGED_IN", "true");
+        
+        setShowDSSNLogin(false);
+        navigate("/moe-dashboard");
+      }
+    } catch (error) {
+      console.error('Error completing DSSN login:', error);
+      alert("Login failed. Please try again.");
+    }
+  };
+
   const handleMinistryClick = (ministryId, e) => {
     e.stopPropagation();
     if (ministryId === "education") {
       if (user) {
         navigate("/moe-dashboard");
       } else {
-        setShowMoeLogin(true);
+        setShowDSSNLogin(true);
       }
     } else {
       alert(`Services for ${ministries.find(m => m.id === ministryId)?.name} are coming soon`);
@@ -814,12 +620,11 @@ const System = () => {
         </div>
       </footer>
 
-      {showMoeLogin && (
-        <div className="fixed inset-0 z-50">
-          <MoeLoginModal 
-            onClose={() => setShowMoeLogin(false)}
-          />
-        </div>
+      {showDSSNLogin && (
+        <DSSNChallengeModal 
+          onClose={() => setShowDSSNLogin(false)}
+          onSuccess={handleDSSNSuccess}
+        />
       )}
 
       <style jsx global>{`
