@@ -131,8 +131,6 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
 
   const pollChallengeStatus = async (challengeId) => {
     try {
-      // We need to adjust this to use challengeId instead of userId
-      // Based on the backend, we might need to modify the endpoint
       const response = await api.get(`/gov-services/status/${challengeId}`);
       return response.data;
     } catch (error) {
@@ -414,22 +412,20 @@ const System = () => {
 
   const handleDSSNSuccess = async (govToken) => {
     try {
-      // Use the govToken to complete the MOE login
-      const response = await api.post('/moe/login-dssn', { govToken });
+      // Decode the govToken to get user information
+      const tokenPayload = JSON.parse(atob(govToken.split('.')[1]));
       
-      if (response.data.success && response.data.data) {
-        const { userId, username, securityLevel } = response.data.data;
-        
-        localStorage.setItem("MOE_USER_ID", userId);
-        localStorage.setItem("MOE_USERNAME", username);
-        localStorage.setItem("MOE_SECURITY_LEVEL", securityLevel);
-        localStorage.setItem("MOE_LOGGED_IN", "true");
-        
-        setShowDSSNLogin(false);
-        navigate("/moe-dashboard");
-      }
+      // Store user information in localStorage
+      localStorage.setItem("MOE_USER_ID", tokenPayload.userId);
+      localStorage.setItem("MOE_USERNAME", "DSSN User"); // You might want to fetch the username from your backend
+      localStorage.setItem("MOE_SECURITY_LEVEL", "1"); // Default security level
+      localStorage.setItem("MOE_LOGGED_IN", "true");
+      localStorage.setItem("MOE_GOV_TOKEN", govToken);
+      
+      setShowDSSNLogin(false);
+      navigate("/moe-dashboard");
     } catch (error) {
-      console.error('Error completing DSSN login:', error);
+      console.error('Error processing DSSN login:', error);
       alert("Login failed. Please try again.");
     }
   };
