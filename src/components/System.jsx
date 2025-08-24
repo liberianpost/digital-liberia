@@ -110,32 +110,51 @@ const quickAccessServices = [
   { id: "tax-services", name: "Tax Services" }
 ];
 
-// DSSN Challenge Modal Component - This replaces the MoeLoginModal for DSSN verification
-const DSSNChallengeModal = ({ onClose, onSuccess }) => {
+// DSSN Challenge Modal Component
+const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Education" }) => {
   const [dssn, setDssn] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [challengeId, setChallengeId] = useState(null);
   const [polling, setPolling] = useState(false);
   const [pollInterval, setPollInterval] = useState(null);
+  const [pushNotificationStatus, setPushNotificationStatus] = useState(null);
 
   const requestDSSNChallenge = async (dssn) => {
     try {
-      const response = await api.post('/gov-services/request', { dssn });
+      const response = await api.post('/gov-services/request', { 
+        dssn, 
+        service,
+        requestData: {
+          timestamp: new Date().toISOString(),
+          service: service,
+          origin: window.location.origin
+        }
+      });
+      
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Failed to initiate challenge');
+      }
+      
       return response.data;
     } catch (error) {
       console.error('Error requesting DSSN challenge:', error);
-      throw error;
+      throw new Error(error.response?.data?.error || error.message || "Failed to initiate DSSN challenge");
     }
   };
 
   const pollChallengeStatus = async (challengeId) => {
     try {
       const response = await api.get(`/gov-services/status/${challengeId}`);
+      
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Failed to check challenge status');
+      }
+      
       return response.data;
     } catch (error) {
       console.error('Error polling challenge status:', error);
-      throw error;
+      throw new Error(error.response?.data?.error || error.message || "Failed to check approval status");
     }
   };
 
@@ -152,12 +171,29 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
     e.preventDefault();
     setError("");
     setLoading(true);
+    setPushNotificationStatus(null);
+
+    // Validate DSSN format (basic validation)
+    if (!dssn.trim()) {
+      setError("Please enter your DSSN");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await requestDSSNChallenge(dssn);
       setChallengeId(response.challengeId);
       setPolling(true);
       setLoading(false);
+      
+      // Update push notification status
+      if (response.pushNotification) {
+        setPushNotificationStatus({
+          sent: response.pushNotification.sent,
+          hasToken: response.pushNotification.hasToken,
+          error: response.pushNotification.error
+        });
+      }
       
       // Start polling for challenge status
       const interval = setInterval(async () => {
@@ -167,24 +203,34 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
           if (statusResponse.status === 'approved') {
             clearInterval(interval);
             setPolling(false);
-            onSuccess(statusResponse.govToken);
+            onSuccess(statusResponse.govToken, response.challengeId);
           } else if (statusResponse.status === 'denied') {
             clearInterval(interval);
             setPolling(false);
-            setError("Challenge was denied");
+            setError("Access was denied on your mobile device");
           }
           // If still pending, continue polling
         } catch (error) {
           console.error('Error polling challenge status:', error);
           clearInterval(interval);
           setPolling(false);
-          setError("Error checking approval status");
+          setError(error.message);
         }
       }, 3000); // Poll every 3 seconds
 
       setPollInterval(interval);
+
+      // Set timeout to stop polling after 5 minutes
+      setTimeout(() => {
+        if (polling) {
+          clearInterval(interval);
+          setPolling(false);
+          setError("Request timed out. Please try again.");
+        }
+      }, 5 * 60 * 1000);
+
     } catch (error) {
-      setError(error.response?.data?.error || "Failed to initiate DSSN challenge");
+      setError(error.message);
       setLoading(false);
     }
   };
@@ -193,11 +239,11 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-md overflow-hidden shadow-xl">
         <div className="bg-blue-600 p-4 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-white">Ministry of Education - DSSN Verification</h2>
+          <h2 className="text-xl font-bold text-white">{service} - DSSN Verification</h2>
           <button 
             onClick={onClose}
             className="text-white text-2xl hover:text-gray-200"
-            disabled={polling}
+            disabled={polling || loading}
           >
             &times;
           </button>
@@ -218,15 +264,33 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
             </div>
           )}
           
+          {pushNotificationStatus && !pushNotificationStatus.sent && (
+            <div className="mb-4 p-3 bg-yellow-100 text-yellow-700 rounded-md text-sm">
+              {!pushNotificationStatus.hasToken ? (
+                "User doesn't have the mobile app installed. Please ask them to download it."
+              ) : (
+                `Push notification failed: ${pushNotificationStatus.error || 'Unknown error'}`
+              )}
+            </div>
+          )}
+          
           {polling ? (
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Waiting for Mobile Approval</h3>
               <p className="text-gray-600 mb-4">
-                Please check your mobile app to approve this login request.
+                Please check your mobile app to approve this verification request.
               </p>
+              {pushNotificationStatus?.sent && (
+                <p className="text-sm text-green-600 mb-2">
+                  ✓ Push notification sent to mobile device
+                </p>
+              )}
               <p className="text-sm text-gray-500">
                 Challenge ID: {challengeId}
+              </p>
+              <p className="text-xs text-gray-400 mt-2">
+                This request will timeout in 5 minutes
               </p>
             </div>
           ) : (
@@ -270,7 +334,16 @@ const DSSNChallengeModal = ({ onClose, onSuccess }) => {
 
           <div className="mt-4 text-center text-sm border-t border-gray-200 pt-4">
             <p className="text-gray-600">
-              Don't have the mobile app? <a href="#" className="text-blue-600 hover:underline">Download it here</a>
+              Don't have the mobile app? <a 
+                href="#" 
+                className="text-blue-600 hover:underline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  alert("The Digital Liberia mobile app is available on the App Store and Google Play Store");
+                }}
+              >
+                Download it here
+              </a>
             </p>
           </div>
         </div>
@@ -285,9 +358,10 @@ const MoeDashboard = () => {
   const [currentDate] = useState(new Date());
 
   const handleLogout = () => {
-    localStorage.removeItem("MOE_LOGGED_IN");
-    localStorage.removeItem("MOE_USERNAME");
-    localStorage.removeItem("MOE_GOV_TOKEN");
+    // Clear all MOE-related localStorage items
+    const keys = Object.keys(localStorage).filter(key => key.startsWith('MOE_'));
+    keys.forEach(key => localStorage.removeItem(key));
+    
     logout();
     navigate("/system");
   };
@@ -322,6 +396,9 @@ const MoeDashboard = () => {
               Welcome, {user.username}
             </h1>
             <p className="text-gray-600">{formatDate(currentDate)}</p>
+            <p className="text-sm text-gray-500">
+              DSSN: {localStorage.getItem("MOE_DSSN") || "Not available"}
+            </p>
           </div>
           <button
             onClick={handleLogout}
@@ -391,6 +468,7 @@ const System = () => {
   const navigate = useNavigate();
   const [activeLogo, setActiveLogo] = useState(0);
   const [showDSSNLogin, setShowDSSNLogin] = useState(false);
+  const [selectedMinistry, setSelectedMinistry] = useState(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -404,26 +482,36 @@ const System = () => {
     if (isLoggedIn && user) {
       navigate("/moe-dashboard");
     } else if (!user) {
-      localStorage.removeItem("MOE_LOGGED_IN");
-      localStorage.removeItem("MOE_USERNAME");
-      localStorage.removeItem("MOE_GOV_TOKEN");
+      // Clear all MOE-related localStorage items
+      const keys = Object.keys(localStorage).filter(key => key.startsWith('MOE_'));
+      keys.forEach(key => localStorage.removeItem(key));
     }
   }, [user, navigate]);
 
-  const handleDSSNSuccess = async (govToken) => {
+  const handleDSSNSuccess = async (govToken, challengeId) => {
     try {
       // Decode the govToken to get user information
       const tokenPayload = JSON.parse(atob(govToken.split('.')[1]));
       
       // Store user information in localStorage
       localStorage.setItem("MOE_USER_ID", tokenPayload.userId);
-      localStorage.setItem("MOE_USERNAME", "DSSN User"); // You might want to fetch the username from your backend
-      localStorage.setItem("MOE_SECURITY_LEVEL", "1"); // Default security level
+      localStorage.setItem("MOE_USERNAME", "DSSN User");
+      localStorage.setItem("MOE_SECURITY_LEVEL", "1");
       localStorage.setItem("MOE_LOGGED_IN", "true");
       localStorage.setItem("MOE_GOV_TOKEN", govToken);
+      localStorage.setItem("MOE_DSSN", tokenPayload.dssn || "");
+      localStorage.setItem("MOE_CHALLENGE_ID", challengeId || "");
+      localStorage.setItem("MOE_LOGIN_TIMESTAMP", new Date().toISOString());
       
       setShowDSSNLogin(false);
-      navigate("/moe-dashboard");
+      
+      // Navigate based on selected ministry or default to MOE dashboard
+      if (selectedMinistry === 'education') {
+        navigate("/moe-dashboard");
+      } else {
+        // For other ministries, you might want to implement specific dashboards
+        navigate("/moe-dashboard");
+      }
     } catch (error) {
       console.error('Error processing DSSN login:', error);
       alert("Login failed. Please try again.");
@@ -432,6 +520,8 @@ const System = () => {
 
   const handleMinistryClick = (ministryId, e) => {
     e.stopPropagation();
+    setSelectedMinistry(ministryId);
+    
     if (ministryId === "education") {
       if (user) {
         navigate("/moe-dashboard");
@@ -439,7 +529,9 @@ const System = () => {
         setShowDSSNLogin(true);
       }
     } else {
-      alert(`Services for ${ministries.find(m => m.id === ministryId)?.name} are coming soon`);
+      const ministry = ministries.find(m => m.id === ministryId);
+      setShowDSSNLogin(true);
+      // You can pass the ministry name to the modal for context
     }
   };
 
@@ -620,6 +712,7 @@ const System = () => {
         <DSSNChallengeModal 
           onClose={() => setShowDSSNLogin(false)}
           onSuccess={handleDSSNSuccess}
+          service={selectedMinistry ? ministries.find(m => m.id === selectedMinistry)?.name : "Ministry of Education"}
         />
       )}
 
@@ -642,6 +735,18 @@ const System = () => {
     </div>
   );
 };
+
+// Helper function (you might need to define this elsewhere)
+function getRoleName(securityLevel) {
+  const roles = {
+    1: 'User',
+    2: 'School Admin',
+    3: 'District Admin',
+    4: 'Ministry Admin',
+    5: 'System Admin'
+  };
+  return roles[securityLevel] || 'Unknown';
+}
 
 export default System;
 export { MoeDashboard, UnauthorizedPage };
