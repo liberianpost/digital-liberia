@@ -24,6 +24,9 @@ export default defineConfig({
     ],
     extensions: ['.js', '.jsx', '.json']
   },
+  optimizeDeps: {
+    include: ['firebase/app', 'firebase/auth', 'firebase/firestore']
+  },
   css: {
     postcss: {
       plugins: [
