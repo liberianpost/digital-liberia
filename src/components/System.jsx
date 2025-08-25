@@ -5,7 +5,9 @@ import { SecurityLevels } from '@utils/securityLevels';
 import { handleLoginSuccess } from '@utils/auth';
 import { DashboardItems } from "@/config/dashboardItems";
 import api from '@/api';
-import { initializeApp } from "firebase/app";
+import { initializeApp } from 'firebase/app'
+import { getAuth } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 // Firebase configuration - UPDATED with correct values
