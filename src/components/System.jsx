@@ -5,6 +5,67 @@ import { SecurityLevels } from '@utils/securityLevels';
 import { handleLoginSuccess } from '@utils/auth';
 import { DashboardItems } from "@/config/dashboardItems";
 import api from '@/api';
+import { initializeApp } from "firebase/app";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+
+// Firebase configuration
+const firebaseConfig = {
+  // Your Firebase config object here
+  apiKey: "AIzaSyA4NndmuQHTCKh7IyQYAz3DL_r8mttyRYg",
+  authDomain: "your-auth-domain",
+  projectId: "digitalliberia-notification",
+  storageBucket: "your-storage-bucket",
+  messagingSenderId: "537791418352",
+  appId: "com.company.digitalliberia"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+// Web Push VAPID public key
+const vapidKey = "BEICu1bx8LKW5j7cag5tU9B2qfcejWi7QPm8a95jFODSIUNRiellygLGroK9NyWt-3WsTiUZscmS311gGXiXV7Q";
+
+// Request notification permission and get FCM token
+const requestNotificationPermission = async () => {
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      console.log('Notification permission granted.');
+      
+      // Get the FCM token with the VAPID key
+      const currentToken = await getToken(messaging, { 
+        vapidKey: vapidKey 
+      });
+      
+      if (currentToken) {
+        console.log('FCM Token:', currentToken);
+        // Send the token to your server to associate it with the user
+        localStorage.setItem('fcmToken', currentToken);
+        return currentToken;
+      } else {
+        console.log('No registration token available. Request permission to generate one.');
+        return null;
+      }
+    } else {
+      console.log('Unable to get permission to notify.');
+      return null;
+    }
+  } catch (error) {
+    console.error('An error occurred while retrieving token:', error);
+    return null;
+  }
+};
+
+// Handle incoming messages when the app is in the foreground
+onMessage(messaging, (payload) => {
+  console.log('Message received in foreground:', payload);
+  // Display the notification
+  if (payload.notification) {
+    const { title, body } = payload.notification;
+    new Notification(title, { body });
+  }
+});
 
 const navLinks = [
   { label: "Home", to: "/", color: "bg-blue-500/80" },
@@ -122,9 +183,13 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
 
   const requestDSSNChallenge = async (dssn) => {
     try {
+      // Get FCM token for push notifications
+      const fcmToken = localStorage.getItem('fcmToken') || await requestNotificationPermission();
+      
       const response = await api.post('/gov-services/request', { 
         dssn, 
         service,
+        fcmToken, // Include FCM token in the request
         requestData: {
           timestamp: new Date().toISOString(),
           service: service,
@@ -357,6 +422,11 @@ const MoeDashboard = () => {
   const navigate = useNavigate();
   const [currentDate] = useState(new Date());
 
+  useEffect(() => {
+    // Request notification permission when the dashboard loads
+    requestNotificationPermission();
+  }, []);
+
   const handleLogout = () => {
     // Clear all MOE-related localStorage items
     const keys = Object.keys(localStorage).filter(key => key.startsWith('MOE_'));
@@ -487,6 +557,11 @@ const System = () => {
       keys.forEach(key => localStorage.removeItem(key));
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    // Request notification permission when the app loads
+    requestNotificationPermission();
+  }, []);
 
   const handleDSSNSuccess = async (govToken, challengeId) => {
     try {
