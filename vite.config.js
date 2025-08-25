@@ -49,7 +49,9 @@ export default defineConfig({
         assetFileNames: 'assets/[name]-[hash][extname]',
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js'
-      }
+      },
+      // Add this external section
+      external: ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase']
     }
   },
   base: './',
