@@ -8,15 +8,14 @@ import api from '@/api';
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
-// Firebase configuration
+// Firebase configuration - UPDATED with correct values
 const firebaseConfig = {
-  // Your Firebase config object here
   apiKey: "AIzaSyA4NndmuQHTCKh7IyQYAz3DL_r8mttyRYg",
-  authDomain: "your-auth-domain",
+  authDomain: "digitalliberia-notification.firebaseapp.com",
   projectId: "digitalliberia-notification",
-  storageBucket: "your-storage-bucket",
+  storageBucket: "digitalliberia-notification.appspot.com",
   messagingSenderId: "537791418352",
-  appId: "com.company.digitalliberia"
+  appId: "1:537791418352:web:378b48439b2c9bed6dd735"
 };
 
 // Initialize Firebase
@@ -26,33 +25,37 @@ const messaging = getMessaging(app);
 // Web Push VAPID public key
 const vapidKey = "BEICu1bx8LKW5j7cag5tU9B2qfcejWi7QPm8a95jFODSIUNRiellygLGroK9NyWt-3WsTiUZscmS311gGXiXV7Q";
 
-// Request notification permission and get FCM token
+// Enhanced notification permission request with service worker registration
 const requestNotificationPermission = async () => {
   try {
+    // Register service worker first
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    console.log('Service Worker registered:', registration);
+
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
       console.log('Notification permission granted.');
       
-      // Get the FCM token with the VAPID key
+      // Get the FCM token with proper service worker registration
       const currentToken = await getToken(messaging, { 
-        vapidKey: vapidKey 
+        vapidKey: vapidKey,
+        serviceWorkerRegistration: registration
       });
       
       if (currentToken) {
         console.log('FCM Token:', currentToken);
-        // Send the token to your server to associate it with the user
         localStorage.setItem('fcmToken', currentToken);
         return currentToken;
       } else {
-        console.log('No registration token available. Request permission to generate one.');
+        console.log('No registration token available.');
         return null;
       }
     } else {
-      console.log('Unable to get permission to notify.');
+      console.log('Notification permission denied.');
       return null;
     }
   } catch (error) {
-    console.error('An error occurred while retrieving token:', error);
+    console.error('Error retrieving token:', error);
     return null;
   }
 };
@@ -60,7 +63,6 @@ const requestNotificationPermission = async () => {
 // Handle incoming messages when the app is in the foreground
 onMessage(messaging, (payload) => {
   console.log('Message received in foreground:', payload);
-  // Display the notification
   if (payload.notification) {
     const { title, body } = payload.notification;
     new Notification(title, { body });
@@ -189,7 +191,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
       const response = await api.post('/gov-services/request', { 
         dssn, 
         service,
-        fcmToken, // Include FCM token in the request
+        fcmToken,
         requestData: {
           timestamp: new Date().toISOString(),
           service: service,
@@ -224,7 +226,6 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
   };
 
   useEffect(() => {
-    // Clean up interval on component unmount
     return () => {
       if (pollInterval) {
         clearInterval(pollInterval);
@@ -238,7 +239,6 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
     setLoading(true);
     setPushNotificationStatus(null);
 
-    // Validate DSSN format (basic validation)
     if (!dssn.trim()) {
       setError("Please enter your DSSN");
       setLoading(false);
@@ -251,7 +251,6 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
       setPolling(true);
       setLoading(false);
       
-      // Update push notification status
       if (response.pushNotification) {
         setPushNotificationStatus({
           sent: response.pushNotification.sent,
@@ -260,7 +259,6 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
         });
       }
       
-      // Start polling for challenge status
       const interval = setInterval(async () => {
         try {
           const statusResponse = await pollChallengeStatus(response.challengeId);
@@ -274,18 +272,16 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
             setPolling(false);
             setError("Access was denied on your mobile device");
           }
-          // If still pending, continue polling
         } catch (error) {
           console.error('Error polling challenge status:', error);
           clearInterval(interval);
           setPolling(false);
           setError(error.message);
         }
-      }, 3000); // Poll every 3 seconds
+      }, 3000);
 
       setPollInterval(interval);
 
-      // Set timeout to stop polling after 5 minutes
       setTimeout(() => {
         if (polling) {
           clearInterval(interval);
@@ -423,12 +419,10 @@ const MoeDashboard = () => {
   const [currentDate] = useState(new Date());
 
   useEffect(() => {
-    // Request notification permission when the dashboard loads
     requestNotificationPermission();
   }, []);
 
   const handleLogout = () => {
-    // Clear all MOE-related localStorage items
     const keys = Object.keys(localStorage).filter(key => key.startsWith('MOE_'));
     keys.forEach(key => localStorage.removeItem(key));
     
@@ -548,27 +542,35 @@ const System = () => {
   }, []);
 
   useEffect(() => {
+    // Register service worker on app load
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        .then((registration) => {
+          console.log('SW registered: ', registration);
+        })
+        .catch((registrationError) => {
+          console.log('SW registration failed: ', registrationError);
+        });
+    }
+    
+    // Request notification permission
+    requestNotificationPermission();
+  }, []);
+
+  useEffect(() => {
     const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
     if (isLoggedIn && user) {
       navigate("/moe-dashboard");
     } else if (!user) {
-      // Clear all MOE-related localStorage items
       const keys = Object.keys(localStorage).filter(key => key.startsWith('MOE_'));
       keys.forEach(key => localStorage.removeItem(key));
     }
   }, [user, navigate]);
 
-  useEffect(() => {
-    // Request notification permission when the app loads
-    requestNotificationPermission();
-  }, []);
-
   const handleDSSNSuccess = async (govToken, challengeId) => {
     try {
-      // Decode the govToken to get user information
       const tokenPayload = JSON.parse(atob(govToken.split('.')[1]));
       
-      // Store user information in localStorage
       localStorage.setItem("MOE_USER_ID", tokenPayload.userId);
       localStorage.setItem("MOE_USERNAME", "DSSN User");
       localStorage.setItem("MOE_SECURITY_LEVEL", "1");
@@ -580,11 +582,9 @@ const System = () => {
       
       setShowDSSNLogin(false);
       
-      // Navigate based on selected ministry or default to MOE dashboard
       if (selectedMinistry === 'education') {
         navigate("/moe-dashboard");
       } else {
-        // For other ministries, you might want to implement specific dashboards
         navigate("/moe-dashboard");
       }
     } catch (error) {
@@ -604,9 +604,7 @@ const System = () => {
         setShowDSSNLogin(true);
       }
     } else {
-      const ministry = ministries.find(m => m.id === ministryId);
       setShowDSSNLogin(true);
-      // You can pass the ministry name to the modal for context
     }
   };
 
@@ -811,7 +809,7 @@ const System = () => {
   );
 };
 
-// Helper function (you might need to define this elsewhere)
+// Helper function
 function getRoleName(securityLevel) {
   const roles = {
     1: 'User',
