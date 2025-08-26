@@ -25,7 +25,7 @@ export default defineConfig({
     extensions: ['.js', '.jsx', '.json']
   },
   optimizeDeps: {
-    include: ['firebase/app', 'firebase/auth', 'firebase/firestore']
+    include: ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/messaging']
   },
   css: {
     postcss: {
@@ -50,8 +50,8 @@ export default defineConfig({
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js'
       },
-      // Add this external section
-      external: ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase']
+      // REMOVE the external section completely or comment it out
+      // external: ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase']
     }
   },
   base: './',
