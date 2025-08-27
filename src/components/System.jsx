@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@context/AuthContext";
+import { SecurityLevels } from '@utils/securityLevels';
+import { handleLoginSuccess } from '@utils/auth';
+import { DashboardItems } from "@/config/dashboardItems";
 import api from '@/api';
 import { initializeApp } from 'firebase/app'
+import { getAuth } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
-// Firebase configuration
+// Firebase configuration - UPDATED with correct values
 const firebaseConfig = {
   apiKey: "AIzaSyA4NndmuQHTCKh7IyQYAz3DL_r8mttyRYg",
   authDomain: "digitalliberia-notification.firebaseapp.com",
@@ -300,7 +306,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
           <button 
             onClick={onClose}
             className="text-white text-2xl hover:text-gray-200"
-            disabled={polling || loading}
+            disabled={polling || loading)
           >
             &times;
           </button>
@@ -353,7 +359,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label className="block text-gray-900 mb-2 font-medium">Digital Social Security Number (DSSN)</label>
+                <label className="block text-gray-9 00 mb-2 font-medium">Digital Social Security Number (DSSN)</label>
                 <input
                   type="text"
                   value={dssn}
@@ -436,6 +442,7 @@ const UnauthorizedPage = () => {
 };
 
 const System = () => {
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [activeLogo, setActiveLogo] = useState(0);
@@ -467,19 +474,24 @@ const System = () => {
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
-    if (isLoggedIn) {
+    if (isLoggedIn && user) {
       navigate("/moe-dashboard");
+    } else if (!user) {
+      const keys = Object.keys(localStorage).filter(key => key.startsWith('MOE_'));
+      keys.forEach(key => localStorage.removeItem(key));
     }
-  }, [navigate]);
+  }, [user, navigate]);
 
   const handleDSSNSuccess = async (govToken, challengeId) => {
     try {
       const tokenPayload = JSON.parse(atob(govToken.split('.')[1]));
       
       localStorage.setItem("MOE_USER_ID", tokenPayload.userId);
-      localStorage.setItem("MOE_DSSN", tokenPayload.dssn || "");
+      localStorage.setItem("MOE_USERNAME", "DSSN User");
+      localStorage.setItem("MOE_SECURITY_LEVEL", "1");
       localStorage.setItem("MOE_LOGGED_IN", "true");
       localStorage.setItem("MOE_GOV_TOKEN", govToken);
+      localStorage.setItem("MOE_DSSN", tokenPayload.dssn || "");
       localStorage.setItem("MOE_CHALLENGE_ID", challengeId || "");
       localStorage.setItem("MOE_LOGIN_TIMESTAMP", new Date().toISOString());
       
@@ -501,8 +513,7 @@ const System = () => {
     setSelectedMinistry(ministryId);
     
     if (ministryId === "education") {
-      const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
-      if (isLoggedIn) {
+      if (user) {
         navigate("/moe-dashboard");
       } else {
         setShowDSSNLogin(true);
@@ -712,6 +723,18 @@ const System = () => {
     </div>
   );
 };
+
+// Helper function
+function getRoleName(securityLevel) {
+  const roles = {
+    1: 'User',
+    2: 'School Admin',
+    3: 'District Admin',
+    4: 'Ministry Admin',
+    5: 'System Admin'
+  };
+  return roles[securityLevel] || 'Unknown';
+}
 
 export default System;
 export { UnauthorizedPage };
