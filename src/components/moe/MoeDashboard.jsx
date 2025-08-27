@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@context/AuthContext";
 
 const navLinks = [
   { label: "Home", to: "/", color: "bg-blue-500/80" },
@@ -21,10 +20,10 @@ const logos = [
 ];
 
 const MoeDashboard = () => {
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [currentDate] = useState(new Date());
   const [activeLogo, setActiveLogo] = useState(0);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -34,16 +33,23 @@ const MoeDashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (!user) {
+    // Check if user is logged in via localStorage
+    const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
+    const username = localStorage.getItem("MOE_USERNAME") || "DSSN User";
+    
+    if (!isLoggedIn) {
       navigate('/system');
+    } else {
+      setUser({ username });
     }
-  }, [user, navigate]);
+  }, [navigate]);
 
   const handleLogout = () => {
+    // Remove all MOE-related items from localStorage
     const keys = Object.keys(localStorage).filter(key => key.startsWith('MOE_'));
     keys.forEach(key => localStorage.removeItem(key));
     
-    logout();
+    // Navigate back to system page
     navigate("/system");
   };
 
@@ -134,7 +140,7 @@ const MoeDashboard = () => {
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h1 className="text-2xl md:text-3xl font-bold text-white">
-                    Welcome, {user.username || "DSSN User"}
+                    Welcome, {user.username}
                   </h1>
                   <p className="text-white/80">{formatDate(currentDate)}</p>
                   <p className="text-sm text-white/60">
