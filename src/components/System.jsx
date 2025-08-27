@@ -306,7 +306,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
           <button 
             onClick={onClose}
             className="text-white text-2xl hover:text-gray-200"
-            disabled={polling || loading)
+            disabled={polling || loading}
           >
             &times;
           </button>
