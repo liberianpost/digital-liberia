@@ -1,186 +1,271 @@
-import React, { useEffect, useState, Component } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@context/AuthContext';
-import { getAvailableDashboardItems, getDefaultRouteForLevel } from '@utils/dashboardManager';
-import { getRoleName } from '@utils/auth';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@context/AuthContext";
 
-class ErrorBoundary extends Component {
-  state = { error: null };
+const navLinks = [
+  { label: "Home", to: "/", color: "bg-blue-500/80" },
+  { label: "System", to: "/system", color: "bg-green-500/80" },
+  { label: "Digital Liberia", to: "/digital-liberia", color: "bg-purple-500/80" },
+  { label: "LibPay", to: "/libpay", color: "bg-yellow-500/80" },
+  { label: "Liberian Post", to: "/liberian-post", color: "bg-pink-500/80" }
+];
 
-  static getDerivedStateFromError(error) {
-    console.error('MoeDashboard.jsx - ErrorBoundary caught:', error, error.stack);
-    return { error };
-  }
-
-  render() {
-    if (this.state.error) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
-            <h1 className="text-2xl font-bold mb-4">Something Went Wrong</h1>
-            <p className="text-red-600 mb-6">{this.state.error.message || 'An unexpected error occurred'}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Reload Page
-            </button>
-          </div>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
+const logos = [
+  "/logos/liberianpost.png",
+  "/logos/digital.png",
+  "/logos/libmusic.png",
+  "/logos/libconnectsit.png",
+  "/logos/libpaysit.png",
+  "/logos/seal of liberia.png",
+  "/logos/liberia.png"
+];
 
 const MoeDashboard = () => {
-  const { user, loading, logout } = useAuth() || { user: null, loading: true };
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const [currentDate] = useState(new Date());
+  const [activeLogo, setActiveLogo] = useState(0);
 
   useEffect(() => {
-    console.log('MoeDashboard.jsx - useEffect - user:', user, 'loading:', loading, 'location:', location.pathname);
-    if (loading) return;
+    const interval = setInterval(() => {
+      setActiveLogo(prev => (prev + 1) % logos.length);
+    }, 600);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     if (!user) {
-      console.log('MoeDashboard.jsx - No user, redirecting to /system');
-      navigate('/system', { replace: true });
-    } else {
-      try {
-        const defaultRoute = getDefaultRouteForLevel(user.securityLevel);
-        if (location.pathname === '/moe/dashboard') {
-          console.log(`MoeDashboard.jsx - Redirecting to ${defaultRoute} for ${user.securityLevel}`);
-          navigate(defaultRoute, { replace: true });
-        }
-      } catch (error) {
-        console.error('MoeDashboard.jsx - Navigation error:', error);
-      }
+      navigate('/system');
     }
-  }, [user, loading, navigate, location.pathname]);
+  }, [user, navigate]);
 
-  let availableItems = [];
-  try {
-    availableItems = getAvailableDashboardItems(user?.securityLevel);
-    console.log('MoeDashboard.jsx - Available items:', availableItems);
-  } catch (error) {
-    console.error('MoeDashboard.jsx - Error fetching available items:', error);
-  }
-
-  const handleCardClick = (path) => {
-    console.log('MoeDashboard.jsx - Navigating to:', path);
-    navigate(path);
+  const handleLogout = () => {
+    const keys = Object.keys(localStorage).filter(key => key.startsWith('MOE_'));
+    keys.forEach(key => localStorage.removeItem(key));
+    
+    logout();
+    navigate("/system");
   };
+
+  if (!user) return null;
 
   const formatDate = (date) => {
-    try {
-      return date.toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      });
-    } catch (error) {
-      console.error('MoeDashboard.jsx - Error formatting date:', error);
-      return 'Date unavailable';
-    }
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="flex items-center space-x-2">
-          <svg
-            className="animate-spin h-8 w-8 text-gray-600"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-          <span>Loading...</span>
+  return (
+    <div className="relative min-h-screen w-full bg-blue-950 text-white font-inter overflow-x-hidden">
+      <div className="fixed inset-0 bg-blue-950 -z-50" />
+
+      <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
+        <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
+          {logos.map((logo, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
+                index === activeLogo ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <img
+                src={logo}
+                alt={`Logo ${index}`}
+                className="max-w-full max-h-full object-contain"
+              />
+              <div className="absolute inset-0 bg-black/5" />
+            </div>
+          ))}
         </div>
       </div>
-    );
-  }
 
-  if (!user) {
-    return null; // Handled by useEffect redirect
-  }
+      <header className="fixed top-0 left-0 w-full z-50">
+        <div className="bg-blue-950/80 backdrop-blur-md border-b border-blue-700/30">
+          <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
+            <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
+              {navLinks.map(link => (
+                <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
+                  <Link 
+                    to={link.to} 
+                    className="text-sm md:text-base lg:text-lg font-bold text-white hover:text-blue-300 transition-colors duration-300"
+                  >
+                    {link.label}
+                  </Link>
+                </div>
+              ))}
+            </nav>
+          </div>
 
-  return (
-    <ErrorBoundary>
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div className="flex items-center space-x-4">
-              <img
-                src="/logos/moe.png"
-                alt="MOE Logo"
-                className="w-16 h-16"
-                onError={(e) => {
-                  console.error('MoeDashboard.jsx - Failed to load MOE logo');
-                  e.target.src = 'https://via.placeholder.com/64?text=MOE';
-                }}
-              />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800">
-                  Welcome, {user.username || 'User'}
-                </h1>
-                <p className="text-gray-600">{formatDate(currentDate)}</p>
+          <div className="w-full bg-gradient-to-b from-blue-950 to-transparent overflow-x-auto">
+            <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
+              {logos.map((logo, index) => (
+                <div 
+                  key={index}
+                  className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
+                    index === activeLogo 
+                      ? "scale-110 bg-white shadow-lg"
+                      : "scale-100 bg-white/90"
+                  }`}
+                  style={{
+                    animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none'
+                  }}
+                >
+                  <img
+                    src={logo}
+                    alt={`Logo ${index}`}
+                    className="w-12 h-12 md:w-16 md:h-16 object-contain"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
+        {/* Welcome Section */}
+        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
+          <div className="bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-blue-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="relative">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-white">
+                    Welcome, {user.username || "DSSN User"}
+                  </h1>
+                  <p className="text-white/80">{formatDate(currentDate)}</p>
+                  <p className="text-sm text-white/60">
+                    DSSN: {localStorage.getItem("MOE_DSSN") || "Not available"}
+                  </p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                >
+                  Logout
+                </button>
               </div>
             </div>
-            <button
-              onClick={() => {
-                console.log('MoeDashboard.jsx - Logging out:', user);
-                logout();
-                navigate('/system', { replace: true });
-              }}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-            >
-              Logout
-            </button>
           </div>
+        </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {availableItems.length > 0 ? (
-              availableItems.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => handleCardClick(item.path)}
-                  className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="text-3xl p-3 bg-blue-100 text-blue-600 rounded-full">
-                      {item.icon}
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-semibold">{item.title}</h2>
-                      <span className="text-xs px-2 py-1 bg-blue-600 text-white rounded-full">
-                        {getRoleName(item.requiredLevel)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-600">No tools available for your role.</p>
-            )}
+        {/* Ministry of Education Introduction */}
+        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
+          <div className="bg-gradient-to-br from-green-500/10 via-teal-500/10 to-emerald-600/10 backdrop-blur-lg rounded-xl border border-green-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                Ministry of Education - Advanced Credential System
+              </h2>
+              <div className="text-white space-y-4">
+                <p>
+                  Welcome to the Ministry of Education's advanced credential management system. 
+                  Our platform leverages cutting-edge technology to provide secure access to 
+                  educational credentials and school management tools.
+                </p>
+                <p>
+                  Through the Digital Liberia initiative, we've implemented a state-of-the-art 
+                  system that ensures the integrity and authenticity of educational records 
+                  while maintaining the highest standards of privacy and security.
+                </p>
+                <p>
+                  The system utilizes blockchain-based verification, biometric authentication, 
+                  and advanced encryption to protect your educational credentials and provide 
+                  instant verification capabilities to employers, institutions, and government 
+                  agencies.
+                </p>
+              </div>
+            </div>
           </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
+          <div className="bg-gradient-to-br from-purple-500/10 via-indigo-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-purple-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                System Features
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                  <h3 className="font-bold text-lg mb-2">Digital Transcripts</h3>
+                  <p className="text-white/80">Access and share verified digital academic transcripts with institutions worldwide.</p>
+                </div>
+                <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                  <h3 className="font-bold text-lg mb-2">Diploma Verification</h3>
+                  <p className="text-white/80">Instant verification of degrees and diplomas for employers and educational institutions.</p>
+                </div>
+                <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                  <h3 className="font-bold text-lg mb-2">Teacher Credentials</h3>
+                  <p className="text-white/80">Manage and verify teaching certifications and professional development records.</p>
+                </div>
+                <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                  <h3 className="font-bold text-lg mb-2">School Management</h3>
+                  <p className="text-white/80">Comprehensive tools for school administration, student records, and resource management.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Technology Section */}
+        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
+          <div className="bg-gradient-to-br from-rose-500/10 via-red-500/10 to-orange-600/10 backdrop-blur-lg rounded-xl border border-rose-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                Advanced Technology
+              </h2>
+              <div className="text-white space-y-4">
+                <p>
+                  Our system is built on the foundation of Digital Liberia's National Database 
+                  Management System (NDMS), providing a secure, centralized, and intelligent 
+                  data backbone for educational credentials.
+                </p>
+                <p>
+                  Key technological features include:
+                </p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>Blockchain-based credential verification</li>
+                  <li>Biometric authentication through DSSN</li>
+                  <li>End-to-end encryption for all data transactions</li>
+                  <li>Real-time credential verification API</li>
+                  <li>Mobile app integration for instant access</li>
+                  <li>AI-powered fraud detection systems</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
+        <div className="border-t border-blue-700/30 pt-6">
+          © {new Date().getFullYear()} Ministry of Education - Digital Liberia. All rights reserved.
         </div>
-      </div>
-    </ErrorBoundary>
+      </footer>
+
+      <style jsx global>{`
+        @keyframes heartbeat {
+          0% { transform: scale(1); }
+          25% { transform: scale(1.1); }
+          50% { transform: scale(1); }
+          75% { transform: scale(1.1); }
+          100% { transform: scale(1); }
+        }
+        .overflow-x-auto {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .overflow-x-auto::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+    </div>
   );
 };
 
