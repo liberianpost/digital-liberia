@@ -23,7 +23,7 @@ const MoeDashboard = () => {
   const navigate = useNavigate();
   const [currentDate] = useState(new Date());
   const [activeLogo, setActiveLogo] = useState(0);
-  const [user, setUser] = useState(null);
+  const [userDSSN, setUserDSSN] = useState("");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -35,12 +35,12 @@ const MoeDashboard = () => {
   useEffect(() => {
     // Check if user is logged in via localStorage
     const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
-    const username = localStorage.getItem("MOE_USERNAME") || "DSSN User";
+    const dssn = localStorage.getItem("MOE_DSSN") || "";
     
     if (!isLoggedIn) {
       navigate('/system');
     } else {
-      setUser({ username });
+      setUserDSSN(dssn);
     }
   }, [navigate]);
 
@@ -53,7 +53,7 @@ const MoeDashboard = () => {
     navigate("/system");
   };
 
-  if (!user) return null;
+  if (!userDSSN) return null;
 
   const formatDate = (date) => {
     return date.toLocaleDateString('en-US', { 
@@ -140,11 +140,11 @@ const MoeDashboard = () => {
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h1 className="text-2xl md:text-3xl font-bold text-white">
-                    Welcome, {user.username}
+                    Welcome, DSSN User
                   </h1>
                   <p className="text-white/80">{formatDate(currentDate)}</p>
                   <p className="text-sm text-white/60">
-                    DSSN: {localStorage.getItem("MOE_DSSN") || "Not available"}
+                    DSSN: {userDSSN}
                   </p>
                 </div>
                 <button
