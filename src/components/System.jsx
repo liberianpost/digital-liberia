@@ -306,7 +306,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
           <button 
             onClick={onClose}
             className="text-white text-2xl hover:text-gray-200"
-            disabled={polling || loading}
+            disabled={polling || loading)
           >
             &times;
           </button>
@@ -359,7 +359,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label className="block text-gray-900 mb-2 font-medium">Digital Social Security Number (DSSN)</label>
+                <label className="block text-gray-9 00 mb-2 font-medium">Digital Social Security Number (DSSN)</label>
                 <input
                   type="text"
                   value={dssn}
@@ -409,93 +409,6 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
               </a>
             </p>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const MoeDashboard = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  const [currentDate] = useState(new Date());
-
-  useEffect(() => {
-    requestNotificationPermission();
-  }, []);
-
-  const handleLogout = () => {
-    const keys = Object.keys(localStorage).filter(key => key.startsWith('MOE_'));
-    keys.forEach(key => localStorage.removeItem(key));
-    
-    logout();
-    navigate("/system");
-  };
-
-  useEffect(() => {
-    if (!user) {
-      navigate('/system');
-    }
-  }, [user, navigate]);
-
-  if (!user) return null;
-
-  const availableItems = DashboardItems.filter(item => 
-    item.requiredLevel <= user.securityLevel
-  );
-
-  const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">
-              Welcome, {user.username}
-            </h1>
-            <p className="text-gray-600">{formatDate(currentDate)}</p>
-            <p className="text-sm text-gray-500">
-              DSSN: {localStorage.getItem("MOE_DSSN") || "Not available"}
-            </p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-          >
-            Logout
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {availableItems.map(item => (
-            <div 
-              key={item.id}
-              onClick={() => navigate(item.path)}
-              className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow"
-            >
-              <div className="flex items-center space-x-4">
-                <div className={`p-3 rounded-full bg-blue-100 text-blue-600`}>
-                  <span className="text-xl">{item.icon}</span>
-                </div>
-                <div>
-                  <h2 className="font-bold text-lg">{item.title}</h2>
-                  {item.requiredLevel >= SecurityLevels.SCHOOL_ADMIN && (
-                    <span className="text-xs px-2 py-1 bg-blue-600 text-white rounded-full">
-                      {getRoleName(item.requiredLevel).toUpperCase()}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </div>
@@ -824,4 +737,4 @@ function getRoleName(securityLevel) {
 }
 
 export default System;
-export { MoeDashboard, UnauthorizedPage };
+export { UnauthorizedPage };
