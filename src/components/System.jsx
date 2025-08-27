@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@context/AuthContext";
-import { SecurityLevels } from '@utils/securityLevels';
-import { handleLoginSuccess } from '@utils/auth';
-import { DashboardItems } from "@/config/dashboardItems";
 import api from '@/api';
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
@@ -488,7 +484,6 @@ const System = () => {
       
       localStorage.setItem("MOE_USER_ID", tokenPayload.userId);
       localStorage.setItem("MOE_USERNAME", "DSSN User");
-      localStorage.setItem("MOE_SECURITY_LEVEL", "1");
       localStorage.setItem("MOE_LOGGED_IN", "true");
       localStorage.setItem("MOE_GOV_TOKEN", govToken);
       localStorage.setItem("MOE_DSSN", tokenPayload.dssn || "");
