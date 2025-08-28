@@ -200,7 +200,7 @@ const MoeDashboard = () => {
         {/* Welcome Section */}
         <section className="max-w-7xl mx-auto mb-12">
           <div className="bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20 backdrop-blur-2xl rounded-3xl border border-purple-500/30 p-8 shadow-2xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%239C92AC\" fill-opacity=\"0.05\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"2\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
+            <div className="absolute inset-0 bg-blue-950/20"></div>
             
             <div className="relative">
               <div className="flex justify-between items-center mb-8">
