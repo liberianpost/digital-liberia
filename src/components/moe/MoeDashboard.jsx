@@ -55,19 +55,29 @@ const MoeDashboard = () => {
       setUserDSSN(dssn);
       
       try {
-        // Fetch user profile using DSSN - NEW ENDPOINT
-        const profileResponse = await api.get('/profile-by-dssn', {
-          params: { dssn: dssn }
-        });
+        // Try to fetch user profile using DSSN - NEW ENDPOINT
+        // This will fail due to CORS, so we'll use fallback data
+        try {
+          const profileResponse = await api.get('/profile-by-dssn', {
+            params: { dssn: dssn }
+          });
 
-        if (profileResponse.data.success) {
-          setUserProfile(profileResponse.data.data);
-        } else {
+          if (profileResponse.data.success) {
+            setUserProfile(profileResponse.data.data);
+          } else {
+            throw new Error('Profile not found');
+          }
+        } catch (apiError) {
+          console.log('API fetch failed, using fallback data');
+          // Use fallback data since API is not accessible due to CORS
           setUserProfile({
             first_name: "DSSN",
             last_name: "User",
             email: `${dssn}@digitalliberia.gov.lr`,
-            image: "/logos/moe-user.png"
+            image: "/logos/moe-user.png",
+            phone: "Not available",
+            address: "Digital Liberia User",
+            postal_address: "Monrovia, Liberia"
           });
         }
 
@@ -98,13 +108,16 @@ const MoeDashboard = () => {
         
         setAnalytics(mockAnalytics);
       } catch (error) {
-        console.error('Error fetching data:', error);
-        // Use fallback data if API fails
+        console.error('Error in data processing:', error);
+        // Use fallback data if anything fails
         setUserProfile({
           first_name: "DSSN",
           last_name: "User",
           email: `${dssn}@digitalliberia.gov.lr`,
-          image: "/logos/moe-user.png"
+          image: "/logos/moe-user.png",
+          phone: "Not available",
+          address: "Digital Liberia User",
+          postal_address: "Monrovia, Liberia"
         });
       } finally {
         setLoading(false);
@@ -205,6 +218,9 @@ const MoeDashboard = () => {
                     <p className="text-blue-600 text-sm mt-1">
                       DSSN: {userDSSN} • {userProfile?.email}
                     </p>
+                    {userProfile?.phone && (
+                      <p className="text-gray-500 text-sm mt-1">Phone: {userProfile.phone}</p>
+                    )}
                   </div>
                 </div>
                 
