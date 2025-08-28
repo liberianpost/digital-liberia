@@ -134,7 +134,7 @@ const MoeDashboard = () => {
           address: "Digital Liberia User",
           postal_address: "Monrovia, Liberia"
         });
-      } finally {
+        } finally {
         setLoading(false);
       }
     };
@@ -146,6 +146,11 @@ const MoeDashboard = () => {
     const keys = Object.keys(localStorage).filter(key => key.startsWith('MOE_'));
     keys.forEach(key => localStorage.removeItem(key));
     navigate("/system");
+  };
+
+  const handleRoleAccessClick = (role) => {
+    // This will be implemented later - for now just show a message
+    alert(`Role-based access for ${role} will be implemented in the next update.`);
   };
 
   const formatNumber = (num) => {
@@ -369,6 +374,64 @@ const MoeDashboard = () => {
               >
                 <div className="text-4xl mb-4">{action.icon}</div>
                 <h3 className="text-xl font-semibold">{action.label}</h3>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Role-Based Access Section */}
+        <section className="max-w-7xl mx-auto mb-12">
+          <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
+            Role-Based Access
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { 
+                icon: "👨‍💼", 
+                label: "Ministry Employees", 
+                color: "from-blue-600 to-blue-700",
+                description: "Access to national education data, policy management, and system administration"
+              },
+              { 
+                icon: "🏢", 
+                label: "School Administrators", 
+                color: "from-green-600 to-green-700",
+                description: "Manage school operations, staff, student records, and academic programs"
+              },
+              { 
+                icon: "👩‍🏫", 
+                label: "Teachers", 
+                color: "from-purple-600 to-purple-700",
+                description: "Access to class management, grading, attendance, and student progress tracking"
+              },
+              { 
+                icon: "👨‍👩‍👧‍👦", 
+                label: "Parents", 
+                color: "from-orange-600 to-orange-700",
+                description: "View student progress, attendance, grades, and communicate with teachers"
+              },
+              { 
+                icon: "🎓", 
+                label: "Students", 
+                color: "from-indigo-600 to-indigo-700",
+                description: "Access to academic records, course materials, and learning resources"
+              },
+              { 
+                icon: "🔐", 
+                label: "System Administrators", 
+                color: "from-red-600 to-red-700",
+                description: "Full system access, user management, and security configuration"
+              }
+            ].map((role, index) => (
+              <div
+                key={index}
+                onClick={() => handleRoleAccessClick(role.label)}
+                className={`bg-gradient-to-r ${role.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-md cursor-pointer text-white`}
+              >
+                <div className="text-4xl mb-4">{role.icon}</div>
+                <h3 className="text-xl font-semibold mb-3">{role.label}</h3>
+                <p className="text-sm opacity-90">{role.description}</p>
               </div>
             ))}
           </div>
