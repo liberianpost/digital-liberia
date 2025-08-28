@@ -190,7 +190,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [challengeId, setChallengeId] = useState(null);
-  const [polling, setPolling] = useState(false);
+  const [polling, setPolling, setPolling] = useState(false);
   const [pollInterval, setPollInterval] = useState(null);
   const [pushNotificationStatus, setPushNotificationStatus] = useState(null);
 
@@ -471,7 +471,24 @@ const System = () => {
     try {
       const tokenPayload = JSON.parse(atob(govToken.split('.')[1]));
       
-      const ministryPrefix = ministryId.toUpperCase();
+      // Map ministry IDs to their correct prefixes
+      const ministryPrefixMap = {
+        education: "MOE",
+        health: "MOH",
+        finance: "MOF",
+        justice: "MOJ",
+        transport: "MOT",
+        foreign: "MOFA",
+        agriculture: "MOA",
+        internal: "MOIA",
+        lands: "MOL",
+        commerce: "MOC",
+        labour: "MOLL",
+        youth: "MOY"
+      };
+      
+      const ministryPrefix = ministryPrefixMap[ministryId];
+      
       localStorage.setItem(`${ministryPrefix}_USER_ID`, tokenPayload.userId);
       localStorage.setItem(`${ministryPrefix}_USERNAME`, "DSSN User");
       localStorage.setItem(`${ministryPrefix}_LOGGED_IN`, "true");
@@ -496,7 +513,24 @@ const System = () => {
   };
 
   const handleGuestAccess = (ministryId) => {
-    const ministryPrefix = ministryId.toUpperCase();
+    // Map ministry IDs to their correct prefixes
+    const ministryPrefixMap = {
+      education: "MOE",
+      health: "MOH",
+      finance: "MOF",
+      justice: "MOJ",
+      transport: "MOT",
+      foreign: "MOFA",
+      agriculture: "MOA",
+      internal: "MOIA",
+      lands: "MOL",
+      commerce: "MOC",
+      labour: "MOLL",
+      youth: "MOY"
+    };
+    
+    const ministryPrefix = ministryPrefixMap[ministryId];
+    
     // Set guest user data in localStorage
     localStorage.setItem(`${ministryPrefix}_USER_ID`, "guest_user");
     localStorage.setItem(`${ministryPrefix}_USERNAME`, "Guest User");
