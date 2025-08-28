@@ -401,7 +401,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
                   <>
                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 极速AI 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     Verifying...
                   </>
@@ -410,7 +410,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
             </form>
           )}
 
-          <极速AI className="mt-6 text-center text-sm border-t border-gray-200 pt-4">
+          <div className="mt-6 text-center text-sm border-t border-gray-200 pt-4">
             <p className="text-gray-600 mb-4">
               Don't have the mobile app? <a 
                 href="#" 
@@ -429,7 +429,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
               <p className="text-gray-500 text-sm mb-3">Or continue as a guest with limited access</p>
               <button
                 onClick={onGuestAccess}
-                className="w-full py-2 px-极速AI bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
+                className="w-full py-2 px-4 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
               >
                 I am a guest
               </button>
@@ -446,7 +446,7 @@ const System = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeLogo, setActiveLogo] = useState(0);
-  const极速AI [showDSSNLogin, setShowDSSNLogin] = useState(false);
+  const [showDSSNLogin, setShowDSSNLogin] = useState(false);
   const [selectedMinistry, setSelectedMinistry] = useState(null);
 
   useEffect(() => {
@@ -464,7 +464,7 @@ const System = () => {
           console.log('SW registered: ', registration);
         })
         .catch((registrationError) => {
-          console.log('极速AI registration failed: ', registrationError);
+          console.log('SW registration failed: ', registrationError);
         });
     }
     
@@ -505,7 +505,7 @@ const System = () => {
     const ministryPrefix = getMinistryPrefix(ministryId);
     
     // Set guest user data in localStorage
-    localStorage.setItem(`${minist极速AI}_USER_ID`, "guest_user");
+    localStorage.setItem(`${ministryPrefix}_USER_ID`, "guest_user");
     localStorage.setItem(`${ministryPrefix}_USERNAME`, "Guest User");
     localStorage.setItem(`${ministryPrefix}_LOGGED_IN`, "true");
     localStorage.setItem(`${ministryPrefix}_IS_GUEST`, "true");
@@ -576,7 +576,7 @@ const System = () => {
       </div>
 
       <header className="fixed top-0 left-0 w-full z-50">
-        <div className="bg-blue-950/80 backdrop-blur-md border极速AI border-blue-700/30">
+        <div className="bg-blue-950/80 backdrop-blur-md border border-blue-700/30">
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
             <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
               {navLinks.map(link => (
@@ -603,7 +603,7 @@ const System = () => {
                   key={index}
                   className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
                     index === activeLogo 
-                      ? "scale-110极速AI shadow-lg"
+                      ? "scale-110 shadow-lg"
                       : "scale-100 bg-white/90"
                   }`}
                   style={{
@@ -630,23 +630,23 @@ const System = () => {
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
                 Digital Social Security Number (DSSN)
               </h2>
-              <div className="极速AI space-y-4">
+              <div className="space-y-4">
                 <p>
                   In the Digital Liberia project, the DSSN (Digital Social Security Number) is a unique digital identifier assigned to every Liberian citizen or legal resident within the system.
                 </p>
                 <Link to="/dssn" className="inline-flex items-center bg-blue-500/80 backdrop-blur-sm rounded-lg px-3 py-1 ml-2 border border-blue-400/30 cursor-pointer hover:bg-blue-600/80 transition-colors">
                   (click here to verify a DSSN)
-                </极速AI>
+                </Link>
               </div>
             </div>
           </div>
         </section>
 
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-gradient-to-br from-green-500/10 via-teal-500/10 to-emerald-600/10 backdrop-blur-lg rounded-xl border border-green-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+          <div className="bg-gradient-to-br from-green-500/极速AI via-teal-500/10 to-emerald-600/10 backdrop-blur-lg rounded-xl border border-green-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
             <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
             <div className="relative">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6极速AI border-b border-white/20 pb-2">
+              <h2 className="极速AI md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
                 Digital Liberia System
               </h2>
               <div className="text-white">
@@ -659,8 +659,8 @@ const System = () => {
         </section>
 
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-gradient-to-br from-purple-500/10 via-indigo-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-purple-400/极速AI p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+          <div className="bg-gradient-to-br from-purple-500/10 via-indigo-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-purple-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/极速AI backdrop-blur-sm"></div>
             <div className="relative">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
                 Government Ministries
@@ -670,7 +670,7 @@ const System = () => {
                   <div 
                     key={ministry.id}
                     onClick={(e) => handleMinistryClick(ministry.id, e)}
-                    className="cursor-pointer bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm relative z-20"
+                    className="cursor-pointer bg-white/5 hover极速AI transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm relative z-20"
                   >
                     <div className="flex items-center space-x-4">
                       <img 
@@ -691,7 +691,7 @@ const System = () => {
         </section>
 
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-gradient-to-br from-blue-极速AI via-purple-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-blue-400/30 p-极速AI md:p-8 shadow-lg relative overflow-hidden">
+          <div className="bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-blue-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
             <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
             <div className="relative">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
@@ -701,7 +701,7 @@ const System = () => {
                 {quickAccessServices.map(service => (
                   <button
                     key={service.id}
-                    onClick={(极速AI) => handleServiceClick(service.id, e)}
+                    onClick={(e) => handleServiceClick(service.id, e)}
                     className="bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm text-left"
                   >
                     <h3 className="font-bold text-lg">{service.name}</h3>
@@ -724,7 +724,7 @@ const System = () => {
           onClose={() => setShowDSSNLogin(false)}
           onSuccess={(token, challengeId) => handleDSSNSuccess(token, challengeId, selectedMinistry)}
           onGuestAccess={() => handleGuestAccess(selectedMinistry)}
-          service={selectedMinistry ? ministries.find(m => m.id === selectedMinistry)?.name : "Ministry of Education"}
+          service={selected极速AI ? ministries.find(m => m.id === selectedMinistry)?.name : "Ministry of Education"}
           ministryId={selectedMinistry}
         />
       )}
