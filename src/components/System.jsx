@@ -185,7 +185,7 @@ const quickAccessServices = [
 ];
 
 // DSSN Challenge Modal Component
-const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Education", onGuestAccess }) => {
+const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Education", onGuestAccess, ministryIcon }) => {
   const [dssn, setDssn] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -324,8 +324,8 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
         <div className="p-6">
           <div className="flex justify-center mb-6">
             <img 
-              src="/logos/moe.png" 
-              alt="MOE Logo" 
+              src={ministryIcon || "/logos/moe.png"} 
+              alt="Ministry Logo" 
               className="w-20 h-20 object-contain"
             />
           </div>
@@ -442,6 +442,7 @@ const System = () => {
   const [activeLogo, setActiveLogo] = useState(0);
   const [showDSSNLogin, setShowDSSNLogin] = useState(false);
   const [selectedMinistry, setSelectedMinistry] = useState(null);
+  const [selectedMinistryData, setSelectedMinistryData] = useState(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -458,7 +459,7 @@ const System = () => {
           console.log('SW registered: ', registration);
         })
         .catch((registrationError) => {
-          console.log('SW registration failed: ', registrationError);
+          console.log('SW registration failed: : ', registrationError);
         });
     }
     
@@ -516,8 +517,12 @@ const System = () => {
 
   const handleMinistryClick = (ministryId, e) => {
     e.stopPropagation();
-    setSelectedMinistry(ministryId);
-    setShowDSSNLogin(true);
+    const ministry = ministries.find(m => m.id === ministryId);
+    if (ministry) {
+      setSelectedMinistry(ministryId);
+      setSelectedMinistryData(ministry);
+      setShowDSSNLogin(true);
+    }
   };
 
   const handleServiceClick = (serviceId, e) => {
@@ -693,12 +698,13 @@ const System = () => {
         </div>
       </footer>
 
-      {showDSSNLogin && (
+      {showDSSNLogin && selectedMinistryData && (
         <DSSNChallengeModal 
           onClose={() => setShowDSSNLogin(false)}
           onSuccess={(token, challengeId) => handleDSSNSuccess(token, challengeId, selectedMinistry)}
           onGuestAccess={() => handleGuestAccess(selectedMinistry)}
-          service={selectedMinistry ? ministries.find(m => m.id === selectedMinistry)?.name : "Ministry of Education"}
+          service={selectedMinistryData.name}
+          ministryIcon={selectedMinistryData.icon}
         />
       )}
 
