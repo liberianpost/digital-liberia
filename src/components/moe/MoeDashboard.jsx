@@ -55,21 +55,37 @@ const MoeDashboard = () => {
       setUserDSSN(dssn);
       
       try {
-        // Try to fetch user profile using DSSN - NEW ENDPOINT
-        // This will fail due to CORS, so we'll use fallback data
+        // Try to fetch user profile using DSSN with better error handling
+        let profileData = null;
         try {
           const profileResponse = await api.get('/profile-by-dssn', {
-            params: { dssn: dssn }
+            params: { dssn: dssn },
+            timeout: 10000 // 10 second timeout
           });
 
-          if (profileResponse.data.success) {
-            setUserProfile(profileResponse.data.data);
-          } else {
-            throw new Error('Profile not found');
+          if (profileResponse.data && profileResponse.data.success) {
+            profileData = profileResponse.data.data;
+            console.log('User profile fetched successfully');
           }
         } catch (apiError) {
-          console.log('API fetch failed, using fallback data');
-          // Use fallback data since API is not accessible due to CORS
+          // Handle different types of errors
+          if (apiError.code === 'ECONNABORTED') {
+            console.log('Profile request timed out - using fallback data');
+          } else if (apiError.response) {
+            // Server responded with error status
+            console.log('Server error:', apiError.response.status);
+          } else if (apiError.request) {
+            // Network error (CORS, no response)
+            console.log('Network error - likely CORS issue');
+          } else {
+            console.log('Other error:', apiError.message);
+          }
+        }
+
+        // Use fetched data or fallback
+        if (profileData) {
+          setUserProfile(profileData);
+        } else {
           setUserProfile({
             first_name: "DSSN",
             last_name: "User",
@@ -81,7 +97,7 @@ const MoeDashboard = () => {
           });
         }
 
-        // Fetch analytics data (mock data for now - replace with actual API call)
+        // Fetch analytics data (mock data for now)
         const mockAnalytics = {
           totalSchools: 5427,
           totalStudents: 1258432,
@@ -109,7 +125,6 @@ const MoeDashboard = () => {
         setAnalytics(mockAnalytics);
       } catch (error) {
         console.error('Error in data processing:', error);
-        // Use fallback data if anything fails
         setUserProfile({
           first_name: "DSSN",
           last_name: "User",
@@ -161,18 +176,9 @@ const MoeDashboard = () => {
     <div className="relative min-h-screen w-full bg-white text-gray-800 font-inter overflow-x-hidden">
       {/* Header */}
       <header className="fixed top-0 left-0 w-full z-50 bg-white shadow-lg border-b border-gray-200">
-        <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-          <div className="flex items-center space-x-4">
-            <img src="/logos/moe.png" alt="MOE Logo" className="w-12 h-12 object-contain" />
-            <div>
-              <h1 className="text-xl font-bold text-blue-800">
-                Ministry of Education
-              </h1>
-              <p className="text-sm text-gray-600">Digital Liberia Platform</p>
-            </div>
-          </div>
-
-          <nav className="flex space-x-3 overflow-x-auto">
+        <div className="flex flex-col px-6 py-4 max-w-7xl mx-auto">
+          {/* Navigation Links - Top Row */}
+          <nav className="flex justify-center space-x-3 mb-4">
             {navLinks.map(link => (
               <div key={link.to} className={`flex-shrink-0 ${link.color} px-4 py-2 rounded-xl shadow-md transform hover:scale-105 transition-all duration-300`}>
                 <Link 
@@ -184,11 +190,22 @@ const MoeDashboard = () => {
               </div>
             ))}
           </nav>
+
+          {/* Ministry of Education Logo and Title - Bottom Row */}
+          <div className="flex items-center justify-center space-x-4">
+            <img src="/logos/moe.png" alt="MOE Logo" className="w-12 h-12 object-contain" />
+            <div className="text-center">
+              <h1 className="text-xl font-bold text-blue-800">
+                Ministry of Education
+              </h1>
+              <p className="text-sm text-gray-600">Digital Liberia Platform</p>
+            </div>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="relative z-30 pt-28 pb-20 px-6">
+      <main className="relative z-30 pt-40 pb-20 px-6">
         {/* Welcome Section */}
         <section className="max-w-7xl mx-auto mb-12">
           <div className="bg-gradient-to-br from-blue-50 via-white to-blue-50 rounded-2xl border border-blue-200 p-8 shadow-lg relative overflow-hidden">
@@ -218,7 +235,7 @@ const MoeDashboard = () => {
                     <p className="text-blue-600 text-sm mt-1">
                       DSSN: {userDSSN} • {userProfile?.email}
                     </p>
-                    {userProfile?.phone && (
+                    {userProfile?.phone && userProfile.phone !== "Not available" && (
                       <p className="text-gray-500 text-sm mt-1">Phone: {userProfile.phone}</p>
                     )}
                   </div>
