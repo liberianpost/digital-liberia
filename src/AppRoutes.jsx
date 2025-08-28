@@ -73,14 +73,91 @@ const DistrictReports = debugLazy(() => import('@components/moe/DistrictReports'
 const DatabaseTools = debugLazy(() => import('@components/moe/DatabaseTools'), 'DatabaseTools');
 const UserManagement = debugLazy(() => import('@components/moe/UserManagement'), 'UserManagement');
 
-// Simple authentication check component
-const SimpleAuthCheck = ({ children }) => {
+// ====================
+// Other Ministry Dashboards (Lazy loaded)
+// ====================
+const MohDashboard = debugLazy(() => import('@components/moh/MohDashboard'), 'MohDashboard');
+const MofDashboard = debugLazy(() => import('@components/mof/MofDashboard'), 'MofDashboard');
+const MojDashboard = debugLazy(() => import('@components/moj/MojDashboard'), 'MojDashboard');
+const MotDashboard = debugLazy(() => import('@components/mot/MotDashboard'), 'MotDashboard');
+const MofaDashboard = debugLazy(() => import('@components/mofa/MofaDashboard'), 'MofaDashboard');
+const MoaDashboard = debugLazy(() => import('@components/moa/MoaDashboard'), 'MoaDashboard');
+const MoiaDashboard = debugLazy(() => import('@components/moia/MoiaDashboard'), 'MoiaDashboard');
+const MolDashboard = debugLazy(() => import('@components/mol/MolDashboard'), 'MolDashboard');
+const MocDashboard = debugLazy(() => import('@components/moc/MocDashboard'), 'MocDashboard');
+const MollDashboard = debugLazy(() => import('@components/moll/MollDashboard'), 'MollDashboard');
+const MoyDashboard = debugLazy(() => import('@components/moy/MoyDashboard'), 'MoyDashboard');
+
+// Simple authentication check components for each ministry
+const SimpleAuthCheckMoe = ({ children }) => {
   const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
-  
-  if (!isLoggedIn) {
-    return <Navigate to="/system" replace />;
-  }
-  
+  if (!isLoggedIn) return <Navigate to="/system" replace />;
+  return children;
+};
+
+const SimpleAuthCheckMoh = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("MOH_LOGGED_IN") === "true";
+  if (!isLoggedIn) return <Navigate to="/system" replace />;
+  return children;
+};
+
+const SimpleAuthCheckMof = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("MOF_LOGGED_IN") === "true";
+  if (!isLoggedIn) return <Navigate to="/system" replace />;
+  return children;
+};
+
+const SimpleAuthCheckMoj = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("MOJ_LOGGED_IN") === "true";
+  if (!isLoggedIn) return <Navigate to="/system" replace />;
+  return children;
+};
+
+const SimpleAuthCheckMot = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("MOT_LOGGED_IN") === "true";
+  if (!isLoggedIn) return <Navigate to="/system" replace />;
+  return children;
+};
+
+const SimpleAuthCheckMofa = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("MOFA_LOGGED_IN") === "true";
+  if (!isLoggedIn) return <Navigate to="/system" replace />;
+  return children;
+};
+
+const SimpleAuthCheckMoa = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("MOA_LOGGED_IN") === "true";
+  if (!isLoggedIn) return <Navigate to="/system" replace />;
+  return children;
+};
+
+const SimpleAuthCheckMoia = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("MOIA_LOGGED_IN") === "true";
+  if (!isLoggedIn) return <Navigate to="/system" replace />;
+  return children;
+};
+
+const SimpleAuthCheckMol = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("MOL_LOGGED_IN") === "true";
+  if (!isLoggedIn) return <Navigate to="/system" replace />;
+  return children;
+};
+
+const SimpleAuthCheckMoc = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("MOC_LOGGED_IN") === "true";
+  if (!isLoggedIn) return <Navigate to="/system" replace />;
+  return children;
+};
+
+const SimpleAuthCheckMoll = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("MOLL_LOGGED_IN") === "true";
+  if (!isLoggedIn) return <Navigate to="/system" replace />;
+  return children;
+};
+
+const SimpleAuthCheckMoy = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("MOY_LOGGED_IN") === "true";
+  if (!isLoggedIn) return <Navigate to="/system" replace />;
   return children;
 };
 
@@ -109,98 +186,201 @@ const AppRoutes = () => {
       {/* Main Dashboard */}
       <Route path="/moe/dashboard" element={
         <SuspenseWrapper>
-          <SimpleAuthCheck>
+          <SimpleAuthCheckMoe>
             <MoeDashboard />
-          </SimpleAuthCheck>
+          </SimpleAuthCheckMoe>
         </SuspenseWrapper>
       } />
 
       {/* School Management */}
       <Route path="/moe/school-management" element={
         <SuspenseWrapper>
-          <SimpleAuthCheck>
+          <SimpleAuthCheckMoe>
             <SchoolManagement />
-          </SimpleAuthCheck>
+          </SimpleAuthCheckMoe>
         </SuspenseWrapper>
       } />
 
       {/* Student Management */}
       <Route path="/moe/student-profile/:studentId" element={
         <SuspenseWrapper>
-          <SimpleAuthCheck>
+          <SimpleAuthCheckMoe>
             <StudentProfile />
-          </SimpleAuthCheck>
+          </SimpleAuthCheckMoe>
         </SuspenseWrapper>
       } />
 
       <Route path="/moe/student-records" element={
         <SuspenseWrapper>
-          <SimpleAuthCheck>
+          <SimpleAuthCheckMoe>
             <StudentRecords />
-          </SimpleAuthCheck>
+          </SimpleAuthCheckMoe>
         </SuspenseWrapper>
       } />
 
       {/* Teacher Management */}
       <Route path="/moe/teacher-management" element={
         <SuspenseWrapper>
-          <SimpleAuthCheck>
+          <SimpleAuthCheckMoe>
             <TeacherManagement />
-          </SimpleAuthCheck>
+          </SimpleAuthCheckMoe>
         </SuspenseWrapper>
       } />
 
       {/* Reports */}
       <Route path="/moe/reports" element={
         <SuspenseWrapper>
-          <SimpleAuthCheck>
+          <SimpleAuthCheckMoe>
             <Reports />
-          </SimpleAuthCheck>
+          </SimpleAuthCheckMoe>
         </SuspenseWrapper>
       } />
 
       {/* System Settings */}
       <Route path="/moe/system-settings" element={
         <SuspenseWrapper>
-          <SimpleAuthCheck>
+          <SimpleAuthCheckMoe>
             <SystemSettings />
-          </SimpleAuthCheck>
+          </SimpleAuthCheckMoe>
         </SuspenseWrapper>
       } />
 
       {/* Class Management */}
       <Route path="/moe/class-management" element={
         <SuspenseWrapper>
-          <SimpleAuthCheck>
+          <SimpleAuthCheckMoe>
             <ClassManagement />
-          </SimpleAuthCheck>
+          </SimpleAuthCheckMoe>
         </SuspenseWrapper>
       } />
 
       {/* District Reports */}
       <Route path="/moe/district-reports" element={
         <SuspenseWrapper>
-          <SimpleAuthCheck>
+          <SimpleAuthCheckMoe>
             <DistrictReports />
-          </SimpleAuthCheck>
+          </SimpleAuthCheckMoe>
         </SuspenseWrapper>
       } />
 
       {/* Database Tools */}
       <Route path="/moe/database-tools" element={
         <SuspenseWrapper>
-          <SimpleAuthCheck>
+          <SimpleAuthCheckMoe>
             <DatabaseTools />
-          </SimpleAuthCheck>
+          </SimpleAuthCheckMoe>
         </SuspenseWrapper>
       } />
 
       {/* User Management */}
       <Route path="/moe/user-management" element={
         <SuspenseWrapper>
-          <SimpleAuthCheck>
+          <SimpleAuthCheckMoe>
             <UserManagement />
-          </SimpleAuthCheck>
+          </SimpleAuthCheckMoe>
+        </SuspenseWrapper>
+      } />
+
+      {/* ==================== */}
+      {/* Other Ministry Dashboards */}
+      {/* ==================== */}
+      
+      {/* Ministry of Health */}
+      <Route path="/moh/dashboard" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMoh>
+            <MohDashboard />
+          </SimpleAuthCheckMoh>
+        </SuspenseWrapper>
+      } />
+
+      {/* Ministry of Finance */}
+      <Route path="/mof/dashboard" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMof>
+            <MofDashboard />
+          </SimpleAuthCheckMof>
+        </SuspenseWrapper>
+      } />
+
+      {/* Ministry of Justice */}
+      <Route path="/moj/dashboard" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMoj>
+            <MojDashboard />
+          </SimpleAuthCheckMoj>
+        </SuspenseWrapper>
+      } />
+
+      {/* Ministry of Transport */}
+      <Route path="/mot/dashboard" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMot>
+            <MotDashboard />
+          </SimpleAuthCheckMot>
+        </SuspenseWrapper>
+      } />
+
+      {/* Ministry of Foreign Affairs */}
+      <Route path="/mofa/dashboard" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMofa>
+            <MofaDashboard />
+          </SimpleAuthCheckMofa>
+        </SuspenseWrapper>
+      } />
+
+      {/* Ministry of Agriculture */}
+      <Route path="/moa/dashboard" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMoa>
+            <MoaDashboard />
+          </SimpleAuthCheckMoa>
+        </SuspenseWrapper>
+      } />
+
+      {/* Ministry of Internal Affairs */}
+      <Route path="/moia/dashboard" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMoia>
+            <MoiaDashboard />
+          </SimpleAuthCheckMoia>
+        </SuspenseWrapper>
+      } />
+
+      {/* Ministry of Lands & Mines */}
+      <Route path="/mol/dashboard" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMol>
+            <MolDashboard />
+          </SimpleAuthCheckMol>
+        </SuspenseWrapper>
+      } />
+
+      {/* Ministry of Commerce */}
+      <Route path="/moc/dashboard" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMoc>
+            <MocDashboard />
+          </SimpleAuthCheckMoc>
+        </SuspenseWrapper>
+      } />
+
+      {/* Ministry of Labour */}
+      <Route path="/moll/dashboard" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMoll>
+            <MollDashboard />
+          </SimpleAuthCheckMoll>
+        </SuspenseWrapper>
+      } />
+
+      {/* Ministry of Youth & Sports */}
+      <Route path="/moy/dashboard" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMoy>
+            <MoyDashboard />
+          </SimpleAuthCheckMoy>
         </SuspenseWrapper>
       } />
 
