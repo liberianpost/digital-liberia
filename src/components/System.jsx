@@ -475,7 +475,7 @@ const System = () => {
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
     if (isLoggedIn && user) {
-      navigate("/moe-dashboard");
+      navigate("/moe/dashboard");
     } else if (!user) {
       const keys = Object.keys(localStorage).filter(key => key.startsWith('MOE_'));
       keys.forEach(key => localStorage.removeItem(key));
@@ -498,9 +498,9 @@ const System = () => {
       setShowDSSNLogin(false);
       
       if (selectedMinistry === 'education') {
-        navigate("/moe-dashboard");
+        navigate("/moe/dashboard");
       } else {
-        navigate("/moe-dashboard");
+        navigate("/moe/dashboard");
       }
     } catch (error) {
       console.error('Error processing DSSN login:', error);
@@ -514,7 +514,7 @@ const System = () => {
     
     if (ministryId === "education") {
       if (user) {
-        navigate("/moe-dashboard");
+        navigate("/moe/dashboard");
       } else {
         setShowDSSNLogin(true);
       }
