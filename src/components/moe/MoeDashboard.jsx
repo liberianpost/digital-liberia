@@ -3,11 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import api from '@/api';
 
 const navLinks = [
-  { label: "Home", to: "/", color: "bg-gradient-to-r from-blue-600 to-purple-600" },
-  { label: "System", to: "/system", color: "bg-gradient-to-r from-green-600 to-teal-600" },
-  { label: "Digital Liberia", to: "/digital-liberia", color: "bg-gradient-to-r from-purple-600 to-pink-600" },
-  { label: "LibPay", to: "/libpay", color: "bg-gradient-to-r from-yellow-600 to-orange-600" },
-  { label: "Liberian Post", to: "/liberian-post", color: "bg-gradient-to-r from-pink-600 to-red-600" }
+  { label: "Home", to: "/", color: "bg-gradient-to-r from-blue-600 to-blue-800 text-white" },
+  { label: "System", to: "/system", color: "bg-gradient-to-r from-green-600 to-green-800 text-white" },
+  { label: "Digital Liberia", to: "/digital-liberia", color: "bg-gradient-to-r from-purple-600 to-purple-800 text-white" },
+  { label: "LibPay", to: "/libpay", color: "bg-gradient-to-r from-yellow-500 to-yellow-700 text-white" },
+  { label: "Liberian Post", to: "/liberian-post", color: "bg-gradient-to-r from-pink-600 to-pink-800 text-white" }
 ];
 
 const logos = [
@@ -46,7 +46,6 @@ const MoeDashboard = () => {
     const checkAuthAndFetchData = async () => {
       const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
       const dssn = localStorage.getItem("MOE_DSSN") || "";
-      const govToken = localStorage.getItem("MOE_GOV_TOKEN");
       
       if (!isLoggedIn) {
         navigate('/system');
@@ -56,13 +55,20 @@ const MoeDashboard = () => {
       setUserDSSN(dssn);
       
       try {
-        // Fetch user profile using DSSN
-        const profileResponse = await api.get('/profile', {
-          params: { email: `${dssn}@digitalliberia.gov.lr` } // Using DSSN as email identifier
+        // Fetch user profile using DSSN - NEW ENDPOINT
+        const profileResponse = await api.get('/profile-by-dssn', {
+          params: { dssn: dssn }
         });
 
         if (profileResponse.data.success) {
           setUserProfile(profileResponse.data.data);
+        } else {
+          setUserProfile({
+            first_name: "DSSN",
+            last_name: "User",
+            email: `${dssn}@digitalliberia.gov.lr`,
+            image: "/logos/moe-user.png"
+          });
         }
 
         // Fetch analytics data (mock data for now - replace with actual API call)
@@ -129,101 +135,74 @@ const MoeDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-950 via-purple-900 to-blue-950 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading Dashboard...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-700 text-lg">Loading Dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen w-full bg-gradient-to-br from-blue-950 via-purple-900 to-blue-950 text-white font-inter overflow-x-hidden">
-      {/* Animated Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-blue-950/90 via-purple-900/80 to-blue-950/90 -z-50">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.3),transparent_50%)]"></div>
-      </div>
-
-      {/* Animated Logos Background */}
-      <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none opacity-20">
-        <div className="relative w-full max-w-4xl mx-4 h-96 flex items-center justify-center">
-          {logos.map((logo, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
-                index === activeLogo ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <img
-                src={logo}
-                alt={`Logo ${index}`}
-                className="max-w-full max-h-full object-contain grayscale"
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-
+    <div className="relative min-h-screen w-full bg-white text-gray-800 font-inter overflow-x-hidden">
       {/* Header */}
-      <header className="fixed top-0 left-0 w-full z-50">
-        <div className="bg-gradient-to-r from-blue-900/90 via-purple-900/90 to-blue-900/90 backdrop-blur-xl border-b border-purple-500/30 shadow-2xl">
-          <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-            <div className="flex items-center space-x-4">
-              <img src="/logos/moe.png" alt="MOE Logo" className="w-12 h-12 object-contain" />
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent">
-                  Ministry of Education
-                </h1>
-                <p className="text-sm text-purple-300">Digital Liberia Platform</p>
-              </div>
+      <header className="fixed top-0 left-0 w-full z-50 bg-white shadow-lg border-b border-gray-200">
+        <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+          <div className="flex items-center space-x-4">
+            <img src="/logos/moe.png" alt="MOE Logo" className="w-12 h-12 object-contain" />
+            <div>
+              <h1 className="text-xl font-bold text-blue-800">
+                Ministry of Education
+              </h1>
+              <p className="text-sm text-gray-600">Digital Liberia Platform</p>
             </div>
-
-            <nav className="flex space-x-3 overflow-x-auto">
-              {navLinks.map(link => (
-                <div key={link.to} className={`flex-shrink-0 ${link.color} px-4 py-2 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300`}>
-                  <Link 
-                    to={link.to} 
-                    className="text-sm font-bold text-white hover:text-blue-100 transition-colors duration-300"
-                  >
-                    {link.label}
-                  </Link>
-                </div>
-              ))}
-            </nav>
           </div>
+
+          <nav className="flex space-x-3 overflow-x-auto">
+            {navLinks.map(link => (
+              <div key={link.to} className={`flex-shrink-0 ${link.color} px-4 py-2 rounded-xl shadow-md transform hover:scale-105 transition-all duration-300`}>
+                <Link 
+                  to={link.to} 
+                  className="text-sm font-bold hover:text-blue-100 transition-colors duration-300"
+                >
+                  {link.label}
+                </Link>
+              </div>
+            ))}
+          </nav>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="relative z-30 pt-32 pb-20 px-6">
+      <main className="relative z-30 pt-28 pb-20 px-6">
         {/* Welcome Section */}
         <section className="max-w-7xl mx-auto mb-12">
-          <div className="bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20 backdrop-blur-2xl rounded-3xl border border-purple-500/30 p-8 shadow-2xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-blue-950/20"></div>
+          <div className="bg-gradient-to-br from-blue-50 via-white to-blue-50 rounded-2xl border border-blue-200 p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-blue-50/50"></div>
             
             <div className="relative">
               <div className="flex justify-between items-center mb-8">
                 <div className="flex items-center space-x-6">
                   <div className="relative">
-                    <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-1 shadow-2xl">
+                    <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl p-1 shadow-xl">
                       <img
                         src={userProfile?.image || "/logos/moe-user.png"}
                         alt="Profile"
                         className="w-full h-full object-cover rounded-2xl"
                       />
                     </div>
-                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-blue-950 flex items-center justify-center">
+                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
                       <div className="w-2 h-2 bg-white rounded-full"></div>
                     </div>
                   </div>
                   
                   <div>
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+                    <h1 className="text-4xl font-bold text-blue-900">
                       Welcome, {userProfile ? `${userProfile.first_name} ${userProfile.last_name}` : 'DSSN User'}
                     </h1>
-                    <p className="text-purple-300 text-lg mt-2">{formatDate(currentDate)}</p>
-                    <p className="text-blue-300 text-sm mt-1">
+                    <p className="text-gray-600 text-lg mt-2">{formatDate(currentDate)}</p>
+                    <p className="text-blue-600 text-sm mt-1">
                       DSSN: {userDSSN} • {userProfile?.email}
                     </p>
                   </div>
@@ -231,7 +210,7 @@ const MoeDashboard = () => {
                 
                 <button
                   onClick={handleLogout}
-                  className="px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold"
+                  className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold"
                 >
                   Logout
                 </button>
@@ -242,92 +221,92 @@ const MoeDashboard = () => {
 
         {/* Analytics Dashboard */}
         <section className="max-w-7xl mx-auto mb-12">
-          <h2 className="text-3xl font-bold mb-8 text-white text-center bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
             Education System Analytics
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Total Schools */}
-            <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 backdrop-blur-xl rounded-2xl border border-blue-500/30 p-6 shadow-xl hover:scale-105 transition-transform duration-300">
+            <div className="bg-white border border-blue-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold text-blue-200">{formatNumber(analytics.totalSchools)}</h3>
-                  <p className="text-blue-300">Total Schools</p>
+                  <h3 className="text-2xl font-bold text-blue-800">{formatNumber(analytics.totalSchools)}</h3>
+                  <p className="text-blue-600">Total Schools</p>
                 </div>
-                <div className="w-12 h-12 bg-blue-600/30 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                   <span className="text-2xl">🏫</span>
                 </div>
               </div>
-              <div className="mt-4 h-2 bg-blue-600/30 rounded-full">
-                <div className="h-full bg-blue-400 rounded-full w-3/4"></div>
+              <div className="mt-4 h-2 bg-blue-100 rounded-full">
+                <div className="h-full bg-blue-500 rounded-full w-3/4"></div>
               </div>
             </div>
 
             {/* Total Students */}
-            <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 backdrop-blur-xl rounded-2xl border border-green-500/30 p-6 shadow-xl hover:scale-105 transition-transform duration-300">
+            <div className="bg-white border border-green-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold text-green-200">{formatNumber(analytics.totalStudents)}</h3>
-                  <p className="text-green-300">Total Students</p>
+                  <h3 className="text-2xl font-bold text-green-800">{formatNumber(analytics.totalStudents)}</h3>
+                  <p className="text-green-600">Total Students</p>
                 </div>
-                <div className="w-12 h-12 bg-green-600/30 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                   <span className="text-2xl">🎓</span>
                 </div>
               </div>
-              <div className="mt-4 h-2 bg-green-600/30 rounded-full">
-                <div className="h-full bg-green-400 rounded-full w-4/5"></div>
+              <div className="mt-4 h-2 bg-green-100 rounded-full">
+                <div className="h-full bg-green-500 rounded-full w-4/5"></div>
               </div>
             </div>
 
             {/* Total Teachers */}
-            <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 backdrop-blur-xl rounded-2xl border border-purple-500/30 p-6 shadow-xl hover:scale-105 transition-transform duration-300">
+            <div className="bg-white border border-purple-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold text-purple-200">{formatNumber(analytics.totalTeachers)}</h3>
-                  <p className="text-purple-300">Total Teachers</p>
+                  <h3 className="text-2xl font-bold text-purple-800">{formatNumber(analytics.totalTeachers)}</h3>
+                  <p className="text-purple-600">Total Teachers</p>
                 </div>
-                <div className="w-12 h-12 bg-purple-600/30 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
                   <span className="text-2xl">👩‍🏫</span>
                 </div>
               </div>
-              <div className="mt-4 h-2 bg-purple-600/30 rounded-full">
-                <div className="h-full bg-purple-400 rounded-full w-2/3"></div>
+              <div className="mt-4 h-2 bg-purple-100 rounded-full">
+                <div className="h-full bg-purple-500 rounded-full w-2/3"></div>
               </div>
             </div>
 
             {/* Boy to Girl Ratio */}
-            <div className="bg-gradient-to-br from-pink-600/20 to-pink-800/20 backdrop-blur-xl rounded-2xl border border-pink-500/30 p-6 shadow-xl hover:scale-105 transition-transform duration-300">
+            <div className="bg-white border border-pink-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold text-pink-200">{analytics.boyToGirlRatio}</h3>
-                  <p className="text-pink-300">Boy:Girl Ratio</p>
+                  <h3 className="text-2xl font-bold text-pink-800">{analytics.boyToGirlRatio}</h3>
+                  <p className="text-pink-600">Boy:Girl Ratio</p>
                 </div>
-                <div className="w-12 h-12 bg-pink-600/30 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
                   <span className="text-2xl">⚖️</span>
                 </div>
               </div>
-              <div className="mt-4 h-2 bg-pink-600/30 rounded-full">
-                <div className="h-full bg-pink-400 rounded-full w-1/2"></div>
+              <div className="mt-4 h-2 bg-pink-100 rounded-full">
+                <div className="h-full bg-pink-500 rounded-full w-1/2"></div>
               </div>
             </div>
           </div>
 
           {/* Schools by County Chart */}
-          <div className="bg-gradient-to-br from-gray-800/20 to-gray-900/20 backdrop-blur-xl rounded-2xl border border-gray-600/30 p-6 shadow-xl">
-            <h3 className="text-xl font-bold text-white mb-6">Schools Distribution by County</h3>
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md">
+            <h3 className="text-xl font-bold text-gray-800 mb-6">Schools Distribution by County</h3>
             <div className="space-y-4">
               {analytics.schoolsByCounty.slice(0, 8).map((county, index) => (
                 <div key={county.county} className="flex items-center justify-between">
-                  <span className="text-gray-300 w-32 truncate">{county.county}</span>
+                  <span className="text-gray-700 w-32 truncate font-medium">{county.county}</span>
                   <div className="flex-1 mx-4">
-                    <div className="h-3 bg-gray-700/50 rounded-full">
+                    <div className="h-3 bg-gray-200 rounded-full">
                       <div 
-                        className="h-full bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"
+                        className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"
                         style={{ width: `${(county.schools / analytics.schoolsByCounty[0].schools) * 100}%` }}
                       ></div>
                     </div>
                   </div>
-                  <span className="text-white font-semibold w-20 text-right">
+                  <span className="text-blue-800 font-semibold w-20 text-right">
                     {formatNumber(county.schools)}
                   </span>
                 </div>
@@ -338,25 +317,25 @@ const MoeDashboard = () => {
 
         {/* Quick Actions */}
         <section className="max-w-7xl mx-auto mb-12">
-          <h2 className="text-3xl font-bold mb-8 text-white text-center bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
             Quick Actions
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: "📊", label: "View Reports", color: "from-blue-600 to-cyan-600" },
-              { icon: "🎓", label: "Student Records", color: "from-green-600 to-emerald-600" },
-              { icon: "👩‍🏫", label: "Teacher Management", color: "from-purple-600 to-pink-600" },
-              { icon: "🏫", label: "School Directory", color: "from-orange-600 to-red-600" },
-              { icon: "📚", label: "Curriculum", color: "from-indigo-600 to-blue-600" },
-              { icon: "⚙️", label: "Settings", color: "from-gray-600 to-gray-800" }
+              { icon: "📊", label: "View Reports", color: "from-blue-600 to-blue-700" },
+              { icon: "🎓", label: "Student Records", color: "from-green-600 to-green-700" },
+              { icon: "👩‍🏫", label: "Teacher Management", color: "from-purple-600 to-purple-700" },
+              { icon: "🏫", label: "School Directory", color: "from-orange-600 to-orange-700" },
+              { icon: "📚", label: "Curriculum", color: "from-indigo-600 to-indigo-700" },
+              { icon: "⚙️", label: "Settings", color: "from-gray-600 to-gray-700" }
             ].map((action, index) => (
               <div
                 key={index}
-                className={`bg-gradient-to-r ${action.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-xl cursor-pointer`}
+                className={`bg-gradient-to-r ${action.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-md cursor-pointer text-white`}
               >
                 <div className="text-4xl mb-4">{action.icon}</div>
-                <h3 className="text-xl font-semibold text-white">{action.label}</h3>
+                <h3 className="text-xl font-semibold">{action.label}</h3>
               </div>
             ))}
           </div>
@@ -364,33 +343,16 @@ const MoeDashboard = () => {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-30 py-8 text-center">
-        <div className="border-t border-purple-500/30 pt-8">
-          <p className="text-purple-300/60 text-sm">
+      <footer className="relative z-30 py-8 text-center bg-gray-50 border-t border-gray-200">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-gray-600 text-sm">
             © {new Date().getFullYear()} Ministry of Education - Digital Liberia. All rights reserved.
           </p>
-          <p className="text-purple-400/40 text-xs mt-2">
+          <p className="text-gray-500 text-xs mt-2">
             Advanced Education Management System • Powered by Digital Liberia NDMS
           </p>
         </div>
       </footer>
-
-      <style jsx global>{`
-        @keyframes heartbeat {
-          0% { transform: scale(1); }
-          25% { transform: scale(1.1); }
-          50% { transform: scale(1); }
-          75% { transform: scale(1.1); }
-          100% { transform: scale(1); }
-        }
-        .overflow-x-auto {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .overflow-x-auto::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </div>
   );
 };
