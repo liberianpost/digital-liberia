@@ -173,7 +173,7 @@ const quickAccessServices = [
 ];
 
 // DSSN Challenge Modal Component
-const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Education" }) => {
+const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Education", onGuestAccess }) => {
   const [dssn, setDssn] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -392,8 +392,8 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
             </form>
           )}
 
-          <div className="mt-4 text-center text-sm border-t border-gray-200 pt-4">
-            <p className="text-gray-600">
+          <div className="mt-6 text-center text-sm border-t border-gray-200 pt-4">
+            <p className="text-gray-600 mb-4">
               Don't have the mobile app? <a 
                 href="#" 
                 className="text-blue-600 hover:underline"
@@ -405,6 +405,17 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
                 Download it here
               </a>
             </p>
+            
+            {/* Guest Access Button */}
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <p className="text-gray-500 text-sm mb-3">Or continue as a guest with limited access</p>
+              <button
+                onClick={onGuestAccess}
+                className="w-full py-2 px-4 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
+              >
+                I am a guest
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -463,6 +474,20 @@ const System = () => {
       console.error('Error processing DSSN login:', error);
       alert("Login failed. Please try again.");
     }
+  };
+
+  const handleGuestAccess = () => {
+    // Set guest user data in localStorage
+    localStorage.setItem("MOE_USER_ID", "guest_user");
+    localStorage.setItem("MOE_USERNAME", "Guest User");
+    localStorage.setItem("MOE_LOGGED_IN", "true");
+    localStorage.setItem("MOE_IS_GUEST", "true");
+    localStorage.setItem("MOE_LOGIN_TIMESTAMP", new Date().toISOString());
+    
+    setShowDSSNLogin(false);
+    
+    // Navigate to dashboard
+    navigate("/moe/dashboard");
   };
 
   const handleMinistryClick = (ministryId, e) => {
@@ -653,6 +678,7 @@ const System = () => {
         <DSSNChallengeModal 
           onClose={() => setShowDSSNLogin(false)}
           onSuccess={handleDSSNSuccess}
+          onGuestAccess={handleGuestAccess}
           service={selectedMinistry ? ministries.find(m => m.id === selectedMinistry)?.name : "Ministry of Education"}
         />
       )}
