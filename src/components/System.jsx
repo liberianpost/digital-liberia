@@ -91,73 +91,85 @@ const ministries = [
     id: "education",
     name: "Ministry of Education",
     description: "School management, student records, and educational resources",
-    icon: "/logos/moe.png"
+    icon: "/logos/moe.png",
+    path: "/moe/dashboard"
   },
   {
     id: "health",
     name: "Ministry of Health",
     description: "Health records, vaccination data, and medical services",
-    icon: "/logos/moh.png"
+    icon: "/logos/moh.png",
+    path: "/moh/dashboard"
   },
   {
     id: "finance",
     name: "Ministry of Finance",
     description: "Tax records, financial services, and economic data",
-    icon: "/logos/mof.png"
+    icon: "/logos/mof.png",
+    path: "/mof/dashboard"
   },
   {
     id: "justice",
     name: "Ministry of Justice",
     description: "Legal documents, court records, and law enforcement",
-    icon: "/logos/moj.png"
+    icon: "/logos/moj.png",
+    path: "/moj/dashboard"
   },
   {
     id: "transport",
     name: "Ministry of Transport",
     description: "Driver licenses, vehicle registration, and transport permits",
-    icon: "/logos/mot.png"
+    icon: "/logos/mot.png",
+    path: "/mot/dashboard"
   },
   {
     id: "foreign",
     name: "Ministry of Foreign Affairs",
     description: "Passport services and international relations",
-    icon: "/logos/mofa.png"
+    icon: "/logos/mofa.png",
+    path: "/mofa/dashboard"
   },
   {
     id: "agriculture",
     name: "Ministry of Agriculture",
     description: "Farming permits, agricultural data, and food security",
-    icon: "/logos/moa.png"
+    icon: "/logos/moa.png",
+    path: "/moa/dashboard"
   },
   {
     id: "internal",
     name: "Ministry of Internal Affairs",
     description: "Citizen IDs, birth certificates, and local governance",
-    icon: "/logos/moia.png"
+    icon: "/logos/moia.png",
+    path: "/moia/dashboard"
   },
   {
     id: "lands",
     name: "Ministry of Lands & Mines",
     description: "Land deeds, mining permits, and property records",
-    icon: "/logos/mol.png"
+    icon: "/logos/mol.png",
+    path: "/mol/dashboard"
   },
   {
     id: "commerce",
     name: "Ministry of Commerce",
     description: "Business registration and trade licenses",
-    icon: "/logos/moc.png"
+    icon: "/logos/moc.png",
+    path: "/moc/dashboard"
   },
   {
     id: "labour",
     name: "Ministry of Labour",
     description: "Employment records and worker rights",
-    icon: "/logos/moll.png"
+    icon: "/logos/moll.png",
+    path: "/moll/dashboard"
   },
   {
     id: "youth",
     name: "Ministry of Youth & Sports",
     description: "Youth programs and sporting events",
-    icon: "/logos/moy.png"
+    icon: "/logos/moy.png",
+    path: "/moy/dashboard"
   }
 ];
 
@@ -454,51 +466,54 @@ const System = () => {
     requestNotificationPermission();
   }, []);
 
-  const handleDSSNSuccess = async (govToken, challengeId) => {
+  const handleDSSNSuccess = async (govToken, challengeId, ministryId) => {
     try {
       const tokenPayload = JSON.parse(atob(govToken.split('.')[1]));
       
-      localStorage.setItem("MOE_USER_ID", tokenPayload.userId);
-      localStorage.setItem("MOE_USERNAME", "DSSN User");
-      localStorage.setItem("MOE_LOGGED_IN", "true");
-      localStorage.setItem("MOE_GOV_TOKEN", govToken);
-      localStorage.setItem("MOE_DSSN", tokenPayload.dssn || "");
-      localStorage.setItem("MOE_CHALLENGE_ID", challengeId || "");
-      localStorage.setItem("MOE_LOGIN_TIMESTAMP", new Date().toISOString());
+      const ministryPrefix = ministryId.toUpperCase();
+      localStorage.setItem(`${ministryPrefix}_USER_ID`, tokenPayload.userId);
+      localStorage.setItem(`${ministryPrefix}_USERNAME`, "DSSN User");
+      localStorage.setItem(`${ministryPrefix}_LOGGED_IN`, "true");
+      localStorage.setItem(`${ministryPrefix}_GOV_TOKEN`, govToken);
+      localStorage.setItem(`${ministryPrefix}_DSSN`, tokenPayload.dssn || "");
+      localStorage.setItem(`${ministryPrefix}_CHALLENGE_ID`, challengeId || "");
+      localStorage.setItem(`${ministryPrefix}_LOGIN_TIMESTAMP`, new Date().toISOString());
       
       setShowDSSNLogin(false);
       
       // Navigate to the correct dashboard path
-      navigate("/moe/dashboard");
+      const ministry = ministries.find(m => m.id === ministryId);
+      if (ministry) {
+        navigate(ministry.path);
+      }
     } catch (error) {
       console.error('Error processing DSSN login:', error);
       alert("Login failed. Please try again.");
     }
   };
 
-  const handleGuestAccess = () => {
+  const handleGuestAccess = (ministryId) => {
+    const ministryPrefix = ministryId.toUpperCase();
     // Set guest user data in localStorage
-    localStorage.setItem("MOE_USER_ID", "guest_user");
-    localStorage.setItem("MOE_USERNAME", "Guest User");
-    localStorage.setItem("MOE_LOGGED_IN", "true");
-    localStorage.setItem("MOE_IS_GUEST", "true");
-    localStorage.setItem("MOE_LOGIN_TIMESTAMP", new Date().toISOString());
+    localStorage.setItem(`${ministryPrefix}_USER_ID`, "guest_user");
+    localStorage.setItem(`${ministryPrefix}_USERNAME`, "Guest User");
+    localStorage.setItem(`${ministryPrefix}_LOGGED_IN`, "true");
+    localStorage.setItem(`${ministryPrefix}_IS_GUEST`, "true");
+    localStorage.setItem(`${ministryPrefix}_LOGIN_TIMESTAMP`, new Date().toISOString());
     
     setShowDSSNLogin(false);
     
-    // Navigate to dashboard
-    navigate("/moe/dashboard");
+    // Navigate to the correct dashboard
+    const ministry = ministries.find(m => m.id === ministryId);
+    if (ministry) {
+      navigate(ministry.path);
+    }
   };
 
   const handleMinistryClick = (ministryId, e) => {
     e.stopPropagation();
     setSelectedMinistry(ministryId);
-    
-    if (ministryId === "education") {
-      setShowDSSNLogin(true);
-    } else {
-      setShowDSSNLogin(true);
-    }
+    setShowDSSNLogin(true);
   };
 
   const handleServiceClick = (serviceId, e) => {
@@ -677,8 +692,8 @@ const System = () => {
       {showDSSNLogin && (
         <DSSNChallengeModal 
           onClose={() => setShowDSSNLogin(false)}
-          onSuccess={handleDSSNSuccess}
-          onGuestAccess={handleGuestAccess}
+          onSuccess={(token, challengeId) => handleDSSNSuccess(token, challengeId, selectedMinistry)}
+          onGuestAccess={() => handleGuestAccess(selectedMinistry)}
           service={selectedMinistry ? ministries.find(m => m.id === selectedMinistry)?.name : "Ministry of Education"}
         />
       )}
