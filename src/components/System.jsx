@@ -481,10 +481,12 @@ const System = () => {
       
       setShowDSSNLogin(false);
       
-      // Navigate to the correct dashboard path
+      // Navigate to the correct dashboard path based on ministry ID
       const ministry = ministries.find(m => m.id === ministryId);
       if (ministry) {
         navigate(ministry.path);
+      } else {
+        console.error(`Ministry with ID ${ministryId} not found`);
       }
     } catch (error) {
       console.error('Error processing DSSN login:', error);
@@ -503,10 +505,12 @@ const System = () => {
     
     setShowDSSNLogin(false);
     
-    // Navigate to the correct dashboard
+    // Navigate to the correct dashboard based on ministry ID
     const ministry = ministries.find(m => m.id === ministryId);
     if (ministry) {
       navigate(ministry.path);
+    } else {
+      console.error(`Ministry with ID ${ministryId} not found`);
     }
   };
 
