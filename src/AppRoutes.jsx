@@ -1,9 +1,7 @@
 import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from './Home';
-import ProtectedRoute from '@components/ProtectedRoute';
 import LoadingFallback from '@components/LoadingFallback';
-import { SecurityLevels } from '@utils/securityLevels';
 
 // Enhanced debugLazy with better error handling and logging
 function debugLazy(importFn, name) {
@@ -75,16 +73,16 @@ const DistrictReports = debugLazy(() => import('@components/moe/DistrictReports'
 const DatabaseTools = debugLazy(() => import('@components/moe/DatabaseTools'), 'DatabaseTools');
 const UserManagement = debugLazy(() => import('@components/moe/UserManagement'), 'UserManagement');
 
-// ====================
-// Wrapper Components
-// ====================
-const ProtectedRouteWithSuspense = ({ children, requiredLevel }) => (
-  <ProtectedRoute requiredLevel={requiredLevel}>
-    <Suspense fallback={<LoadingFallback />}>
-      {children}
-    </Suspense>
-  </ProtectedRoute>
-);
+// Simple authentication check component
+const SimpleAuthCheck = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
+  
+  if (!isLoggedIn) {
+    return <Navigate to="/system" replace />;
+  }
+  
+  return children;
+};
 
 const SuspenseWrapper = ({ children }) => (
   <Suspense fallback={<LoadingFallback />}>
@@ -106,82 +104,104 @@ const AppRoutes = () => {
       <Route path="/liberian-post" element={<div className="p-4">LiberianPost (Coming Soon)</div>} />
 
       {/* ==================== */}
-      {/* Protected MOE Routes */}
+      {/* Protected MOE Routes - Simplified Authentication */}
       {/* ==================== */}
       {/* Main Dashboard */}
       <Route path="/moe/dashboard" element={
-        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.MINISTRY_EMPLOYEE}>
-          <MoeDashboard />
-        </ProtectedRouteWithSuspense>
+        <SuspenseWrapper>
+          <SimpleAuthCheck>
+            <MoeDashboard />
+          </SimpleAuthCheck>
+        </SuspenseWrapper>
       } />
 
       {/* School Management */}
       <Route path="/moe/school-management" element={
-        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SCHOOL_ADMIN}>
-          <SchoolManagement />
-        </ProtectedRouteWithSuspense>
+        <SuspenseWrapper>
+          <SimpleAuthCheck>
+            <SchoolManagement />
+          </SimpleAuthCheck>
+        </SuspenseWrapper>
       } />
 
       {/* Student Management */}
       <Route path="/moe/student-profile/:studentId" element={
-        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SCHOOL_ADMIN}>
-          <StudentProfile />
-        </ProtectedRouteWithSuspense>
+        <SuspenseWrapper>
+          <SimpleAuthCheck>
+            <StudentProfile />
+          </SimpleAuthCheck>
+        </SuspenseWrapper>
       } />
 
       <Route path="/moe/student-records" element={
-        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SCHOOL_ADMIN}>
-          <StudentRecords />
-        </ProtectedRouteWithSuspense>
+        <SuspenseWrapper>
+          <SimpleAuthCheck>
+            <StudentRecords />
+          </SimpleAuthCheck>
+        </SuspenseWrapper>
       } />
 
       {/* Teacher Management */}
       <Route path="/moe/teacher-management" element={
-        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SCHOOL_ADMIN}>
-          <TeacherManagement />
-        </ProtectedRouteWithSuspense>
+        <SuspenseWrapper>
+          <SimpleAuthCheck>
+            <TeacherManagement />
+          </SimpleAuthCheck>
+        </SuspenseWrapper>
       } />
 
       {/* Reports */}
       <Route path="/moe/reports" element={
-        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.MINISTRY_EMPLOYEE}>
-          <Reports />
-        </ProtectedRouteWithSuspense>
+        <SuspenseWrapper>
+          <SimpleAuthCheck>
+            <Reports />
+          </SimpleAuthCheck>
+        </SuspenseWrapper>
       } />
 
       {/* System Settings */}
       <Route path="/moe/system-settings" element={
-        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SYSTEM_ADMIN}>
-          <SystemSettings />
-        </ProtectedRouteWithSuspense>
+        <SuspenseWrapper>
+          <SimpleAuthCheck>
+            <SystemSettings />
+          </SimpleAuthCheck>
+        </SuspenseWrapper>
       } />
 
       {/* Class Management */}
       <Route path="/moe/class-management" element={
-        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SCHOOL_ADMIN}>
-          <ClassManagement />
-        </ProtectedRouteWithSuspense>
+        <SuspenseWrapper>
+          <SimpleAuthCheck>
+            <ClassManagement />
+          </SimpleAuthCheck>
+        </SuspenseWrapper>
       } />
 
       {/* District Reports */}
       <Route path="/moe/district-reports" element={
-        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.MINISTRY_EMPLOYEE}>
-          <DistrictReports />
-        </ProtectedRouteWithSuspense>
+        <SuspenseWrapper>
+          <SimpleAuthCheck>
+            <DistrictReports />
+          </SimpleAuthCheck>
+        </SuspenseWrapper>
       } />
 
       {/* Database Tools */}
       <Route path="/moe/database-tools" element={
-        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SYSTEM_ADMIN}>
-          <DatabaseTools />
-        </ProtectedRouteWithSuspense>
+        <SuspenseWrapper>
+          <SimpleAuthCheck>
+            <DatabaseTools />
+          </SimpleAuthCheck>
+        </SuspenseWrapper>
       } />
 
       {/* User Management */}
       <Route path="/moe/user-management" element={
-        <ProtectedRouteWithSuspense requiredLevel={SecurityLevels.SYSTEM_ADMIN}>
-          <UserManagement />
-        </ProtectedRouteWithSuspense>
+        <SuspenseWrapper>
+          <SimpleAuthCheck>
+            <UserManagement />
+          </SimpleAuthCheck>
+        </SuspenseWrapper>
       } />
 
       {/* ==================== */}
