@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@context/AuthContext";
-import { SecurityLevels } from '@utils/securityLevels';
-import { handleLoginSuccess } from '@utils/auth';
-import { DashboardItems } from "@/config/dashboardItems";
 import api from '@/api';
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
-// Firebase configuration - UPDATED with correct values
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyA4NndmuQHTCKh7IyQYAz3DL_r8mttyRYg",
   authDomain: "digitalliberia-notification.firebaseapp.com",
@@ -359,7 +356,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label className="block text-gray-9 00 mb-2 font-medium">Digital Social Security Number (DSSN)</label>
+                <label className="block text-gray-900 mb-2 font-medium">Digital Social Security Number (DSSN)</label>
                 <input
                   type="text"
                   value={dssn}
@@ -415,32 +412,6 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
   );
 };
 
-const UnauthorizedPage = () => {
-  const navigate = useNavigate();
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
-        <div className="text-red-500 mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-        </div>
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">Access Denied</h1>
-        <p className="text-gray-600 mb-6">
-          You don't have permission to access this page. Please contact your administrator if you believe this is an error.
-        </p>
-        <button
-          onClick={() => navigate(-1)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-        >
-          Go Back
-        </button>
-      </div>
-    </div>
-  );
-};
-
 const System = () => {
   const { user } = useAuth();
   const location = useLocation();
@@ -472,23 +443,12 @@ const System = () => {
     requestNotificationPermission();
   }, []);
 
-  useEffect(() => {
-    const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
-    if (isLoggedIn && user) {
-      navigate("/moe/dashboard");
-    } else if (!user) {
-      const keys = Object.keys(localStorage).filter(key => key.startsWith('MOE_'));
-      keys.forEach(key => localStorage.removeItem(key));
-    }
-  }, [user, navigate]);
-
   const handleDSSNSuccess = async (govToken, challengeId) => {
     try {
       const tokenPayload = JSON.parse(atob(govToken.split('.')[1]));
       
       localStorage.setItem("MOE_USER_ID", tokenPayload.userId);
       localStorage.setItem("MOE_USERNAME", "DSSN User");
-      localStorage.setItem("MOE_SECURITY_LEVEL", "1");
       localStorage.setItem("MOE_LOGGED_IN", "true");
       localStorage.setItem("MOE_GOV_TOKEN", govToken);
       localStorage.setItem("MOE_DSSN", tokenPayload.dssn || "");
@@ -497,11 +457,8 @@ const System = () => {
       
       setShowDSSNLogin(false);
       
-      if (selectedMinistry === 'education') {
-        navigate("/moe/dashboard");
-      } else {
-        navigate("/moe/dashboard");
-      }
+      // Navigate to the correct dashboard path
+      navigate("/moe/dashboard");
     } catch (error) {
       console.error('Error processing DSSN login:', error);
       alert("Login failed. Please try again.");
@@ -513,11 +470,7 @@ const System = () => {
     setSelectedMinistry(ministryId);
     
     if (ministryId === "education") {
-      if (user) {
-        navigate("/moe/dashboard");
-      } else {
-        setShowDSSNLogin(true);
-      }
+      setShowDSSNLogin(true);
     } else {
       setShowDSSNLogin(true);
     }
@@ -724,17 +677,4 @@ const System = () => {
   );
 };
 
-// Helper function
-function getRoleName(securityLevel) {
-  const roles = {
-    1: 'User',
-    2: 'School Admin',
-    3: 'District Admin',
-    4: 'Ministry Admin',
-    5: 'System Admin'
-  };
-  return roles[securityLevel] || 'Unknown';
-}
-
 export default System;
-export { UnauthorizedPage };
