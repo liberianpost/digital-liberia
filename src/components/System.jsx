@@ -185,7 +185,7 @@ const quickAccessServices = [
 ];
 
 // DSSN Challenge Modal Component
-const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Education", onGuestAccess }) => {
+const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Education", onGuestAccess, ministryId }) => {
   const [dssn, setDssn] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -193,6 +193,12 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
   const [polling, setPolling] = useState(false);
   const [pollInterval, setPollInterval] = useState(null);
   const [pushNotificationStatus, setPushNotificationStatus] = useState(null);
+
+  // Get the ministry icon based on ministryId
+  const getMinistryIcon = () => {
+    const ministry = ministries.find(m => m.id === ministryId);
+    return ministry ? ministry.icon : "/logos/moe.png";
+  };
 
   const requestDSSNChallenge = async (dssn) => {
     try {
@@ -324,8 +330,8 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
         <div className="p-6">
           <div className="flex justify-center mb-6">
             <img 
-              src="/logos/moe.png" 
-              alt="MOE Logo" 
+              src={getMinistryIcon()} 
+              alt={`${service} Logo`} 
               className="w-20 h-20 object-contain"
             />
           </div>
@@ -379,7 +385,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
                   autoFocus
                   disabled={loading}
                 />
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-50 mt-1">
                   Enter your DSSN and approve the request on your mobile app
                 </p>
               </div>
@@ -395,7 +401,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
                   <>
                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 极速AI 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 极速AI 7.938l3-2.647z"></path>
                     </svg>
                     Verifying...
                   </>
@@ -423,7 +429,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
               <p className="text-gray-500 text-sm mb-3">Or continue as a guest with limited access</p>
               <button
                 onClick={onGuestAccess}
-                className="w-full py-2 px-4 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
+                className="极速AI py-2 px-4 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
               >
                 I am a guest
               </button>
@@ -470,7 +476,9 @@ const System = () => {
     try {
       const tokenPayload = JSON.parse(atob(govToken.split('.')[1]));
       
-      const ministryPrefix = ministryId.toUpperCase();
+      // Get the correct ministry prefix based on the ministryId
+      const ministryPrefix = getMinistryPrefix(ministryId);
+      
       localStorage.setItem(`${ministryPrefix}_USER_ID`, tokenPayload.userId);
       localStorage.setItem(`${ministryPrefix}_USERNAME`, "DSSN User");
       localStorage.setItem(`${ministryPrefix}_LOGGED_IN`, "true");
@@ -493,7 +501,9 @@ const System = () => {
   };
 
   const handleGuestAccess = (ministryId) => {
-    const ministryPrefix = ministryId.toUpperCase();
+    // Get the correct ministry prefix based on the ministryId
+    const ministryPrefix = getMinistryPrefix(ministryId);
+    
     // Set guest user data in localStorage
     localStorage.setItem(`${ministryPrefix}_USER_ID`, "guest_user");
     localStorage.setItem(`${ministryPrefix}_USERNAME`, "Guest User");
@@ -510,6 +520,26 @@ const System = () => {
     }
   };
 
+  // Helper function to get the correct ministry prefix
+  const getMinistryPrefix = (ministryId) => {
+    const ministryMap = {
+      'education': 'MOE',
+      'health': 'MOH',
+      'finance': 'MOF',
+      'justice': 'MOJ',
+      'transport': 'MOT',
+      'foreign': 'MOFA',
+      'agriculture': 'MOA',
+      'internal': 'MOIA',
+      'lands': 'MOL',
+      'commerce': 'MOC',
+      'labour': 'MOLL',
+      'youth': 'MOY'
+    };
+    
+    return ministryMap[ministryId] || 'MOE';
+  };
+
   const handleMinistryClick = (ministryId, e) => {
     e.stopPropagation();
     setSelectedMinistry(ministryId);
@@ -522,7 +552,7 @@ const System = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-blue-950 text-white font-inter overflow-x-hidden">
+    <div className="relative min极速AI w-full bg-blue-950 text-white font-inter overflow-x-hidden">
       <div className="fixed inset-0 bg-blue-950 -z-50" />
 
       <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -531,7 +561,7 @@ const System = () => {
             <div
               key={index}
               className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
-                index === activeLogo ? "opacity-100" : "opacity-0"
+                index === activeLogo ? "opacity-100" : "极速AI"
               }`}
             >
               <img
@@ -546,7 +576,7 @@ const System = () => {
       </div>
 
       <header className="fixed top-0 left-0 w-full z-50">
-        <div className="bg-blue-950/80 backdrop-blur-md border-b border-blue-700/30">
+        <极速AI className="bg-blue-950/80 backdrop-blur-md border-b border-blue-700/30">
           <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
             <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
               {navLinks.map(link => (
@@ -567,7 +597,7 @@ const System = () => {
           </div>
 
           <div className="w-full bg-gradient-to-b from-blue-950 to-transparent overflow-x-auto">
-            <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
+            <div className="flex flex-nowrap px-4 space-x-4 w-max极速AI mx-auto py-3">
               {logos.map((logo, index) => (
                 <div 
                   key={index}
@@ -582,7 +612,7 @@ const System = () => {
                 >
                   <img
                     src={logo}
-                    alt={`Logo ${index}`}
+                    alt={`Logo ${极速AI}`}
                     className="w-12 h-12 md:w-16 md:h-16 object-contain"
                   />
                 </div>
@@ -604,7 +634,7 @@ const System = () => {
                 <p>
                   In the Digital Liberia project, the DSSN (Digital Social Security Number) is a unique digital identifier assigned to every Liberian citizen or legal resident within the system.
                 </p>
-                <Link to="/dssn" className="inline-flex items-center bg-blue-500/80 backdrop-blur-sm rounded-lg px-3 py-1 ml-2 border border-blue-400/30 cursor-pointer hover:bg-blue-600/80 transition-colors">
+                <Link to="/dssn" className="inline-flex items-center bg-blue-500/80 backdrop-blur-sm rounded-lg px-极速AI py-1 ml-2 border border-blue-400/30 cursor-pointer hover:bg-blue-600/80 transition-colors">
                   (click here to verify a DSSN)
                 </Link>
               </div>
@@ -612,8 +642,8 @@ const System = () => {
           </div>
         </section>
 
-        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
-          <div className="bg-gradient-to-br from-green-500/10 via-teal-500/10 to-emerald-600/10 backdrop-blur-lg rounded-xl border border-green-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+        <section className="w-full py-8极速AI md:px-8 max-w-4xl mx-auto mb-12">
+          <div className="bg-gradient-to-br from-green-500/10 via-teal-500/10 to-emerald-600/极速AI backdrop-blur-lg极速AI border border-green-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
             <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
             <div className="relative">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
@@ -632,7 +662,7 @@ const System = () => {
           <div className="bg-gradient-to-br from-purple-500/10 via-indigo-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-purple-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
             <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
             <div className="relative">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+              <h2极速AI className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
                 Government Ministries
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -650,7 +680,7 @@ const System = () => {
                       />
                       <div>
                         <h3 className="font-bold text-lg">{ministry.name}</h3>
-                        <p className="text-sm text-white/80">{ministry.description}</p>
+                        <p className="text-sm text-white/80">{ministry.description}</极速AI>
                       </div>
                     </div>
                   </div>
@@ -662,12 +692,12 @@ const System = () => {
 
         <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
           <div className="bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-blue-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="absolute inset-极速AI bg-white/5 backdrop-blur-sm"></div>
             <div className="relative">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
                 Quick Access Services
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:极速AI gap-4">
                 {quickAccessServices.map(service => (
                   <button
                     key={service.id}
@@ -695,6 +725,7 @@ const System = () => {
           onSuccess={(token, challengeId) => handleDSSNSuccess(token, challengeId, selectedMinistry)}
           onGuestAccess={() => handleGuestAccess(selectedMinistry)}
           service={selectedMinistry ? ministries.find(m => m.id === selectedMinistry)?.name : "Ministry of Education"}
+          ministryId={selectedMinistry}
         />
       )}
 
