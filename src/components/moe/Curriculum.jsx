@@ -1,16 +1,10 @@
 import React, { useState } from "react";
 
 const Curriculum = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("grades");
   
-  // Updated curriculum data with direct download links
+  // Curriculum data with direct download links
   const curriculumData = {
-    overview: `The Liberian National Curriculum, developed by the Ministry of Education, 
-    provides a comprehensive educational framework that prepares students for academic excellence, 
-    personal development, and national progress. Our curriculum emphasizes critical thinking, 
-    creativity, and practical skills aligned with 21st-century requirements while maintaining 
-    strong foundations in core subjects and Liberian cultural values.`,
-    
     grades: {
       "Grades 1-6": {
         title: "Elementary Education Foundation",
@@ -88,16 +82,6 @@ const Curriculum = () => {
         <div className="flex justify-center mb-10">
           <div className="bg-white rounded-xl p-1 shadow-lg flex">
             <button
-              onClick={() => setActiveTab("overview")}
-              className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                activeTab === "overview"
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "text-gray-600 hover:text-blue-600"
-              }`}
-            >
-              Overview
-            </button>
-            <button
               onClick={() => setActiveTab("grades")}
               className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
                 activeTab === "grades"
@@ -110,56 +94,9 @@ const Curriculum = () => {
           </div>
         </div>
 
-        {/* Content Based on Active Tab */}
-        {activeTab === "overview" && (
-          <div className="bg-white rounded-2xl shadow-xl p-8 mb-10 transform transition-all duration-500 hover:shadow-2xl">
-            <div className="prose prose-lg max-w-none text-gray-700">
-              <p>{curriculumData.overview}</p>
-              
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-blue-50 p-6 rounded-xl border-l-4 border-blue-500">
-                  <h3 className="text-xl font-bold text-blue-800 mb-3">Vision</h3>
-                  <p>To create a world-class education system that empowers all Liberian students to reach their full potential and contribute to national development.</p>
-                </div>
-                
-                <div className="bg-green-50 p-6 rounded-xl border-l-4 border-green-500">
-                  <h3 className="text-xl font-bold text-green-800 mb-3">Mission</h3>
-                  <p>To provide equitable access to quality education that develops knowledgeable, skilled, and ethical citizens for a prosperous Liberia.</p>
-                </div>
-                
-                <div className="bg-purple-50 p-6 rounded-xl border-l-4 border-purple-500">
-                  <h3 className="text-xl font-bold text-purple-800 mb-3">Core Values</h3>
-                  <p>Excellence, Equity, Innovation, Integrity, and Patriotism - guiding principles for educational development in Liberia.</p>
-                </div>
-              </div>
-
-              <div className="mt-8 bg-yellow-50 p-6 rounded-xl border-l-4 border-yellow-500">
-                <h3 className="text-xl font-bold text-yellow-800 mb-3">Curriculum Philosophy</h3>
-                <p>
-                  The Liberian National Curriculum is built on the belief that every child deserves 
-                  quality education that is relevant, engaging, and responsive to both local needs 
-                  and global standards. We emphasize:
-                </p>
-                <ul className="mt-3 space-y-2">
-                  <li>• Student-centered learning approaches</li>
-                  <li>• Integration of technology in education</li>
-                  <li>• Preservation of Liberian cultural heritage</li>
-                  <li>• Development of critical thinking and problem-solving skills</li>
-                  <li>• Preparation for both higher education and vocational opportunities</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
-
+        {/* Curriculum Downloads Content */}
         {activeTab === "grades" && (
           <div className="mb-10">
-            {/* Revision Notice */}
-            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-8 rounded">
-              <p className="font-bold">Notice</p>
-              <p>Please note: All curricula are presently under revision.</p>
-            </div>
-            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {Object.entries(curriculumData.grades).map(([grade, data]) => (
                 <div 
