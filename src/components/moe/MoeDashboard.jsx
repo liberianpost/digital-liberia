@@ -153,6 +153,11 @@ const MoeDashboard = () => {
     alert(`Role-based access for ${role} will be implemented in the next update.`);
   };
 
+  const handleQuickActionClick = (action) => {
+    // This will be implemented later - for now just show a message
+    alert(`${action} functionality will be implemented in the next update.`);
+  };
+
   const formatNumber = (num) => {
     return new Intl.NumberFormat().format(num);
   };
@@ -333,7 +338,7 @@ const MoeDashboard = () => {
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md">
             <h3 className="text-xl font-bold text-gray-800 mb-6">Schools Distribution by County</h3>
             <div className="space-y-4">
-              {analytics.schoolsByCounty.slice(0, 8).map((county, index) => (
+              {analytics.schoolsByCounty.map((county, index) => (
                 <div key={county.county} className="flex items-center justify-between">
                   <span className="text-gray-700 w-32 truncate font-medium">{county.county}</span>
                   <div className="flex-1 mx-4">
@@ -363,13 +368,14 @@ const MoeDashboard = () => {
             {[
               { icon: "📊", label: "View Reports", color: "from-blue-600 to-blue-700" },
               { icon: "🎓", label: "Student Records", color: "from-green-600 to-green-700" },
-              { icon: "👩‍🏫", label: "Teacher Management", color: "from-purple-600 to-purple-700" },
-              { icon: "🏫", label: "School Directory", color: "from-orange-600 to-orange-700" },
+              { icon: "👩‍🏫", label: "Teacher Records", color: "from-purple-600 to-purple-700" },
+              { icon: "🏫", label: "School Records", color: "from-orange-600 to-orange-700" },
               { icon: "📚", label: "Curriculum", color: "from-indigo-600 to-indigo-700" },
               { icon: "⚙️", label: "Settings", color: "from-gray-600 to-gray-700" }
             ].map((action, index) => (
               <div
                 key={index}
+                onClick={() => handleQuickActionClick(action.label)}
                 className={`bg-gradient-to-r ${action.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-md cursor-pointer text-white`}
               >
                 <div className="text-4xl mb-4">{action.icon}</div>
