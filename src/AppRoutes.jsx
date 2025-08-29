@@ -73,6 +73,9 @@ const DistrictReports = debugLazy(() => import('@components/moe/DistrictReports'
 const DatabaseTools = debugLazy(() => import('@components/moe/DatabaseTools'), 'DatabaseTools');
 const UserManagement = debugLazy(() => import('@components/moe/UserManagement'), 'UserManagement');
 const Curriculum = debugLazy(() => import('@components/moe/Curriculum'), 'Curriculum');
+const Grades1To6 = debugLazy(() => import('@components/moe/Grades1-6'), 'Grades1To6');
+const Grades7To9 = debugLazy(() => import('@components/moe/Grades7-9'), 'Grades7To9');
+const Grades10To12 = debugLazy(() => import('@components/moe/Grades10-12'), 'Grades10To12');
 
 // ====================
 // Other Ministry Dashboards (Lazy loaded)
@@ -287,6 +290,31 @@ const AppRoutes = () => {
         <SuspenseWrapper>
           <SimpleAuthCheckMoe>
             <Curriculum />
+          </SimpleAuthCheckMoe>
+        </SuspenseWrapper>
+      } />
+
+      {/* Grade Level Curriculum Pages */}
+      <Route path="/moe/curriculum/grades-1-6" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMoe>
+            <Grades1To6 />
+          </SimpleAuthCheckMoe>
+        </SuspenseWrapper>
+      } />
+
+      <Route path="/moe/curriculum/grades-7-9" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMoe>
+            <Grades7To9 />
+          </SimpleAuthCheckMoe>
+        </SuspenseWrapper>
+      } />
+
+      <Route path="/moe/curriculum/grades-10-12" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMoe>
+            <Grades10To12 />
           </SimpleAuthCheckMoe>
         </SuspenseWrapper>
       } />
