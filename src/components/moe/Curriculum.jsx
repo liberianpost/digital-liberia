@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 
 const Curriculum = () => {
   const [activeTab, setActiveTab] = useState("overview");
   
-  // Sample curriculum data structure
+  // Updated curriculum data with direct download links
   const curriculumData = {
     overview: `The Liberian National Curriculum, developed by the Ministry of Education, 
     provides a comprehensive educational framework that prepares students for academic excellence, 
@@ -13,17 +12,43 @@ const Curriculum = () => {
     strong foundations in core subjects and Liberian cultural values.`,
     
     grades: {
-      "Grades 1-6": {
+      "Elementary Level (K-6)": {
         title: "Elementary Education Foundation",
-        color: "from-blue-500 to-blue-700"
+        color: "from-blue-500 to-blue-700",
+        downloads: [
+          { name: "Elementary Science (K-6)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Elementary-Science-K-6.pdf" },
+          { name: "Elementary Mathematics (K-6)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Elementary-Mathematics-K-6.pdf" },
+          { name: "Elementary Language Arts (K-6)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Elementary-Language-Arts-K-6.pdf" },
+          { name: "Elementary Social Studies (K-6)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Elementary-Social-Studies-K-6.pdf" },
+          { name: "Elementary Health (K-6)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Elementary-Health-K-6.pdf" },
+          { name: "Elementary Physical Education (K-6)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Elementary-Physical-Education-K-6.pdf" }
+        ]
       },
-      "Grades 7-9": {
+      "Junior High Level (7-9)": {
         title: "Junior High Development",
-        color: "from-green-500 to-green-700"
+        color: "from-green-500 to-green-700",
+        downloads: [
+          { name: "Junior High Level English (7-9)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Junior-High-Level-English-7-9.pdf" },
+          { name: "Junior High Level Mathematics (7-9)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Junior-High-Level-Mathematics-7-9.pdf" },
+          { name: "Junior High Level General Science (7-9)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Junior-High-Level-General-Science-7-9.pdf" },
+          { name: "Junior High Level Social Studies (7-9)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Junior-High-Level-Social-Studies-7-9.pdf" },
+          { name: "Junior High Level Health (7-9)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Junior-High-Level-Health-7-9.pdf" },
+          { name: "Junior High Level Physical Education (7-9)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Junior-High-Level-Physical-Education-7-9.pdf" }
+        ]
       },
-      "Grades 10-12": {
+      "Senior High Level (10-12)": {
         title: "Senior High Specialization",
-        color: "from-purple-500 to-purple-700"
+        color: "from-purple-500 to-purple-700",
+        downloads: [
+          { name: "Senior High Level Biology (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-Biology-10-12.pdf" },
+          { name: "Senior High Level Chemistry (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-Chemistry-10-12.pdf" },
+          { name: "Senior High Level Physics (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-Physics-10-12.pdf" },
+          { name: "Senior High Level Mathematics (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-Mathematics-10-12.pdf" },
+          { name: "Senior High Level English (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-English-10-12.pdf" },
+          { name: "Senior High Level Economics (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-Economics-10-12.pdf" },
+          { name: "Senior High Level Geography (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-Geography-10-12.pdf" },
+          { name: "Senior High Level History (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-History-10-12.pdf" }
+        ]
       }
     }
   };
@@ -110,7 +135,7 @@ const Curriculum = () => {
                   : "text-gray-600 hover:text-blue-600"
               }`}
             >
-              Grade Levels
+              Curriculum Downloads
             </button>
           </div>
         </div>
@@ -158,30 +183,46 @@ const Curriculum = () => {
         )}
 
         {activeTab === "grades" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
-            {Object.entries(curriculumData.grades).map(([grade, data]) => (
-              <Link 
-                to={`/moe/curriculum/${grade.toLowerCase().replace(/\s+/g, '-')}`} 
-                key={grade}
-                className="block transform transition-all duration-300 hover:scale-105"
-              >
-                <div className={`bg-gradient-to-br ${data.color} rounded-2xl shadow-xl overflow-hidden h-full`}>
+          <div className="mb-10">
+            {/* Revision Notice */}
+            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-8 rounded">
+              <p className="font-bold">Notice</p>
+              <p>Please note: All curricula are presently under revision.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {Object.entries(curriculumData.grades).map(([grade, data]) => (
+                <div 
+                  key={grade}
+                  className={`bg-gradient-to-br ${data.color} rounded-2xl shadow-xl overflow-hidden h-full transform transition-all duration-300 hover:scale-105`}
+                >
                   <div className="p-6 text-white">
                     <h3 className="text-2xl font-bold mb-2">{grade}</h3>
-                    <h4 className="text-xl font-semibold mb-3">{data.title}</h4>
+                    <h4 className="text-xl font-semibold mb-4">{data.title}</h4>
                     
-                    <div className="mt-6 pt-4 border-t border-white border-opacity-20">
-                      <span className="inline-flex items-center font-medium">
-                        Explore Curriculum
-                        <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                        </svg>
-                      </span>
+                    <div className="mt-4 pt-4 border-t border-white border-opacity-20">
+                      <h5 className="font-semibold mb-3">Available Curriculum Downloads:</h5>
+                      <div className="space-y-2">
+                        {data.downloads.map((item, index) => (
+                          <a
+                            key={index}
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-2 transition-all duration-200 flex items-center"
+                          >
+                            <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span className="text-sm truncate">{item.name}</span>
+                          </a>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </Link>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
