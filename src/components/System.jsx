@@ -1,13 +1,79 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@context/AuthContext";
 import api from '@/api';
+import { initializeApp } from 'firebase/app'
+import { getAuth } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyA4NndmuQHTCKh7IyQYAz3DL_r8mttyRYg",
+  authDomain: "digitalliberia-notification.firebaseapp.com",
+  projectId: "digitalliberia-notification",
+  storageBucket: "digitalliberia-notification.appspot.com",
+  messagingSenderId: "537791418352",
+  appId: "1:537791418352:web:378b48439b2c9bed6dd735"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+// Web Push VAPID public key
+const vapidKey = "BEICu1bx8LKW5j7cag5tU9B2qfcejWi7QPm8a95jFODSIUNRiellygLGroK9NyWt-3WsTiUZscmS311gGXiXV7Q";
+
+// Enhanced notification permission request with service worker registration
+const requestNotificationPermission = async () => {
+  try {
+    // Register service worker first
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    console.log('Service Worker registered:', registration);
+
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      console.log('Notification permission granted.');
+      
+      // Get the FCM token with proper service worker registration
+      const currentToken = await getToken(messaging, { 
+        vapidKey: vapidKey,
+        serviceWorkerRegistration: registration
+      });
+      
+      if (currentToken) {
+        console.log('FCM Token:', currentToken);
+        localStorage.setItem('fcmToken', currentToken);
+        return currentToken;
+      } else {
+        console.log('No registration token available.');
+        return null;
+      }
+    } else {
+      console.log('Notification permission denied.');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error retrieving token:', error);
+    return null;
+  }
+};
+
+// Handle incoming messages when the app is in the foreground
+onMessage(messaging, (payload) => {
+  console.log('Message received in foreground:', payload);
+  if (payload.notification) {
+    const { title, body } = payload.notification;
+    new Notification(title, { body });
+  }
+});
 
 const navLinks = [
-  { label: "Home", to: "/", color: "bg-gradient-to-r from-blue-600 to-blue-800 text-white" },
-  { label: "System", to: "/system", color: "bg-gradient-to-r from-green-600 to-green-800 text-white" },
-  { label: "Digital Liberia", to: "/digital-liberia", color: "bg-gradient-to-r from-purple-600 to-purple-800 text-white" },
-  { label: "LibPay", to: "/libpay", color: "bg-gradient-to-r from-yellow-500 to-yellow-700 text-white" },
-  { label: "Liberian Post", to: "/liberian-post", color: "bg-gradient-to-r from-pink-600 to-pink-800 text-white" }
+  { label: "Home", to: "/", color: "bg-blue-500/80" },
+  { label: "System", to: "/system", color: "bg-green-500/80" },
+  { label: "Digital Liberia", to: "/digital-liberia", color: "bg-purple-500/80" },
+  { label: "LibPay", to: "/libpay", color: "bg-yellow-500/80" },
+  { label: "Liberian Post", to: "/liberian-post", color: "bg-pink-500/80" }
 ];
 
 const logos = [
@@ -20,20 +86,363 @@ const logos = [
   "/logos/liberia.png"
 ];
 
-const MoeDashboard = () => {
+const ministries = [
+  {
+    id: "education",
+    name: "Ministry of Education",
+    description: "School management, student records, and educational resources",
+    icon: "/logos/moe.png",
+    path: "/moe/dashboard"
+  },
+  {
+    id: "health",
+    name: "Ministry of Health",
+    description: "Health records, vaccination data, and medical services",
+    icon: "/logos/moh.png",
+    path: "/moh/dashboard"
+  },
+  {
+    id: "finance",
+    name: "Ministry of Finance",
+    description: "Tax records, financial services, and economic data",
+    icon: "/logos/mof.png",
+    path: "/mof/dashboard"
+  },
+  {
+    id: "justice",
+    name: "Ministry of Justice",
+    description: "Legal documents, court records, and law enforcement",
+    icon: "/logos/moj.png",
+    path: "/moj/dashboard"
+  },
+  {
+    id: "transport",
+    name: "Ministry of Transport",
+    description: "Driver licenses, vehicle registration, and transport permits",
+    icon: "/logos/mot.png",
+    path: "/mot/dashboard"
+  },
+  {
+    id: "foreign",
+    name: "Ministry of Foreign Affairs",
+    description: "Passport services and international relations",
+    icon: "/logos/mofa.png",
+    path: "/mofa/dashboard"
+  },
+  {
+    id: "agriculture",
+    name: "Ministry of Agriculture",
+    description: "Farming permits, agricultural data, and food security",
+    icon: "/logos/moa.png",
+    path: "/moa/dashboard"
+  },
+  {
+    id: "internal",
+    name: "Ministry of Internal Affairs",
+    description: "Citizen IDs, birth certificates, and local governance",
+    icon: "/logos/moia.png",
+    path: "/moia/dashboard"
+  },
+  {
+    id: "lands",
+    name: "Ministry of Lands & Mines",
+    description: "Land deeds, mining permits, and property records",
+    icon: "/logos/mol.png",
+    path: "/mol/dashboard"
+  },
+  {
+    id: "commerce",
+    name: "Ministry of Commerce",
+    description: "Business registration and trade licenses",
+    icon: "/logos/moc.png",
+    path: "/moc/dashboard"
+  },
+  {
+    id: "labour",
+    name: "Ministry of Labour",
+    description: "Employment records and worker rights",
+    icon: "/logos/moll.png",
+    path: "/moll/dashboard"
+  },
+  {
+    id: "youth",
+    name: "Ministry of Youth & Sports",
+    description: "Youth programs and sporting events",
+    icon: "/logos/moy.png",
+    path: "/moy/dashboard"
+  }
+];
+
+const quickAccessServices = [
+  { id: "passport", name: "Passport" },
+  { id: "birth-certificate", name: "Birth Certificate" },
+  { id: "drivers-license", name: "Driver's License" },
+  { id: "citizen-id", name: "Citizen ID" },
+  { id: "business-registration", name: "Business Registration" },
+  { id: "vehicle-registration", name: "Vehicle Registration" },
+  { id: "land-deed", name: "Land Deed" },
+  { id: "tax-services", name: "Tax Services" }
+];
+
+// DSSN Challenge Modal Component
+const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Education", onGuestAccess, ministryIcon }) => {
+  const [dssn, setDssn] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [challengeId, setChallengeId] = useState(null);
+  const [polling, setPolling, setPolling] = useState(false);
+  const [pollInterval, setPollInterval] = useState(null);
+  const [pushNotificationStatus, setPushNotificationStatus] = useState(null);
+
+  const requestDSSNChallenge = async (dssn) => {
+    try {
+      // Get FCM token for push notifications
+      const fcmToken = localStorage.getItem('fcmToken') || await requestNotificationPermission();
+      
+      const response = await api.post('/gov-services/request', { 
+        dssn, 
+        service,
+        fcmToken,
+        requestData: {
+          timestamp: new Date().toISOString(),
+          service: service,
+          origin: window.location.origin
+        }
+      });
+      
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Failed to initiate challenge');
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error requesting DSSN challenge:', error);
+      throw new Error(error.response?.data?.error || error.message || "Failed to initiate DSSN challenge");
+    }
+  };
+
+  const pollChallengeStatus = async (challengeId) => {
+    try {
+      const response = await api.get(`/gov-services/status/${challengeId}`);
+      
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Failed to check challenge status');
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error polling challenge status:', error);
+      throw new Error(error.response?.data?.error || error.message || "Failed to check approval status");
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
+    };
+  }, [pollInterval]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    setPushNotificationStatus(null);
+
+    if (!dssn.trim()) {
+      setError("Please enter your DSSN");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await requestDSSNChallenge(dssn);
+      setChallengeId(response.challengeId);
+      setPolling(true);
+      setLoading(false);
+      
+      if (response.pushNotification) {
+        setPushNotificationStatus({
+          sent: response.pushNotification.sent,
+          hasToken: response.pushNotification.hasToken,
+          error: response.pushNotification.error
+        });
+      }
+      
+      const interval = setInterval(async () => {
+        try {
+          const statusResponse = await pollChallengeStatus(response.challengeId);
+          
+          if (statusResponse.status === 'approved') {
+            clearInterval(interval);
+            setPolling(false);
+            onSuccess(statusResponse.govToken, response.challengeId);
+          } else if (statusResponse.status === 'denied') {
+            clearInterval(interval);
+            setPolling(false);
+            setError("Access was denied on your mobile device");
+          }
+        } catch (error) {
+          console.error('Error polling challenge status:', error);
+          clearInterval(interval);
+          setPolling(false);
+          setError(error.message);
+        }
+      }, 3000);
+
+      setPollInterval(interval);
+
+      setTimeout(() => {
+        if (polling) {
+          clearInterval(interval);
+          setPolling(false);
+          setError("Request timed out. Please try again.");
+        }
+      }, 5 * 60 * 1000);
+
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg w-full max-w-md overflow-hidden shadow-xl">
+        <div className="bg-blue-600 p-4 flex justify-between items-center">
+          <h2 className="text-xl font-bold text-white">{service} - DSSN Verification</h2>
+          <button 
+            onClick={onClose}
+            className="text-white text-2xl hover:text-gray-200"
+            disabled={polling || loading}
+          >
+            &times;
+          </button>
+        </div>
+        
+        <div className="p-6">
+          <div className="flex justify-center mb-6">
+            <img 
+              src={ministryIcon || "/logos/moe.png"} 
+              alt="Ministry Logo" 
+              className="w-20 h-20 object-contain"
+            />
+          </div>
+          
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+          
+          {pushNotificationStatus && !pushNotificationStatus.sent && (
+            <div className="mb-4 p-3 bg-yellow-100 text-yellow-700 rounded-md text-sm">
+              {!pushNotificationStatus.hasToken ? (
+                "User doesn't have the mobile app installed. Please ask them to download it."
+              ) : (
+                `Push notification failed: ${pushNotificationStatus.error || 'Unknown error'}`
+              )}
+            </div>
+          )}
+          
+          {polling ? (
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Waiting for Mobile Approval</h3>
+              <p className="text-gray-600 mb-4">
+                Please check your mobile app to approve this verification request.
+              </p>
+              {pushNotificationStatus?.sent && (
+                <p className="text-sm text-green-600 mb-2">
+                  ✓ Push notification sent to mobile device
+                </p>
+              )}
+              <p className="text-sm text-gray-500">
+                Challenge ID: {challengeId}
+              </p>
+              <p className="text-xs text-gray-400 mt-2">
+                This request will timeout in 5 minutes
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label className="block text-gray-900 mb-2 font-medium">Digital Social Security Number (DSSN)</label>
+                <input
+                  type="text"
+                  value={dssn}
+                  onChange={(e) => setDssn(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                  placeholder="Enter your DSSN"
+                  required
+                  autoFocus
+                  disabled={loading}
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  Enter your DSSN and approve the request on your mobile app
+                </p>
+              </div>
+              
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full py-3 px-4 rounded-md text-white font-semibold ${
+                  loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+                } transition-colors flex items-center justify-center`}
+              >
+                {loading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Verifying...
+                  </>
+                ) : 'Verify with DSSN'}
+              </button>
+            </form>
+          )}
+
+          <div className="mt-6 text-center text-sm border-t border-gray-200 pt-4">
+            <p className="text-gray-600 mb-4">
+              Don't have the mobile app? <a 
+                href="#" 
+                className="text-blue-600 hover:underline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  alert("The Digital Liberia mobile app is available on the App Store and Google Play Store");
+                }}
+              >
+                Download it here
+              </a>
+            </p>
+            
+            {/* Guest Access Button */}
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <p className="text-gray-500 text-sm mb-3">Or continue as a guest with limited access</p>
+              <button
+                onClick={onGuestAccess}
+                className="w-full py-2 px-4 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
+              >
+                I am a guest
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const System = () => {
+  const { user } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
-  const [currentDate] = useState(new Date());
   const [activeLogo, setActiveLogo] = useState(0);
-  const [userDSSN, setUserDSSN] = useState("");
-  const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [analytics, setAnalytics] = useState({
-    totalSchools: 0,
-    totalStudents: 0,
-    totalTeachers: 0,
-    boyToGirlRatio: "0:0",
-    schoolsByCounty: []
-  });
+  const [showDSSNLogin, setShowDSSNLogin] = useState(false);
+  const [selectedMinistry, setSelectedMinistry] = useState(null);
+  const [selectedMinistryData, setSelectedMinistryData] = useState(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -43,423 +452,314 @@ const MoeDashboard = () => {
   }, []);
 
   useEffect(() => {
-    const checkAuthAndFetchData = async () => {
-      const isLoggedIn = localStorage.getItem("MOE_LOGGED_IN") === "true";
-      const dssn = localStorage.getItem("MOE_DSSN") || "";
-      
-      if (!isLoggedIn) {
-        navigate('/system');
-        return;
-      }
-
-      setUserDSSN(dssn);
-      
-      try {
-        // Try to fetch user profile using DSSN with better error handling
-        let profileData = null;
-        try {
-          const profileResponse = await api.get('/profile-by-dssn', {
-            params: { dssn: dssn },
-            timeout: 10000 // 10 second timeout
-          });
-
-          if (profileResponse.data && profileResponse.data.success) {
-            profileData = profileResponse.data.data;
-            console.log('User profile fetched successfully');
-          }
-        } catch (apiError) {
-          // Handle different types of errors
-          if (apiError.code === 'ECONNABORTED') {
-            console.log('Profile request timed out - using fallback data');
-          } else if (apiError.response) {
-            // Server responded with error status
-            console.log('Server error:', apiError.response.status);
-          } else if (apiError.request) {
-            // Network error (CORS, no response)
-            console.log('Network error - likely CORS issue');
-          } else {
-            console.log('Other error:', apiError.message);
-          }
-        }
-
-        // Use fetched data or fallback
-        if (profileData) {
-          setUserProfile(profileData);
-        } else {
-          setUserProfile({
-            first_name: "DSSN",
-            last_name: "User",
-            email: `${dssn}@digitalliberia.gov.lr`,
-            image: "/logos/moe-user.png",
-            phone: "Not available",
-            address: "Digital Liberia User",
-            postal_address: "Monrovia, Liberia"
-          });
-        }
-
-        // Fetch analytics data (mock data for now)
-        const mockAnalytics = {
-          totalSchools: 5427,
-          totalStudents: 1258432,
-          totalTeachers: 28756,
-          boyToGirlRatio: "52:48",
-          schoolsByCounty: [
-            { county: "Montserrado", schools: 1254, students: 425632 },
-            { county: "Nimba", schools: 876, students: 198754 },
-            { county: "Bong", schools: 543, students: 98765 },
-            { county: "Lofa", schools: 432, students: 76543 },
-            { county: "Grand Bassa", schools: 321, students: 54321 },
-            { county: "Margibi", schools: 298, students: 48765 },
-            { county: "Grand Gedeh", schools: 187, students: 32456 },
-            { county: "Sinoe", schools: 156, students: 28765 },
-            { county: "Rivercess", schools: 98, students: 16543 },
-            { county: "Gbarpolu", schools: 87, students: 14321 },
-            { county: "River Gee", schools: 76, students: 12345 },
-            { county: "Grand Kru", schools: 65, students: 10987 },
-            { county: "Maryland", schools: 143, students: 25432 },
-            { county: "Bomi", schools: 132, students: 23456 },
-            { county: "Grand Cape Mount", schools: 121, students: 21543 }
-          ]
-        };
-        
-        setAnalytics(mockAnalytics);
-      } catch (error) {
-        console.error('Error in data processing:', error);
-        setUserProfile({
-          first_name: "DSSN",
-          last_name: "User",
-          email: `${dssn}@digitalliberia.gov.lr`,
-          image: "/logos/moe-user.png",
-          phone: "Not available",
-          address: "Digital Liberia User",
-          postal_address: "Monrovia, Liberia"
+    // Register service worker on app load
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        .then((registration) => {
+          console.log('SW registered: ', registration);
+        })
+        .catch((registrationError) => {
+          console.log('SW registration failed: : ', registrationError);
         });
-        } finally {
-        setLoading(false);
+    }
+    
+    // Request notification permission
+    requestNotificationPermission();
+  }, []);
+
+  const handleDSSNSuccess = async (govToken, challengeId, ministryId) => {
+    try {
+      const tokenPayload = JSON.parse(atob(govToken.split('.')[1]));
+      
+      // Map ministry IDs to their correct prefixes
+      const ministryPrefixMap = {
+        education: "MOE",
+        health: "MOH",
+        finance: "MOF",
+        justice: "MOJ",
+        transport: "MOT",
+        foreign: "MOFA",
+        agriculture: "MOA",
+        internal: "MOIA",
+        lands: "MOL",
+        commerce: "MOC",
+        labour: "MOLL",
+        youth: "MOY"
+      };
+      
+      const ministryPrefix = ministryPrefixMap[ministryId];
+      
+      localStorage.setItem(`${ministryPrefix}_USER_ID`, tokenPayload.userId);
+      localStorage.setItem(`${ministryPrefix}_USERNAME`, "DSSN User");
+      localStorage.setItem(`${ministryPrefix}_LOGGED_IN`, "true");
+      localStorage.setItem(`${ministryPrefix}_GOV_TOKEN`, govToken);
+      localStorage.setItem(`${ministryPrefix}_DSSN`, tokenPayload.dssn || "");
+      localStorage.setItem(`${ministryPrefix}_CHALLENGE_ID`, challengeId || "");
+      localStorage.setItem(`${ministryPrefix}_LOGIN_TIMESTAMP`, new Date().toISOString());
+      
+      setShowDSSNLogin(false);
+      
+      // Navigate to the correct dashboard path based on ministry ID
+      const ministry = ministries.find(m => m.id === ministryId);
+      if (ministry) {
+        navigate(ministry.path);
+      } else {
+        console.error(`Ministry with ID ${ministryId} not found`);
       }
-    };
-
-    checkAuthAndFetchData();
-  }, [navigate]);
-
-  const handleLogout = () => {
-    const keys = Object.keys(localStorage).filter(key => key.startsWith('MOE_'));
-    keys.forEach(key => localStorage.removeItem(key));
-    navigate("/system");
-  };
-
-  const handleRoleAccessClick = (role) => {
-    // This will be implemented later - for now just show a message
-    alert(`Role-based access for ${role} will be implemented in the next update.`);
-  };
-
-  const handleQuickActionClick = (action) => {
-    if (action === "Curriculum") {
-      navigate("/moe/curriculum");
-    } else {
-      alert(`${action} functionality will be implemented in the next update.`);
+    } catch (error) {
+      console.error('Error processing DSSN login:', error);
+      alert("Login failed. Please try again.");
     }
   };
 
-  const formatNumber = (num) => {
-    return new Intl.NumberFormat().format(num);
+  const handleGuestAccess = (ministryId) => {
+    // Map ministry IDs to their correct prefixes
+    const ministryPrefixMap = {
+      education: "MOE",
+      health: "MOH",
+      finance: "MOF",
+      justice: "MOJ",
+      transport: "MOT",
+      foreign: "MOFA",
+      agriculture: "MOA",
+      internal: "MOIA",
+      lands: "MOL",
+      commerce: "MOC",
+      labour: "MOLL",
+      youth: "MOY"
+    };
+    
+    const ministryPrefix = ministryPrefixMap[ministryId];
+    
+    // Set guest user data in localStorage
+    localStorage.setItem(`${ministryPrefix}_USER_ID`, "guest_user");
+    localStorage.setItem(`${ministryPrefix}_USERNAME`, "Guest User");
+    localStorage.setItem(`${ministryPrefix}_LOGGED_IN`, "true");
+    localStorage.setItem(`${ministryPrefix}_IS_GUEST`, "true");
+    localStorage.setItem(`${ministryPrefix}_LOGIN_TIMESTAMP`, new Date().toISOString());
+    
+    setShowDSSNLogin(false);
+    
+    // Navigate to the correct dashboard based on ministry ID
+    const ministry = ministries.find(m => m.id === ministryId);
+    if (ministry) {
+      navigate(ministry.path);
+    } else {
+      console.error(`Ministry with ID ${ministryId} not found`);
+    }
   };
 
-  const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+  const handleMinistryClick = (ministryId, e) => {
+    e.stopPropagation();
+    const ministry = ministries.find(m => m.id === ministryId);
+    if (ministry) {
+      setSelectedMinistry(ministryId);
+      setSelectedMinistryData(ministry);
+      setShowDSSNLogin(true);
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-700 text-lg">Loading Dashboard...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleServiceClick = (serviceId, e) => {
+    e.stopPropagation();
+    alert(`${serviceId.replace('-', ' ')} service will be available soon`);
+  };
 
   return (
-    <div className="relative min-h-screen w-full bg-white text-gray-800 font-inter overflow-x-hidden">
-      {/* Header */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-white shadow-lg border-b border-gray-200">
-        <div className="flex flex-col px-6 py-4 max-w-7xl mx-auto">
-          {/* Navigation Links - Top Row */}
-          <nav className="flex justify-center space-x-3 mb-4">
-            {navLinks.map(link => (
-              <div key={link.to} className={`flex-shrink-0 ${link.color} px-4 py-2 rounded-xl shadow-md transform hover:scale-105 transition-all duration-300`}>
-                <Link 
-                  to={link.to} 
-                  className="text-sm font-bold hover:text-blue-100 transition-colors duration-300"
-                >
-                  {link.label}
-                </Link>
-              </div>
-            ))}
-          </nav>
+    <div className="relative min-h-screen w-full bg-blue-950 text-white font-inter overflow-x-hidden">
+      <div className="fixed inset-0 bg-blue-950 -z-50" />
 
-          {/* Ministry of Education Logo and Title - Bottom Row */}
-          <div className="flex items-center justify-center space-x-4">
-            <img src="/logos/moe.png" alt="MOE Logo" className="w-12 h-12 object-contain" />
-            <div className="text-center">
-              <h1 className="text-xl font-bold text-blue-800">
-                Ministry of Education
-              </h1>
-              <p className="text-sm text-gray-600">Digital Liberia Platform</p>
+      <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
+        <div className="relative w-full max-w-2xl mx-4 h-64 md:h-96 flex items-center justify-center">
+          {logos.map((logo, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
+                index === activeLogo ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <img
+                src={logo}
+                alt={`Logo ${index}`}
+                className="max-w-full max-h-full object-contain"
+              />
+              <div className="absolute inset-0 bg-black/5" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <header className="fixed top-0 left-0 w-full z-50">
+        <div className="bg-blue-950/80 backdrop-blur-md border-b border-blue-700/30">
+          <div className="flex items-center justify-center px-4 py-4 max-w-7xl mx-auto">
+            <nav className="flex space-x-2 md:space-x-4 overflow-x-auto w-full justify-center">
+              {navLinks.map(link => (
+                <div key={link.to} className={`flex-shrink-0 ${link.color} px-3 py-1 rounded-lg`}>
+                  <Link 
+                    to={link.to} 
+                    className={`text-sm md:text-base lg:text-lg font-bold transition-colors duration-300 ${
+                      location.pathname === link.to 
+                        ? "text-red-500" 
+                        : "text-white hover:text-blue-300"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </div>
+              ))}
+            </nav>
+          </div>
+
+          <div className="w-full bg-gradient-to-b from-blue-950 to-transparent overflow-x-auto">
+            <div className="flex flex-nowrap px-4 space-x-4 w-max max-w-full mx-auto py-3">
+              {logos.map((logo, index) => (
+                <div 
+                  key={index}
+                  className={`flex-shrink-0 flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${
+                    index === activeLogo 
+                      ? "scale-110 bg-white shadow-lg"
+                      : "scale-100 bg-white/90"
+                  }`}
+                  style={{
+                    animation: index === activeLogo ? 'heartbeat 600ms ease-in-out' : 'none'
+                  }}
+                >
+                  <img
+                    src={logo}
+                    alt={`Logo ${index}`}
+                    className="w-12 h-12 md:w-16 md:h-16 object-contain"
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="relative z-30 pt-40 pb-20 px-6">
-        {/* Welcome Section */}
-        <section className="max-w-7xl mx-auto mb-12">
-          <div className="bg-gradient-to-br from-blue-50 via-white to-blue-50 rounded-2xl border border-blue-200 p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute inset-0 bg-blue-50/50"></div>
-            
+      <main className="relative z-30 pt-48 pb-20 px-4 md:px-8">
+        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
+          <div className="bg-gradient-to-br from-rose-500/10 via-red-500/10 to-orange-600/10 backdrop-blur-lg rounded-xl border border-rose-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
             <div className="relative">
-              <div className="flex justify-between items-center mb-8">
-                <div className="flex items-center space-x-6">
-                  <div className="relative">
-                    <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl p-1 shadow-xl">
-                      <img
-                        src={userProfile?.image || "/logos/moe-user.png"}
-                        alt="Profile"
-                        className="w-full h-full object-cover rounded-2xl"
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                Digital Social Security Number (DSSN)
+              </h2>
+              <div className="text-white space-y-4">
+                <p>
+                  In the Digital Liberia project, the DSSN (Digital Social Security Number) is a unique digital identifier assigned to every Liberian citizen or legal resident within the system.
+                </p>
+                <Link to="/dssn" className="inline-flex items-center bg-blue-500/80 backdrop-blur-sm rounded-lg px-3 py-1 ml-2 border border-blue-400/30 cursor-pointer hover:bg-blue-600/80 transition-colors">
+                  (click here to verify a DSSN)
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
+          <div className="bg-gradient-to-br from-green-500/10 via-teal-500/10 to-emerald-600/10 backdrop-blur-lg rounded-xl border border-green-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                Digital Liberia System
+              </h2>
+              <div className="text-white">
+                <p>
+                  The National Database Management System (NDMS) is the secure, centralized, and intelligent national data backbone that powers Digital Liberia.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
+          <div className="bg-gradient-to-br from-purple-500/10 via-indigo-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-purple-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                Government Ministries
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {ministries.map(ministry => (
+                  <div 
+                    key={ministry.id}
+                    onClick={(e) => handleMinistryClick(ministry.id, e)}
+                    className="cursor-pointer bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm relative z-20"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <img 
+                        src={ministry.icon} 
+                        alt={ministry.name} 
+                        className="w-12 h-12 object-contain"
                       />
-                    </div>
-                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
-                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                      <div>
+                        <h3 className="font-bold text-lg">{ministry.name}</h3>
+                        <p className="text-sm text-white/80">{ministry.description}</p>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div>
-                    <h1 className="text-4xl font-bold text-blue-900">
-                      Welcome, {userProfile ? `${userProfile.first_name} ${userProfile.last_name}` : 'DSSN User'}
-                    </h1>
-                    <p className="text-gray-600 text-lg mt-2">{formatDate(currentDate)}</p>
-                    <p className="text-blue-600 text-sm mt-1">
-                      DSSN: {userDSSN} • {userProfile?.email}
-                    </p>
-                    {userProfile?.phone && userProfile.phone !== "Not available" && (
-                      <p className="text-gray-500 text-sm mt-1">Phone: {userProfile.phone}</p>
-                    )}
-                  </div>
-                </div>
-                
-                <button
-                  onClick={handleLogout}
-                  className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold"
-                >
-                  Logout
-                </button>
+                ))}
               </div>
             </div>
           </div>
         </section>
 
-        {/* Analytics Dashboard */}
-        <section className="max-w-7xl mx-auto mb-12">
-          <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
-            Education System Analytics
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {/* Total Schools */}
-            <div className="bg-white border border-blue-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-blue-800">{formatNumber(analytics.totalSchools)}</h3>
-                  <p className="text-blue-600">Total Schools</p>
-                </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <span className="text-2xl">🏫</span>
-                </div>
-              </div>
-              <div className="mt-4 h-2 bg-blue-100 rounded-full">
-                <div className="h-full bg-blue-500 rounded-full w-3/4"></div>
+        <section className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12">
+          <div className="bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-600/10 backdrop-blur-lg rounded-xl border border-blue-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                Quick Access Services
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {quickAccessServices.map(service => (
+                  <button
+                    key={service.id}
+                    onClick={(e) => handleServiceClick(service.id, e)}
+                    className="bg-white/5 hover:bg-white/10 transition-colors p-4 rounded-lg border border-white/10 backdrop-blur-sm text-left"
+                  >
+                    <h3 className="font-bold text-lg">{service.name}</h3>
+                  </button>
+                ))}
               </div>
             </div>
-
-            {/* Total Students */}
-            <div className="bg-white border border-green-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-green-800">{formatNumber(analytics.totalStudents)}</h3>
-                  <p className="text-green-600">Total Students</p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <span className="text-2xl">🎓</span>
-                </div>
-              </div>
-              <div className="mt-4 h-2 bg-green-100 rounded-full">
-                <div className="h-full bg-green-500 rounded-full w-4/5"></div>
-              </div>
-            </div>
-
-            {/* Total Teachers */}
-            <div className="bg-white border border-purple-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-purple-800">{formatNumber(analytics.totalTeachers)}</h3>
-                  <p className="text-purple-600">Total Teachers</p>
-                </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <span className="text-2xl">👩‍🏫</span>
-                </div>
-              </div>
-              <div className="mt-4 h-2 bg-purple-100 rounded-full">
-                <div className="h-full bg-purple-500 rounded-full w-2/3"></div>
-              </div>
-            </div>
-
-            {/* Boy to Girl Ratio */}
-            <div className="bg-white border border-pink-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-pink-800">{analytics.boyToGirlRatio}</h3>
-                  <p className="text-pink-600">Boy:Girl Ratio</p>
-                </div>
-                <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
-                  <span className="text-2xl">⚖️</span>
-                </div>
-              </div>
-              <div className="mt-4 h-2 bg-pink-100 rounded-full">
-                <div className="h-full bg-pink-500 rounded-full w-1/2"></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Schools by County Chart */}
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md">
-            <h3 className="text-xl font-bold text-gray-800 mb-6">Schools Distribution by County</h3>
-            <div className="space-y-4">
-              {analytics.schoolsByCounty.map((county, index) => (
-                <div key={county.county} className="flex items-center justify-between">
-                  <span className="text-gray-700 w-32 truncate font-medium">{county.county}</span>
-                  <div className="flex-1 mx-4">
-                    <div className="h-3 bg-gray-200 rounded-full">
-                      <div 
-                        className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"
-                        style={{ width: `${(county.schools / analytics.schoolsByCounty[0].schools) * 100}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  <span className="text-blue-800 font-semibold w-20 text-right">
-                    {formatNumber(county.schools)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Quick Actions */}
-        <section className="max-w-7xl mx-auto mb-12">
-          <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
-            Quick Actions
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { icon: "📊", label: "View Reports", color: "from-blue-600 to-blue-700" },
-              { icon: "🎓", label: "Student Records", color: "from-green-600 to-green-700" },
-              { icon: "👩‍🏫", label: "Teacher Records", color: "from-purple-600 to-purple-700" },
-              { icon: "🏫", label: "School Records", color: "from-orange-600 to-orange-700" },
-              { icon: "📚", label: "Curriculum", color: "from-indigo-600 to-indigo-700" },
-              { icon: "⚙️", label: "Settings", color: "from-gray-600 to-gray-700" }
-            ].map((action, index) => (
-              <div
-                key={index}
-                onClick={() => handleQuickActionClick(action.label)}
-                className={`bg-gradient-to-r ${action.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-md cursor-pointer text-white`}
-              >
-                <div className="text-4xl mb-4">{action.icon}</div>
-                <h3 className="text-xl font-semibold">{action.label}</h3>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Role-Based Access Section */}
-        <section className="max-w-7xl mx-auto mb-12">
-          <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
-            Role-Based Access
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { 
-                icon: "👨‍💼", 
-                label: "Ministry Employees", 
-                color: "from-blue-600 to-blue-700",
-                description: "Access to national education data, policy management, and system administration"
-              },
-              { 
-                icon: "🏢", 
-                label: "School Administrators", 
-                color: "from-green-600 to-green-700",
-                description: "Manage school operations, staff, student records, and academic programs"
-              },
-              { 
-                icon: "👩‍🏫", 
-                label: "Teachers", 
-                color: "from-purple-600 to-purple-700",
-                description: "Access to class management, grading, attendance, and student progress tracking"
-              },
-              { 
-                icon: "👨‍👩‍👧‍👦", 
-                label: "Parents", 
-                color: "from-orange-600 to-orange-700",
-                description: "View student progress, attendance, grades, and communicate with teachers"
-              },
-              { 
-                icon: "🎓", 
-                label: "Students", 
-                color: "from-indigo-600 to-indigo-700",
-                description: "Access to academic records, course materials, and learning resources"
-              },
-              { 
-                icon: "🔐", 
-                label: "System Administrators", 
-                color: "from-red-600 to-red-700",
-                description: "Full system access, user management, and security configuration"
-              }
-            ].map((role, index) => (
-              <div
-                key={index}
-                onClick={() => handleRoleAccessClick(role.label)}
-                className={`bg-gradient-to-r ${role.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-md cursor-pointer text-white`}
-              >
-                <div className="text-4xl mb-4">{role.icon}</div>
-                <h3 className="text-xl font-semibold mb-3">{role.label}</h3>
-                <p className="text-sm opacity-90">{role.description}</p>
-              </div>
-            ))}
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-30 py-8 text-center bg-gray-50 border-t border-gray-200">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-gray-600 text-sm">
-            © {new Date().getFullYear()} Ministry of Education - Digital Liberia. All rights reserved.
-          </p>
-          <p className="text-gray-500 text-xs mt-2">
-            Advanced Education Management System • Powered by Digital Liberia NDMS
-          </p>
+      <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
+        <div className="border-t border-blue-700/30 pt-6">
+          © {new Date().getFullYear()} Digital Liberia. All rights reserved.
         </div>
       </footer>
+
+      {showDSSNLogin && selectedMinistryData && (
+        <DSSNChallengeModal 
+          onClose={() => setShowDSSNLogin(false)}
+          onSuccess={(token, challengeId) => handleDSSNSuccess(token, challengeId, selectedMinistry)}
+          onGuestAccess={() => handleGuestAccess(selectedMinistry)}
+          service={selectedMinistryData.name}
+          ministryIcon={selectedMinistryData.icon}
+        />
+      )}
+
+      <style jsx global>{`
+        @keyframes heartbeat {
+          0% { transform: scale(1); }
+          25% { transform: scale(1.1); }
+          50% { transform: scale(1); }
+          75% { transform: scale(1.1); }
+          100% { transform: scale(1); }
+        }
+        .overflow-x-auto {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .overflow-x-auto::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 };
 
-export default MoeDashboard;
+export default System;
