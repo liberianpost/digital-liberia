@@ -39,31 +39,29 @@ const Curriculum = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Ministry of Education Header */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-10">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="flex items-center space-x-6 mb-6 md:mb-0">
-              <img 
-                src="/logos/moe.png" 
-                alt="Ministry of Education Logo" 
-                className="w-20 h-20 object-contain"
-              />
-              <div>
-                <h1 className="text-3xl font-bold text-blue-800">
-                  Ministry of Education
-                </h1>
-                <p className="text-lg text-gray-600 mt-1">
-                  Republic of Liberia
-                </p>
-              </div>
+        {/* Ministry of Education Header - Centered */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-10 flex justify-center">
+          <div className="flex flex-col items-center text-center">
+            <img 
+              src="/logos/moe.png" 
+              alt="Ministry of Education Logo" 
+              className="w-20 h-20 object-contain mb-4"
+            />
+            <div>
+              <h1 className="text-3xl font-bold text-blue-800">
+                Ministry of Education
+              </h1>
+              <p className="text-lg text-gray-600 mt-1">
+                Republic of Liberia
+              </p>
             </div>
           </div>
         </div>
 
-        {/* About Ministry of Education */}
+        {/* About the Curriculum */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-10">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-blue-200 pb-3">
-            About the Ministry of Education
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-blue-200 pb-3 text-center">
+            About the Curriculum
           </h2>
           <div className="prose prose-lg max-w-none text-gray-700 space-y-4">
             <p>
@@ -84,17 +82,6 @@ const Curriculum = () => {
               to ensuring equitable access to quality education across all counties and communities.
             </p>
           </div>
-        </div>
-
-        {/* Curriculum Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-            Liberian National Curriculum Framework
-          </h1>
-          <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-            Comprehensive educational framework designed to develop well-rounded, 
-            critically-thinking citizens prepared for the challenges of the modern world.
-          </p>
         </div>
 
         {/* Navigation Tabs */}
