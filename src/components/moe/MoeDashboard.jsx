@@ -154,8 +154,13 @@ const MoeDashboard = () => {
   };
 
   const handleQuickActionClick = (action) => {
-    // This will be implemented later - for now just show a message
-    alert(`${action} functionality will be implemented in the next update.`);
+    switch(action) {
+      case "Curriculum":
+        navigate("/moe/curriculum");
+        break;
+      default:
+        alert(`${action} functionality will be implemented in the next update.`);
+    }
   };
 
   const formatNumber = (num) => {
@@ -334,22 +339,22 @@ const MoeDashboard = () => {
             </div>
           </div>
 
-          {/* Schools by County Chart */}
+          {/* Schools by County Chart - Reduced Size */}
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md">
-            <h3 className="text-xl font-bold text-gray-800 mb-6">Schools Distribution by County</h3>
-            <div className="space-y-4">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Schools Distribution by County</h3>
+            <div className="space-y-3 max-h-80 overflow-y-auto">
               {analytics.schoolsByCounty.map((county, index) => (
                 <div key={county.county} className="flex items-center justify-between">
-                  <span className="text-gray-700 w-32 truncate font-medium">{county.county}</span>
-                  <div className="flex-1 mx-4">
-                    <div className="h-3 bg-gray-200 rounded-full">
+                  <span className="text-gray-700 w-28 truncate font-medium text-sm">{county.county}</span>
+                  <div className="flex-1 mx-3">
+                    <div className="h-2 bg-gray-200 rounded-full">
                       <div 
                         className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"
                         style={{ width: `${(county.schools / analytics.schoolsByCounty[0].schools) * 100}%` }}
                       ></div>
                     </div>
                   </div>
-                  <span className="text-blue-800 font-semibold w-20 text-right">
+                  <span className="text-blue-800 font-semibold w-16 text-right text-sm">
                     {formatNumber(county.schools)}
                   </span>
                 </div>
