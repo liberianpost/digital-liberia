@@ -161,7 +161,7 @@ const Curriculum = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
             {Object.entries(curriculumData.grades).map(([grade, data]) => (
               <Link 
-                to={`/curriculum/${grade.toLowerCase().replace(/\s+/g, '-')}`} 
+                to={`/moe/curriculum/${grade.toLowerCase().replace(/\s+/g, '-')}`} 
                 key={grade}
                 className="block transform transition-all duration-300 hover:scale-105"
               >
