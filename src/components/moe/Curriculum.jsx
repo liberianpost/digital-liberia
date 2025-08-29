@@ -1,6 +1,24 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
+const navLinks = [
+  { label: "Home", to: "/", color: "bg-gradient-to-r from-blue-600 to-blue-800 text-white" },
+  { label: "System", to: "/system", color: "bg-gradient-to-r from-green-600 to-green-800 text-white" },
+  { label: "Digital Liberia", to: "/digital-liberia", color: "bg-gradient-to-r from-purple-600 to-purple-800 text-white" },
+  { label: "LibPay", to: "/libpay", color: "bg-gradient-to-r from-yellow-500 to-yellow-700 text-white" },
+  { label: "Liberian Post", to: "/liberian-post", color: "bg-gradient-to-r from-pink-600 to-pink-800 text-white" }
+];
+
+const logos = [
+  "/logos/liberianpost.png",
+  "/logos/digital.png",
+  "/logos/libmusic.png",
+  "/logos/libconnectsit.png",
+  "/logos/libpaysit.png",
+  "/logos/seal of liberia.png",
+  "/logos/liberia.png"
+];
+
 const Curriculum = () => {
   const [activeTab, setActiveTab] = useState("overview");
   
