@@ -190,7 +190,7 @@ const DSSNChallengeModal = ({ onClose, onSuccess, service = "Ministry of Educati
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [challengeId, setChallengeId] = useState(null);
-  const [polling, setPolling, setPolling] = useState(false);
+  const [polling, setPolling] = useState(false);
   const [pollInterval, setPollInterval] = useState(null);
   const [pushNotificationStatus, setPushNotificationStatus] = useState(null);
 
