@@ -72,6 +72,7 @@ const ClassManagement = debugLazy(() => import('@components/moe/ClassManagement'
 const DistrictReports = debugLazy(() => import('@components/moe/DistrictReports'), 'DistrictReports');
 const DatabaseTools = debugLazy(() => import('@components/moe/DatabaseTools'), 'DatabaseTools');
 const UserManagement = debugLazy(() => import('@components/moe/UserManagement'), 'UserManagement');
+const Curriculum = debugLazy(() => import('@components/moe/Curriculum'), 'Curriculum');
 
 // ====================
 // Other Ministry Dashboards (Lazy loaded)
@@ -277,6 +278,15 @@ const AppRoutes = () => {
         <SuspenseWrapper>
           <SimpleAuthCheckMoe>
             <UserManagement />
+          </SimpleAuthCheckMoe>
+        </SuspenseWrapper>
+      } />
+
+      {/* Curriculum */}
+      <Route path="/moe/curriculum" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckMoe>
+            <Curriculum />
           </SimpleAuthCheckMoe>
         </SuspenseWrapper>
       } />
