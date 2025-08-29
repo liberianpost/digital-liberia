@@ -12,42 +12,25 @@ const Curriculum = () => {
     strong foundations in core subjects and Liberian cultural values.`,
     
     grades: {
-      "Elementary Level (K-6)": {
+      "Grades 1-6": {
         title: "Elementary Education Foundation",
         color: "from-blue-500 to-blue-700",
         downloads: [
-          { name: "Elementary Science (K-6)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Elementary-Science-K-6.pdf" },
-          { name: "Elementary Mathematics (K-6)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Elementary-Mathematics-K-6.pdf" },
-          { name: "Elementary Language Arts (K-6)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Elementary-Language-Arts-K-6.pdf" },
-          { name: "Elementary Social Studies (K-6)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Elementary-Social-Studies-K-6.pdf" },
-          { name: "Elementary Health (K-6)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Elementary-Health-K-6.pdf" },
-          { name: "Elementary Physical Education (K-6)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Elementary-Physical-Education-K-6.pdf" }
+          { name: "Complete Elementary Curriculum (ZIP)", url: "http://www.moeliberia.com/wp-content/uploads/2019/09/GRADE-1-6.zip" }
         ]
       },
-      "Junior High Level (7-9)": {
+      "Grades 7-9": {
         title: "Junior High Development",
         color: "from-green-500 to-green-700",
         downloads: [
-          { name: "Junior High Level English (7-9)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Junior-High-Level-English-7-9.pdf" },
-          { name: "Junior High Level Mathematics (7-9)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Junior-High-Level-Mathematics-7-9.pdf" },
-          { name: "Junior High Level General Science (7-9)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Junior-High-Level-General-Science-7-9.pdf" },
-          { name: "Junior High Level Social Studies (7-9)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Junior-High-Level-Social-Studies-7-9.pdf" },
-          { name: "Junior High Level Health (7-9)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Junior-High-Level-Health-7-9.pdf" },
-          { name: "Junior High Level Physical Education (7-9)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Junior-High-Level-Physical-Education-7-9.pdf" }
+          { name: "Complete Junior High Curriculum (ZIP)", url: "http://www.moeliberia.com/wp-content/uploads/2019/09/GRADE-7-9.zip" }
         ]
       },
-      "Senior High Level (10-12)": {
+      "Grades 10-12": {
         title: "Senior High Specialization",
         color: "from-purple-500 to-purple-700",
         downloads: [
-          { name: "Senior High Level Biology (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-Biology-10-12.pdf" },
-          { name: "Senior High Level Chemistry (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-Chemistry-10-12.pdf" },
-          { name: "Senior High Level Physics (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-Physics-10-12.pdf" },
-          { name: "Senior High Level Mathematics (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-Mathematics-10-12.pdf" },
-          { name: "Senior High Level English (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-English-10-12.pdf" },
-          { name: "Senior High Level Economics (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-Economics-10-12.pdf" },
-          { name: "Senior High Level Geography (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-Geography-10-12.pdf" },
-          { name: "Senior High Level History (10-12)", url: "http://www.moeliberia.com/wp-content/uploads/2021/09/Senior-High-Level-History-10-12.pdf" }
+          { name: "Complete Senior High Curriculum (ZIP)", url: "http://www.moeliberia.com/wp-content/uploads/2019/09/Grade-10-12.zip" }
         ]
       }
     }
@@ -190,7 +173,7 @@ const Curriculum = () => {
               <p>Please note: All curricula are presently under revision.</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {Object.entries(curriculumData.grades).map(([grade, data]) => (
                 <div 
                   key={grade}
@@ -201,7 +184,7 @@ const Curriculum = () => {
                     <h4 className="text-xl font-semibold mb-4">{data.title}</h4>
                     
                     <div className="mt-4 pt-4 border-t border-white border-opacity-20">
-                      <h5 className="font-semibold mb-3">Available Curriculum Downloads:</h5>
+                      <h5 className="font-semibold mb-3">Curriculum Download:</h5>
                       <div className="space-y-2">
                         {data.downloads.map((item, index) => (
                           <a
@@ -209,12 +192,12 @@ const Curriculum = () => {
                             href={item.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="block bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-2 transition-all duration-200 flex items-center"
+                            className="block bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-3 transition-all duration-200 flex items-center justify-center text-center"
                           >
-                            <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                             </svg>
-                            <span className="text-sm truncate">{item.name}</span>
+                            <span className="text-sm font-medium">{item.name}</span>
                           </a>
                         ))}
                       </div>
