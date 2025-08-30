@@ -91,6 +91,7 @@ const MolDashboard = debugLazy(() => import('@components/mol/MolDashboard'), 'Mo
 const MocDashboard = debugLazy(() => import('@components/moc/MocDashboard'), 'MocDashboard');
 const MollDashboard = debugLazy(() => import('@components/moll/MollDashboard'), 'MollDashboard');
 const MoyDashboard = debugLazy(() => import('@components/moy/MoyDashboard'), 'MoyDashboard');
+const LlaDashboard = debugLazy(() => import('@components/lla/LlaDashboard'), 'LlaDashboard');
 
 // Simple authentication check components for each ministry
 const SimpleAuthCheckMoe = ({ children }) => {
@@ -161,6 +162,12 @@ const SimpleAuthCheckMoll = ({ children }) => {
 
 const SimpleAuthCheckMoy = ({ children }) => {
   const isLoggedIn = localStorage.getItem("MOY_LOGGED_IN") === "true";
+  if (!isLoggedIn) return <Navigate to="/system" replace />;
+  return children;
+};
+
+const SimpleAuthCheckLla = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("LLA_LOGGED_IN") === "true";
   if (!isLoggedIn) return <Navigate to="/system" replace />;
   return children;
 };
@@ -386,7 +393,7 @@ const AppRoutes = () => {
         </SuspenseWrapper>
       } />
 
-      {/* Ministry of Lands & Mines */}
+      {/* Ministry of Mines and Energy */}
       <Route path="/mol/dashboard" element={
         <SuspenseWrapper>
           <SimpleAuthCheckMol>
@@ -419,6 +426,15 @@ const AppRoutes = () => {
           <SimpleAuthCheckMoy>
             <MoyDashboard />
           </SimpleAuthCheckMoy>
+        </SuspenseWrapper>
+      } />
+
+      {/* Liberia Land Authority */}
+      <Route path="/lla/dashboard" element={
+        <SuspenseWrapper>
+          <SimpleAuthCheckLla>
+            <LlaDashboard />
+          </SimpleAuthCheckLla>
         </SuspenseWrapper>
       } />
 
