@@ -28,10 +28,10 @@ const MolDashboard = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState({
-    landDeeds: 0,
     miningPermits: 0,
-    propertyRecords: 0,
-    landDisputes: 0,
+    energyProjects: 0,
+    mineralRecords: 0,
+    complianceChecks: 0,
     miningTypes: []
   });
 
@@ -85,10 +85,10 @@ const MolDashboard = () => {
 
         // Mock analytics data
         const mockAnalytics = {
-          landDeeds: 185000,
           miningPermits: 1250,
-          propertyRecords: 285000,
-          landDisputes: 3250,
+          energyProjects: 85,
+          mineralRecords: 285000,
+          complianceChecks: 3250,
           miningTypes: [
             { type: "Gold", permits: 450, percentage: 36 },
             { type: "Diamond", permits: 325, percentage: 26 },
@@ -171,12 +171,12 @@ const MolDashboard = () => {
             ))}
           </nav>
 
-          {/* Ministry of Lands & Mines Logo and Title - Bottom Row */}
+          {/* Ministry of Mines and Energy Logo and Title - Bottom Row */}
           <div className="flex items-center justify-center space-x-4">
             <img src="/logos/mol.png" alt="MOL Logo" className="w-12 h-12 object-contain" />
             <div className="text-center">
               <h1 className="text-xl font-bold text-blue-800">
-                Ministry of Lands & Mines
+                Ministry of Mines and Energy
               </h1>
               <p className="text-sm text-gray-600">Digital Liberia Platform</p>
             </div>
@@ -235,26 +235,10 @@ const MolDashboard = () => {
         {/* Analytics Dashboard */}
         <section className="max-w-7xl mx-auto mb-12">
           <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
-            Lands & Mines Analytics
+            Mines and Energy Analytics
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {/* Land Deeds */}
-            <div className="bg-white border border-blue-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-blue-800">{formatNumber(analytics.landDeeds)}</h3>
-                  <p className="text-blue-600">Land Deeds</p>
-                </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <span className="text-2xl">🏠</span>
-                </div>
-              </div>
-              <div className="mt-4 h-2 bg-blue-100 rounded-full">
-                <div className="h-full bg-blue-500 rounded-full w-3/4"></div>
-              </div>
-            </div>
-
             {/* Mining Permits */}
             <div className="bg-white border border-green-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
               <div className="flex items-center justify-between">
@@ -271,15 +255,31 @@ const MolDashboard = () => {
               </div>
             </div>
 
-            {/* Property Records */}
+            {/* Energy Projects */}
+            <div className="bg-white border border-yellow-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-yellow-800">{formatNumber(analytics.energyProjects)}</h3>
+                  <p className="text-yellow-600">Energy Projects</p>
+                </div>
+                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                  <span className="text-2xl">⚡</span>
+                </div>
+              </div>
+              <div className="mt-4 h-2 bg-yellow-100 rounded-full">
+                <div className="h-full bg-yellow-500 rounded-full w-1/5"></div>
+              </div>
+            </div>
+
+            {/* Mineral Records */}
             <div className="bg-white border border-purple-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold text-purple-800">{formatNumber(analytics.propertyRecords)}</h3>
-                  <p className="text-purple-600">Property Records</p>
+                  <h3 className="text-2xl font-bold text-purple-800">{formatNumber(analytics.mineralRecords)}</h3>
+                  <p className="text-purple-600">Mineral Records</p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <span className="text-2xl">📋</span>
+                  <span className="text-2xl">💎</span>
                 </div>
               </div>
               <div className="mt-4 h-2 bg-purple-100 rounded-full">
@@ -287,15 +287,15 @@ const MolDashboard = () => {
               </div>
             </div>
 
-            {/* Land Disputes */}
+            {/* Compliance Checks */}
             <div className="bg-white border border-orange-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold text-orange-800">{formatNumber(analytics.landDisputes)}</h3>
-                  <p className="text-orange-600">Land Disputes</p>
+                  <h3 className="text-2xl font-bold text-orange-800">{formatNumber(analytics.complianceChecks)}</h3>
+                  <p className="text-orange-600">Compliance Checks</p>
                 </div>
                 <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                  <span className="text-2xl">⚖️</span>
+                  <span className="text-2xl">✅</span>
                 </div>
               </div>
               <div className="mt-4 h-2 bg-orange-100 rounded-full">
@@ -336,11 +336,11 @@ const MolDashboard = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: "🏠", label: "Land Deeds", color: "from-blue-600 to-blue-700" },
               { icon: "⛏️", label: "Mining Permits", color: "from-green-600 to-green-700" },
-              { icon: "📋", label: "Property Records", color: "from-purple-600 to-purple-700" },
-              { icon: "🗺️", label: "Land Survey", color: "from-orange-600 to-orange-700" },
-              { icon: "⚖️", label: "Dispute Resolution", color: "from-red-600 to-red-700" },
+              { icon: "⚡", label: "Energy Projects", color: "from-yellow-600 to-yellow-700" },
+              { icon: "💎", label: "Mineral Records", color: "from-purple-600 to-purple-700" },
+              { icon: "🔍", label: "Exploration", color: "from-orange-600 to-orange-700" },
+              { icon: "✅", label: "Compliance", color: "from-red-600 to-red-700" },
               { icon: "⚙️", label: "Settings", color: "from-gray-600 to-gray-700" }
             ].map((action, index) => (
               <div
@@ -366,31 +366,31 @@ const MolDashboard = () => {
                 icon: "👨‍💼", 
                 label: "Ministry Employees", 
                 color: "from-blue-600 to-blue-700",
-                description: "Access to lands and mines data, policy management, and system administration"
-              },
-              { 
-                icon: "🏠", 
-                label: "Land Officers", 
-                color: "from-green-600 to-green-700",
-                description: "Process land deeds, property records, and land use approvals"
+                description: "Access to mines and energy data, policy management, and system administration"
               },
               { 
                 icon: "⛏️", 
                 label: "Mining Officers", 
-                color: "from-purple-600 to-purple-700",
+                color: "from-green-600 to-green-700",
                 description: "Process mining permits, conduct inspections, and monitor mining operations"
               },
               { 
-                icon: "🗺️", 
-                label: "Surveyors", 
-                color: "from-orange-600 to-orange-700",
-                description: "Conduct land surveys, boundary demarcation, and mapping services"
+                icon: "⚡", 
+                label: "Energy Officers", 
+                color: "from-yellow-600 to-yellow-700",
+                description: "Manage energy projects, renewable resources, and power distribution"
               },
               { 
-                icon: "⚖️", 
-                label: "Dispute Resolution", 
+                icon: "🔍", 
+                label: "Geologists", 
+                color: "from-orange-600 to-orange-700",
+                description: "Conduct mineral exploration, geological surveys, and resource assessment"
+              },
+              { 
+                icon: "✅", 
+                label: "Compliance Officers", 
                 color: "from-red-600 to-red-700",
-                description: "Handle land disputes, mediation, and conflict resolution processes"
+                description: "Enforce regulations, conduct audits, and ensure environmental compliance"
               },
               { 
                 icon: "🔐", 
@@ -417,10 +417,10 @@ const MolDashboard = () => {
       <footer className="relative z-30 py-8 text-center bg-gray-50 border-t border-gray-200">
         <div className="max-w-7xl mx-auto">
           <p className="text-gray-600 text-sm">
-            © {new Date().getFullYear()} Ministry of Lands & Mines - Digital Liberia. All rights reserved.
+            © {new Date().getFullYear()} Ministry of Mines and Energy - Digital Liberia. All rights reserved.
           </p>
           <p className="text-gray-500 text-xs mt-2">
-            Advanced Lands & Mines Management System • Powered by Digital Liberia NDMS
+            Advanced Mines and Energy Management System • Powered by Digital Liberia NDMS
           </p>
         </div>
       </footer>
