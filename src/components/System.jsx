@@ -145,8 +145,8 @@ const ministries = [
   },
   {
     id: "lands",
-    name: "Ministry of Lands & Mines",
-    description: "Land deeds, mining permits, and property records",
+    name: "Ministry of Mines and Energy",
+    description: "Mining permits, energy resources, and mineral records",
     icon: "/logos/mol.png",
     path: "/mol/dashboard"
   },
@@ -170,6 +170,13 @@ const ministries = [
     description: "Youth programs and sporting events",
     icon: "/logos/moy.png",
     path: "/moy/dashboard"
+  },
+  {
+    id: "land-authority",
+    name: "Liberia Land Authority",
+    description: "Land deeds, property records, and land administration",
+    icon: "/logos/lla.png",
+    path: "/lla/dashboard"
   }
 ];
 
@@ -484,7 +491,8 @@ const System = () => {
         lands: "MOL",
         commerce: "MOC",
         labour: "MOLL",
-        youth: "MOY"
+        youth: "MOY",
+        "land-authority": "LLA"
       };
       
       const ministryPrefix = ministryPrefixMap[ministryId];
@@ -526,7 +534,8 @@ const System = () => {
       lands: "MOL",
       commerce: "MOC",
       labour: "MOLL",
-      youth: "MOY"
+      youth: "MOY",
+      "land-authority": "LLA"
     };
     
     const ministryPrefix = ministryPrefixMap[ministryId];
