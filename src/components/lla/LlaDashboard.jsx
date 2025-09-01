@@ -50,7 +50,6 @@ const LlaDashboard = () => {
   const [verifyUPTC, setVerifyUPTC] = useState("");
   const [verificationResult, setVerificationResult] = useState(null);
   const [verifying, setVerifying] = useState(false);
-  const [activeTab, setActiveTab] = useState("generate"); // "generate" or "verify"
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -304,181 +303,190 @@ const LlaDashboard = () => {
 
         {/* UPTC Management Section */}
         <section className="max-w-7xl mx-auto mb-12">
-          <div className="bg-white rounded-2xl border border-blue-200 shadow-lg overflow-hidden">
-            {/* Tabs */}
-            <div className="flex border-b border-gray-200">
-              <button
-                className={`px-6 py-4 font-semibold text-lg ${activeTab === "generate" ? "text-blue-700 border-b-2 border-blue-700" : "text-gray-500"}`}
-                onClick={() => setActiveTab("generate")}
-              >
-                Generate UPTC
-              </button>
-              <button
-                className={`px-6 py-4 font-semibold text-lg ${activeTab === "verify" ? "text-blue-700 border-b-2 border-blue-700" : "text-gray-500"}`}
-                onClick={() => setActiveTab("verify")}
-              >
-                Verify UPTC
-              </button>
+          {/* Generate UPTC Container */}
+          <div className="bg-white rounded-2xl border border-blue-200 shadow-lg overflow-hidden mb-8">
+            <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+              <h2 className="text-2xl font-bold">Generate Unique Property Token Code (UPTC)</h2>
             </div>
-
-            {/* Tab Content */}
+            
             <div className="p-8">
-              {activeTab === "generate" ? (
+              <form onSubmit={handleGenerateUPTC} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">County</label>
+                    <input
+                      type="text"
+                      name="county"
+                      value={generateData.county}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                      placeholder="Enter county"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
+                    <input
+                      type="text"
+                      name="postal_code"
+                      value={generateData.postal_code}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                      placeholder="Enter postal code"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Latitude</label>
+                    <input
+                      type="text"
+                      name="latitude"
+                      value={generateData.latitude}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                      placeholder="e.g., 6.300774"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Longitude</label>
+                    <input
+                      type="text"
+                      name="longitude"
+                      value={generateData.longitude}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                      placeholder="e.g., -10.79716"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Surveyor License ID</label>
+                    <input
+                      type="text"
+                      name="surveyor_license_id"
+                      value={generateData.surveyor_license_id}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                      placeholder="Enter your surveyor license ID"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={generating}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold disabled:opacity-50"
+                >
+                  {generating ? "Generating..." : "Generate UPTC"}
+                </button>
+              </form>
+
+              {generatedUPTC && (
+                <div className="mt-8 p-6 bg-green-50 border border-green-200 rounded-2xl">
+                  <h3 className="text-lg font-semibold text-green-800 mb-2">UPTC Generated Successfully!</h3>
+                  <div className="flex items-center space-x-4">
+                    <span className="text-2xl">✅</span>
+                    <div>
+                      <p className="text-green-700 font-mono break-all">{generatedUPTC}</p>
+                      <p className="text-sm text-green-600 mt-2">
+                        This UPTC code can now be used to verify the land credentials.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Verify UPTC Container */}
+          <div className="bg-white rounded-2xl border border-blue-200 shadow-lg overflow-hidden">
+            <div className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-800 text-white">
+              <h2 className="text-2xl font-bold">Verify Unique Property Token Code (UPTC)</h2>
+            </div>
+            
+            <div className="p-8">
+              <form onSubmit={handleVerifyUPTC} className="space-y-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-blue-900 mb-6">Generate Unique Property Token Code (UPTC)</h2>
-                  <form onSubmit={handleGenerateUPTC} className="space-y-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">UPTC Code</label>
+                  <input
+                    type="text"
+                    value={verifyUPTC}
+                    onChange={(e) => setVerifyUPTC(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                    placeholder="Enter UPTC code to verify"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={verifying}
+                  className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg font-semibold disabled:opacity-50"
+                >
+                  {verifying ? "Verifying..." : "Verify UPTC"}
+                </button>
+              </form>
+
+              {verificationResult && (
+                <div className="mt-8">
+                  <div className="p-6 bg-blue-50 border border-blue-200 rounded-2xl mb-6">
+                    <h3 className="text-lg font-semibold text-blue-800 mb-4">UPTC Verification Results</h3>
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">County</label>
-                        <input
-                          type="text"
-                          name="county"
-                          value={generateData.county}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                          placeholder="Enter county"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
-                        <input
-                          type="text"
-                          name="postal_code"
-                          value={generateData.postal_code}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                          placeholder="Enter postal code"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Latitude</label>
-                        <input
-                          type="text"
-                          name="latitude"
-                          value={generateData.latitude}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                          placeholder="e.g., 6.300774"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Longitude</label>
-                        <input
-                          type="text"
-                          name="longitude"
-                          value={generateData.longitude}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                          placeholder="e.g., -10.79716"
-                        />
-                      </div>
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Surveyor License ID</label>
-                        <input
-                          type="text"
-                          name="surveyor_license_id"
-                          value={generateData.surveyor_license_id}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                          placeholder="Enter your surveyor license ID"
-                        />
-                      </div>
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={generating}
-                      className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold disabled:opacity-50"
-                    >
-                      {generating ? "Generating..." : "Generate UPTC"}
-                    </button>
-                  </form>
-
-                  {generatedUPTC && (
-                    <div className="mt-8 p-6 bg-green-50 border border-green-200 rounded-2xl">
-                      <h3 className="text-lg font-semibold text-green-800 mb-2">UPTC Generated Successfully!</h3>
-                      <div className="flex items-center space-x-4">
-                        <span className="text-2xl">✅</span>
-                        <div>
-                          <p className="text-green-700 font-mono break-all">{generatedUPTC}</p>
-                          <p className="text-sm text-green-600 mt-2">
-                            This UPTC code can now be used to verify the land credentials.
-                          </p>
+                        <h4 className="font-medium text-blue-700 mb-2">Land Information</h4>
+                        <div className="space-y-2 text-sm">
+                          <p><span className="font-medium">Parcel ID:</span> {verificationResult.land_parcel.parcel_id}</p>
+                          <p><span className="font-medium">County:</span> {verificationResult.land_parcel.county}</p>
+                          <p><span className="font-medium">Postal Code:</span> {verificationResult.land_parcel.postal_code}</p>
+                          <p><span className="font-medium">Coordinates:</span> {verificationResult.land_parcel.latitude}, {verificationResult.land_parcel.longitude}</p>
+                          <p><span className="font-medium">Date Surveyed:</span> {new Date(verificationResult.land_parcel.date_surveyed).toLocaleDateString()}</p>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div>
-                  <h2 className="text-2xl font-bold text-blue-900 mb-6">Verify Unique Property Token Code (UPTC)</h2>
-                  <form onSubmit={handleVerifyUPTC} className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">UPTC Code</label>
-                      <input
-                        type="text"
-                        value={verifyUPTC}
-                        onChange={(e) => setVerifyUPTC(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required
-                        placeholder="Enter UPTC code to verify"
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={verifying}
-                      className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg font-semibold disabled:opacity-50"
-                    >
-                      {verifying ? "Verifying..." : "Verify UPTC"}
-                    </button>
-                  </form>
-
-                  {verificationResult && (
-                    <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-2xl">
-                      <h3 className="text-lg font-semibold text-blue-800 mb-4">UPTC Verification Results</h3>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <h4 className="font-medium text-blue-700 mb-2">Land Information</h4>
-                          <div className="space-y-2 text-sm">
-                            <p><span className="font-medium">Parcel ID:</span> {verificationResult.land_parcel.parcel_id}</p>
-                            <p><span className="font-medium">County:</span> {verificationResult.land_parcel.county}</p>
-                            <p><span className="font-medium">Postal Code:</span> {verificationResult.land_parcel.postal_code}</p>
-                            <p><span className="font-medium">Coordinates:</span> {verificationResult.land_parcel.latitude}, {verificationResult.land_parcel.longitude}</p>
-                            <p><span className="font-medium">Date Surveyed:</span> {new Date(verificationResult.land_parcel.date_surveyed).toLocaleDateString()}</p>
-                          </div>
+                      <div>
+                        <h4 className="font-medium text-blue-700 mb-2">Surveyor Information</h4>
+                        <div className="space-y-2 text-sm">
+                          <p><span className="font-medium">License ID:</span> {verificationResult.surveyor.license_id}</p>
+                          <p><span className="font-medium">Name:</span> {verificationResult.surveyor.first_name} {verificationResult.surveyor.last_name}</p>
+                          <p><span className="font-medium">DSSN:</span> {verificationResult.surveyor.dssn}</p>
                         </div>
                         
-                        <div>
-                          <h4 className="font-medium text-blue-700 mb-2">Surveyor Information</h4>
-                          <div className="space-y-2 text-sm">
-                            <p><span className="font-medium">License ID:</span> {verificationResult.surveyor.license_id}</p>
-                            <p><span className="font-medium">Name:</span> {verificationResult.surveyor.first_name} {verificationResult.surveyor.last_name}</p>
-                            <p><span className="font-medium">DSSN:</span> {verificationResult.surveyor.dssn}</p>
-                          </div>
-                          
-                          {verificationResult.owners.length > 0 && (
-                            <div className="mt-4">
-                              <h4 className="font-medium text-blue-700 mb-2">Owners</h4>
-                              <div className="space-y-2 text-sm">
-                                {verificationResult.owners.map((owner, index) => (
-                                  <div key={index} className="border-t border-blue-100 pt-2">
-                                    <p><span className="font-medium">Name:</span> {owner.first_name} {owner.last_name}</p>
-                                    <p><span className="font-medium">DSSN:</span> {owner.dssn}</p>
-                                    <p><span className="font-medium">Address:</span> {owner.address}</p>
-                                  </div>
-                                ))}
-                              </div>
+                        {verificationResult.owners.length > 0 && (
+                          <div className="mt-4">
+                            <h4 className="font-medium text-blue-700 mb-2">Owners</h4>
+                            <div className="space-y-2 text-sm">
+                              {verificationResult.owners.map((owner, index) => (
+                                <div key={index} className="border-t border-blue-100 pt-2">
+                                  <p><span className="font-medium">Name:</span> {owner.first_name} {owner.last_name}</p>
+                                  <p><span className="font-medium">DSSN:</span> {owner.dssn}</p>
+                                  <p><span className="font-medium">Address:</span> {owner.address}</p>
+                                </div>
+                              ))}
                             </div>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  )}
+                  </div>
+                  
+                  {/* Google Maps Integration */}
+                  <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Property Location</h3>
+                    <div className="h-96 w-full rounded-xl overflow-hidden border border-gray-300">
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        frameBorder="0"
+                        style={{ border: 0 }}
+                        src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyATNMTYKT2bvDzWMBSKGl-HvYqNz1BzYfs&q=${verificationResult.land_parcel.latitude},${verificationResult.land_parcel.longitude}&zoom=15`}
+                        allowFullScreen
+                      ></iframe>
+                    </div>
+                    <p className="text-sm text-gray-600 mt-3 text-center">
+                      Coordinates: {verificationResult.land_parcel.latitude}, {verificationResult.land_parcel.longitude}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
