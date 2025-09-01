@@ -137,15 +137,21 @@ const AIChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
 
-  // API configuration
-  const baseUrl = "http://192.168.1.119:8080";
-  const chatUrl = `${baseUrl}/chat`;
-  const healthUrl = `${baseUrl}/health`;
+  // API configuration - using relative URL to avoid CORS issues
+  const baseUrl = window.location.origin; // Use the same origin as the website
+  const chatUrl = `${baseUrl}/api/chat`; // Proxy through your own server
+  const healthUrl = `${baseUrl}/api/health`; // Proxy through your own server
 
   // Check connection to AI server
   const checkConnection = async () => {
     try {
-      const response = await fetch(healthUrl, { timeout: 3000 });
+      const response = await fetch(healthUrl, { 
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+      
       if (response.ok) {
         const data = await response.json();
         setIsConnected(data.status === "healthy" && data.ollama === "connected");
@@ -169,7 +175,9 @@ const AIChat = () => {
     try {
       const response = await fetch(chatUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ message: inputMessage }),
       });
 
@@ -179,14 +187,14 @@ const AIChat = () => {
         setMessages(prev => [aiMessage, ...prev]);
       } else {
         const errorMessage = { 
-          text: "I'm experiencing some technical difficulties. Please make sure the server is running.", 
+          text: "I'm experiencing some technical difficulties. Please try again later.", 
           isUser: false 
         };
         setMessages(prev => [errorMessage, ...prev]);
       }
     } catch (error) {
       const errorMessage = { 
-        text: "I'm currently unavailable. Please check your connection and make sure the server is running on port 8080.", 
+        text: "I'm currently unavailable. Please check your connection and try again.", 
         isUser: false 
       };
       setMessages(prev => [errorMessage, ...prev]);
@@ -213,23 +221,23 @@ const AIChat = () => {
     <>
       {/* Floating AI Button */}
       <div 
-        className="fixed z-50 right-4 bottom-4 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:shadow-xl transition-all"
+        className="fixed z-50 right-4 bottom-4 w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:shadow-xl transition-all hover:scale-110"
         onClick={() => setIsChatOpen(true)}
       >
-        <div className="text-black text-xs font-bold text-center">
-          Digital Liberia Ai
+        <div className="text-white text-xs font-bold text-center px-1">
+          AI Assistant
         </div>
       </div>
 
       {/* Chat Modal */}
       {isChatOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-          <div className="bg-black w-full h-full max-w-4xl max-h-[90vh] rounded-lg flex flex-col">
+          <div className="bg-gray-900 w-full h-full max-w-4xl max-h-[90vh] rounded-lg flex flex-col border border-gray-700">
             {/* Header */}
-            <div className="p-4 border-b border-gray-800 flex justify-between items-center">
-              <h2 className="text-white text-lg font-bold">Digital Liberia AI</h2>
+            <div className="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-800">
+              <h2 className="text-white text-lg font-bold">Digital Liberia AI Assistant</h2>
               <button 
-                className="text-white hover:text-gray-300"
+                className="text-white hover:text-gray-300 text-xl"
                 onClick={() => setIsChatOpen(false)}
               >
                 ✕
@@ -237,43 +245,53 @@ const AIChat = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 bg-black">
+            <div className="flex-1 overflow-y-auto p-4 bg-gray-900">
+              {messages.length === 0 && !isLoading && (
+                <div className="text-center text-gray-400 my-8">
+                  <p>Hello! I'm your Digital Liberia AI assistant.</p>
+                  <p className="mt-2">How can I help you today?</p>
+                </div>
+              )}
+              
               {isLoading && (
                 <div className="flex items-center p-4 text-gray-400">
                   <div className="w-5 h-5 border-t-2 border-green-500 rounded-full animate-spin mr-2"></div>
                   Digital Liberia AI is thinking...
                 </div>
               )}
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex mb-4 ${message.isUser ? "justify-end" : "justify-start"}`}
-                >
-                  {!message.isUser && (
-                    <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center mr-2">
-                      <span className="text-white text-sm">AI</span>
-                    </div>
-                  )}
+              
+              <div className="space-y-4">
+                {messages.map((message, index) => (
                   <div
-                    className={`max-w-xs md:max-w-md p-3 rounded-lg ${
-                      message.isUser
-                        ? "bg-gray-700 text-white"
-                        : "bg-gray-900 text-white"
-                    }`}
+                    key={index}
+                    className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}
                   >
-                    {message.text}
-                  </div>
-                  {message.isUser && (
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center ml-2">
-                      <span className="text-white text-xs">You</span>
+                    {!message.isUser && (
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded flex items-center justify-center mr-2 flex-shrink-0">
+                        <span className="text-white text-xs">AI</span>
+                      </div>
+                    )}
+                    <div
+                      className={`max-w-xs md:max-w-md p-3 rounded-lg ${
+                        message.isUser
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-800 text-white"
+                      }`}
+                    >
+                      {message.text}
                     </div>
-                  )}
-                </div>
-              ))}
+                    {message.isUser && (
+                      <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center ml-2 flex-shrink-0">
+                        <span className="text-white text-xs">You</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Input Area */}
-            <div className="p-4 border-t border-gray-800 bg-gray-900">
+            <div className="p-4 border-t border-gray-700 bg-gray-800">
               <div className="flex">
                 <input
                   type="text"
@@ -281,13 +299,13 @@ const AIChat = () => {
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Message Digital Liberia AI..."
-                  className="flex-1 bg-gray-800 text-white rounded-l p-3 focus:outline-none"
+                  className="flex-1 bg-gray-700 text-white rounded-l p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={isLoading}
                 />
                 <button
                   onClick={sendMessage}
                   disabled={isLoading || !inputMessage.trim()}
-                  className="bg-green-600 text-white p-3 rounded-r hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-gradient-to-br from-blue-600 to-purple-600 text-white p-3 rounded-r hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
                 >
                   Send
                 </button>
@@ -315,12 +333,13 @@ const AIChat = () => {
 export default function Home() {
   const location = useLocation();
   const [activeLogo, setActiveLogo] = useState(0);
+  const [isAIOpen, setIsAIOpen] = useState(false);
 
   // Faster logo heartbeat (600ms instead of 1000ms)
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveLogo(prev => (prev + 1) % logos.length);
-    }, 600); // Changed from 1000ms to 600ms
+    }, 600);
     return () => clearInterval(interval);
   }, []);
 
@@ -347,15 +366,6 @@ export default function Home() {
               <div className="absolute inset-0 bg-black/5" />
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Digital Liberia AI Circle - Static at center right */}
-      <div className="fixed right-4 top-1/2 transform -translate-y-1/2 z-40">
-        <div className="bg-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
-          <div className="text-black text-xs font-bold text-center px-1">
-            Digital Liberia Ai
-          </div>
         </div>
       </div>
 
@@ -438,11 +448,56 @@ export default function Home() {
           </section>
         ))}
 
-        {/* New Contact Us Section with Unique Styling */}
+        {/* New AI Assistant Section */}
         <section
           className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12"
           style={{
             animation: `fadeInUp 0.5s ease-out ${sections.length * 0.1}s forwards`,
+            opacity: 0
+          }}
+        >
+          <div className="bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-indigo-600/10 backdrop-blur-lg rounded-xl border border-purple-400/30 p-6 md:p-8 shadow-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-white/20 pb-2">
+                Digital Liberia AI Assistant
+              </h2>
+              <div className="text-white space-y-4">
+                <p className="text-lg">
+                  Our AI assistant is powered by advanced machine learning models to help you navigate Digital Liberia's ecosystem. It can answer questions about our services, provide guidance on using our platforms, and offer insights into Liberia's digital transformation journey.
+                </p>
+                
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20 mt-4">
+                  <h3 className="text-xl font-semibold mb-2 text-purple-200">Features:</h3>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>24/7 assistance with Digital Liberia services</li>
+                    <li>Information about government digital initiatives</li>
+                    <li>Guidance on using LibPay and other platforms</li>
+                    <li>Answers to frequently asked questions</li>
+                    <li>Multi-language support (English and local dialects)</li>
+                  </ul>
+                </div>
+
+                <button
+                  onClick={() => setIsAIOpen(true)}
+                  className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 inline-flex items-center"
+                >
+                  <span>Chat with AI Assistant</span>
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* New Contact Us Section with Unique Styling */}
+        <section
+          className="w-full py-8 px-4 md:px-8 max-w-4xl mx-auto mb-12"
+          style={{
+            animation: `fadeInUp 0.5s ease-out ${(sections.length + 1) * 0.1}s forwards`,
             opacity: 0
           }}
         >
