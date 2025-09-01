@@ -129,46 +129,31 @@ const sections = [
   }
 ];
 
-// AI Chat Component with CORS proxy solution
+// AI Chat Component
 const AIChat = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
-  const [serverStatus, setServerStatus] = useState("Checking connection...");
 
-  // Using a proxy to avoid CORS issues
-  // In production, you should set up a proper backend proxy
-  const createProxyUrl = (endpoint) => {
-    // For development, we'll use a simple approach
-    // In production, you should set up a proper backend proxy
-    return `/api/proxy?url=${encodeURIComponent(`http://192.168.1.119:8080${endpoint}`)}`;
-  };
+  // API configuration
+  const baseUrl = "http://192.168.1.119:8080";
+  const chatUrl = `${baseUrl}/chat`;
+  const healthUrl = `${baseUrl}/health`;
 
   // Check connection to AI server
   const checkConnection = async () => {
     try {
-      setServerStatus("Checking connection...");
-      const response = await fetch(createProxyUrl('/health'), {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
+      const response = await fetch(healthUrl, { timeout: 3000 });
       if (response.ok) {
         const data = await response.json();
-        const connected = data.status === "healthy" && data.ollama === "connected";
-        setIsConnected(connected);
-        setServerStatus(connected ? "Connected to AI Server" : "Server not fully connected");
+        setIsConnected(data.status === "healthy" && data.ollama === "connected");
       } else {
         setIsConnected(false);
-        setServerStatus("Server responded with error");
       }
     } catch (error) {
       setIsConnected(false);
-      setServerStatus("Cannot connect to server");
     }
   };
 
@@ -182,20 +167,15 @@ const AIChat = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(createProxyUrl('/chat'), {
+      const response = await fetch(chatUrl, {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: inputMessage }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        const aiMessage = { 
-          text: data.response || "I'm here to help. What else would you like to know?", 
-          isUser: false 
-        };
+        const aiMessage = { text: data.response || "I'm here to help. What else would you like to know?", isUser: false };
         setMessages(prev => [aiMessage, ...prev]);
       } else {
         const errorMessage = { 
@@ -257,41 +237,39 @@ const AIChat = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 bg-black flex flex-col-reverse">
-              <div>
-                {isLoading && (
-                  <div className="flex items-center p-4 text-gray-400">
-                    <div className="w-5 h-5 border-t-2 border-green-500 rounded-full animate-spin mr-2"></div>
-                    Digital Liberia AI is thinking...
-                  </div>
-                )}
-                {messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={`flex mb-4 ${message.isUser ? "justify-end" : "justify-start"}`}
-                  >
-                    {!message.isUser && (
-                      <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center mr-2 flex-shrink-0">
-                        <span className="text-white text-sm">AI</span>
-                      </div>
-                    )}
-                    <div
-                      className={`max-w-xs md:max-w-md p-3 rounded-lg ${
-                        message.isUser
-                          ? "bg-gray-700 text-white"
-                          : "bg-gray-900 text-white"
-                      }`}
-                    >
-                      {message.text}
+            <div className="flex-1 overflow-y-auto p-4 bg-black">
+              {isLoading && (
+                <div className="flex items-center p-4 text-gray-400">
+                  <div className="w-5 h-5 border-t-2 border-green-500 rounded-full animate-spin mr-2"></div>
+                  Digital Liberia AI is thinking...
+                </div>
+              )}
+              {messages.map((message, index) => (
+                <div
+                  key={index}
+                  className={`flex mb-4 ${message.isUser ? "justify-end" : "justify-start"}`}
+                >
+                  {!message.isUser && (
+                    <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center mr-2">
+                      <span className="text-white text-sm">AI</span>
                     </div>
-                    {message.isUser && (
-                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center ml-2 flex-shrink-0">
-                        <span className="text-white text-xs">You</span>
-                      </div>
-                    )}
+                  )}
+                  <div
+                    className={`max-w-xs md:max-w-md p-3 rounded-lg ${
+                      message.isUser
+                        ? "bg-gray-700 text-white"
+                        : "bg-gray-900 text-white"
+                    }`}
+                  >
+                    {message.text}
                   </div>
-                ))}
-              </div>
+                  {message.isUser && (
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center ml-2">
+                      <span className="text-white text-xs">You</span>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
 
             {/* Input Area */}
@@ -321,17 +299,10 @@ const AIChat = () => {
                   }`}
                 ></div>
                 <span className={isConnected ? "text-green-400" : "text-red-400"}>
-                  {serverStatus}
+                  {isConnected
+                    ? "Connected to AI Server"
+                    : "AI Server not connected"}
                 </span>
-                <button 
-                  onClick={checkConnection}
-                  className="ml-4 text-blue-400 hover:text-blue-300 text-xs"
-                >
-                  Retry
-                </button>
-              </div>
-              <div className="mt-1 text-xs text-gray-500">
-                Server: http://192.168.1.119:8080
               </div>
             </div>
           </div>
@@ -349,7 +320,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveLogo(prev => (prev + 1) % logos.length);
-    }, 600);
+    }, 600); // Changed from 1000ms to 600ms
     return () => clearInterval(interval);
   }, []);
 
