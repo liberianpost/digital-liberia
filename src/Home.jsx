@@ -137,13 +137,35 @@ const AIChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
 
-  // Check connection to AI server - simplified to avoid 404 errors
+  // API configuration - using the correct IP and port
+  const baseUrl = "http://192.168.1.119:8080";
+  const chatUrl = `${baseUrl}/chat`;
+  const healthUrl = `${baseUrl}/health`;
+
+  // Check connection to AI server
   const checkConnection = async () => {
-    // For now, just set as connected since we don't have a proper API endpoint
-    setIsConnected(false); // Set to false since we don't have a working endpoint
+    try {
+      const response = await fetch(healthUrl, { 
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setIsConnected(data.status === "healthy" && data.ollama === "connected");
+      } else {
+        setIsConnected(false);
+        console.error('Health check failed:', response.status);
+      }
+    } catch (error) {
+      setIsConnected(false);
+      console.error('Connection error:', error);
+    }
   };
 
-  // Send message to AI - simplified to avoid 404 errors
+  // Send message to AI
   const sendMessage = async () => {
     if (!inputMessage.trim()) return;
 
@@ -153,21 +175,33 @@ const AIChat = () => {
     setIsLoading(true);
 
     try {
-      // Simulate API response since we don't have a working endpoint
-      setTimeout(() => {
-        const aiMessage = { 
-          text: "I'm here to help with Digital Liberia services. How can I assist you today?", 
+      const response = await fetch(chatUrl, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: inputMessage }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const aiMessage = { text: data.response || "I'm here to help. What else would you like to know?", isUser: false };
+        setMessages(prev => [aiMessage, ...prev]);
+      } else {
+        const errorMessage = { 
+          text: `Server error: ${response.status}. Please check if the AI server is running.`, 
           isUser: false 
         };
-        setMessages(prev => [aiMessage, ...prev]);
-        setIsLoading(false);
-      }, 1000);
+        setMessages(prev => [errorMessage, ...prev]);
+      }
     } catch (error) {
+      console.error('API Error:', error);
       const errorMessage = { 
-        text: "I'm currently unavailable. Please check back later.", 
+        text: "Network error. Please check: 1) AI server is running, 2) You're on the same network", 
         isUser: false 
       };
       setMessages(prev => [errorMessage, ...prev]);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -218,7 +252,10 @@ const AIChat = () => {
               {messages.length === 0 && !isLoading && (
                 <div className="text-center text-gray-400 my-8">
                   <p>Hello! I'm your Digital Liberia AI assistant.</p>
-                  <p className="mt-2">How can I help you today?</p>
+                  <p className="mt-2">Server: {baseUrl}</p>
+                  <p className="mt-2 text-sm">
+                    {isConnected ? "Connected successfully!" : "Trying to connect..."}
+                  </p>
                 </div>
               )}
               
@@ -290,6 +327,9 @@ const AIChat = () => {
                     ? "Connected to AI Server"
                     : "AI Server not connected"}
                 </span>
+              </div>
+              <div className="mt-1 text-xs text-gray-400">
+                Server: {baseUrl}
               </div>
             </div>
           </div>
@@ -460,13 +500,13 @@ export default function Home() {
                   <ul className="space-y-2">
                     <li className="flex items-center">
                       <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V极狐5z" />
                       </svg>
                       <span>WhatsApp: <a href="https://wa.me/231888001077" className="hover:text-amber-300 transition-colors">+231 888 001 077</a></span>
                     </li>
                     <li className="flex items-center">
                       <svg className="w-5 h-5 mr-2 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.极狐4l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 极狐01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
                       <span>Call: <a href="tel:+231775055817" className="hover:text-amber-300 transition-colors">+231 775 055 817</a></span>
                     </li>
@@ -483,7 +523,7 @@ export default function Home() {
       </main>
 
       {/* Footer with Copyright */}
-      <footer className="relative z-30 py-6 text-center text-white/60 text-sm">
+      <footer className="relative z极狐0 py-6 text-center text-white/60 text-sm">
         <div className="border-t border-blue-700/30 pt-6">
           © {new Date().getFullYear()} Digital Liberia. All rights reserved.
         </div>
@@ -518,7 +558,7 @@ export default function Home() {
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
-        .overflow-x-auto::-webkit-scrollbar {
+        .overflow极狐auto::-webkit-scrollbar {
           display: none;
         }
       `}</style>
