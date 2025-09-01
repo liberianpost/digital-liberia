@@ -129,6 +129,189 @@ const sections = [
   }
 ];
 
+// AI Chat Component
+const AIChat = () => {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+
+  // API configuration
+  const baseUrl = "http://192.168.1.119:8080";
+  const chatUrl = `${baseUrl}/chat`;
+  const healthUrl = `${baseUrl}/health`;
+
+  // Check connection to AI server
+  const checkConnection = async () => {
+    try {
+      const response = await fetch(healthUrl, { timeout: 3000 });
+      if (response.ok) {
+        const data = await response.json();
+        setIsConnected(data.status === "healthy" && data.ollama === "connected");
+      } else {
+        setIsConnected(false);
+      }
+    } catch (error) {
+      setIsConnected(false);
+    }
+  };
+
+  // Send message to AI
+  const sendMessage = async () => {
+    if (!inputMessage.trim()) return;
+
+    const userMessage = { text: inputMessage, isUser: true };
+    setMessages(prev => [userMessage, ...prev]);
+    setInputMessage("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(chatUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: inputMessage }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const aiMessage = { text: data.response || "I'm here to help. What else would you like to know?", isUser: false };
+        setMessages(prev => [aiMessage, ...prev]);
+      } else {
+        const errorMessage = { 
+          text: "I'm experiencing some technical difficulties. Please make sure the server is running.", 
+          isUser: false 
+        };
+        setMessages(prev => [errorMessage, ...prev]);
+      }
+    } catch (error) {
+      const errorMessage = { 
+        text: "I'm currently unavailable. Please check your connection and make sure the server is running on port 8080.", 
+        isUser: false 
+      };
+      setMessages(prev => [errorMessage, ...prev]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle Enter key press
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !isLoading) {
+      sendMessage();
+    }
+  };
+
+  // Check connection when chat opens
+  useEffect(() => {
+    if (isChatOpen) {
+      checkConnection();
+    }
+  }, [isChatOpen]);
+
+  return (
+    <>
+      {/* Floating AI Button */}
+      <div 
+        className="fixed z-50 right-4 bottom-4 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:shadow-xl transition-all"
+        onClick={() => setIsChatOpen(true)}
+      >
+        <div className="text-black text-xs font-bold text-center">
+          Digital Liberia Ai
+        </div>
+      </div>
+
+      {/* Chat Modal */}
+      {isChatOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+          <div className="bg-black w-full h-full max-w-4xl max-h-[90vh] rounded-lg flex flex-col">
+            {/* Header */}
+            <div className="p-4 border-b border-gray-800 flex justify-between items-center">
+              <h2 className="text-white text-lg font-bold">Digital Liberia AI</h2>
+              <button 
+                className="text-white hover:text-gray-300"
+                onClick={() => setIsChatOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 bg-black">
+              {isLoading && (
+                <div className="flex items-center p-4 text-gray-400">
+                  <div className="w-5 h-5 border-t-2 border-green-500 rounded-full animate-spin mr-2"></div>
+                  Digital Liberia AI is thinking...
+                </div>
+              )}
+              {messages.map((message, index) => (
+                <div
+                  key={index}
+                  className={`flex mb-4 ${message.isUser ? "justify-end" : "justify-start"}`}
+                >
+                  {!message.isUser && (
+                    <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center mr-2">
+                      <span className="text-white text-sm">AI</span>
+                    </div>
+                  )}
+                  <div
+                    className={`max-w-xs md:max-w-md p-3 rounded-lg ${
+                      message.isUser
+                        ? "bg-gray-700 text-white"
+                        : "bg-gray-900 text-white"
+                    }`}
+                  >
+                    {message.text}
+                  </div>
+                  {message.isUser && (
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center ml-2">
+                      <span className="text-white text-xs">You</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Input Area */}
+            <div className="p-4 border-t border-gray-800 bg-gray-900">
+              <div className="flex">
+                <input
+                  type="text"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Message Digital Liberia AI..."
+                  className="flex-1 bg-gray-800 text-white rounded-l p-3 focus:outline-none"
+                  disabled={isLoading}
+                />
+                <button
+                  onClick={sendMessage}
+                  disabled={isLoading || !inputMessage.trim()}
+                  className="bg-green-600 text-white p-3 rounded-r hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Send
+                </button>
+              </div>
+              <div className="mt-2 flex items-center text-sm">
+                <div
+                  className={`w-3 h-3 rounded-full mr-2 ${
+                    isConnected ? "bg-green-500" : "bg-red-500"
+                  }`}
+                ></div>
+                <span className={isConnected ? "text-green-400" : "text-red-400"}>
+                  {isConnected
+                    ? "Connected to AI Server"
+                    : "AI Server not connected"}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
 export default function Home() {
   const location = useLocation();
   const [activeLogo, setActiveLogo] = useState(0);
@@ -164,6 +347,15 @@ export default function Home() {
               <div className="absolute inset-0 bg-black/5" />
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Digital Liberia AI Circle - Static at center right */}
+      <div className="fixed right-4 top-1/2 transform -translate-y-1/2 z-40">
+        <div className="bg-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+          <div className="text-black text-xs font-bold text-center px-1">
+            Digital Liberia Ai
+          </div>
         </div>
       </div>
 
@@ -318,6 +510,9 @@ export default function Home() {
           © {new Date().getFullYear()} Digital Liberia. All rights reserved.
         </div>
       </footer>
+
+      {/* AI Chat Component */}
+      <AIChat />
 
       {/* Global Styles - Updated with heartbeat animation */}
       <style jsx global>{`
