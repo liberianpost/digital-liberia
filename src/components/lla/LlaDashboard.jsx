@@ -20,6 +20,330 @@ const logos = [
   "/logos/liberia.png"
 ];
 
+// County and postal code data
+const counties = [
+  "Bomi", "Bong", "Gbarpolu", "Grand Bassa", "Grand Cape Mount", 
+  "Grand Gedeh", "Grand Kru", "Lofa", "Margibi", "Maryland", 
+  "Montserrado", "Nimba", "Rivercess", "River Gee", "Sinoe"
+];
+
+const postalCodes = {
+  "Montserrado": [
+    { code: "10101", area: "BENTOL - BENSONVILLE - DISTRICT 1" },
+    { code: "10102", area: "CAREYSBURG - CAREYSBURG - DISTRICT 1" },
+    { code: "10103", area: "TODEE - TODEE - DISTRICT 1" },
+    { code: "10104", area: "LOUISIANA - LOUISIANA - DISTRICT 1" },
+    { code: "10201", area: "JOHNSONVILLE - JOHNSONVILLE - DISTRICT 2" },
+    { code: "10202", area: "DOUBLE BRIDGE - SOMALIA DRIVE - DISTRICT 2" },
+    { code: "10203", area: "JACOB TOWN - SOMALIA DRIVE - DISTRICT 2" },
+    { code: "10204", area: "ZINC FACTORY - SOMALIA DRIVE - DISTRICT 2" },
+    { code: "10205", area: "MOUNT BARCLAY - MOUNT BARCLAY - DISTRICT 2" },
+    { code: "10301", area: "PIPELINE - PAYNESVILLE - DISTRICT 3" },
+    { code: "10302", area: "MORRIS FARM - PAYNESVILLE - DISTRICT 3" },
+    { code: "10303", area: "WOOD CAMP - PAYNESVILLE - DISTRICT 3" },
+    { code: "10304", area: "NEEZOE - PAYNESVILLE - DISTRICT 3" },
+    { code: "10401", area: "BARNARD FARM - PAYNESVILLE - DISTRICT 4" },
+    { code: "10402", area: "OMEGA/KEMAH TOWN - PAYNESVILLE - DISTRICT 4" },
+    { code: "10403", area: "PAYESVILLE JOE BAR - PAYNESVILLE - DISTRICT 4" },
+    { code: "10404", area: "DUPORT ROAD - PAYNESVILLE - DISTRICT 4" },
+    { code: "10501", area: "RED LIGHT - PAYNESVILLE - DISTRICT 5" },
+    { code: "10502", area: "POLICE ACADEMY - PAYNESVILLE - DISTRICT 5" },
+    { code: "10503", area: "BASSA TOWN - PAYNESVILLE - DISTRICT 5" },
+    { code: "10504", area: "72ND - PAYNESVILLE - DISTRICT 5" },
+    { code: "10505", area: "TOWN HALL - PAYNESVILLE - DISTRICT 5" },
+    { code: "10506", area: "A.B TOLBERT ROAD - PAYNESVILLE - DISTRICT 5" },
+    { code: "10507", area: "PAGOS ISLAND - PAYNESVILLE - DISTRICT 5" },
+    { code: "10508", area: "SWANKAMORE - PAYNESVILLE - DISTRICT 5" },
+    { code: "10601", area: "GSA ROAD ROCKVILLE - PAYNESVILLE - DISTRICT 6" },
+    { code: "10602", area: "S.D COOPER ROAD - PAYNESVILLE - DISTRICT 6" },
+    { code: "10603", area: "KPELLE TOWN - PAYNESVILLE - DISTRICT 6" },
+    { code: "10604", area: "KING GRAY - PAYNESVILLE - DISTRICT 6" },
+    { code: "10605", area: "ELWA - PAYNESVILLE - DISTRICT 6" },
+    { code: "10606", area: "REHAB/BORBOR TOWN - PAYNESVILLE - DISTRICT 6" },
+    { code: "10607", area: "KENDE-JAH - PAYNESVILLE - DISTRICT 6" },
+    { code: "10608", area: "THINKER'S VILLAGE - PAYNESVILLE - DISTRICT 6" },
+    { code: "10609", area: "BAPTIST SEMINARY - ROBERT'S FIELD HIGH WAY - DISTRICT 6" },
+    { code: "10610", area: "WAMBA TOWN - ROBERT'S FIELD HIGH WAY - DISTRICT 6" },
+    { code: "10701", area: "WEST POINT - WEST POINT TOWNSHIP - DISTRICT 7" },
+    { code: "10702", area: "ROCK CRUSHER - CENTRAL MONROVIA - DISTRICT 7" },
+    { code: "10703", area: "SNAPPER HILL - CENTRAL MONROVIA - DISTRICT 7" },
+    { code: "10704", area: "MAMBA POINT - CENTRAL MONROVIA - DISTRICT 7" },
+    { code: "10705", area: "U. N. DRIVE - CENTRAL MONROVIA - DISTRICT 7" },
+    { code: "10706", area: "RANDALL/NEWPORT/LYNCH STREET - CENTRAL MONROVIA - DISTRICT 7" },
+    { code: "10707", area: "CAREY/GURLEY/MECHLIN STREET - CENTRAL MONROVIA - DISTRICT 7" },
+    { code: "10708", area: "BROAD/ASHMUN STREET - CENTRAL MONROVIA - DISTRICT 7" },
+    { code: "10709", area: "BENSON/WARREN/PERRY/CLAY/JOHNSON STREET - CENTRAL MONROVIA - DISTRICT 7" },
+    { code: "10801", area: "CROWN HILL - MONROVIA - DISTRICT 8" },
+    { code: "10802", area: "SLIP WAY - MONROVIA - DISTRICT 8" },
+    { code: "10803", area: "SONIWEIN - MONROVIA - DISTRICT 8" },
+    { code: "10804", area: "BUZZI QUARTERS - MONROVIA - DISTRICT 8" },
+    { code: "10805", area: "JALLAH TOWN - MONROVIA - DISTRICT 8" },
+    { code: "10806", area: "CAPITAL HILL - MONROVIA - DISTRICT 8" },
+    { code: "10807", area: "SINKOR (1ST - 12) STREET - MONROVIA - DISTRICT 8" },
+    { code: "10901", area: "SINKOR (13 - 24) STREET - MONROVIA - DISTRICT 9" },
+    { code: "10902", area: "NEW MATADI - MONROVIA - DISTRICT 9" },
+    { code: "10903", area: "OLD MATADI - MONROVIA - DISTRICT 9" },
+    { code: "10904", area: "LAKPAZEE - MONROVIA - DISTRICT 9" },
+    { code: "10905", area: "FIAMA - MONROVIA - DISTRICT 9" },
+    { code: "10906", area: "RAYMOND FIELD - MONROVIA - DISTRICT 9" },
+    { code: "10907", area: "GBANGAYE TOWN - MONROVIA - DISTRICT 9" },
+    { code: "10908", area: "AIRFIELD - MONROVIA - DISTRICT 9" },
+    { code: "10909", area: "WROTO TOWN - MONROVIA - DISTRICT 9" },
+    { code: "10910", area: "FISH MARKET - MONROVIA - DISTRICT 9" },
+    { code: "11001", area: "KEY & DEATH HOLE - OLD ROAD - DISTRICT 10" },
+    { code: "11002", area: "CATHOLIC HOSPITAL - OLD ROAD - DISTRICT 10" },
+    { code: "11003", area: "DIVINE & TOGBA CAMP - OLD ROAD - DISTRICT 10" },
+    { code: "11004", area: "NIPPAY TOWN - OLD ROAD - DISTRICT 10" },
+    { code: "11005", area: "SMYTHE ROAD - OLD ROAD - DISTRICT 10" },
+    { code: "11006", area: "CHUGBOR - OLD ROAD - DISTRICT 10" },
+    { code: "11007", area: "GAYE TOWN COMMUNITY - OLD ROAD - DISTRICT 10" },
+    { code: "11008", area: "TARR TOWN - OLD ROAD - DISTRICT 10" },
+    { code: "11009", area: "YEKPEE TOWN - OLD ROAD - DISTRICT 10" },
+    { code: "11010", area: "PEACE ISLAND - CONGO TOWN - DISTRICT 10" },
+    { code: "11011", area: "CONGO TOWN - CONGO TOWN - DISTRICT 10" },
+    { code: "11101", area: "CASSAVA HILL - CALDWELL TOWNSHIP - DISTRICT 11" },
+    { code: "11102", area: "SAMUKAI TOWN - CALDWELL TOWNSHIP - DISTRICT 11" },
+    { code: "11103", area: "DIXVILLE - DIXVILLE TOWNSHIP - DISTRICT 11" },
+    { code: "11104", area: "CALDWELL - CALDWELL TOWNSHIP - DISTRICT 11" },
+    { code: "11105", area: "KABA TOWN - BARDNERSVILLE TOWNSHIP - DISTRICT 11" },
+    { code: "11106", area: "BEHWEIN COMMUNITY - BARDNERSVILLE TOWNSHIP - DISTRICT 11" },
+    { code: "11107", area: "BARNESVILLE ESTATE - BARDNERSVILLE TOWNSHIP - DISTRICT 11" },
+    { code: "11108", area: "GRASS FIELD - BARDNERSVILLE TOWNSHIP - DISTRICT 11" },
+    { code: "11109", area: "DAY BREAK MOUTH OPEN - BARDNERSVILLE TOWNSHIP - DISTRICT 11" },
+    { code: "11201", area: "JOHNSONVILLE ROAD - BARDNERSVILLE TOWNSHIP - DISTRICT 12" },
+    { code: "11202", area: "CHICKEN SOUP FACTORY - GARDNERSVILLE TOWNSHIP - DISTRICT 12" },
+    { code: "11203", area: "SHOE FACTORY - GARDNERSVILLE TOWNSHIP - DISTRICT 12" },
+    { code: "11204", area: "MTA - GARDNERSVILLE TOWNSHIP -DISTRICT 12" },
+    { code: "11205", area: "STEPHEN TOLBERT ESTATE - GARDNERSVILLE TOWNSHIP - DISTRICT 12" },
+    { code: "11206", area: "RIVER VIEW - GARDNERSVILLE TOWNSHIP - DISTRICT 12" },
+    { code: "11207", area: "KESSELLY BOULEVARD - GARDNERSVILLE TOWNSHIP - DISTRICT 12" },
+    { code: "11208", area: "MANGROVE ISLAND - GARDNERSVILLE TOWNSHIP - DISTRICT 12" },
+    { code: "11209", area: "J.J.Y. SNOW HILL - GARDNERSVILLE TOWNSHIP - DISTRICT 12" },
+    { code: "11301", area: "NEW GEORGIA - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
+    { code: "11302", area: "ST. MICHEAL - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
+    { code: "11303", area: "CHOCOLATE CITY - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
+    { code: "11304", area: "IRON FACTORY - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
+    { code: "11305", area: "SOS TRANSIT - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
+    { code: "11306", area: "NEW GEORGIA ESTATE - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
+    { code: "11307", area: "BASSA TOWN - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
+    { code: "11308", area: "TOPOE VILLAGE - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
+    { code: "11309", area: "BATTERY FACTORY - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
+    { code: "11310", area: "FLAHN TOWN - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
+    { code: "11311", area: "STOCKTON CREEK - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
+    { code: "11312", area: "JAMAICA ROAD - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
+    { code: "11401", area: "FREE PORT COMMUNITY - GARGLORH TOWNSHIP - DISTRICT 14" },
+    { code: "11402", area: "COW FACTORY - GARGLORH TOWNSHIP - DISTRICT 14" },
+    { code: "11403", area: "STRUGGLE COMMUNITY - GARGLORH TOWNSHIP - DISTRICT 14" },
+    { code: "11404", area: "HOPE COMMUNITY - GARGLORH TOWNSHIP - DISTRICT 14" },
+    { code: "11405", area: "PEUGEOT GARAGE - GARGLORH TOWNSHIP - DISTRICT 14" },
+    { code: "11406", area: "PAITY TOWN - GARGLORH TOWNSHIP - DISTRICT 14" },
+    { code: "11407", area: "RIVER VIEW - GARGLORH TOWNSHIP - DISTRICT 14" },
+    { code: "11408", area: "CLARA TOWN - GARGLORH TOWNSHIP - DISTRICT 14" },
+    { code: "11409", area: "GIBLATA - GARGLORH TOWNSHIP - DISTRICT 14" },
+    { code: "11410", area: "VIA TOWN - GARGLORH TOWNSHIP - DISTRICT 14" },
+    { code: "11501", area: "LOGAN TOWN - GARGLORH TOWNSHIP - DISTRICT 15" },
+    { code: "11502", area: "GBANDI TOWN - GARGLORH TOWNSHIP - DISTRICT 15" },
+    { code: "11503", area: "ZINC CAMP - GARGLORH TOWNSHIP - DISTRICT 15" },
+    { code: "11504", area: "ZONDO TOWN - GARGLORH TOWNSHIP - DISTRICT 15" },
+    { code: "11505", area: "BLAMO TOWN - GARGLORH TOWNSHIP - DISTRICT 15" },
+    { code: "11506", area: "KING PETER TOWN - GARGLORH TOWNSHIP - DISTRICT 15" },
+    { code: "11601", area: "ST. PAUL BRIDGE - BOROUGH OF KRU TOWN - DISTRICT 16" },
+    { code: "11602", area: "TWEH FARM - BOROUGH OF KRU TOWN - DISTRICT 16" },
+    { code: "11603", area: "MONBOE TOWN - BOROUGH OF KRU TOWN - DISTRICT 16" },
+    { code: "11604", area: "LAGOON - BOROUGH OF KRU TOWN - DISTRICT 16" },
+    { code: "11605", area: "NEW KRU TOWN - BOROUGH OF KRU TOWN - DISTRICT 16" },
+    { code: "11606", area: "FUNDAYE - BOROUGH OF KRU TOWN - DISTRICT 16" },
+    { code: "11607", area: "DUALA MARKET - BOROUGH OF KRU TOWN - DISTRICT 16" },
+    { code: "11608", area: "NYUANTOWN - BOROUGH OF KRU TOWN - DISTRICT 16" },
+    { code: "11609", area: "BONG MINES BRIDGE - BOROUGH OF KRU TOWN - DISTRICT 16" },
+    { code: "11610", area: "POPO BEACH - BOROUGH OF KRU TOWN - DISTRICT 16" },
+    { code: "11611", area: "POINT FOUR (4) - BOROUGH OF KRU TOWN - DISTRICT 16" },
+    { code: "11701", area: "GBARVEAH - ARTHINGTON - DISTRICT 17" },
+    { code: "11702", area: "BONOWAH - ARTHINGTON - DISTRICT 17" },
+    { code: "11703", area: "DINEEKON - ARTHINGTON - DISTRICT 17" },
+    { code: "11704", area: "CENTRAL ARTHINGTON - ARTHINGTON - DISTRICT 17" },
+    { code: "11705", area: "MILLSBURG - ARTHINGTON - DISTRICT 17" },
+    { code: "11706", area: "LUNEH - CLAY ASHLAND - DISTRICT 17" },
+    { code: "11707", area: "BARCON - CLAY ASHLAND - DISTRICT 17" },
+    { code: "11708", area: "KAIKPU - CLAY ASHLAND - DISTRICT 17" },
+    { code: "11709", area: "VIRGINIA - VIRGINIA TOWNSHIP - DISTRICT 17" },
+    { code: "11710", area: "SUNDUFU - CHEESEMANBURG TOWNSHIP - DISTRICT 17" },
+    { code: "11711", area: "CHEESEMANBURG - CHEESEMANBURG TOWNSHIP - DISTRICT 17" },
+    { code: "11712", area: "BREWERVILLE - BREWERVILLE - DISTRICT 17" },
+    { code: "11713", area: "ROYESVILLE - ROYESVILLE TOWNSHIP - DISTRICT 17" },
+    { code: "11714", area: "ACROSS THE CREEK - ROYESVILLE TOWNSHIP - DISTRICT 17" }
+  ],
+  "Bong": [
+    { code: "30101", area: "DOE - DOE - KOKOYAH" },
+    { code: "30102", area: "NANGBO - NANGBO - KOKOYAH" },
+    { code: "30103", area: "TIKPAH - TIKPAH - TUKPAHBLEE" },
+    { code: "30104", area: "MELEKEI - MELEKEI - TUKPAHBLEE" },
+    { code: "30105", area: "DEAN TOWN - DEAN - BEINSEN" },
+    { code: "30106", area: "U-LA - U-LA - BEINSEN" },
+    { code: "30107", area: "BEHWEE - BEHWEE - BEINSEN" },
+    { code: "30108", area: "DUTA - DUTA - KPAAI" },
+    { code: "30109", area: "WOLATA - WOLATA - KPAAI" },
+    { code: "30201", area: "TAMAY TA - TAMAY TA - JORQUELLEH 2" },
+    { code: "30202", area: "GBENEQUELLEH - GBENEQUELLEH - JORQUELLEH 2" },
+    { code: "30203", area: "JANKPAYAH - JANKPAYAH - JORQUELLEH 2" },
+    { code: "30204", area: "SAMAY - SAMAY - JORQUELLEH 2" },
+    { code: "30205", area: "MANO-WEASUE - MANOWEASUE - JORQUELLLEH 2" },
+    { code: "30206", area: "JANYEA - JANYEA - JORQUELLEH 2" },
+    { code: "30207", area: "KOLLIETA-MULA - KOLLIETA-MULA - JORQUELLEH 2" },
+    { code: "30301", area: "MELEKEI - GBARNGA - JORQUELLEH 1" },
+    { code: "30302", area: "CAMP TUBMAN BARRACK - GBARNGA - JORQUELLEH 1" },
+    { code: "30303", area: "RUBBER FACTORY - GBARNGA - JORQUELLEH 1" },
+    { code: "30304", area: "LOFA ROAD - GBARNGA - JORQUELLEH 1" },
+    { code: "30305", area: "IRON GATE - GBARNGA - JORQUELLEH 1" },
+    { code: "30306", area: "OLD IRON GATE - GBARNGA - JORQUELLEH 1" },
+    { code: "30307", area: "BROOKLYN - GBARNGA - JORQUELLEH 1" },
+    { code: "30308", area: "SUGAR HILL - GBARNGA - JORQUELLEH 1" },
+    { code: "30309", area: "FAR EAST - GBARNGA - JORQUELLEH 1" },
+    { code: "30310", area: "BROAD STREET - GBARNGA - JORQUELLEH 1" },
+    { code: "30311", area: "LELEKPAYEA - GBARNGA - JORQUELLEH 1" },
+    { code: "30312", area: "LPMC ROAD - GBARNGA - JORQUELLLEH 1" },
+    { code: "30313", area: "GANTA PARKING - GBARNGA - JORQUELLEH 1" },
+    { code: "30314", area: "COUNTY FIELD - GBARNGA - JORQUELLEH 1" },
+    { code: "30315", area: "WONGBA - WONGBA - JORQUELLEH 1" },
+    { code: "30316", area: "GBAOTA - GBAOTA - JORQUELLEH 1" },
+    { code: "30317", area: "KPANYAH - KPANYAH - JORQUELLEH 1" },
+    { code: "30318", area: "GBARMUE - GBARMUE - JORQUELLEH 1" },
+    { code: "30401", area: "MOAGAN - MOAGAN - PANTA" },
+    { code: "30402", area: "JORWAH - JORWAH - PANTA" },
+    { code: "30403", area: "BELEFANAI - BELEFANAI - ZOTA" },
+    { code: "30404", area: "YOWEE - YOWEE - ZOTA" },
+    { code: "30405", area: "GOU - GOU - SANOYEA" },
+    { code: "30406", area: "GBONOTA - GBONOTA - SANOYEA" },
+    { code: "30501", area: "SKT - SKT - SUAKOKO" },
+    { code: "30502", area: "CUTTINGTON - PHEBE - SUAKOKO" },
+    { code: "30503", area: "PHEBE - PHEBE - SUAKOKO" },
+    { code: "30504", area: "SINYEA - SINYEA - SUAKOKO" },
+    { code: "30505", area: "GEAMUE - GEAMUE - SUAKOKO" },
+    { code: "30506", area: "DULIMUE - DULIMUE - SUAKOKO" },
+    { code: "30507", area: "GOKAI - GOKAI - SUAKOKO" },
+    { code: "30601", area: "GBARTALA - GBARTALA - YEALLLEQUELLEH" },
+    { code: "30602", area: "PALALA - PALALA - YEALLEQUELLEH" },
+    { code: "30603", area: "FENUTOLI - FENUTOLI - YEALLEQUELLEH" },
+    { code: "30604", area: "GARYEA - GARYEA - YEALLEQUELLEH" },
+    { code: "30605", area: "GLENKORMAH - GLENKORMAH - YEALLEQUELLEH" },
+    { code: "30701", area: "SALALA - SALALA - SALALA" },
+    { code: "30702", area: "TOTOTA - TOTOTA - SALALA" },
+    { code: "30703", area: "POPOTA - POPOTA - FUAMAH" },
+    { code: "30704", area: "DOBLI ISLAND - DOBLI ISLAND - FUAMAH" }
+  ],
+  "Grand Bassa": [
+    { code: "40101", area: "LLOYDSVILLE - KPORKON - DISTRICT 1" },
+    { code: "40102", area: "KPALAWRU - KPORKON - DISTRICT 1" },
+    { code: "40103", area: "ZEON - ZEON - DISTRICT 1" },
+    { code: "40104", area: "ZUZOHN - ZUZOHN - DISTRICT 1" },
+    { code: "40105", area: "EDINA - EDINA - DISTRICT 1" },
+    { code: "40106", area: "LITTLE BASSA - EDINA - DISTRICT 1" },
+    { code: "40107", area: "OWENSGROOVE - OWENSGROOVE - DISTRICT 1" },
+    { code: "40201", area: "GEEHGBAHN - GEEHBAHN - DISTRICT 2" },
+    { code: "40202", area: "YEABLOE - YEABLOE - DISTRICT 2" },
+    { code: "40203", area: "ST. JOHN - ST. JOHN - DISTRICT 2" },
+    { code: "40204", area: "HARTFORD - HARTFORD - DISTRICT 2" },
+    { code: "40301", area: "BLEEWEIN TOWN - BUCHANAN - DISTRICT 3" },
+    { code: "40302", area: "SANWIN TOWN - BUCHANAN - DISTRICT 3" },
+    { code: "40303", area: "BARCONI - BUCHANAN - DISTRICT 3" },
+    { code: "40304", area: "UPPER BUCHANAN - BUCHANAN - DISTRICT 3" },
+    { code: "40305", area: "FOUR HOUSES - BUCHANAN - DISTRICT 3" },
+    { code: "40306", area: "CENTRAL BUCHANAN - BUCHANAN - DISTRICT 3" },
+    { code: "40307", area: "LOWER BUCHANAN - BUCHANAN - DISTRICT 3" },
+    { code: "40308", area: "FAIR GROUND - BUCHANAN - DISTRICT 3" },
+    { code: "40309", area: "GOD BLESS YOU HILL - BUCHANAN - DISTRICT 3" },
+    { code: "40310", area: "WATCO CAMP - LOWER HARLANDSVILLE - DISTRICT 3" },
+    { code: "40311", area: "NEW BUCHANAN - LOWER HARLANDSVILLE - DISTRICT 3" },
+    { code: "40312", area: "JECKO TOWN - LOWER HARLANDSVILLE - DISTRICT 3" },
+    { code: "40313", area: "EEKREEN - KEEKREEN - DISTRICT 3" },
+    { code: "40314", area: "OWN YOUR OWN - KEEKREEN - DISTRICT 3" },
+    { code: "40315", area: "CORN FARM - BUCHANAN - DISTRICT 3" },
+    { code: "40316", area: "SUGAR CANE FARM - BUCHANAN - DISTRICT 3" },
+    { code: "40317", area: "BIAFRA - BUCHANAN - DISTRICT 3" },
+    { code: "40318", area: "FANTI TOWN - BUCHANAN - DISTRICT 3" },
+    { code: "40319", area: "DIRT HOLE - BUCHANAN - DISTRICT 3" },
+    { code: "40320", area: "SAYEPUE HILL - BUCHANAN - DISTRICT 3" },
+    { code: "40321", area: "SUGAR HILL - BUCHANAN - DISTRICT 3" },
+    { code: "40401", area: "GORBLEE - GORBLEE - DISTRICT 4" },
+    { code: "40402", area: "BLEZEE - BLEZEE - DISTRICT 4" },
+    { code: "40403", area: "DEEGBAH - BLEEZEE - DISTRICT 4" },
+    { code: "40404", area: "ZONDO MISSION - ZONDO MISSION - DISTRICT 4" },
+    { code: "40405", area: "NYUEIN_WEIN - NYUEIN_WEIN - DISTRICT 4" },
+    { code: "40501", area: "WHROGBA - WHROGBA - DISTRICT 5" },
+    { code: "40502", area: "DOEGBAHN_GLAYDOR - DOEGBAHN_GLAYDOR - DISTRICT 5" },
+    { code: "40503", area: "KPOEWEIN - KPOEWEIN - DISTRICT 5" },
+    { code: "40504", area: "PALM BAY - PALM BAY - DISTRICT 5" }
+  ],
+  "Margibi": [
+    { code: "20101", area: "R2 COMMUNITY - DUAZON - MAMBAH KABA" },
+    { code: "20102", area: "ROCK INTERNATIONAL - DUAZON - MAMBAH KABA" },
+    { code: "20103", area: "DUAZON - DUAZON - MAMBAH KABA" },
+    { code: "20104", area: "EBK BARRACKS - SCHIEFFLIN - MAMBAH KABA" },
+    { code: "20105", area: "BOYS TOWN - SCHIEFFLIN - MAMBAH KABA" },
+    { code: "20106", area: "SCHIEFFLIN - SCHIEFFLIN - MAMBAH KABA" },
+    { code: "20107", area: "ELLEN ESTATE - SCHIEFFLIN - MAMBAH KABA" },
+    { code: "20108", area: "MARSHALL - MARSHALL - MAMBAH KABA" },
+    { code: "20109", area: "FARMINGTON - FARMINGTON - MAMBAH KABA" },
+    { code: "20110", area: "KARFEAH - KARFEAH - MAMBAH KABA" },
+    { code: "20111", area: "LOONGAYE - LOONGAYE - MAMBAH KABA" },
+    { code: "20112", area: "ZOEDUEHN - ZOEDUEHN - MAMBAH KABA" },
+    { code: "20113", area: "GARNOE - GARNOE - MAMBAH KABA" },
+    { code: "20114", area: "GARZON - FARMINGTON - MAMBAH KABA" },
+    { code: "20115", area: "LLOYDSVILLE CENTRAL - LOYDSVILLE - MAMBAH KABA" },
+    { code: "20201", area: "UNIFICATION TOWN - UNIFICATION - MAMBAH KABA" },
+    { code: "20202", area: "CENTRAL CHARLESVILLE - FARMINGTON - MAMBAH KABA" },
+    { code: "20203", area: "DOLO TOWN - UNIFICATION - MAMBAH KABA" },
+    { code: "20204", area: "COTTON TREE - UNIFICATION - MAMBAH KABA" },
+    { code: "20205", area: "HARBEL - UNIFICATION - MAMBAH KABA" },
+    { code: "20206", area: "GARZON WEST - FARMINTON - MAMBAH KABA" },
+    { code: "20301", area: "DIVISION 25 - DIVISION 25 - FIRESTONE" },
+    { code: "20302", area: "DIVISION 29 - CAMP 2 - FIRESTONE" },
+    { code: "20303", area: "DIVISION 36 - CAMP 3 - FIRESTONE" },
+    { code: "20304", area: "DIVISION 14 - CAMP 3 - FIRESTONE" },
+    { code: "20305", area: "DIVISION 38 - OLD CAMP - FIRESTONE" },
+    { code: "20306", area: "DIVISION 43 - CAMP - FIRESTONE" },
+    { code: "20307", area: "DIVISION 24 - CAMP - FIRESTONE" },
+    { code: "20308", area: "DIVISION 27 - FIRESTONE - FIRESTONE" },
+    { code: "20309", area: "DU SIDE VILLAGE - DU SIDE - FIRESTONE" },
+    { code: "20401", area: "DENNISVILLE COMMUNITY - KAKATA - KAKATA" },
+    { code: "20402", area: "MENDE TOWN - KAKATA - KAKATA" },
+    { code: "20403", area: "KRTTI - KAKATA - KAKATA" },
+    { code: "20404", area: "BWI - KAKATA - KAKATA" },
+    { code: "20405", area: "NANCY DOE - KAKATA - KAKATA" },
+    { code: "20406", area: "ST. CHRISTOPHER - KAKATA - KAKATA" },
+    { code: "20407", area: "CH RENNIE - KAKATA - KAKATA" },
+    { code: "20408", area: "WHENNEY TOWN - KAKATA - KAKATA" },
+    { code: "20409", area: "SUE TOWN - KAKATA - KAKATA" },
+    { code: "20410", area: "BARCLAY - KAKATA - KAKATA" },
+    { code: "20411", area: "MULA - KAKATA - KAKATA" },
+    { code: "20412", area: "GBOYORMU - KAKATA - KAKATA" },
+    { code: "20413", area: "JOHN HILL - KAKATA - KAKATA" },
+    { code: "20414", area: "MORRIS FARM - KAKATA - KAKATA" },
+    { code: "20501", area: "GALILA - GALILA - GIBI" },
+    { code: "20502", area: "MASSAQUOI - MASSAQUOI - GIBI" },
+    { code: "20503", area: "KPENEWEIN - KPENEWEIN - GIBI" },
+    { code: "20504", area: "FAHNJACK - FAHNJACK - GIBI" }
+  ],
+  "Nimba": [
+    { code: "50101", area: "NENGBE - NENGBE - GARR-BAIN" },
+    { code: "50102", area: "GBUYEE - GBUYEE - GARR-BAIN" },
+    { code: "50103", area: "TONGLAYWIN - TONGLAYWIN - GARR-BAIN" },
+    { code: "50104", area: "DORMAH PA - DORMAH PA - GARR-BAIN" },
+    { code: "50105", area: "YELEKORYEE - YELEKORYEE - GARR-BAIN" },
+    { code: "50106", area: "GUINEA BORDER - GBUYEE - GARR-BAIN" },
+    { code: "50107", area: "CITY VIEW - GANTA - GARR-BAIN" },
+    { code: "50108", area: "ZOKESEH - GANTA - GARR-BAIN" },
+    { code: "50109", area: "GEOLANDO - GANTA - GARR-BAIN" },
+    { code: "50110", area: "TONGLAYWIN - GANTA - GARR-BAIN" },
+    { code: "50111", area: "HOPE VILLAGE - GANTA - GARR-BAIN" },
+    { code: "50112", area: "BLAGAYS - GANTA - GARR-BAIN" },
+    { code: "50113", area: "DEAKEHMEIN - GANTA - GARR-BAIN" },
+    { code: "50114", area: "GBUYEE - GANTA - GARR-BAIN" },
+    { code: "50115", area: "J.W. PEARSON - GANTA - GARR-BAIN" },
+    { code: "50116", area: "TOKAY HILL - GANTA - GARR-BAIN" }
+  ]
+};
+
 const LlaDashboard = () => {
   const navigate = useNavigate();
   const [currentDate] = useState(new Date());
@@ -50,6 +374,9 @@ const LlaDashboard = () => {
   const [verifyUPTC, setVerifyUPTC] = useState("");
   const [verificationResult, setVerificationResult] = useState(null);
   const [verifying, setVerifying] = useState(false);
+
+  // Filtered postal codes based on selected county
+  const [filteredPostalCodes, setFilteredPostalCodes] = useState([]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -133,6 +460,16 @@ const LlaDashboard = () => {
 
     checkAuthAndFetchData();
   }, [navigate]);
+
+  // Update postal codes when county changes
+  useEffect(() => {
+    if (generateData.county && postalCodes[generateData.county]) {
+      setFilteredPostalCodes(postalCodes[generateData.county]);
+      setGenerateData(prev => ({ ...prev, postal_code: "" }));
+    } else {
+      setFilteredPostalCodes([]);
+    }
+  }, [generateData.county]);
 
   const handleLogout = () => {
     const keys = Object.keys(localStorage).filter(key => key.startsWith('LLA_'));
@@ -314,27 +651,39 @@ const LlaDashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">County</label>
-                    <input
-                      type="text"
+                    <select
                       name="county"
                       value={generateData.county}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       required
-                      placeholder="Enter county"
-                    />
+                    >
+                      <option value="">Select County</option>
+                      {counties.map(county => (
+                        <option key={county} value={county}>{county}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
-                    <input
-                      type="text"
+                    <select
                       name="postal_code"
                       value={generateData.postal_code}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       required
-                      placeholder="Enter postal code"
-                    />
+                      disabled={!generateData.county}
+                    >
+                      <option value="">Select Postal Code</option>
+                      {filteredPostalCodes.map(item => (
+                        <option key={item.code} value={item.code}>
+                          {item.code} - {item.area}
+                        </option>
+                      ))}
+                    </select>
+                    {!generateData.county && (
+                      <p className="text-xs text-gray-500 mt-1">Please select a county first</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Latitude</label>
@@ -470,7 +819,7 @@ const LlaDashboard = () => {
                     </div>
                   </div>
                   
-                  {/* Google Maps Integration */}
+                  {/* Google Maps Integration - FIXED */}
                   <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">Property Location</h3>
                     <div className="h-96 w-full rounded-xl overflow-hidden border border-gray-300">
@@ -479,7 +828,7 @@ const LlaDashboard = () => {
                         height="100%"
                         frameBorder="0"
                         style={{ border: 0 }}
-                        src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyATNMTYKT2bvDzWMBSKGl-HvYqNz1BzYfs&q=${verificationResult.land_parcel.latitude},${verificationResult.land_parcel.longitude}&zoom=15`}
+                        src={`https://www.google.com/maps/embed/v1/view?key=AIzaSyATNMTYKT2bvDzWMBSKGl-HvYqNz1BzYfs&center=${verificationResult.land_parcel.latitude},${verificationResult.land_parcel.longitude}&zoom=15&maptype=satellite`}
                         allowFullScreen
                       ></iframe>
                     </div>
