@@ -117,7 +117,7 @@ const postalCodes = {
     { code: "11205", area: "STEPHEN TOLBERT ESTATE - GARDNERSVILLE TOWNSHIP - DISTRICT 12" },
     { code: "11206", area: "RIVER VIEW - GARDNERSVILLE TOWNSHIP - DISTRICT 12" },
     { code: "11207", area: "KESSELLY BOULEVARD - GARDNERSVILLE TOWNSHIP - DISTRICT 12" },
-    { code: "11208", area: "MANGROVE ISLAND - GARDNERSVILLE TOWNSHIP - DISTRICT 12" },
+    { code: "11208", area: "MANGROVE ISLAND - GARDNERSVILLE TOWnship - DISTRICT 12" },
     { code: "11209", area: "J.J.Y. SNOW HILL - GARDNERSVILLE TOWNSHIP - DISTRICT 12" },
     { code: "11301", area: "NEW GEORGIA - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
     { code: "11302", area: "ST. MICHEAL - NEW GEORGIA TOWNSHIP - DISTRICT 13" },
@@ -439,7 +439,7 @@ const postalCodes = {
     { code: "50804", area: "BUNADIN - BUNADIN - MEINPEA-MAHN" },
     { code: "50805", area: "GARNWIN - GARNWIN - MEINPEA-MAHN" },
     { code: "50806", area: "TINYEE - TINYEE - MEINPEA-MAHN" },
-    { code: "50807", area: "SOKOPA - SOKOPA - MEINPEA-MAHN" },
+    { code: "50807", area: "SOKOPA - SOKOPA - MEINPEa-MAHN" },
     { code: "50808", area: "GBLEHYEE - GBLEHYEE - MEINPEA-MAHN" },
     { code: "50809", area: "KPEIN - KPEIN - MEINPEA-MAHN" },
     { code: "50810", area: "TUNUKPUYEE - TUNUKPUYEE - MEINPEA-MAHN" },
@@ -485,7 +485,7 @@ const postalCodes = {
     { code: "60402", area: "BARZIWEN - BARZIWEN - ZORZOR" },
     { code: "60403", area: "KARZAH - KARZAH - VOINJAMA" },
     { code: "60404", area: "ZOGOLEMAI - ZOGOLEMAI - VOINJAMA" },
-    { code: "60405", area: "DAYZABAH - DAYZABAH - VOINJAMA" },
+    { code: "60405", area: "DAYZABAH - DAYZabah - VOINJAMA" },
     { code: "60406", area: "KESSELEMAI - KESSELEMAI - VOINJAMA" },
     { code: "60407", area: "WARBALAMAI - WARBALAMAI - VOINJAMA" },
     { code: "60408", area: "VOINJAMA - VOINJAMA - VOINJAMA" },
@@ -537,7 +537,6 @@ const postalCodes = {
     { code: "71204", area: "SIEH - SIEH - KLAY" },
     { code: "71205", area: "MALEMA - MALEMA - KLAY" },
     { code: "71206", area: "MAMJAMA - MAMJAMA - DOWEIN" },
-    { code: "71207", area: "BEH - BEH - DOWEIN" },
     { code: "71208", area: "VORTOR - VORTOR - DOWEIN" },
     { code: "71209", area: "GBAIGBON - GBAIGBON - DOWEIN" },
     { code: "71301", area: "MECCA - MECCA - SUEHN MECCA" },
@@ -568,7 +567,7 @@ const postalCodes = {
     { code: "72205", area: "GATIMA - GATIMA - BELLEH" },
     { code: "72206", area: "TIGGELEE - TIGGELEE - BELLEH" },
     { code: "72207", area: "GOMU - GOMU - GOUNWOLAILA" },
-    { code: "72208", area: "KELLEH - KELLEH - GOUNWOLAILA" },
+    { code: "72208", area: "KELLEH - KELLEH - GOUNWOLAILa" },
     { code: "72209", area: "GOU - GOU - GOUNWOLAILA" },
     { code: "72210", area: "ZEAYEA - ZEAYEA - GOUNWOLAILA" },
     { code: "72211", area: "ZALAKAI - ZALAKAI - BOKOMU" },
@@ -825,6 +824,27 @@ const LlaDashboard = () => {
     }));
   };
 
+  // Helper function to construct image URLs
+  const constructImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith('http')) return imagePath;
+    return `https://storage.googleapis.com/system-liberianpost/${imagePath}`;
+  };
+
+  // Format date for display
+  const formatDisplayDate = (dateString) => {
+    if (!dateString) return "Not available";
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return dateString;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -1048,7 +1068,7 @@ const LlaDashboard = () => {
                 <button
                   type="submit"
                   disabled={verifying}
-                  className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg font-semibold disabled:opacity-50"
+                    className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg font-semibold disabled:opacity-50"
                 >
                   {verifying ? "Verifying..." : "Verify UPTC"}
                 </button>
@@ -1099,7 +1119,7 @@ const LlaDashboard = () => {
                           </div>
                         </div>
                         
-                        {/* Surveyor Information Card */}
+                        {/* Surveyor Information Card - UPDATED WITH NEW FIELDS */}
                         <div className="bg-green-50 p-5 rounded-xl border border-green-100">
                           <div className="flex items-center mb-4">
                             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
@@ -1120,11 +1140,36 @@ const LlaDashboard = () => {
                               <span className="text-green-700 font-medium">DSSN:</span>
                               <span className="text-green-900 font-mono">{verificationResult.surveyor.dssn}</span>
                             </div>
+                            {/* NEW FIELDS */}
+                            <div className="flex justify-between">
+                              <span className="text-green-700 font-medium">Phone:</span>
+                              <span className="text-green-900">{verificationResult.surveyor.phone_number || "Not available"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-green-700 font-medium">Date of Birth:</span>
+                              <span className="text-green-900">{formatDisplayDate(verificationResult.surveyor.date_of_birth)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-green-700 font-medium">Place of Birth:</span>
+                              <span className="text-green-900">{verificationResult.surveyor.place_of_birth || "Not available"}</span>
+                            </div>
+                            {verificationResult.surveyor.image_url && (
+                              <div className="pt-3 border-t border-green-200">
+                                <div className="flex items-center space-x-3">
+                                  <span className="text-green-700 font-medium">Photo:</span>
+                                  <img 
+                                    src={constructImageUrl(verificationResult.surveyor.image_url)} 
+                                    alt="Surveyor" 
+                                    className="w-12 h-12 rounded-lg object-cover border border-green-300"
+                                  />
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
                       
-                      {/* Owners Information */}
+                      {/* Owners Information - UPDATED WITH NEW FIELDS */}
                       {verificationResult.owners.length > 0 && (
                         <div className="mt-6 bg-purple-50 p-5 rounded-xl border border-purple-100">
                           <div className="flex items-center mb-4">
@@ -1136,13 +1181,26 @@ const LlaDashboard = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {verificationResult.owners.map((owner, index) => (
                               <div key={index} className="bg-white p-4 rounded-lg border border-purple-200">
-                                <div className="flex items-center mb-2">
-                                  <span className="text-purple-600 font-medium mr-2">#{index + 1}</span>
-                                  <h5 className="text-purple-800 font-semibold">{owner.first_name} {owner.last_name}</h5>
+                                <div className="flex items-center mb-3">
+                                  {owner.image_url && (
+                                    <img 
+                                      src={constructImageUrl(owner.image_url)} 
+                                      alt={owner.first_name} 
+                                      className="w-12 h-12 rounded-lg object-cover border border-purple-300 mr-3"
+                                    />
+                                  )}
+                                  <div>
+                                    <span className="text-purple-600 font-medium mr-2">#{index + 1}</span>
+                                    <h5 className="text-purple-800 font-semibold">{owner.first_name} {owner.last_name}</h5>
+                                  </div>
                                 </div>
-                                <div className="space-y-1 text-sm">
+                                <div className="space-y-2 text-sm">
                                   <p><span className="text-purple-700 font-medium">DSSN:</span> {owner.dssn}</p>
                                   <p><span className="text-purple-700 font-medium">Address:</span> {owner.address}</p>
+                                  {/* NEW FIELDS */}
+                                  <p><span className="text-purple-700 font-medium">Phone:</span> {owner.phone_number || "Not available"}</p>
+                                  <p><span className="text-purple-700 font-medium">Date of Birth:</span> {formatDisplayDate(owner.date_of_birth)}</p>
+                                  <p><span className="text-purple-700 font-medium">Place of Birth:</span> {owner.place_of_birth || "Not available"}</p>
                                 </div>
                               </div>
                             ))}
