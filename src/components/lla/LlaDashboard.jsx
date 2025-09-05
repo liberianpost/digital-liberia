@@ -301,7 +301,7 @@ const postalCodes = {
     { code: "20303", area: "DIVISION 36 - CAMP 3 - FIRESTONE" },
     { code: "20304", area: "DIVISION 14 - CAMP 3 - FIRESTONE" },
     { code: "20305", area: "DIVISION 38 - OLD CAMP - FIRESTONE" },
-    { code: "20306", area: "DIVISION 43 - CAMP - FIRESTONE" },
+    { code: "20306", area: "DIVISION 43 - CAMp - FIRESTONE" },
     { code: "20307", area: "DIVISION 24 - CAMP - FIRESTONE" },
     { code: "20308", area: "DIVISION 27 - FIRESTONE - FIRESTONE" },
     { code: "20309", area: "DU SIDE VILLAGE - DU SIDE - FIRESTONE" },
@@ -349,7 +349,7 @@ const postalCodes = {
     { code: "50203", area: "SEHYI KIMPA - SEHYI KIMPA - SANNIQUELLIE-MAHN" },
     { code: "50204", area: "ZOLOWEE - ZOLOWEE - SANNIQUELLIE-MAHN" },
     { code: "50205", area: "NEIPA COMMUNITY - SANNIQUELLIE - SANNIQUELLIE-MAHN" },
-    { code: "50206", area: "RED CROSS - SANNIQUELLIE - SANNIQUELLIE-MAHN" },
+    { code: "50206", area: "RED CROSS - SANNIQUEELLIE - SANNIQUELLIE-MAHN" },
     { code: "50207", area: "BADIO TOWN - SANNIQUELLIE - SANNIQUELLIE-MAHN" },
     { code: "50208", area: "BAHA'I LOCAL - SANNIQUELLIE - SANNIQUELLIE-MAHN" },
     { code: "50209", area: "ARS COMPOUND - SANNIQUELLIE - SANNIQUELLIE-MAHN" },
@@ -474,7 +474,6 @@ const postalCodes = {
     { code: "60204", area: "KAMATAHUN - KAMATAHUN - WANHASSA" },
     { code: "60205", area: "POPALAHUN - POPALAHUN - WANHASSA" },
     { code: "60206", area: "LEHUMA - LEHUMA - WANHASSA" },
-    { code: "60207", area: "YASSADU - YASSADU - FOYA" },
     { code: "60208", area: "KIMBALOE - KIMBALOE - FOYA" },
     { code: "60301", area: "YASELAHUN - YASELAHUN - KOLAHUN" },
     { code: "60302", area: "BOWAHUN - BOWAHUN - KOLAHUN" },
@@ -636,12 +635,11 @@ const LlaDashboard = () => {
     landUseTypes: []
   });
   
-  // UPTC Generation State
+  // UPTC Generation State - UPDATED: Removed latitude/longitude, added boundary
   const [generateData, setGenerateData] = useState({
     county: "",
     postal_code: "",
-    latitude: "",
-    longitude: "",
+    boundary: "",
     surveyor_license_id: ""
   });
   const [generatedUPTC, setGeneratedUPTC] = useState("");
@@ -771,7 +769,7 @@ const LlaDashboard = () => {
     });
   };
 
-  // Handle UPTC Generation
+  // Handle UPTC Generation - UPDATED: Now uses boundary instead of lat/long
   const handleGenerateUPTC = async (e) => {
     e.preventDefault();
     setGenerating(true);
@@ -843,6 +841,45 @@ const LlaDashboard = () => {
     } catch (error) {
       return dateString;
     }
+  };
+
+  // Helper function to parse polygon boundary coordinates
+  const parsePolygonCoordinates = (boundary) => {
+    if (!boundary) return [];
+    
+    try {
+      // Extract coordinates from WKT format: POLYGON((lon1 lat1, lon2 lat2, ...))
+      const match = boundary.match(/POLYGON\(\((.*?)\)\)/);
+      if (!match) return [];
+      
+      const coordsString = match[1];
+      return coordsString.split(',').map(coord => {
+        const [lon, lat] = coord.trim().split(' ');
+        return { latitude: parseFloat(lat), longitude: parseFloat(lon) };
+      });
+    } catch (error) {
+      console.error('Error parsing polygon coordinates:', error);
+      return [];
+    }
+  };
+
+  // Get center coordinates from boundary for map display
+  const getCenterFromBoundary = (boundary) => {
+    const coordinates = parsePolygonCoordinates(boundary);
+    if (coordinates.length === 0) return { lat: 6.300774, lng: -10.79716 }; // Default Monrovia
+    
+    // Calculate center by averaging all coordinates
+    const sum = coordinates.reduce((acc, coord) => {
+      return {
+        lat: acc.lat + coord.latitude,
+        lng: acc.lng + coord.longitude
+      };
+    }, { lat: 0, lng: 0 });
+    
+    return {
+      lat: sum.lat / coordinates.length,
+      lng: sum.lng / coordinates.length
+    };
   };
 
   if (loading) {
@@ -938,7 +975,7 @@ const LlaDashboard = () => {
 
         {/* UPTC Management Section */}
         <section className="max-w-7xl mx-auto mb-12">
-          {/* Generate UPTC Container */}
+          {/* Generate UPTC Container - UPDATED: Replaced lat/long with boundary */}
           <div className="bg-white rounded-2xl border border-blue-200 shadow-lg overflow-hidden mb-8">
             <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
               <h2 className="text-2xl font-bold">Generate Unique Property Token Code (UPTC)</h2>
@@ -983,29 +1020,20 @@ const LlaDashboard = () => {
                       <p className="text-xs text-gray-500 mt-1">Please select a county first</p>
                     )}
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Latitude</label>
-                    <input
-                      type="text"
-                      name="latitude"
-                      value={generateData.latitude}
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Boundary (WKT Polygon Format)</label>
+                    <textarea
+                      name="boundary"
+                      value={generateData.boundary}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       required
-                      placeholder="e.g., 6.300774"
+                      rows="4"
+                      placeholder="POLYGON((longitude1 latitude1, longitude2 latitude2, longitude3 latitude3, ...))"
                     />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Longitude</label>
-                    <input
-                      type="text"
-                      name="longitude"
-                      value={generateData.longitude}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                      placeholder="e.g., -10.79716"
-                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Example: POLYGON((-10.79716 6.300774, -10.79716 6.301774, -10.79616 6.301774, -10.79616 6.300774, -10.79716 6.300774))
+                    </p>
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Surveyor License ID</label>
@@ -1076,7 +1104,7 @@ const LlaDashboard = () => {
 
               {verificationResult && (
                 <div className="mt-8">
-                  {/* Enhanced Verification Results */}
+                  {/* Enhanced Verification Results - UPDATED: Now shows boundary instead of lat/long */}
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden mb-6">
                     <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
                       <h3 className="text-xl font-bold">UPTC Verification Results</h3>
@@ -1087,7 +1115,7 @@ const LlaDashboard = () => {
                     
                     <div className="p-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Land Information Card */}
+                        {/* Land Information Card - UPDATED: Shows boundary instead of lat/long */}
                         <div className="bg-blue-50 p-5 rounded-xl border border-blue-100">
                           <div className="flex items-center mb-4">
                             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
@@ -1109,8 +1137,12 @@ const LlaDashboard = () => {
                               <span className="text-blue-900">{verificationResult.land_parcel.postal_code}</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-blue-700 font-medium">Coordinates:</span>
-                              <span className="text-blue-900">{verificationResult.land_parcel.latitude}, {verificationResult.land_parcel.longitude}</span>
+                              <span className="text-blue-700 font-medium">Boundary Points:</span>
+                              <span className="text-blue-900">
+                                {verificationResult.land_parcel.boundary 
+                                  ? `${parsePolygonCoordinates(verificationResult.land_parcel.boundary_wkt).length} coordinates` 
+                                  : "Not available"}
+                              </span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-blue-700 font-medium">Date Surveyed:</span>
@@ -1119,7 +1151,7 @@ const LlaDashboard = () => {
                           </div>
                         </div>
                         
-                        {/* Surveyor Information Card - UPDATED WITH NEW FIELDS */}
+                        {/* Surveyor Information Card */}
                         <div className="bg-green-50 p-5 rounded-xl border border-green-100">
                           <div className="flex items-center mb-4">
                             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
@@ -1140,7 +1172,6 @@ const LlaDashboard = () => {
                               <span className="text-green-700 font-medium">DSSN:</span>
                               <span className="text-green-900 font-mono">{verificationResult.surveyor.dssn}</span>
                             </div>
-                            {/* NEW FIELDS */}
                             <div className="flex justify-between">
                               <span className="text-green-700 font-medium">Phone:</span>
                               <span className="text-green-900">{verificationResult.surveyor.phone_number || "Not available"}</span>
@@ -1169,38 +1200,69 @@ const LlaDashboard = () => {
                         </div>
                       </div>
                       
-                      {/* Owners Information - UPDATED WITH NEW FIELDS */}
-                      {verificationResult.owners.length > 0 && (
+                      {/* Boundary Details Card */}
+                      {verificationResult.land_parcel.boundary_wkt && (
                         <div className="mt-6 bg-purple-50 p-5 rounded-xl border border-purple-100">
                           <div className="flex items-center mb-4">
                             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                              <span className="text-purple-600 text-xl">👥</span>
+                              <span className="text-purple-600 text-xl">🗺️</span>
                             </div>
-                            <h4 className="text-lg font-semibold text-purple-800">Property Owners</h4>
+                            <h4 className="text-lg font-semibold text-purple-800">Boundary Details</h4>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <h5 className="text-purple-700 font-medium mb-2">WKT Format</h5>
+                              <div className="bg-white p-3 rounded-lg border border-purple-200 overflow-x-auto">
+                                <code className="text-sm text-purple-800 break-all">
+                                  {verificationResult.land_parcel.boundary_wkt}
+                                </code>
+                              </div>
+                            </div>
+                            <div>
+                              <h5 className="text-purple-700 font-medium mb-2">Coordinates</h5>
+                              <div className="bg-white p-3 rounded-lg border border-purple-200 max-h-40 overflow-y-auto">
+                                {parsePolygonCoordinates(verificationResult.land_parcel.boundary_wkt).map((coord, index) => (
+                                  <div key={index} className="text-sm text-purple-800 mb-1">
+                                    {index + 1}. {coord.latitude.toFixed(6)}, {coord.longitude.toFixed(6)}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Owners Information */}
+                      {verificationResult.owners.length > 0 && (
+                        <div className="mt-6 bg-orange-50 p-5 rounded-xl border border-orange-100">
+                          <div className="flex items-center mb-4">
+                            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
+                              <span className="text-orange-600 text-xl">👥</span>
+                            </div>
+                            <h4 className="text-lg font-semibold text-orange-800">Property Owners</h4>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {verificationResult.owners.map((owner, index) => (
-                              <div key={index} className="bg-white p-4 rounded-lg border border-purple-200">
+                              <div key={index} className="bg-white p-4 rounded-lg border border-orange-200">
                                 <div className="flex items-center mb-3">
                                   {owner.image_url && (
                                     <img 
                                       src={constructImageUrl(owner.image_url)} 
                                       alt={owner.first_name} 
-                                      className="w-12 h-12 rounded-lg object-cover border border-purple-300 mr-3"
+                                      className="w-12 h-12 rounded-lg object-cover border border-orange-300 mr-3"
                                     />
                                   )}
                                   <div>
-                                    <span className="text-purple-600 font-medium mr-2">#{index + 1}</span>
-                                    <h5 className="text-purple-800 font-semibold">{owner.first_name} {owner.last_name}</h5>
+                                    <span className="text-orange-600 font-medium mr-2">#{index + 1}</span>
+                                    <h5 className="text-orange-800 font-semibold">{owner.first_name} {owner.last_name}</h5>
                                   </div>
                                 </div>
                                 <div className="space-y-2 text-sm">
-                                  <p><span className="text-purple-700 font-medium">DSSN:</span> {owner.dssn}</p>
-                                  <p><span className="text-purple-700 font-medium">Address:</span> {owner.address}</p>
-                                  {/* NEW FIELDS */}
-                                  <p><span className="text-purple-700 font-medium">Phone:</span> {owner.phone_number || "Not available"}</p>
-                                  <p><span className="text-purple-700 font-medium">Date of Birth:</span> {formatDisplayDate(owner.date_of_birth)}</p>
-                                  <p><span className="text-purple-700 font-medium">Place of Birth:</span> {owner.place_of_birth || "Not available"}</p>
+                                  <p><span className="text-orange-700 font-medium">DSSN:</span> {owner.dssn}</p>
+                                  <p><span className="text-orange-700 font-medium">Address:</span> {owner.address}</p>
+                                  <p><span className="text-orange-700 font-medium">Phone:</span> {owner.phone_number || "Not available"}</p>
+                                  <p><span className="text-orange-700 font-medium">Date of Birth:</span> {formatDisplayDate(owner.date_of_birth)}</p>
+                                  <p><span className="text-orange-700 font-medium">Place of Birth:</span> {owner.place_of_birth || "Not available"}</p>
                                 </div>
                               </div>
                             ))}
@@ -1223,33 +1285,35 @@ const LlaDashboard = () => {
                     </div>
                   </div>
                   
-                  {/* Google Maps Integration */}
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
-                    <div className="flex items-center mb-4">
-                      <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
-                        <span className="text-red-600 text-xl">📍</span>
+                  {/* Google Maps Integration - UPDATED: Uses boundary center */}
+                  {verificationResult.land_parcel.boundary_wkt && (
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+                      <div className="flex items-center mb-4">
+                        <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                          <span className="text-red-600 text-xl">📍</span>
+                        </div>
+                        <h3 className="text-xl font-semibold text-gray-800">Property Location</h3>
                       </div>
-                      <h3 className="text-xl font-semibold text-gray-800">Property Location</h3>
+                      <div className="h-96 w-full rounded-xl overflow-hidden border border-gray-300 shadow-md">
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          frameBorder="0"
+                          style={{ border: 0 }}
+                          src={`https://www.google.com/maps/embed/v1/view?key=AIzaSyATNMTYKT2bvDzWMBSKGl-HvYqNz1BzYfs&center=${getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt).lat},${getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt).lng}&zoom=15&maptype=satellite`}
+                          allowFullScreen
+                        ></iframe>
+                      </div>
+                      <div className="mt-4 flex justify-between items-center">
+                        <p className="text-sm text-gray-600">
+                          Boundary Center: {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt).lat.toFixed(6)}, {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt).lng.toFixed(6)}
+                        </p>
+                        <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                          Download Boundary Details
+                        </button>
+                      </div>
                     </div>
-                    <div className="h-96 w-full rounded-xl overflow-hidden border border-gray-300 shadow-md">
-                      <iframe
-                        width="100%"
-                        height="100%"
-                        frameBorder="0"
-                        style={{ border: 0 }}
-                        src={`https://www.google.com/maps/embed/v1/view?key=AIzaSyATNMTYKT2bvDzWMBSKGl-HvYqNz1BzYfs&center=${verificationResult.land_parcel.latitude},${verificationResult.land_parcel.longitude}&zoom=15&maptype=satellite`}
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                    <div className="mt-4 flex justify-between items-center">
-                      <p className="text-sm text-gray-600">
-                        Coordinates: {verificationResult.land_parcel.latitude}, {verificationResult.land_parcel.longitude}
-                      </p>
-                      <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
-                        Download Location Details
-                      </button>
-                    </div>
-                  </div>
+                  )}
                 </div>
               )}
             </div>
