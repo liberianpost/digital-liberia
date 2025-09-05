@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { MapContainer, TileLayer, Polygon, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import api from '@/api';
+
+// Fix for default markers in Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 const navLinks = [
   { label: "Home", to: "/", color: "bg-gradient-to-r from-blue-600 to-blue-800 text-white" },
@@ -257,7 +268,7 @@ const postalCodes = {
     { code: "40312", area: "JECKO TOWN - LOWER HARLANDSVILLE - DISTRICT 3" },
     { code: "40313", area: "EEKREEN - KEEKREEN - DISTRICT 3" },
     { code: "40314", area: "OWN YOUR OWN - KEEKREEN - DISTRICT 3" },
-    { code: "40315", area: "CORN FARM - BUCHANAN - DISTRICT 3" },
+    { code: "40315", area: "CORN FAM - BUCHANAN - DISTRICT 3" },
     { code: "40316", area: "SUGAR CANE FARM - BUCHANAN - DISTRICT 3" },
     { code: "40317", area: "BIAFRA - BUCHANAN - DISTRICT 3" },
     { code: "40318", area: "FANTI TOWN - BUCHANAN - DISTRICT 3" },
@@ -298,7 +309,7 @@ const postalCodes = {
     { code: "20206", area: "GARZON WEST - FARMINTON - MAMBAH KABA" },
     { code: "20301", area: "DIVISION 25 - DIVISION 25 - FIRESTONE" },
     { code: "20302", area: "DIVISION 29 - CAMP 2 - FIRESTONE" },
-    { code: "20303", area: "DIVISION 36 - CAMP 3 - FIRESTONE" },
+    { code: "20303", area: "DIVISION 36 - CAMp 3 - FIRESTONE" },
     { code: "20304", area: "DIVISION 14 - CAMP 3 - FIRESTONE" },
     { code: "20305", area: "DIVISION 38 - OLD CAMP - FIRESTONE" },
     { code: "20306", area: "DIVISION 43 - CAMp - FIRESTONE" },
@@ -620,6 +631,61 @@ const postalCodes = {
   ]
 };
 
+// Interactive Map Component
+const InteractiveMap = ({ boundary, center, zoom = 15 }) => {
+  const [map, setMap] = useState(null);
+  
+  // Parse WKT boundary to coordinates
+  const parseBoundary = (wkt) => {
+    if (!wkt) return [];
+    
+    try {
+      const match = wkt.match(/POLYGON\(\((.*?)\)\)/);
+      if (!match) return [];
+      
+      const coordsString = match[1];
+      return coordsString.split(',').map(coord => {
+        const [lng, lat] = coord.trim().split(' ').map(Number);
+        return [lat, lng];
+      });
+    } catch (error) {
+      console.error('Error parsing boundary:', error);
+      return [];
+    }
+  };
+  
+  const boundaryCoords = parseBoundary(boundary);
+  
+  return (
+    <div className="h-96 w-full rounded-xl overflow-hidden border border-gray-300 shadow-md">
+      <MapContainer
+        center={center || [6.300774, -10.79716]}
+        zoom={zoom}
+        style={{ height: '100%', width: '100%' }}
+        whenCreated={setMap}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        
+        {boundaryCoords.length > 0 && (
+          <Polygon
+            positions={[boundaryCoords]}
+            pathOptions={{ color: 'blue', fillColor: 'blue', fillOpacity: 0.2 }}
+          />
+        )}
+        
+        {center && (
+          <Marker position={center}>
+            <Popup>Property Center</Popup>
+          </Marker>
+        )}
+      </MapContainer>
+    </div>
+  );
+};
+
 const LlaDashboard = () => {
   const navigate = useNavigate();
   const [currentDate] = useState(new Date());
@@ -635,7 +701,7 @@ const LlaDashboard = () => {
     landUseTypes: []
   });
   
-  // UPTC Generation State - UPDATED: Removed latitude/longitude, added boundary
+  // UPTC Generation State
   const [generateData, setGenerateData] = useState({
     county: "",
     postal_code: "",
@@ -769,7 +835,7 @@ const LlaDashboard = () => {
     });
   };
 
-  // Handle UPTC Generation - UPDATED: Now uses boundary instead of lat/long
+  // Handle UPTC Generation
   const handleGenerateUPTC = async (e) => {
     e.preventDefault();
     setGenerating(true);
@@ -866,7 +932,7 @@ const LlaDashboard = () => {
   // Get center coordinates from boundary for map display
   const getCenterFromBoundary = (boundary) => {
     const coordinates = parsePolygonCoordinates(boundary);
-    if (coordinates.length === 0) return { lat: 6.300774, lng: -10.79716 }; // Default Monrovia
+    if (coordinates.length === 0) return [6.300774, -10.79716]; // Default Monrovia
     
     // Calculate center by averaging all coordinates
     const sum = coordinates.reduce((acc, coord) => {
@@ -876,10 +942,10 @@ const LlaDashboard = () => {
       };
     }, { lat: 0, lng: 0 });
     
-    return {
-      lat: sum.lat / coordinates.length,
-      lng: sum.lng / coordinates.length
-    };
+    return [
+      sum.lat / coordinates.length,
+      sum.lng / coordinates.length
+    ];
   };
 
   if (loading) {
@@ -975,7 +1041,7 @@ const LlaDashboard = () => {
 
         {/* UPTC Management Section */}
         <section className="max-w-7xl mx-auto mb-12">
-          {/* Generate UPTC Container - UPDATED: Replaced lat/long with boundary */}
+          {/* Generate UPTC Container */}
           <div className="bg-white rounded-2xl border border-blue-200 shadow-lg overflow-hidden mb-8">
             <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
               <h2 className="text-2xl font-bold">Generate Unique Property Token Code (UPTC)</h2>
@@ -1104,7 +1170,7 @@ const LlaDashboard = () => {
 
               {verificationResult && (
                 <div className="mt-8">
-                  {/* Enhanced Verification Results - UPDATED: Now shows boundary instead of lat/long */}
+                  {/* Enhanced Verification Results */}
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden mb-6">
                     <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
                       <h3 className="text-xl font-bold">UPTC Verification Results</h3>
@@ -1115,7 +1181,7 @@ const LlaDashboard = () => {
                     
                     <div className="p-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Land Information Card - UPDATED: Shows boundary instead of lat/long */}
+                        {/* Land Information Card */}
                         <div className="bg-blue-50 p-5 rounded-xl border border-blue-100">
                           <div className="flex items-center mb-4">
                             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
@@ -1139,7 +1205,7 @@ const LlaDashboard = () => {
                             <div className="flex justify-between">
                               <span className="text-blue-700 font-medium">Boundary Points:</span>
                               <span className="text-blue-900">
-                                {verificationResult.land_parcel.boundary 
+                                {verificationResult.land_parcel.boundary_wkt 
                                   ? `${parsePolygonCoordinates(verificationResult.land_parcel.boundary_wkt).length} coordinates` 
                                   : "Not available"}
                               </span>
@@ -1285,7 +1351,7 @@ const LlaDashboard = () => {
                     </div>
                   </div>
                   
-                  {/* Google Maps Integration - UPDATED: Uses boundary center */}
+                  {/* Interactive Map for Boundary Visualization */}
                   {verificationResult.land_parcel.boundary_wkt && (
                     <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
                       <div className="flex items-center mb-4">
@@ -1294,19 +1360,15 @@ const LlaDashboard = () => {
                         </div>
                         <h3 className="text-xl font-semibold text-gray-800">Property Location</h3>
                       </div>
-                      <div className="h-96 w-full rounded-xl overflow-hidden border border-gray-300 shadow-md">
-                        <iframe
-                          width="100%"
-                          height="100%"
-                          frameBorder="0"
-                          style={{ border: 0 }}
-                          src={`https://www.google.com/maps/embed/v1/view?key=AIzaSyATNMTYKT2bvDzWMBSKGl-HvYqNz1BzYfs&center=${getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt).lat},${getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt).lng}&zoom=15&maptype=satellite`}
-                          allowFullScreen
-                        ></iframe>
-                      </div>
+                      
+                      <InteractiveMap 
+                        boundary={verificationResult.land_parcel.boundary_wkt}
+                        center={getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)}
+                      />
+                      
                       <div className="mt-4 flex justify-between items-center">
                         <p className="text-sm text-gray-600">
-                          Boundary Center: {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt).lat.toFixed(6)}, {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt).lng.toFixed(6)}
+                          Boundary Center: {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[0].toFixed(6)}, {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[1].toFixed(6)}
                         </p>
                         <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
                           Download Boundary Details
@@ -1326,7 +1388,7 @@ const LlaDashboard = () => {
             Land Administration Analytics
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-col-4 gap-6 mb-8">
             {/* Land Deeds */}
             <div className="bg-white border border-blue-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
               <div className="flex items-center justify-between">
