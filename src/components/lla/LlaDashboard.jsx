@@ -1299,7 +1299,7 @@ const LlaDashboard = () => {
                       )}
                       
                       {/* Owners Information */}
-                      {verificationResult.owners.length > 0 && (
+                      {verificationResult.owners && verificationResult.owners.length > 0 && (
                         <div className="mt-6 bg-orange-50 p-5 rounded-xl border border-orange-100">
                           <div className="flex items-center mb-4">
                             <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
