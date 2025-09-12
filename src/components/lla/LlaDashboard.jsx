@@ -1411,7 +1411,7 @@ const LlaDashboard = () => {
                     </div>
                   </div>
                   
-                  {/* Interactive Map for Boundary Visualization */}
+                   {/* Interactive Map for Boundary Visualization */}
                   {verificationResult.land_parcel.boundary_wkt && (
                     <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
                       <div className="flex items-center mb-4">
@@ -1438,9 +1438,6 @@ const LlaDashboard = () => {
                   )}
                 </div>
               )}
-            </div>
-          </div>
-        </section>
 
         {/* Analytics Dashboard */}
         <section className="max-w-7xl mx-auto mb-12">
