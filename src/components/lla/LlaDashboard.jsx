@@ -1636,7 +1636,6 @@ const LlaDashboard = () => {
           </section>
         </main>
       </div>
-    </div>
   );
 };
 
