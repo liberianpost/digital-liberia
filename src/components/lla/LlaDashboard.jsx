@@ -1122,7 +1122,7 @@ const LlaDashboard = () => {
                   {generating ? "Generating..." : "Generate UPTC"}
                 </button>
               </form>
-
+        
               {generatedUPTC && (
                 <div className="mt-8 p-6 bg-green-50 border border-green-200 rounded-2xl">
                   <h3 className="text-lg font-semibold text-green-800 mb-2">UPTC Generated Successfully!</h3>
@@ -1139,7 +1139,7 @@ const LlaDashboard = () => {
               )}
             </div>
           </div>
-
+        
           {/* Verify UPTC Container */}
           <div className="bg-white rounded-2xl border border-blue-200 shadow-lg overflow-hidden">
             <div className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-800 text-white">
@@ -1167,7 +1167,7 @@ const LlaDashboard = () => {
                   {verifying ? "Verifying..." : "Verify UPTC"}
                 </button>
               </form>
-
+        
              {verificationResult && (
               <div className="mt-8">
                 {/* Enhanced Verification Results */}
@@ -1439,8 +1439,9 @@ const LlaDashboard = () => {
                 )}
               </div>
             )}
-          </div>
-        </section>
+            </div> {/* Closing div for p-8 */}
+          </div> {/* Closing div for Verify UPTC Container */}
+        </section> {/* Closing section for UPTC Management Section */}
 
         {/* Analytics Dashboard */}
         <section className="max-w-7xl mx-auto mb-12">
