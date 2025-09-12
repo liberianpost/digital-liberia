@@ -1396,7 +1396,7 @@ const LlaDashboard = () => {
                         </div>
                       </div>
                     )}
-                  
+                    
                     {/* Status Bar */}
                     <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
                       <div className="flex items-center justify-between">
@@ -1410,34 +1410,35 @@ const LlaDashboard = () => {
                       </div>
                     </div>
                   </div>
-                  
-                   {/* Interactive Map for Boundary Visualization */}
-                  {verificationResult.land_parcel.boundary_wkt && (
-                    <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
-                          <span className="text-red-600 text-xl">📍</span>
-                        </div>
-                        <h3 className="text-xl font-semibold text-gray-800">Property Location</h3>
-                      </div>
-                      
-                      <InteractiveMap 
-                        boundary={verificationResult.land_parcel.boundary_wkt}
-                        center={getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)}
-                      />
-                      
-                      <div className="mt-4 flex justify-between items-center">
-                        <p className="text-sm text-gray-600">
-                          Boundary Center: {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[0].toFixed(6)}, {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[1].toFixed(6)}
-                        </p>
-                        <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
-                          Download Boundary Details
-                        </button>
-                      </div>
-                    </div>
-                  )}
                 </div>
-              )}
+                
+                {/* Interactive Map for Boundary Visualization */}
+                {verificationResult.land_parcel.boundary_wkt && (
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                        <span className="text-red-600 text-xl">📍</span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-800">Property Location</h3>
+                    </div>
+                    
+                    <InteractiveMap 
+                      boundary={verificationResult.land_parcel.boundary_wkt}
+                      center={getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)}
+                    />
+                    
+                    <div className="mt-4 flex justify-between items-center">
+                      <p className="text-sm text-gray-600">
+                        Boundary Center: {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[0].toFixed(6)}, {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[1].toFixed(6)}
+                      </p>
+                      <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                        Download Boundary Details
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
         {/* Analytics Dashboard */}
         <section className="max-w-7xl mx-auto mb-12">
