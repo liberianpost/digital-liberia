@@ -631,6 +631,7 @@ const postalCodes = {
   ]
 };
 
+
 // Interactive Map Component
 const InteractiveMap = ({ boundary, center, zoom = 15 }) => {
   const [map, setMap] = useState(null);
@@ -1632,3 +1633,11 @@ const LlaDashboard = () => {
                 </p>
               </div>
             </footer>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+};
+
+export default LlaDashboard;
