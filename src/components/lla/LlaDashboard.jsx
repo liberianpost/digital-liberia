@@ -631,7 +631,6 @@ const postalCodes = {
   ]
 };
 
-
 // Interactive Map Component
 const InteractiveMap = ({ boundary, center, zoom = 15 }) => {
   const [map, setMap] = useState(null);
@@ -1440,202 +1439,203 @@ const LlaDashboard = () => {
                 )}
               </div>
             )}
-
-            
-            {/* Analytics Dashboard */}
-            <section className="max-w-7xl mx-auto mb-12">
-              <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
-                Land Administration Analytics
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {/* Land Deeds */}
-                <div className="bg-white border border-blue-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-2xl font-bold text-blue-800">{formatNumber(analytics.landDeeds)}</h3>
-                      <p className="text-blue-600">Land Deeds</p>
-                    </div>
-                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                      <span className="text-2xl">🏠</span>
-                    </div>
-                  </div>
-                  <div className="mt-4 h-2 bg-blue-100 rounded-full">
-                    <div className="h-full bg-blue-500 rounded-full w-3/4"></div>
-                  </div>
-                </div>
-            
-                {/* Property Records */}
-                <div className="bg-white border border-purple-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-2xl font-bold text-purple-800">{formatNumber(analytics.propertyRecords)}</h3>
-                      <p className="text-purple-600">Property Records</p>
-                    </div>
-                    <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                      <span className="text-2xl">📋</span>
-                    </div>
-                  </div>
-                  <div className="mt-4 h-2 bg-purple-100 rounded-full">
-                    <div className="h-full bg-purple-500 rounded-full w-2/3"></div>
-                  </div>
-                </div>
-            
-                {/* Land surveys */}
-                <div className="bg-white border border-green-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-2xl font-bold text-green-800">{formatNumber(analytics.landSurveys)}</h3>
-                      <p className="text-green-600">Land Surveys</p>
-                    </div>
-                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                      <span className="text-2xl">🗺️</span>
-                    </div>
-                  </div>
-                  <div className="mt-4 h-2 bg-green-100 rounded-full">
-                    <div className="h-full bg-green-500 rounded-full w-1/3"></div>
-                  </div>
-                </div>
-            
-                {/* Land Disputes */}
-                <div className="bg-white border border-orange-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-2xl font-bold text-orange-800">{formatNumber(analytics.landDisputes)}</h3>
-                      <p className="text-orange-600">Land Disputes</p>
-                    </div>
-                    <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                      <span className="text-2xl">⚖️</span>
-                    </div>
-                  </div>
-                  <div className="mt-4 h-2 bg-orange-100 rounded-full">
-                    <div className="h-full bg-orange-500 rounded-full w-1/4"></div>
-                  </div>
-                </div>
-              </div>
-            
-              {/* Land Use Types Chart */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md">
-                <h3 className="text-xl font-bold text-gray-800 mb-6">Land Use Types Distribution</h3>
-                <div className="space-y-4">
-                  {analytics.landUseTypes.map((landUse, index) => (
-                    <div key={landUse.type} className="flex items-center justify-between">
-                      <span className="text-gray-700 w-32 truncate font-medium">{landUse.type}</span>
-                      <div className="flex-1 mx-4">
-                        <div className="h-3 bg-gray-200 rounded-full">
-                          <div 
-                            className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"
-                            style={{ width: `${landUse.percentage}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                      <span className="text-blue-800 font-semibold w-20 text-right">
-                        {formatNumber(landUse.records)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-            
-            {/* Quick Actions */}
-            <section className="max-w-7xl mx-auto mb-12">
-              <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
-                Quick Actions
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  { icon: "🏠", label: "Land Deeds", color: "from-blue-600 to-blue-700" },
-                  { icon: "📋", label: "Property Records", color: "from-purple-600 to-purple-700" },
-                  { icon: "🗺️", label: "Land Survey", color: "from-green-600 to-green-700" },
-                  { icon: "⚖️", label: "Dispute Resolution", color: "from-orange-600 to-orange-700" },
-                  { icon: "📝", label: "Land Registration", color: "from-red-600 to-red-700" },
-                  { icon: "⚙️", label: "Settings", color: "from-gray-600 to-gray-700" }
-                ].map((action, index) => (
-                  <div
-                    key={index}
-                    className={`bg-gradient-to-r ${action.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-md cursor-pointer text-white`}
-                  >
-                    <div className="text-4xl mb-4">{action.icon}</div>
-                    <h3 className="text-xl font-semibold">{action.label}</h3>
-                  </div>
-                ))}
-              </div>
-            </section>
-            
-            {/* Role-Based Access Section */}
-            <section className="max-w-7xl mx-auto mb-12">
-              <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
-                Role-Based Access
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  { 
-                    icon: "👨‍💼", 
-                    label: "Authority Employees", 
-                    color: "from-blue-600 to-blue-700",
-                    description: "Access to land administration data, policy management, and system administration"
-                  },
-                  { 
-                    icon: "🏠", 
-                    label: "Land Officers", 
-                    color: "from-blue-600 to-blue-700",
-                    description: "Process land deeds, property records, and land use approvals"
-                  },
-                  { 
-                    icon: "🗺️", 
-                    label: "Surveyors", 
-                    color: "from-green-600 to-green-700",
-                    description: "Conduct land surveys, boundary demarcation, and mapping services"
-                  },
-                  { 
-                    icon: "⚖️", 
-                    label: "Dispute Resolution", 
-                    color: "from-orange-600 to-orange-700",
-                    description: "Handle land disputes, mediation, and conflict resolution processes"
-                  },
-                  { 
-                    icon: "📝", 
-                    label: "Registration Officers", 
-                    color: "from-red-600 to-red-700",
-                    description: "Process land registration, title deeds, and ownership transfers"
-                  },
-                  { 
-                    icon: "🔐", 
-                    label: "System Administrators", 
-                    color: "from-gray-600 to-gray-700",
-                    description: "Full system access, user management, and security configuration"
-                  }
-                ].map((role, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleRoleAccessClick(role.label)}
-                    className={`bg-gradient-to-r ${role.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-md cursor-pointer text-white`}
-                  >
-                    <div className="text-4xl mb-4">{role.icon}</div>
-                    <h3 className="text-xl font-semibold mb-3">{role.label}</h3>
-                    <p className="text-sm opacity-90">{role.description}</p>
-                  </div>  {/* This closing div was likely missing */}
-                ))}
-              </div>
-            </section>
-            
-            {/* Footer */}
-        <footer className="relative z-30 py-8 text-center bg-gray-50 border-t border-gray-200">
-          <div className="max-w-7xl mx-auto">
-            <p className="text-gray-600 text-sm">
-              © {new Date().getFullYear()} Liberia Land Authority - Digital Liberia. All rights reserved.
-            </p>
-            <p className="text-gray-500 text-xs mt-2">
-              Advanced Land Administration System • Powered by Digital Liberia NDMS
-            </p>
           </div>
-        </footer>
-      </section>  {/* Make sure this closing section tag exists */}
-    </main>
-  </div>
-);
+        </section>
+
+        {/* Analytics Dashboard */}
+        <section className="max-w-7xl mx-auto mb-12">
+          <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
+            Land Administration Analytics
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Land Deeds */}
+            <div className="bg-white border border-blue-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-blue-800">{formatNumber(analytics.landDeeds)}</h3>
+                  <p className="text-blue-600">Land Deeds</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <span className="text-2xl">🏠</span>
+                </div>
+              </div>
+              <div className="mt-4 h-2 bg-blue-100 rounded-full">
+                <div className="h-full bg-blue-500 rounded-full w-3/4"></div>
+              </div>
+            </div>
+        
+            {/* Property Records */}
+            <div className="bg-white border border-purple-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-purple-800">{formatNumber(analytics.propertyRecords)}</h3>
+                  <p className="text-purple-600">Property Records</p>
+                </div>
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <span className="text-2xl">📋</span>
+                </div>
+              </div>
+              <div className="mt-4 h-2 bg-purple-100 rounded-full">
+                <div className="h-full bg-purple-500 rounded-full w-2/3"></div>
+              </div>
+            </div>
+        
+            {/* Land surveys */}
+            <div className="bg-white border border-green-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-green-800">{formatNumber(analytics.landSurveys)}</h3>
+                  <p className="text-green-600">Land Surveys</p>
+                </div>
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                  <span className="text-2xl">🗺️</span>
+                </div>
+              </div>
+              <div className="mt-4 h-2 bg-green-100 rounded-full">
+                <div className="h-full bg-green-500 rounded-full w-1/3"></div>
+              </div>
+            </div>
+        
+            {/* Land Disputes */}
+            <div className="bg-white border border-orange-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-orange-800">{formatNumber(analytics.landDisputes)}</h3>
+                  <p className="text-orange-600">Land Disputes</p>
+                </div>
+                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                  <span className="text-2xl">⚖️</span>
+                </div>
+              </div>
+              <div className="mt-4 h-2 bg-orange-100 rounded-full">
+                <div className="h-full bg-orange-500 rounded-full w-1/4"></div>
+              </div>
+            </div>
+          </div>
+        
+          {/* Land Use Types Chart */}
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md">
+            <h3 className="text-xl font-bold text-gray-800 mb-6">Land Use Types Distribution</h3>
+            <div className="space-y-4">
+              {analytics.landUseTypes.map((landUse, index) => (
+                <div key={landUse.type} className="flex items-center justify-between">
+                  <span className="text-gray-700 w-32 truncate font-medium">{landUse.type}</span>
+                  <div className="flex-1 mx-4">
+                    <div className="h-3 bg-gray-200 rounded-full">
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"
+                        style={{ width: `${landUse.percentage}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  <span className="text-blue-800 font-semibold w-20 text-right">
+                    {formatNumber(landUse.records)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+        
+        {/* Quick Actions */}
+        <section className="max-w-7xl mx-auto mb-12">
+          <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
+            Quick Actions
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { icon: "🏠", label: "Land Deeds", color: "from-blue-600 to-blue-700" },
+              { icon: "📋", label: "Property Records", color: "from-purple-600 to-purple-700" },
+              { icon: "🗺️", label: "Land Survey", color: "from-green-600 to-green-700" },
+              { icon: "⚖️", label: "Dispute Resolution", color: "from-orange-600 to-orange-700" },
+              { icon: "📝", label: "Land Registration", color: "from-red-600 to-red-700" },
+              { icon: "⚙️", label: "Settings", color: "from-gray-600 to-gray-700" }
+            ].map((action, index) => (
+              <div
+                key={index}
+                className={`bg-gradient-to-r ${action.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-md cursor-pointer text-white`}
+              >
+                <div className="text-4xl mb-4">{action.icon}</div>
+                <h3 className="text-xl font-semibold">{action.label}</h3>
+              </div>
+            ))}
+          </div>
+        </section>
+        
+        {/* Role-Based Access Section */}
+        <section className="max-w-7xl mx-auto mb-12">
+          <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
+            Role-Based Access
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { 
+                icon: "👨‍💼", 
+                label: "Authority Employees", 
+                color: "from-blue-600 to-blue-700",
+                description: "Access to land administration data, policy management, and system administration"
+              },
+              { 
+                icon: "🏠", 
+                label: "Land Officers", 
+                color: "from-blue-600 to-blue-700",
+                description: "Process land deeds, property records, and land use approvals"
+              },
+              { 
+                icon: "🗺️", 
+                label: "Surveyors", 
+                color: "from-green-600 to-green-700",
+                description: "Conduct land surveys, boundary demarcation, and mapping services"
+              },
+              { 
+                icon: "⚖️", 
+                label: "Dispute Resolution", 
+                color: "from-orange-600 to-orange-700",
+                description: "Handle land disputes, mediation, and conflict resolution processes"
+              },
+              { 
+                icon: "📝", 
+                label: "Registration Officers", 
+                color: "from-red-600 to-red-700",
+                description: "Process land registration, title deeds, and ownership transfers"
+              },
+              { 
+                icon: "🔐", 
+                label: "System Administrators", 
+                color: "from-gray-600 to-gray-700",
+                description: "Full system access, user management, and security configuration"
+              }
+            ].map((role, index) => (
+              <div
+                key={index}
+                onClick={() => handleRoleAccessClick(role.label)}
+                className={`bg-gradient-to-r ${role.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-md cursor-pointer text-white`}
+              >
+                <div className="text-4xl mb-4">{role.icon}</div>
+                <h3 className="text-xl font-semibold mb-3">{role.label}</h3>
+                <p className="text-sm opacity-90">{role.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="relative z-30 py-8 text-center bg-gray-50 border-t border-gray-200">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-gray-600 text-sm">
+            © {new Date().getFullYear()} Liberia Land Authority - Digital Liberia. All rights reserved.
+          </p>
+          <p className="text-gray-500 text-xs mt-2">
+            Advanced Land Administration System • Powered by Digital Liberia NDMS
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+};
 
 export default LlaDashboard;
