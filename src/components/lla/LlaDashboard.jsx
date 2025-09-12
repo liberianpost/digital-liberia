@@ -1633,10 +1633,8 @@ const LlaDashboard = () => {
                 </p>
               </div>
             </footer>
-          </section>
-        </main>
-      </div>
-  );
-};
+         </div>
+       );
+     };
 
 export default LlaDashboard;
