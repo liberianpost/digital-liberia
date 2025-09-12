@@ -1633,9 +1633,9 @@ const LlaDashboard = () => {
                 </p>
               </div>
             </footer>
-          </div>
-        </section>
-      </main>
+          </section>
+        </main>
+      </div>
     </div>
   );
 };
