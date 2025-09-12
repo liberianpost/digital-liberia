@@ -1623,18 +1623,19 @@ const LlaDashboard = () => {
             </section>
             
             {/* Footer */}
-            <footer className="relative z-30 py-8 text-center bg-gray-50 border-t border-gray-200">
-              <div className="max-w-7xl mx-auto">
-                <p className="text-gray-600 text-sm">
-                  © {new Date().getFullYear()} Liberia Land Authority - Digital Liberia. All rights reserved.
-                </p>
-                <p className="text-gray-500 text-xs mt-2">
-                  Advanced Land Administration System • Powered by Digital Liberia NDMS
-                </p>
-              </div>
-            </footer>
-         </div>
-       );
-     };
+        <footer className="relative z-30 py-8 text-center bg-gray-50 border-t border-gray-200">
+          <div className="max-w-7xl mx-auto">
+            <p className="text-gray-600 text-sm">
+              © {new Date().getFullYear()} Liberia Land Authority - Digital Liberia. All rights reserved.
+            </p>
+            <p className="text-gray-500 text-xs mt-2">
+              Advanced Land Administration System • Powered by Digital Liberia NDMS
+            </p>
+          </div>
+        </footer>
+      </section>  {/* Make sure this closing section tag exists */}
+    </main>
+  </div>
+);
 
 export default LlaDashboard;
