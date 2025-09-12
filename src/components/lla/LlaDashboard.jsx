@@ -1169,474 +1169,465 @@ const LlaDashboard = () => {
               </form>
 
              {verificationResult && (
-              <div className="mt-8">
-                {/* Enhanced Verification Results */}
-                <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden mb-6">
-                  <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
-                    <h3 className="text-xl font-bold">UPTC Verification Results</h3>
-                    <p className="text-blue-100 text-sm mt-1">
-                      Verified on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
-                    </p>
+  <div className="mt-8">
+    {/* Enhanced Verification Results */}
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden mb-6">
+      <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+        <h3 className="text-xl font-bold">UPTC Verification Results</h3>
+        <p className="text-blue-100 text-sm mt-1">
+          Verified on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
+        </p>
+      </div>
+      
+      <div className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Land Information Card */}
+          <div className="bg-blue-50 p-5 rounded-xl border border-blue-100">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-blue-600 text-xl">🏠</span>
+              </div>
+              <h4 className="text-lg font-semibold text-blue-800">Land Information</h4>
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-blue-700 font-medium">Parcel ID:</span>
+                <span className="text-blue-900 font-mono">{verificationResult.land_parcel.parcel_id}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-blue-700 font-medium">County:</span>
+                <span className="text-blue-900">{verificationResult.land_parcel.county}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-blue-700 font-medium">Postal Code:</span>
+                <span className="text-blue-900">{verificationResult.land_parcel.postal_code}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-blue-700 font-medium">Area Name:</span>
+                <span className="text-blue-900">{verificationResult.land_parcel.area_name || "Not available"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-blue-700 font-medium">Plot Number:</span>
+                <span className="text-blue-900">{verificationResult.land_parcel.plot_number}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-blue-700 font-medium">Boundary Points:</span>
+                <span className="text-blue-900">
+                  {verificationResult.land_parcel.boundary 
+                    ? `${verificationResult.land_parcel.boundary.length} coordinates` 
+                    : "Not available"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-blue-700 font-medium">Date Surveyed:</span>
+                <span className="text-blue-900">{formatDisplayDate(verificationResult.land_parcel.date_surveyed)}</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Surveyor Information Card */}
+          <div className="bg-green-50 p-5 rounded-xl border border-green-100">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-green-600 text-xl">👨‍💼</span>
+              </div>
+              <h4 className="text-lg font-semibold text-green-800">Surveyor Information</h4>
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-green-700 font-medium">License ID:</span>
+                <span className="text-green-900">{verificationResult.surveyor.license_id}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-green-700 font-medium">Name:</span>
+                <span className="text-green-900">{verificationResult.surveyor.first_name} {verificationResult.surveyor.last_name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-green-700 font-medium">DSSN:</span>
+                <span className="text-green-900 font-mono">{verificationResult.surveyor.dssn}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-green-700 font-medium">Phone:</span>
+                <span className="text-green-900">{verificationResult.surveyor.phone_number || "Not available"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-green-700 font-medium">Date of Birth:</span>
+                <span className="text-green-900">{formatDisplayDate(verificationResult.surveyor.date_of_birth)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-green-700 font-medium">Place of Birth:</span>
+                <span className="text-green-900">{verificationResult.surveyor.place_of_birth || "Not available"}</span>
+              </div>
+              {verificationResult.surveyor.image_url && (
+                <div className="pt-3 border-t border-green-200">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-green-700 font-medium">Photo:</span>
+                    <img 
+                      src={constructImageUrl(verificationResult.surveyor.image_url)} 
+                      alt="Surveyor" 
+                      className="w-12 h-12 rounded-lg object-cover border border-green-300"
+                      onError={(e) => {
+                        e.target.src = "/logos/lla-user.png";
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        {/* Boundary Details Card */}
+        {verificationResult.land_parcel.boundary_wkt && (
+          <div className="mt-6 bg-purple-50 p-5 rounded-xl border border-purple-100">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-purple-600 text-xl">🗺️</span>
+              </div>
+              <h4 className="text-lg font-semibold text-purple-800">Boundary Details</h4>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h5 className="text-purple-700 font-medium mb-2">WKT Format</h5>
+                <div className="bg-white p-3 rounded-lg border border-purple-200 overflow-x-auto">
+                  <code className="text-sm text-purple-800 break-all">
+                    {verificationResult.land_parcel.boundary_wkt}
+                  </code>
+                </div>
+              </div>
+              <div>
+                <h5 className="text-purple-700 font-medium mb-2">Coordinates</h5>
+                <div className="bg-white p-3 rounded-lg border border-purple-200 max-h-40 overflow-y-auto">
+                  {verificationResult.land_parcel.boundary ? (
+                    verificationResult.land_parcel.boundary.map((coord, index) => (
+                      <div key={index} className="text-sm text-purple-800 mb-1">
+                        {index + 1}. {coord.latitude.toFixed(6)}, {coord.longitude.toFixed(6)}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-sm text-purple-600">No boundary coordinates available</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Owners Information */}
+        {verificationResult.owners && verificationResult.owners.length > 0 && (
+          <div className="mt-6 bg-orange-50 p-5 rounded-xl border border-orange-100">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-orange-600 text-xl">👥</span>
+              </div>
+              <h4 className="text-lg font-semibold text-orange-800">Property Owners</h4>
+              <span className="ml-2 text-orange-600 bg-orange-100 px-2 py-1 rounded-full text-sm">
+                {verificationResult.owners.length} owner(s)
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {verificationResult.owners.map((owner, index) => (
+                <div key={index} className="bg-white p-5 rounded-xl border border-orange-200">
+                  <div className="flex items-center mb-4">
+                    {owner.image_url && (
+                      <img 
+                        src={constructImageUrl(owner.image_url)} 
+                        alt={owner.first_name} 
+                        className="w-16 h-16 rounded-xl object-cover border border-orange-300 mr-4"
+                        onError={(e) => {
+                          e.target.src = "/logos/lla-user.png";
+                        }}
+                      />
+                    )}
+                    <div>
+                      <span className="text-orange-600 font-medium mr-2">Owner #{index + 1}</span>
+                      <h5 className="text-orange-800 font-semibold text-lg">{owner.first_name} {owner.last_name}</h5>
+                      <p className="text-orange-700 text-sm font-mono">{owner.dssn}</p>
+                    </div>
                   </div>
                   
-                  <div className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Land Information Card */}
-                      <div className="bg-blue-50 p-5 rounded-xl border border-blue-100">
-                        <div className="flex items-center mb-4">
-                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                            <span className="text-blue-600 text-xl">🏠</span>
-                          </div>
-                          <h4 className="text-lg font-semibold text-blue-800">Land Information</h4>
-                        </div>
-                        <div className="space-y-3">
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">Parcel ID:</span>
-                            <span className="text-blue-900 font-mono">{verificationResult.land_parcel.parcel_id}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">County:</span>
-                            <span className="text-blue-900">{verificationResult.land_parcel.county}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">Postal Code:</span>
-                            <span className="text-blue-900">{verificationResult.land_parcel.postal_code}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">Area Name:</span>
-                            <span className="text-blue-900">{verificationResult.land_parcel.area_name || "Not available"}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">Plot Number:</span>
-                            <span className="text-blue-900">{verificationResult.land_parcel.plot_number}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">Boundary Points:</span>
-                            <span className="text-blue-900">
-                              {verificationResult.land_parcel.boundary 
-                                ? `${verificationResult.land_parcel.boundary.length} coordinates` 
-                                : "Not available"}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">Date Surveyed:</span>
-                            <span className="text-blue-900">{formatDisplayDate(verificationResult.land_parcel.date_surveyed)}</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Surveyor Information Card */}
-                      <div className="bg-green-50 p-5 rounded-xl border border-green-100">
-                        <div className="flex items-center mb-4">
-                          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                            <span className="text-green-600 text-xl">👨‍💼</span>
-                          </div>
-                          <h4 className="text-lg font-semibold text-green-800">Surveyor Information</h4>
-                        </div>
-                        <div className="space-y-3">
-                          <div className="flex justify-between">
-                            <span className="text-green-700 font-medium">License ID:</span>
-                            <span className="text-green-900">{verificationResult.surveyor.license_id}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-green-700 font-medium">Name:</span>
-                            <span className="text-green-900">{verificationResult.surveyor.first_name} {verificationResult.surveyor.last_name}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-green-700 font-medium">DSSN:</span>
-                            <span className="text-green-900 font-mono">{verificationResult.surveyor.dssn}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-green-700 font-medium">Phone:</span>
-                            <span className="text-green-900">{verificationResult.surveyor.phone_number || "Not available"}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-green-700 font-medium">Date of Birth:</span>
-                            <span className="text-green-900">{formatDisplayDate(verificationResult.surveyor.date_of_birth)}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-green-700 font-medium">Place of Birth:</span>
-                            <span className="text-green-900">{verificationResult.surveyor.place_of_birth || "Not available"}</span>
-                          </div>
-                          {verificationResult.surveyor.image_url && (
-                            <div className="pt-3 border-t border-green-200">
-                              <div className="flex items-center space-x-3">
-                                <span className="text-green-700 font-medium">Photo:</span>
-                                <img 
-                                  src={constructImageUrl(verificationResult.surveyor.image_url)} 
-                                  alt="Surveyor" 
-                                  className="w-12 h-12 rounded-lg object-cover border border-green-300"
-                                  onError={(e) => {
-                                    e.target.src = "/logos/lla-user.png";
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                  <div className="space-y-3 text-sm border-t border-orange-100 pt-4">
+                    <div className="flex justify-between">
+                      <span className="text-orange-700 font-medium">Address:</span>
+                      <span className="text-orange-900 text-right">{owner.address || "Not available"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-orange-700 font-medium">Phone:</span>
+                      <span className="text-orange-900">{owner.phone_number || "Not available"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-orange-700 font-medium">Date of Birth:</span>
+                      <span className="text-orange-900">{formatDisplayDate(owner.date_of_birth)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-orange-700 font-medium">Place of Birth:</span>
+                      <span className="text-orange-900">{owner.place_of_birth || "Not available"}</span>
                     </div>
                     
-                    {/* Boundary Details Card */}
-                    {verificationResult.land_parcel.boundary_wkt && (
-                      <div className="mt-6 bg-purple-50 p-5 rounded-xl border border-purple-100">
-                        <div className="flex items-center mb-4">
-                          <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                            <span className="text-purple-600 text-xl">🗺️</span>
-                          </div>
-                          <h4 className="text-lg font-semibold text-purple-800">Boundary Details</h4>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <h5 className="text-purple-700 font-medium mb-2">WKT Format</h5>
-                            <div className="bg-white p-3 rounded-lg border border-purple-200 overflow-x-auto">
-                              <code className="text-sm text-purple-800 break-all">
-                                {verificationResult.land_parcel.boundary_wkt}
-                              </code>
-                            </div>
-                          </div>
-                          <div>
-                            <h5 className="text-purple-700 font-medium mb-2">Coordinates</h5>
-                            <div className="bg-white p-3 rounded-lg border border-purple-200 max-h-40 overflow-y-auto">
-                              {verificationResult.land_parcel.boundary ? (
-                                verificationResult.land_parcel.boundary.map((coord, index) => (
-                                  <div key={index} className="text-sm text-purple-800 mb-1">
-                                    {index + 1}. {coord.latitude.toFixed(6)}, {coord.longitude.toFixed(6)}
-                                  </div>
-                                ))
-                              ) : (
-                                <div className="text-sm text-purple-600">No boundary coordinates available</div>
+                    {/* Owner Documents */}
+                    {owner.documents && owner.documents.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-orange-100">
+                        <h6 className="text-orange-700 font-medium mb-3">Documents ({owner.documents.length})</h6>
+                        <div className="space-y-3">
+                          {owner.documents.map((doc, docIndex) => (
+                            <div key={docIndex} className="flex items-center justify-between bg-orange-50 p-3 rounded-lg border border-orange-200">
+                              <div>
+                                <span className="text-orange-700 font-medium capitalize">{doc.document_type || "Document"}</span>
+                                <p className="text-orange-600 text-xs">{formatDisplayDate(doc.date_uploaded)}</p>
+                              </div>
+                              {doc.image_url && (
+                                <a 
+                                  href={constructImageUrl(doc.image_url)} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-orange-600 hover:text-orange-800 text-sm font-medium"
+                                >
+                                  View Document
+                                </a>
                               )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Owners Information */}
-                    {verificationResult.owners && verificationResult.owners.length > 0 && (
-                      <div className="mt-6 bg-orange-50 p-5 rounded-xl border border-orange-100">
-                        <div className="flex items-center mb-4">
-                          <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
-                            <span className="text-orange-600 text-xl">👥</span>
-                          </div>
-                          <h4 className="text-lg font-semibold text-orange-800">Property Owners</h4>
-                          <span className="ml-2 text-orange-600 bg-orange-100 px-2 py-1 rounded-full text-sm">
-                            {verificationResult.owners.length} owner(s)
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {verificationResult.owners.map((owner, index) => (
-                            <div key={index} className="bg-white p-5 rounded-xl border border-orange-200">
-                              <div className="flex items-center mb-4">
-                                {owner.image_url && (
-                                  <img 
-                                    src={constructImageUrl(owner.image_url)} 
-                                    alt={owner.first_name} 
-                                    className="w-16 h-16 rounded-xl object-cover border border-orange-300 mr-4"
-                                    onError={(e) => {
-                                      e.target.src = "/logos/lla-user.png";
-                                    }}
-                                  />
-                                )}
-                                <div>
-                                  <span className="text-orange-600 font-medium mr-2">Owner #{index + 1}</span>
-                                  <h5 className="text-orange-800 font-semibold text-lg">{owner.first_name} {owner.last_name}</h5>
-                                  <p className="text-orange-700 text-sm font-mono">{owner.dssn}</p>
-                                </div>
-                              </div>
-                              
-                              <div className="space-y-3 text-sm border-t border-orange-100 pt-4">
-                                <div className="flex justify-between">
-                                  <span className="text-orange-700 font-medium">Address:</span>
-                                  <span className="text-orange-900 text-right">{owner.address || "Not available"}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-orange-700 font-medium">Phone:</span>
-                                  <span className="text-orange-900">{owner.phone_number || "Not available"}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-orange-700 font-medium">Date of Birth:</span>
-                                  <span className="text-orange-900">{formatDisplayDate(owner.date_of_birth)}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-orange-700 font-medium">Place of Birth:</span>
-                                  <span className="text-orange-900">{owner.place_of_birth || "Not available"}</span>
-                                </div>
-                                
-                                {/* Owner Documents */}
-                                {owner.documents && owner.documents.length > 0 && (
-                                  <div className="mt-4 pt-4 border-t border-orange-100">
-                                    <h6 className="text-orange-700 font-medium mb-3">Documents ({owner.documents.length})</h6>
-                                    <div className="space-y-3">
-                                      {owner.documents.map((doc, docIndex) => (
-                                        <div key={docIndex} className="flex items-center justify-between bg-orange-50 p-3 rounded-lg border border-orange-200">
-                                          <div>
-                                            <span className="text-orange-700 font-medium capitalize">{doc.document_type || "Document"}</span>
-                                            <p className="text-orange-600 text-xs">{formatDisplayDate(doc.date_uploaded)}</p>
-                                          </div>
-                                          {doc.image_url && (
-                                            <a 
-                                              href={constructImageUrl(doc.image_url)} 
-                                              target="_blank" 
-                                              rel="noopener noreferrer"
-                                              className="text-orange-600 hover:text-orange-800 text-sm font-medium"
-                                            >
-                                              View Document
-                                            </a>
-                                          )}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
-                    
-                    {/* Status Bar */}
-                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                          <span className="text-green-700 font-medium">Verification Successful</span>
-                        </div>
-                        <span className="text-gray-500 text-sm">
-                          UPTC: <span className="font-mono">{verifyUPTC}</span>
-                        </span>
-                      </div>
-                    </div>
                   </div>
-                </div>
-                
-                {/* Interactive Map for Boundary Visualization */}
-                {verificationResult.land_parcel.boundary_wkt && (
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
-                    <div className="flex items-center mb-4">
-                      <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
-                        <span className="text-red-600 text-xl">📍</span>
-                      </div>
-                      <h3 className="text-xl font-semibold text-gray-800">Property Location</h3>
-                    </div>
-                    
-                    <InteractiveMap 
-                      boundary={verificationResult.land_parcel.boundary_wkt}
-                      center={getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)}
-                    />
-                    
-                    <div className="mt-4 flex justify-between items-center">
-                      <p className="text-sm text-gray-600">
-                        Boundary Center: {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[0].toFixed(6)}, {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[1].toFixed(6)}
-                      </p>
-                      <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
-                        Download Boundary Details
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-        {/* Analytics Dashboard */}
-        <section className="max-w-7xl mx-auto mb-12">
-          <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
-            Land Administration Analytics
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-col-4 gap-6 mb-8">
-            {/* Land Deeds */}
-            <div className="bg-white border border-blue-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-blue-800">{formatNumber(analytics.landDeeds)}</h3>
-                  <p className="text-blue-600">Land Deeds</p>
-                </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <span className="text-2xl">🏠</span>
-                </div>
-              </div>
-              <div className="mt-4 h-2 bg-blue-100 rounded-full">
-                <div className="h-full bg-blue-500 rounded-full w-3/4"></div>
-              </div>
-            </div>
-
-            {/* Property Records */}
-            <div className="bg-white border border-purple-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-purple-800">{formatNumber(analytics.propertyRecords)}</h3>
-                  <p className="text-purple-600">Property Records</p>
-                </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <span className="text-2xl">📋</span>
-                </div>
-              </div>
-              <div className="mt-4 h-2 bg-purple-100 rounded-full">
-                <div className="h-full bg-purple-500 rounded-full w-2/3"></div>
-              </div>
-            </div>
-
-            {/* Land surveys */}
-            <div className="bg-white border border-green-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-green-800">{formatNumber(analytics.landSurveys)}</h3>
-                  <p className="text-green-600">Land Surveys</p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <span className="text-2xl">🗺️</span>
-                </div>
-              </div>
-              <div className="mt-4 h-2 bg-green-100 rounded-full">
-                <div className="h-full bg-green-500 rounded-full w-1/3"></div>
-              </div>
-            </div>
-
-            {/* Land Disputes */}
-            <div className="bg-white border border-orange-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-orange-800">{formatNumber(analytics.landDisputes)}</h3>
-                  <p className="text-orange-600">Land Disputes</p>
-                </div>
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                  <span className="text-2xl">⚖️</span>
-                </div>
-              </div>
-              <div className="mt-4 h-2 bg-orange-100 rounded-full">
-                <div className="h-full bg-orange-500 rounded-full w-1/4"></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Land Use Types Chart */}
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md">
-            <h3 className="text-xl font-bold text-gray-800 mb-6">Land Use Types Distribution</h3>
-            <div className="space-y-4">
-              {analytics.landUseTypes.map((landUse, index) => (
-                <div key={landUse.type} className="flex items-center justify-between">
-                  <span className="text-gray-700 w-32 truncate font-medium">{landUse.type}</span>
-                  <div className="flex-1 mx-4">
-                    <div className="h-3 bg-gray-200 rounded-full">
-                      <div 
-                        className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"
-                        style={{ width: `${landUse.percentage}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  <span className="text-blue-800 font-semibold w-20 text-right">
-                    {formatNumber(landUse.records)}
-                  </span>
                 </div>
               ))}
             </div>
           </div>
-        </section>
-
-        {/* Quick Actions */}
-        <section className="max-w-7xl mx-auto mb-12">
-          <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
-            Quick Actions
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { icon: "🏠", label: "Land Deeds", color: "from-blue-600 to-blue-700" },
-              { icon: "📋", label: "Property Records", color: "from-purple-600 to-purple-700" },
-              { icon: "🗺️", label: "Land Survey", color: "from-green-600 to-green-700" },
-              { icon: "⚖️", label: "Dispute Resolution", color: "from-orange-600 to-orange-700" },
-              { icon: "📝", label: "Land Registration", color: "from-red-600 to-red-700" },
-              { icon: "⚙️", label: "Settings", color: "from-gray-600 to-gray-700" }
-            ].map((action, index) => (
-              <div
-                key={index}
-                className={`bg-gradient-to-r ${action.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-md cursor-pointer text-white`}
-              >
-                <div className="text-4xl mb-4">{action.icon}</div>
-                <h3 className="text-xl font-semibold">{action.label}</h3>
-              </div>
-            ))}
+        )}
+        
+        {/* Status Bar */}
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+              <span className="text-green-700 font-medium">Verification Successful</span>
+            </div>
+            <span className="text-gray-500 text-sm">
+              UPTC: <span className="font-mono">{verifyUPTC}</span>
+            </span>
           </div>
-        </section>
-
-        {/* Role-Based Access Section */}
-        <section className="max-w-7xl mx-auto mb-12">
-          <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
-            Role-Based Access
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { 
-                icon: "👨‍💼", 
-                label: "Authority Employees", 
-                color: "from-blue-600 to-blue-700",
-                description: "Access to land administration data, policy management, and system administration"
-              },
-              { 
-                icon: "🏠", 
-                label: "Land Officers", 
-                color: "from-blue-600 to-blue-700",
-                description: "Process land deeds, property records, and land use approvals"
-              },
-              { 
-                icon: "🗺️", 
-                label: "Surveyors", 
-                color: "from-green-600 to-green-700",
-                description: "Conduct land surveys, boundary demarcation, and mapping services"
-              },
-              { 
-                icon: "⚖️", 
-                label: "Dispute Resolution", 
-                color: "from-orange-600 to-orange-700",
-                description: "Handle land disputes, mediation, and conflict resolution processes"
-              },
-              { 
-                icon: "📝", 
-                label: "Registration Officers", 
-                color: "from-red-600 to-red-700",
-                description: "Process land registration, title deeds, and ownership transfers"
-              },
-              { 
-                icon: "🔐", 
-                label: "System Administrators", 
-                color: "from-gray-600 to-gray-700",
-                description: "Full system access, user management, and security configuration"
-              }
-            ].map((role, index) => (
-              <div
-                key={index}
-                onClick={() => handleRoleAccessClick(role.label)}
-                className={`bg-gradient-to-r ${role.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-md cursor-pointer text-white`}
-              >
-                <div className="text-4xl mb-4">{role.icon}</div>
-                <h3 className="text-xl font-semibold mb-3">{role.label}</h3>
-                <p className="text-sm opacity-90">{role.description}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div> {/* This closing div was missing */}
-    </div> {/* This closing div was missing */}
-  </div> {/* This closing div was missing */}
-</div> {/* This closing div was missing */}
-      
-      {/* Footer */}
-      <footer className="relative z-30 py-8 text-center bg-gray-50 border-t border-gray-200">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-gray-600 text-sm">
-            © {new Date().getFullYear()} Liberia Land Authority - Digital Liberia. All rights reserved.
-          </p>
-          <p className="text-gray-500 text-xs mt-2">
-            Advanced Land Administration System • Powered by Digital Liberia NDMS
-          </p>
         </div>
-      </footer>
+      </div>
     </div>
-  );
-};
+    
+    {/* Interactive Map for Boundary Visualization */}
+    {verificationResult.land_parcel.boundary_wkt && (
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+        <div className="flex items-center mb-4">
+          <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+            <span className="text-red-600 text-xl">📍</span>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-800">Property Location</h3>
+        </div>
+        
+        <InteractiveMap 
+          boundary={verificationResult.land_parcel.boundary_wkt}
+          center={getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)}
+        />
+        
+        <div className="mt-4 flex justify-between items-center">
+          <p className="text-sm text-gray-600">
+            Boundary Center: {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[0].toFixed(6)}, {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[1].toFixed(6)}
+          </p>
+          <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+            Download Boundary Details
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+)}
 
-export default LlaDashboard;
+{/* Analytics Dashboard */}
+<section className="max-w-7xl mx-auto mb-12">
+  <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
+    Land Administration Analytics
+  </h2>
+  
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    {/* Land Deeds */}
+    <div className="bg-white border border-blue-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-2xl font-bold text-blue-800">{formatNumber(analytics.landDeeds)}</h3>
+          <p className="text-blue-600">Land Deeds</p>
+        </div>
+        <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+          <span className="text-2xl">🏠</span>
+        </div>
+      </div>
+      <div className="mt-4 h-2 bg-blue-100 rounded-full">
+        <div className="h-full bg-blue-500 rounded-full w-3/4"></div>
+      </div>
+    </div>
+
+    {/* Property Records */}
+    <div className="bg-white border border-purple-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-2xl font-bold text-purple-800">{formatNumber(analytics.propertyRecords)}</h3>
+          <p className="text-purple-600">Property Records</p>
+        </div>
+        <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+          <span className="text-2xl">📋</span>
+        </div>
+      </div>
+      <div className="mt-4 h-2 bg-purple-100 rounded-full">
+        <div className="h-full bg-purple-500 rounded-full w-2/3"></div>
+      </div>
+    </div>
+
+    {/* Land surveys */}
+    <div className="bg-white border border-green-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-2xl font-bold text-green-800">{formatNumber(analytics.landSurveys)}</h3>
+          <p className="text-green-600">Land Surveys</p>
+        </div>
+        <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+          <span className="text-2xl">🗺️</span>
+        </div>
+      </div>
+      <div className="mt-4 h-2 bg-green-100 rounded-full">
+        <div className="h-full bg-green-500 rounded-full w-1/3"></div>
+      </div>
+    </div>
+
+    {/* Land Disputes */}
+    <div className="bg-white border border-orange-200 rounded-2xl p-6 shadow-md hover:scale-105 transition-transform duration-300">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-2xl font-bold text-orange-800">{formatNumber(analytics.landDisputes)}</h3>
+          <p className="text-orange-600">Land Disputes</p>
+        </div>
+        <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+          <span className="text-2xl">⚖️</span>
+        </div>
+      </div>
+      <div className="mt-4 h-2 bg-orange-100 rounded-full">
+        <div className="h-full bg-orange-500 rounded-full w-1/4"></div>
+      </div>
+    </div>
+  </div>
+
+  {/* Land Use Types Chart */}
+  <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md">
+    <h3 className="text-xl font-bold text-gray-800 mb-6">Land Use Types Distribution</h3>
+    <div className="space-y-4">
+      {analytics.landUseTypes.map((landUse, index) => (
+        <div key={landUse.type} className="flex items-center justify-between">
+          <span className="text-gray-700 w-32 truncate font-medium">{landUse.type}</span>
+          <div className="flex-1 mx-4">
+            <div className="h-3 bg-gray-200 rounded-full">
+              <div 
+                className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"
+                style={{ width: `${landUse.percentage}%` }}
+              ></div>
+            </div>
+          </div>
+          <span className="text-blue-800 font-semibold w-20 text-right">
+            {formatNumber(landUse.records)}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+{/* Quick Actions */}
+<section className="max-w-7xl mx-auto mb-12">
+  <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
+    Quick Actions
+  </h2>
+  
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {[
+      { icon: "🏠", label: "Land Deeds", color: "from-blue-600 to-blue-700" },
+      { icon: "📋", label: "Property Records", color: "from-purple-600 to-purple-700" },
+      { icon: "🗺️", label: "Land Survey", color: "from-green-600 to-green-700" },
+      { icon: "⚖️", label: "Dispute Resolution", color: "from-orange-600 to-orange-700" },
+      { icon: "📝", label: "Land Registration", color: "from-red-600 to-red-700" },
+      { icon: "⚙️", label: "Settings", color: "from-gray-600 to-gray-700" }
+    ].map((action, index) => (
+      <div
+        key={index}
+        className={`bg-gradient-to-r ${action.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-md cursor-pointer text-white`}
+      >
+        <div className="text-4xl mb-4">{action.icon}</div>
+        <h3 className="text-xl font-semibold">{action.label}</h3>
+      </div>
+    ))}
+  </div>
+</section>
+
+{/* Role-Based Access Section */}
+<section className="max-w-7xl mx-auto mb-12">
+  <h2 className="text-3xl font-bold mb-8 text-blue-900 text-center">
+    Role-Based Access
+  </h2>
+  
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {[
+      { 
+        icon: "👨‍💼", 
+        label: "Authority Employees", 
+        color: "from-blue-600 to-blue-700",
+        description: "Access to land administration data, policy management, and system administration"
+      },
+      { 
+        icon: "🏠", 
+        label: "Land Officers", 
+        color: "from-blue-600 to-blue-700",
+        description: "Process land deeds, property records, and land use approvals"
+      },
+      { 
+        icon: "🗺️", 
+        label: "Surveyors", 
+        color: "from-green-600 to-green-700",
+        description: "Conduct land surveys, boundary demarcation, and mapping services"
+      },
+      { 
+        icon: "⚖️", 
+        label: "Dispute Resolution", 
+        color: "from-orange-600 to-orange-700",
+        description: "Handle land disputes, mediation, and conflict resolution processes"
+      },
+      { 
+        icon: "📝", 
+        label: "Registration Officers", 
+        color: "from-red-600 to-red-700",
+        description: "Process land registration, title deeds, and ownership transfers"
+      },
+      { 
+        icon: "🔐", 
+        label: "System Administrators", 
+        color: "from-gray-600 to-gray-700",
+        description: "Full system access, user management, and security configuration"
+      }
+    ].map((role, index) => (
+      <div
+        key={index}
+        onClick={() => handleRoleAccessClick(role.label)}
+        className={`bg-gradient-to-r ${role.color} rounded-2xl p-6 text-center transform hover:scale-105 transition-all duration-300 shadow-md cursor-pointer text-white`}
+      >
+        <div className="text-4xl mb-4">{role.icon}</div>
+        <h3 className="text-xl font-semibold mb-3">{role.label}</h3>
+        <p className="text-sm opacity-90">{role.description}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+{/* Footer */}
+<footer className="relative z-30 py-8 text-center bg-gray-50 border-t border-gray-200">
+  <div className="max-w-7xl mx-auto">
+    <p className="text-gray-600 text-sm">
+      © {new Date().getFullYear()} Liberia Land Authority - Digital Liberia. All rights reserved.
+    </p>
+    <p className="text-gray-500 text-xs mt-2">
+      Advanced Land Administration System • Powered by Digital Liberia NDMS
+    </p>
+  </div>
+</footer>
