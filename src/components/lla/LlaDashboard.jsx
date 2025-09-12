@@ -1178,7 +1178,7 @@ const LlaDashboard = () => {
                       Verified on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
                     </p>
                   </div>
-                  
+            
                   <div className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Land Information Card */}
@@ -1224,7 +1224,7 @@ const LlaDashboard = () => {
                           </div>
                         </div>
                       </div>
-                      
+            
                       {/* Surveyor Information Card */}
                       <div className="bg-green-50 p-5 rounded-xl border border-green-100">
                         <div className="flex items-center mb-4">
@@ -1276,7 +1276,7 @@ const LlaDashboard = () => {
                         </div>
                       </div>
                     </div>
-                    
+            
                     {/* Boundary Details Card */}
                     {verificationResult.land_parcel.boundary_wkt && (
                       <div className="mt-6 bg-purple-50 p-5 rounded-xl border border-purple-100">
@@ -1312,7 +1312,7 @@ const LlaDashboard = () => {
                         </div>
                       </div>
                     )}
-                    
+            
                     {/* Owners Information */}
                     {verificationResult.owners && verificationResult.owners.length > 0 && (
                       <div className="mt-6 bg-orange-50 p-5 rounded-xl border border-orange-100">
@@ -1345,7 +1345,7 @@ const LlaDashboard = () => {
                                   <p className="text-orange-700 text-sm font-mono">{owner.dssn}</p>
                                 </div>
                               </div>
-                              
+            
                               <div className="space-y-3 text-sm border-t border-orange-100 pt-4">
                                 <div className="flex justify-between">
                                   <span className="text-orange-700 font-medium">Address:</span>
@@ -1363,7 +1363,7 @@ const LlaDashboard = () => {
                                   <span className="text-orange-700 font-medium">Place of Birth:</span>
                                   <span className="text-orange-900">{owner.place_of_birth || "Not available"}</span>
                                 </div>
-                                
+            
                                 {/* Owner Documents */}
                                 {owner.documents && owner.documents.length > 0 && (
                                   <div className="mt-4 pt-4 border-t border-orange-100">
@@ -1396,7 +1396,7 @@ const LlaDashboard = () => {
                         </div>
                       </div>
                     )}
-                    
+            
                     {/* Status Bar */}
                     <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
                       <div className="flex items-center justify-between">
@@ -1411,7 +1411,7 @@ const LlaDashboard = () => {
                     </div>
                   </div>
                 </div>
-                
+            
                 {/* Interactive Map for Boundary Visualization */}
                 {verificationResult.land_parcel.boundary_wkt && (
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
@@ -1421,12 +1421,12 @@ const LlaDashboard = () => {
                       </div>
                       <h3 className="text-xl font-semibold text-gray-800">Property Location</h3>
                     </div>
-                    
+            
                     <InteractiveMap 
                       boundary={verificationResult.land_parcel.boundary_wkt}
                       center={getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)}
                     />
-                    
+            
                     <div className="mt-4 flex justify-between items-center">
                       <p className="text-sm text-gray-600">
                         Boundary Center: {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[0].toFixed(6)}, {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[1].toFixed(6)}
@@ -1439,6 +1439,7 @@ const LlaDashboard = () => {
                 )}
               </div>
             )}
+
             
             {/* Analytics Dashboard */}
             <section className="max-w-7xl mx-auto mb-12">
