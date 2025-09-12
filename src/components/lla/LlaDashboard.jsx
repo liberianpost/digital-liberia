@@ -1617,7 +1617,7 @@ const LlaDashboard = () => {
                     <div className="text-4xl mb-4">{role.icon}</div>
                     <h3 className="text-xl font-semibold mb-3">{role.label}</h3>
                     <p className="text-sm opacity-90">{role.description}</p>
-                  </div>
+                  </div>  {/* This closing div was likely missing */}
                 ))}
               </div>
             </section>
