@@ -1619,8 +1619,11 @@ const LlaDashboard = () => {
             ))}
           </div>
         </section>
-      </main>
-
+      </div> {/* This closing div was missing */}
+    </div> {/* This closing div was missing */}
+  </div> {/* This closing div was missing */}
+</div> {/* This closing div was missing */}
+      
       {/* Footer */}
       <footer className="relative z-30 py-8 text-center bg-gray-50 border-t border-gray-200">
         <div className="max-w-7xl mx-auto">
