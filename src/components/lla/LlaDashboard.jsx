@@ -477,7 +477,7 @@ const postalCodes = {
     { code: "60107", area: "YELAYALOE - YELAYALOE - FOYA" },
     { code: "60108", area: "BORLILOE - BORLILOE - FOYA" },
     { code: "60109", area: "BANDENIN - BANDENIN - FOYA" },
-    { code: "60110", area: "BANDENIN MELIMU - BANDENIN MELIMU - FOYA" },
+    { code: "60110", area: "BANDENIN MELIMU - BANDENIN MELIMu - FOYA" },
     { code: "60111", area: "LEPALOE - LEPALOE - FOYA" },
     { code: "60201", area: "KORTUMA - KORTUMA - VAHUN" },
     { code: "60202", area: "VAHUN - VAHUN CITY - VAHUN" },
@@ -794,7 +794,7 @@ const LlaDashboard = () => {
           address: "Digital Liberia User",
           postal_address: "Monrovia, Liberia"
         });
-        } finally {
+      } finally {
         setLoading(false);
       }
     };
@@ -1162,286 +1162,286 @@ const LlaDashboard = () => {
                 <button
                   type="submit"
                   disabled={verifying}
-                    className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg font-semibold disabled:opacity-50"
+                  className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg font-semibold disabled:opacity-50"
                 >
                   {verifying ? "Verifying..." : "Verify UPTC"}
                 </button>
               </form>
         
-             {verificationResult && (
-              <div className="mt-8">
-                {/* Enhanced Verification Results */}
-                <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden mb-6">
-                  <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
-                    <h3 className="text-xl font-bold">UPTC Verification Results</h3>
-                    <p className="text-blue-100 text-sm mt-1">
-                      Verified on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
-                    </p>
-                  </div>
-            
-                  <div className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Land Information Card */}
-                      <div className="bg-blue-50 p-5 rounded-xl border border-blue-100">
-                        <div className="flex items-center mb-4">
-                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                            <span className="text-blue-600 text-xl">🏠</span>
-                          </div>
-                          <h4 className="text-lg font-semibold text-blue-800">Land Information</h4>
-                        </div>
-                        <div className="space-y-3">
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">Parcel ID:</span>
-                            <span className="text-blue-900 font-mono">{verificationResult.land_parcel.parcel_id}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">County:</span>
-                            <span className="text-blue-900">{verificationResult.land_parcel.county}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">Postal Code:</span>
-                            <span className="text-blue-900">{verificationResult.land_parcel.postal_code}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">Area Name:</span>
-                            <span className="text-blue-900">{verificationResult.land_parcel.area_name || "Not available"}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">Plot Number:</span>
-                            <span className="text-blue-900">{verificationResult.land_parcel.plot_number}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">Boundary Points:</span>
-                            <span className="text-blue-900">
-                              {verificationResult.land_parcel.boundary 
-                                ? `${verificationResult.land_parcel.boundary.length} coordinates` 
-                                : "Not available"}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-700 font-medium">Date Surveyed:</span>
-                            <span className="text-blue-900">{formatDisplayDate(verificationResult.land_parcel.date_surveyed)}</span>
-                          </div>
-                        </div>
-                      </div>
-            
-                      {/* Surveyor Information Card */}
-                      <div className="bg-green-50 p-5 rounded-xl border border-green-100">
-                        <div className="flex items-center mb-4">
-                          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                            <span className="text-green-600 text-xl">👨‍💼</span>
-                          </div>
-                          <h4 className="text-lg font-semibold text-green-800">Surveyor Information</h4>
-                        </div>
-                        <div className="space-y-3">
-                          <div className="flex justify-between">
-                            <span className="text-green-700 font-medium">License ID:</span>
-                            <span className="text-green-900">{verificationResult.surveyor.license_id}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-green-700 font-medium">Name:</span>
-                            <span className="text-green-900">{verificationResult.surveyor.first_name} {verificationResult.surveyor.last_name}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-green-700 font-medium">DSSN:</span>
-                            <span className="text-green-900 font-mono">{verificationResult.surveyor.dssn}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-green-700 font-medium">Phone:</span>
-                            <span className="text-green-900">{verificationResult.surveyor.phone_number || "Not available"}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-green-700 font-medium">Date of Birth:</span>
-                            <span className="text-green-900">{formatDisplayDate(verificationResult.surveyor.date_of_birth)}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-green-700 font-medium">Place of Birth:</span>
-                            <span className="text-green-900">{verificationResult.surveyor.place_of_birth || "Not available"}</span>
-                          </div>
-                          {verificationResult.surveyor.image_url && (
-                            <div className="pt-3 border-t border-green-200">
-                              <div className="flex items-center space-x-3">
-                                <span className="text-green-700 font-medium">Photo:</span>
-                                <img 
-                                  src={constructImageUrl(verificationResult.surveyor.image_url)} 
-                                  alt="Surveyor" 
-                                  className="w-12 h-12 rounded-lg object-cover border border-green-300"
-                                  onError={(e) => {
-                                    e.target.src = "/logos/lla-user.png";
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+              {verificationResult && (
+                <div className="mt-8">
+                  {/* Enhanced Verification Results */}
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden mb-6">
+                    <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+                      <h3 className="text-xl font-bold">UPTC Verification Results</h3>
+                      <p className="text-blue-100 text-sm mt-1">
+                        Verified on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
+                      </p>
                     </div>
-            
-                    {/* Boundary Details Card */}
-                    {verificationResult.land_parcel.boundary_wkt && (
-                      <div className="mt-6 bg-purple-50 p-5 rounded-xl border border-purple-100">
-                        <div className="flex items-center mb-4">
-                          <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                            <span className="text-purple-600 text-xl">🗺️</span>
+                
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Land Information Card */}
+                        <div className="bg-blue-50 p-5 rounded-xl border border-blue-100">
+                          <div className="flex items-center mb-4">
+                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                              <span className="text-blue-600 text-xl">🏠</span>
+                            </div>
+                            <h4 className="text-lg font-semibold text-blue-800">Land Information</h4>
                           </div>
-                          <h4 className="text-lg font-semibold text-purple-800">Boundary Details</h4>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <h5 className="text-purple-700 font-medium mb-2">WKT Format</h5>
-                            <div className="bg-white p-3 rounded-lg border border-purple-200 overflow-x-auto">
-                              <code className="text-sm text-purple-800 break-all">
-                                {verificationResult.land_parcel.boundary_wkt}
-                              </code>
+                          <div className="space-y-3">
+                            <div className="flex justify-between">
+                              <span className="text-blue-700 font-medium">Parcel ID:</span>
+                              <span className="text-blue-900 font-mono">{verificationResult.land_parcel.parcel_id}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-blue-700 font-medium">County:</span>
+                              <span className="text-blue-900">{verificationResult.land_parcel.county}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-blue-700 font-medium">Postal Code:</span>
+                              <span className="text-blue-900">{verificationResult.land_parcel.postal_code}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-blue-700 font-medium">Area Name:</span>
+                              <span className="text-blue-900">{verificationResult.land_parcel.area_name || "Not available"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-blue-700 font-medium">Plot Number:</span>
+                              <span className="text-blue-900">{verificationResult.land_parcel.plot_number}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-blue-700 font-medium">Boundary Points:</span>
+                              <span className="text-blue-900">
+                                {verificationResult.land_parcel.boundary 
+                                  ? `${verificationResult.land_parcel.boundary.length} coordinates` 
+                                  : "Not available"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-blue-700 font-medium">Date Surveyed:</span>
+                              <span className="text-blue-900">{formatDisplayDate(verificationResult.land_parcel.date_surveyed)}</span>
                             </div>
                           </div>
-                          <div>
-                            <h5 className="text-purple-700 font-medium mb-2">Coordinates</h5>
-                            <div className="bg-white p-3 rounded-lg border border-purple-200 max-h-40 overflow-y-auto">
-                              {verificationResult.land_parcel.boundary ? (
-                                verificationResult.land_parcel.boundary.map((coord, index) => (
-                                  <div key={index} className="text-sm text-purple-800 mb-1">
-                                    {index + 1}. {coord.latitude.toFixed(6)}, {coord.longitude.toFixed(6)}
-                                  </div>
-                                ))
-                              ) : (
-                                <div className="text-sm text-purple-600">No boundary coordinates available</div>
-                              )}
+                        </div>
+                
+                        {/* Surveyor Information Card */}
+                        <div className="bg-green-50 p-5 rounded-xl border border-green-100">
+                          <div className="flex items-center mb-4">
+                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                              <span className="text-green-600 text-xl">👨‍💼</span>
                             </div>
+                            <h4 className="text-lg font-semibold text-green-800">Surveyor Information</h4>
                           </div>
-                        </div>
-                      </div>
-                    )}
-            
-                    {/* Owners Information */}
-                    {verificationResult.owners && verificationResult.owners.length > 0 && (
-                      <div className="mt-6 bg-orange-50 p-5 rounded-xl border border-orange-100">
-                        <div className="flex items-center mb-4">
-                          <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
-                            <span className="text-orange-600 text-xl">👥</span>
-                          </div>
-                          <h4 className="text-lg font-semibold text-orange-800">Property Owners</h4>
-                          <span className="ml-2 text-orange-600 bg-orange-100 px-2 py-1 rounded-full text-sm">
-                            {verificationResult.owners.length} owner(s)
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {verificationResult.owners.map((owner, index) => (
-                            <div key={index} className="bg-white p-5 rounded-xl border border-orange-200">
-                              <div className="flex items-center mb-4">
-                                {owner.image_url && (
+                          <div className="space-y-3">
+                            <div className="flex justify-between">
+                              <span className="text-green-700 font-medium">License ID:</span>
+                              <span className="text-green-900">{verificationResult.surveyor.license_id}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-green-700 font-medium">Name:</span>
+                              <span className="text-green-900">{verificationResult.surveyor.first_name} {verificationResult.surveyor.last_name}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-green-700 font-medium">DSSN:</span>
+                              <span className="text-green-900 font-mono">{verificationResult.surveyor.dssn}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-green-700 font-medium">Phone:</span>
+                              <span className="text-green-900">{verificationResult.surveyor.phone_number || "Not available"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-green-700 font-medium">Date of Birth:</span>
+                              <span className="text-green-900">{formatDisplayDate(verificationResult.surveyor.date_of_birth)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-green-700 font-medium">Place of Birth:</span>
+                              <span className="text-green-900">{verificationResult.surveyor.place_of_birth || "Not available"}</span>
+                            </div>
+                            {verificationResult.surveyor.image_url && (
+                              <div className="pt-3 border-t border-green-200">
+                                <div className="flex items-center space-x-3">
+                                  <span className="text-green-700 font-medium">Photo:</span>
                                   <img 
-                                    src={constructImageUrl(owner.image_url)} 
-                                    alt={owner.first_name} 
-                                    className="w-16 h-16 rounded-xl object-cover border border-orange-300 mr-4"
+                                    src={constructImageUrl(verificationResult.surveyor.image_url)} 
+                                    alt="Surveyor" 
+                                    className="w-12 h-12 rounded-lg object-cover border border-green-300"
                                     onError={(e) => {
                                       e.target.src = "/logos/lla-user.png";
                                     }}
                                   />
-                                )}
-                                <div>
-                                  <span className="text-orange-600 font-medium mr-2">Owner #{index + 1}</span>
-                                  <h5 className="text-orange-800 font-semibold text-lg">{owner.first_name} {owner.last_name}</h5>
-                                  <p className="text-orange-700 text-sm font-mono">{owner.dssn}</p>
                                 </div>
                               </div>
-            
-                              <div className="space-y-3 text-sm border-t border-orange-100 pt-4">
-                                <div className="flex justify-between">
-                                  <span className="text-orange-700 font-medium">Address:</span>
-                                  <span className="text-orange-900 text-right">{owner.address || "Not available"}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-orange-700 font-medium">Phone:</span>
-                                  <span className="text-orange-900">{owner.phone_number || "Not available"}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-orange-700 font-medium">Date of Birth:</span>
-                                  <span className="text-orange-900">{formatDisplayDate(owner.date_of_birth)}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-orange-700 font-medium">Place of Birth:</span>
-                                  <span className="text-orange-900">{owner.place_of_birth || "Not available"}</span>
-                                </div>
-            
-                                {/* Owner Documents */}
-                                {owner.documents && owner.documents.length > 0 && (
-                                  <div className="mt-4 pt-4 border-t border-orange-100">
-                                    <h6 className="text-orange-700 font-medium mb-3">Documents ({owner.documents.length})</h6>
-                                    <div className="space-y-3">
-                                      {owner.documents.map((doc, docIndex) => (
-                                        <div key={docIndex} className="flex items-center justify-between bg-orange-50 p-3 rounded-lg border border-orange-200">
-                                          <div>
-                                            <span className="text-orange-700 font-medium capitalize">{doc.document_type || "Document"}</span>
-                                            <p className="text-orange-600 text-xs">{formatDisplayDate(doc.date_uploaded)}</p>
-                                          </div>
-                                          {doc.image_url && (
-                                            <a 
-                                              href={constructImageUrl(doc.image_url)} 
-                                              target="_blank" 
-                                              rel="noopener noreferrer"
-                                              className="text-orange-600 hover:text-orange-800 text-sm font-medium"
-                                            >
-                                              View Document
-                                            </a>
-                                          )}
-                                        </div>
-                                      ))}
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                
+                      {/* Boundary Details Card */}
+                      {verificationResult.land_parcel.boundary_wkt && (
+                        <div className="mt-6 bg-purple-50 p-5 rounded-xl border border-purple-100">
+                          <div className="flex items-center mb-4">
+                            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                              <span className="text-purple-600 text-xl">🗺️</span>
+                            </div>
+                            <h4 className="text-lg font-semibold text-purple-800">Boundary Details</h4>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <h5 className="text-purple-700 font-medium mb-2">WKT Format</h5>
+                              <div className="bg-white p-3 rounded-lg border border-purple-200 overflow-x-auto">
+                                <code className="text-sm text-purple-800 break-all">
+                                  {verificationResult.land_parcel.boundary_wkt}
+                                </code>
+                              </div>
+                            </div>
+                            <div>
+                              <h5 className="text-purple-700 font-medium mb-2">Coordinates</h5>
+                              <div className="bg-white p-3 rounded-lg border border-purple-200 max-h-40 overflow-y-auto">
+                                {verificationResult.land_parcel.boundary ? (
+                                  verificationResult.land_parcel.boundary.map((coord, index) => (
+                                    <div key={index} className="text-sm text-purple-800 mb-1">
+                                      {index + 1}. {coord.latitude.toFixed(6)}, {coord.longitude.toFixed(6)}
                                     </div>
-                                  </div>
+                                  ))
+                                ) : (
+                                  <div className="text-sm text-purple-600">No boundary coordinates available</div>
                                 )}
                               </div>
                             </div>
-                          ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-            
-                    {/* Status Bar */}
-                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                          <span className="text-green-700 font-medium">Verification Successful</span>
+                      )}
+                
+                      {/* Owners Information */}
+                      {verificationResult.owners && verificationResult.owners.length > 0 && (
+                        <div className="mt-6 bg-orange-50 p-5 rounded-xl border border-orange-100">
+                          <div className="flex items-center mb-4">
+                            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
+                              <span className="text-orange-600 text-xl">👥</span>
+                            </div>
+                            <h4 className="text-lg font-semibold text-orange-800">Property Owners</h4>
+                            <span className="ml-2 text-orange-600 bg-orange-100 px-2 py-1 rounded-full text-sm">
+                              {verificationResult.owners.length} owner(s)
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {verificationResult.owners.map((owner, index) => (
+                              <div key={index} className="bg-white p-5 rounded-xl border border-orange-200">
+                                <div className="flex items-center mb-4">
+                                  {owner.image_url && (
+                                    <img 
+                                      src={constructImageUrl(owner.image_url)} 
+                                      alt={owner.first_name} 
+                                      className="w-16 h-16 rounded-xl object-cover border border-orange-300 mr-4"
+                                      onError={(e) => {
+                                        e.target.src = "/logos/lla-user.png";
+                                      }}
+                                    />
+                                  )}
+                                  <div>
+                                    <span className="text-orange-600 font-medium mr-2">Owner #{index + 1}</span>
+                                    <h5 className="text-orange-800 font-semibold text-lg">{owner.first_name} {owner.last_name}</h5>
+                                    <p className="text-orange-700 text-sm font-mono">{owner.dssn}</p>
+                                  </div>
+                                </div>
+                
+                                <div className="space-y-3 text-sm border-t border-orange-100 pt-4">
+                                  <div className="flex justify-between">
+                                    <span className="text-orange-700 font-medium">Address:</span>
+                                    <span className="text-orange-900 text-right">{owner.address || "Not available"}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-orange-700 font-medium">Phone:</span>
+                                    <span className="text-orange-900">{owner.phone_number || "Not available"}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-orange-700 font-medium">Date of Birth:</span>
+                                    <span className="text-orange-900">{formatDisplayDate(owner.date_of_birth)}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-orange-700 font-medium">Place of Birth:</span>
+                                    <span className="text-orange-900">{owner.place_of_birth || "Not available"}</span>
+                                  </div>
+                
+                                  {/* Owner Documents */}
+                                  {owner.documents && owner.documents.length > 0 && (
+                                    <div className="mt-4 pt-4 border-t border-orange-100">
+                                      <h6 className="text-orange-700 font-medium mb-3">Documents ({owner.documents.length})</h6>
+                                      <div className="space-y-3">
+                                        {owner.documents.map((doc, docIndex) => (
+                                          <div key={docIndex} className="flex items-center justify-between bg-orange-50 p-3 rounded-lg border border-orange-200">
+                                            <div>
+                                              <span className="text-orange-700 font-medium capitalize">{doc.document_type || "Document"}</span>
+                                              <p className="text-orange-600 text-xs">{formatDisplayDate(doc.date_uploaded)}</p>
+                                            </div>
+                                            {doc.image_url && (
+                                              <a 
+                                                href={constructImageUrl(doc.image_url)} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="text-orange-600 hover:text-orange-800 text-sm font-medium"
+                                              >
+                                                View Document
+                                              </a>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <span className="text-gray-500 text-sm">
-                          UPTC: <span className="font-mono">{verifyUPTC}</span>
-                        </span>
+                      )}
+                
+                      {/* Status Bar */}
+                      <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                            <span className="text-green-700 font-medium">Verification Successful</span>
+                          </div>
+                          <span className="text-gray-500 text-sm">
+                            UPTC: <span className="font-mono">{verifyUPTC}</span>
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
+                
+                  {/* Interactive Map for Boundary Visualization */}
+                  {verificationResult.land_parcel.boundary_wkt && (
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+                      <div className="flex items-center mb-4">
+                        <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                          <span className="text-red-600 text-xl">📍</span>
+                        </div>
+                        <h3 className="text-xl font-semibold text-gray-800">Property Location</h3>
+                      </div>
+                
+                      <InteractiveMap 
+                        boundary={verificationResult.land_parcel.boundary_wkt}
+                        center={getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)}
+                      />
+                
+                      <div className="mt-4 flex justify-between items-center">
+                        <p className="text-sm text-gray-600">
+                          Boundary Center: {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[0].toFixed(6)}, {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[1].toFixed(6)}
+                        </p>
+                        <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                          Download Boundary Details
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-            
-                {/* Interactive Map for Boundary Visualization */}
-                {verificationResult.land_parcel.boundary_wkt && (
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
-                    <div className="flex items-center mb-4">
-                      <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
-                        <span className="text-red-600 text-xl">📍</span>
-                      </div>
-                      <h3 className="text-xl font-semibold text-gray-800">Property Location</h3>
-                    </div>
-            
-                    <InteractiveMap 
-                      boundary={verificationResult.land_parcel.boundary_wkt}
-                      center={getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)}
-                    />
-            
-                    <div className="mt-4 flex justify-between items-center">
-                      <p className="text-sm text-gray-600">
-                        Boundary Center: {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[0].toFixed(6)}, {getCenterFromBoundary(verificationResult.land_parcel.boundary_wkt)[1].toFixed(6)}
-                      </p>
-                      <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
-                        Download Boundary Details
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-            </div> {/* Closing div for p-8 */}
-          </div> {/* Closing div for Verify UPTC Container */}
-        </section> {/* Closing section for UPTC Management Section */}
+              )}
+            </div>
+          </div>
+        </section>
 
         {/* Analytics Dashboard */}
         <section className="max-w-7xl mx-auto mb-12">
