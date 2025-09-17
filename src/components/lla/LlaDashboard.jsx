@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Polygon, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import api from '@/api';
+import ImmigrationPayment from './ImmigrationPayment';
 
 // Fix for default markers in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -477,7 +478,7 @@ const postalCodes = {
     { code: "60107", area: "YELAYALOE - YELAYALOE - FOYA" },
     { code: "60108", area: "BORLILOE - BORLILOE - FOYA" },
     { code: "60109", area: "BANDENIN - BANDENIN - FOYA" },
-    { code: "60110", area: "BANDENIN MELIMU - BANDENIN MELIMu - FOYA" },
+    { code: "60110", area: "BANDENIN MELIMU - BANDENIN MELIMU - FOYA" },
     { code: "60111", area: "LEPALOE - LEPALOE - FOYA" },
     { code: "60201", area: "KORTUMA - KORTUMA - VAHUN" },
     { code: "60202", area: "VAHUN - VAHUN CITY - VAHUN" },
@@ -716,6 +717,10 @@ const LlaDashboard = () => {
   const [verificationResult, setVerificationResult] = useState(null);
   const [verifying, setVerifying] = useState(false);
 
+  // Payment state
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
+
   // Filtered postal codes based on selected county
   const [filteredPostalCodes, setFilteredPostalCodes] = useState([]);
 
@@ -837,7 +842,14 @@ const LlaDashboard = () => {
 
   // Handle UPTC Generation
   const handleGenerateUPTC = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    
+    // Check if payment is completed
+    if (!paymentCompleted) {
+      setShowPaymentModal(true);
+      return;
+    }
+    
     setGenerating(true);
     setGeneratedUPTC("");
     
@@ -846,6 +858,7 @@ const LlaDashboard = () => {
       
       if (response.data.success) {
         setGeneratedUPTC(response.data.uptc_code);
+        setPaymentCompleted(false); // Reset for next time
       } else {
         alert("Error generating UPTC: " + response.data.message);
       }
@@ -1115,11 +1128,11 @@ const LlaDashboard = () => {
                   </div>
                 </div>
                 <button
-                  type="submit"
-                  disabled={generating}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold disabled:opacity-50"
+                  type="button" // Change from "submit" to "button"
+                  onClick={() => setShowPaymentModal(true)}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"
                 >
-                  {generating ? "Generating..." : "Generate UPTC"}
+                  Generate UPTC
                 </button>
               </form>
         
@@ -1442,6 +1455,23 @@ const LlaDashboard = () => {
             </div>
           </div>
         </section>
+
+        {/* Payment Modal */}
+        {showPaymentModal && (
+          <ImmigrationPayment
+            onPaymentSuccess={(paymentDetails) => {
+              setPaymentCompleted(true);
+              setShowPaymentModal(false);
+              // Now actually generate the UPTC
+              handleGenerateUPTC();
+            }}
+            onPaymentCancel={(reason) => {
+              setShowPaymentModal(false);
+              console.log('Payment cancelled:', reason);
+            }}
+            uptcData={generateData}
+          />
+        )}
 
         {/* Analytics Dashboard */}
         <section className="max-w-7xl mx-auto mb-12">
