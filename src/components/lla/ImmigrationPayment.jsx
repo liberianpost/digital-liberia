@@ -7,6 +7,7 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
   const [libpayIdentifier, setLibpayIdentifier] = useState("");
   const [currency, setCurrency] = useState("USD");
   const [errors, setErrors] = useState({});
+  const [userInfo, setUserInfo] = useState(null);
   
   // Payment amount for UPTC generation
   const paymentAmount = currency === "USD" ? 25.00 : 4500.00; // 25 USD or ~4500 LRD
@@ -25,13 +26,46 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
     return Object.keys(newErrors).length === 0;
   };
 
+  // Check if user exists before processing payment
+  const lookupUser = async () => {
+    try {
+      const response = await api.post('https://libpayapp.liberianpost.com:3000/api/lookup-user', {
+        contact: libpayIdentifier
+      }, {
+        withCredentials: false
+      });
+
+      if (response.data.success) {
+        setUserInfo(response.data.user);
+        return true;
+      } else {
+        setErrors({ submit: response.data.message || 'User not found in LibPay system' });
+        return false;
+      }
+    } catch (error) {
+      console.error('User lookup error:', error);
+      setErrors({ submit: 'Unable to verify LibPay account. Please try again.' });
+      return false;
+    }
+  };
+
   const handlePayment = async () => {
     if (!validateForm()) return;
     
     setIsProcessing(true);
-    setPaymentStatus('processing');
+    setPaymentStatus('validating');
     
     try {
+      // First verify user exists
+      const userExists = await lookupUser();
+      if (!userExists) {
+        setIsProcessing(false);
+        setPaymentStatus('error');
+        return;
+      }
+
+      setPaymentStatus('processing');
+      
       // Create payment request WITHOUT credentials
       const paymentResponse = await api.post('https://libpayapp.liberianpost.com:3000/payment-request', {
         payerEmail: libpayIdentifier, // This can be email OR phone
@@ -44,17 +78,43 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
           uptcData: uptcData
         }
       }, {
-        withCredentials: false // Explicitly disable credentials
+        withCredentials: false,
+        timeout: 30000 // 30 second timeout
       });
       
       if (paymentResponse.data.success) {
         const paymentRequestId = paymentResponse.data.paymentRequestId;
+        const pushNotificationSent = paymentResponse.data.pushNotification?.sent;
         
-        // Poll for payment status WITHOUT credentials
+        if (!pushNotificationSent) {
+          setPaymentStatus('waiting');
+          setErrors({ 
+            submit: 'Notification could not be sent. Please ensure you have the Digital Liberia Mobile App installed and notifications enabled.' 
+          });
+          setIsProcessing(false);
+          return;
+        }
+
+        setPaymentStatus('waiting');
+        
+        // Extended polling for payment status (5 minutes total)
+        let pollingAttempts = 0;
+        const maxPollingAttempts = 150; // 5 minutes (150 * 2000ms = 300000ms = 5 minutes)
+        
         const checkPaymentStatus = async () => {
           try {
+            pollingAttempts++;
+            
+            if (pollingAttempts > maxPollingAttempts) {
+              setPaymentStatus('timeout');
+              setIsProcessing(false);
+              setErrors({ submit: 'Payment confirmation timeout. Please check your mobile app and try again.' });
+              return;
+            }
+
             const statusResponse = await api.get(`https://libpayapp.liberianpost.com:3000/payment-status/${paymentRequestId}`, {
-              withCredentials: false // Explicitly disable credentials
+              withCredentials: false,
+              timeout: 10000
             });
             
             if (statusResponse.data.status === 'completed') {
@@ -67,7 +127,8 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
                   paymentRequestId,
                   amount: paymentAmount,
                   currency: currency,
-                  timestamp: new Date().toISOString()
+                  timestamp: new Date().toISOString(),
+                  userInfo: userInfo
                 });
               }
             } else if (statusResponse.data.status === 'rejected') {
@@ -77,19 +138,33 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
               if (onPaymentCancel) {
                 onPaymentCancel('Payment was rejected by user');
               }
+            } else if (statusResponse.data.status === 'pending') {
+              // Continue polling if still pending, but with slower interval after first minute
+              const pollInterval = pollingAttempts > 30 ? 5000 : 2000; // Slow down after 1 minute
+              setTimeout(checkPaymentStatus, pollInterval);
+              
+              // Update status message to show we're still waiting
+              if (pollingAttempts % 15 === 0) { // Update message every 30 seconds
+                setPaymentStatus(`waiting-${Math.floor(pollingAttempts / 15)}`);
+              }
             } else {
-              // Continue polling if still pending
+              // Continue polling for other statuses
               setTimeout(checkPaymentStatus, 2000);
             }
           } catch (error) {
             console.error('Error checking payment status:', error);
-            setPaymentStatus('error');
-            setIsProcessing(false);
+            // Don't stop on network errors, continue polling
+            if (pollingAttempts <= maxPollingAttempts) {
+              setTimeout(checkPaymentStatus, 3000);
+            } else {
+              setPaymentStatus('error');
+              setIsProcessing(false);
+            }
           }
         };
         
-        // Start polling
-        setTimeout(checkPaymentStatus, 2000);
+        // Start polling with initial delay
+        setTimeout(checkPaymentStatus, 3000);
         
       } else {
         throw new Error(paymentResponse.data.message || 'Failed to create payment request');
@@ -104,6 +179,8 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
         setErrors({ submit: error.response.data.message });
       } else if (error.message.includes('Network Error') || error.message.includes('CORS')) {
         setErrors({ submit: 'Network connection failed. Please check your internet connection and try again.' });
+      } else if (error.code === 'ECONNABORTED') {
+        setErrors({ submit: 'Request timeout. Please check your connection and try again.' });
       } else {
         setErrors({ submit: error.message || 'Payment failed. Please try again.' });
       }
@@ -114,6 +191,16 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
     if (onPaymentCancel) {
       onPaymentCancel('Payment cancelled by user');
     }
+  };
+
+  // Get waiting message based on polling attempts
+  const getWaitingMessage = (status) => {
+    if (status === 'waiting') return "Waiting for confirmation...";
+    if (status.startsWith('waiting-')) {
+      const minutes = parseInt(status.split('-')[1]) || 1;
+      return `Waiting for confirmation... (${minutes} minute${minutes > 1 ? 's' : ''})`;
+    }
+    return "Waiting for confirmation...";
   };
 
   return (
@@ -150,7 +237,11 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
           <input
             type="text"
             value={libpayIdentifier}
-            onChange={(e) => setLibpayIdentifier(e.target.value)}
+            onChange={(e) => {
+              setLibpayIdentifier(e.target.value);
+              setErrors({});
+              setUserInfo(null);
+            }}
             placeholder="Enter your LibPay email or phone number"
             className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               errors.libpayIdentifier ? 'border-red-500' : 'border-gray-300'
@@ -161,6 +252,26 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
             <p className="text-red-500 text-sm mt-1">{errors.libpayIdentifier}</p>
           )}
         </div>
+
+        {/* User Info Display */}
+        {userInfo && (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+            <div className="flex items-center">
+              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                <span className="text-white text-sm">✓</span>
+              </div>
+              <div>
+                <p className="text-green-800 font-medium">LibPay account verified</p>
+                <p className="text-green-700 text-sm">{userInfo.email || userInfo.phone}</p>
+                {userInfo.balance !== undefined && (
+                  <p className="text-green-600 text-xs">
+                    Balance: {currency === "USD" ? "$" : "LD$"}{userInfo.balance} {currency}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Currency Selection */}
         <div className="mb-6">
@@ -214,7 +325,7 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
                     alt="LibPay" 
                     className="w-full h-full object-contain"
                     onError={(e) => {
-                      e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iOCIgZmlsbD0iIzM1NjZGRiIvPgo8dGV4dCB4PSIzMiIgeT0iMzUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5MaWJQYXk8L3RleHQ+Cjwvc3ZnPg==";
+                      e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg=";
                     }}
                   />
                 </div>
@@ -233,19 +344,40 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
             <div>
               <p className="text-yellow-800 text-sm">
                 You will receive a payment confirmation request on your Digital Liberia Mobile App. 
-                Please approve the payment to complete your UPTC generation.
+                Please approve the payment within 5 minutes to complete your UPTC generation.
               </p>
             </div>
           </div>
         </div>
         
         {/* Payment Status */}
+        {paymentStatus === 'validating' && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
+              <span className="text-blue-800">Verifying LibPay account...</span>
+            </div>
+          </div>
+        )}
+        
         {paymentStatus === 'processing' && (
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
             <div className="flex items-center">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
-              <span className="text-blue-800">Processing payment request...</span>
+              <span className="text-blue-800">Creating payment request...</span>
             </div>
+          </div>
+        )}
+        
+        {(paymentStatus === 'waiting' || paymentStatus?.startsWith('waiting-')) && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
+              <span className="text-blue-800">{getWaitingMessage(paymentStatus)}</span>
+            </div>
+            <p className="text-blue-600 text-sm mt-2">
+              Please check your Digital Liberia Mobile App to confirm the payment
+            </p>
           </div>
         )}
         
@@ -267,6 +399,17 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
                 <span className="text-white text-sm">✗</span>
               </div>
               <span className="text-red-800">Payment was rejected. Please try again.</span>
+            </div>
+          </div>
+        )}
+        
+        {paymentStatus === 'timeout' && (
+          <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
+            <div className="flex items-center">
+              <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center mr-3">
+                <span className="text-white text-sm">⏰</span>
+              </div>
+              <span className="text-orange-800">Confirmation timeout. Please try again.</span>
             </div>
           </div>
         )}
@@ -298,7 +441,7 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
         <div className="flex space-x-4">
           <button
             onClick={handleCancel}
-            disabled={isProcessing}
+            disabled={isProcessing && !['waiting', 'waiting-'].includes(paymentStatus)}
             className="flex-1 px-6 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 disabled:opacity-50 transition-colors"
           >
             Cancel
@@ -306,7 +449,7 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
           
           <button
             onClick={handlePayment}
-            disabled={isProcessing}
+            disabled={isProcessing || !libpayIdentifier}
             className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
             {isProcessing ? "Processing..." : `Pay with LibPay`}
@@ -317,6 +460,9 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
         <div className="mt-4 text-center">
           <p className="text-xs text-gray-500">
             By proceeding, you agree to our Terms of Service and Privacy Policy
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            You have 5 minutes to confirm the payment in your mobile app
           </p>
         </div>
       </div>
