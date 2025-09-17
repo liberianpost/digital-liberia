@@ -2,26 +2,41 @@ import React, { useState } from "react";
 import api from '@/api';
 
 const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => {
-  const [paymentMethod, setPaymentMethod] = useState("libpay");
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [libpayIdentifier, setLibpayIdentifier] = useState("");
+  const [currency, setCurrency] = useState("USD");
+  const [errors, setErrors] = useState({});
   
-  // Payment amount - you can adjust this based on your requirements
-  const paymentAmount = 25.00; // $25 for UPTC generation
-  
+  // Payment amount for UPTC generation
+  const paymentAmount = currency === "USD" ? 25.00 : 4500.00; // 25 USD or ~4500 LRD
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!libpayIdentifier.trim()) {
+      newErrors.libpayIdentifier = "LibPay email or phone number is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(libpayIdentifier) && 
+               !/^\+?[0-9]{7,15}$/.test(libpayIdentifier.replace(/\s/g, ''))) {
+      newErrors.libpayIdentifier = "Please enter a valid email or phone number";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handlePayment = async () => {
+    if (!validateForm()) return;
+    
     setIsProcessing(true);
-    setPaymentStatus(null);
+    setPaymentStatus('processing');
     
     try {
-      // Get user email from localStorage or props
-      const userEmail = localStorage.getItem("user_email") || uptcData?.userEmail || "user@example.com";
-      
       // Create payment request
       const paymentResponse = await api.post('https://libpayapp.liberianpost.com:3000/payment-request', {
-        payerEmail: userEmail,
+        payerEmail: libpayIdentifier, // This can be email OR phone
         amount: paymentAmount,
-        currency: "USD",
+        currency: currency,
         description: `UPTC Generation for ${uptcData?.county || 'Property'}`,
         merchantInfo: {
           name: "Liberia Land Authority",
@@ -47,7 +62,7 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
                 onPaymentSuccess({
                   paymentRequestId,
                   amount: paymentAmount,
-                  currency: "USD",
+                  currency: currency,
                   timestamp: new Date().toISOString()
                 });
               }
@@ -79,6 +94,13 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
       console.error('Payment error:', error);
       setPaymentStatus('error');
       setIsProcessing(false);
+      
+      // Show specific error messages
+      if (error.response?.data?.message) {
+        setErrors({ submit: error.response.data.message });
+      } else {
+        setErrors({ submit: error.message || 'Payment failed. Please try again.' });
+      }
     }
   };
 
@@ -90,7 +112,7 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-blue-800 mb-2">UPTC Generation Payment</h2>
           <p className="text-gray-600">Complete payment to generate your Unique Property Token Code</p>
@@ -108,45 +130,88 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-700">Amount:</span>
-            <span className="text-2xl font-bold text-green-600">${paymentAmount.toFixed(2)} USD</span>
+            <span className="text-2xl font-bold text-green-600">
+              {currency === "USD" ? "$" : "LD$"} {paymentAmount.toFixed(2)} {currency}
+            </span>
           </div>
         </div>
-        
-        {/* Payment Method Selection */}
+
+        {/* LibPay Credentials Input */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Payment Method</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            LibPay Email or Phone Number
+          </label>
+          <input
+            type="text"
+            value={libpayIdentifier}
+            onChange={(e) => setLibpayIdentifier(e.target.value)}
+            placeholder="Enter your LibPay email or phone number"
+            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.libpayIdentifier ? 'border-red-500' : 'border-gray-300'
+            }`}
+            disabled={isProcessing}
+          />
+          {errors.libpayIdentifier && (
+            <p className="text-red-500 text-sm mt-1">{errors.libpayIdentifier}</p>
+          )}
+        </div>
+
+        {/* Currency Selection */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-3">Payment Currency</label>
           <div className="grid grid-cols-2 gap-3">
             <button
-              onClick={() => setPaymentMethod("libpay")}
+              onClick={() => setCurrency("USD")}
               className={`p-4 rounded-xl border-2 transition-all ${
-                paymentMethod === "libpay"
+                currency === "USD"
                   ? "border-blue-500 bg-blue-50"
                   : "border-gray-300 hover:border-blue-300"
               }`}
+              disabled={isProcessing}
             >
               <div className="text-center">
-                <div className="w-8 h-8 mx-auto mb-2 bg-blue-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-lg">$</span>
+                <div className="w-8 h-8 mx-auto mb-2 bg-green-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-lg font-bold">$</span>
                 </div>
-                <span className="text-sm font-medium">LibPay</span>
+                <span className="text-sm font-medium">USD</span>
               </div>
             </button>
             
             <button
-              onClick={() => setPaymentMethod("mobile")}
+              onClick={() => setCurrency("LRD")}
               className={`p-4 rounded-xl border-2 transition-all ${
-                paymentMethod === "mobile"
+                currency === "LRD"
                   ? "border-blue-500 bg-blue-50"
                   : "border-gray-300 hover:border-blue-300"
               }`}
+              disabled={isProcessing}
             >
               <div className="text-center">
-                <div className="w-8 h-8 mx-auto mb-2 bg-green-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-lg">📱</span>
+                <div className="w-8 h-8 mx-auto mb-2 bg-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-lg font-bold">LD$</span>
                 </div>
-                <span className="text-sm font-medium">Mobile Money</span>
+                <span className="text-sm font-medium">LRD</span>
               </div>
             </button>
+          </div>
+        </div>
+        
+        {/* Payment Method - LibPay Only */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-3">Payment Method</label>
+          <div className="flex justify-center">
+            <div className="p-4 rounded-xl border-2 border-blue-500 bg-blue-50 transition-all">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-2 bg-white rounded-full flex items-center justify-center p-2">
+                  <img 
+                    src="/logos/libpaysit.png" 
+                    alt="LibPay" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <span className="text-sm font-medium text-blue-800">LibPay</span>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -158,10 +223,8 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
             </div>
             <div>
               <p className="text-yellow-800 text-sm">
-                {paymentMethod === "libpay" 
-                  ? "You will receive a confirmation request on your LibPay mobile app. Please approve the payment to continue."
-                  : "Mobile money payment options will be available soon. Please use LibPay for now."
-                }
+                You will receive a payment confirmation request on your Digital Liberia Mobile App. 
+                Please approve the payment to complete your UPTC generation.
               </p>
             </div>
           </div>
@@ -172,7 +235,7 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
             <div className="flex items-center">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
-              <span className="text-blue-800">Processing payment...</span>
+              <span className="text-blue-800">Processing payment request...</span>
             </div>
           </div>
         )}
@@ -209,6 +272,18 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
             </div>
           </div>
         )}
+
+        {/* Submit Error */}
+        {errors.submit && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+            <div className="flex items-center">
+              <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center mr-3">
+                <span className="text-white text-sm">!</span>
+              </div>
+              <span className="text-red-800">{errors.submit}</span>
+            </div>
+          </div>
+        )}
         
         {/* Action Buttons */}
         <div className="flex space-x-4">
@@ -222,10 +297,10 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
           
           <button
             onClick={handlePayment}
-            disabled={isProcessing || paymentMethod === "mobile"}
-            className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            disabled={isProcessing}
+            className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
-            {isProcessing ? "Processing..." : "Pay with LibPay"}
+            {isProcessing ? "Processing..." : `Pay with LibPay`}
           </button>
         </div>
         
