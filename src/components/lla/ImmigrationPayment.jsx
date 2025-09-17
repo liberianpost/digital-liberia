@@ -32,7 +32,7 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
     setPaymentStatus('processing');
     
     try {
-      // Create payment request
+      // Create payment request WITHOUT credentials
       const paymentResponse = await api.post('https://libpayapp.liberianpost.com:3000/payment-request', {
         payerEmail: libpayIdentifier, // This can be email OR phone
         amount: paymentAmount,
@@ -43,15 +43,19 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
           service: "UPTC Generation",
           uptcData: uptcData
         }
+      }, {
+        withCredentials: false // Explicitly disable credentials
       });
       
       if (paymentResponse.data.success) {
         const paymentRequestId = paymentResponse.data.paymentRequestId;
         
-        // Poll for payment status
+        // Poll for payment status WITHOUT credentials
         const checkPaymentStatus = async () => {
           try {
-            const statusResponse = await api.get(`https://libpayapp.liberianpost.com:3000/payment-status/${paymentRequestId}`);
+            const statusResponse = await api.get(`https://libpayapp.liberianpost.com:3000/payment-status/${paymentRequestId}`, {
+              withCredentials: false // Explicitly disable credentials
+            });
             
             if (statusResponse.data.status === 'completed') {
               setPaymentStatus('success');
@@ -98,6 +102,8 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
       // Show specific error messages
       if (error.response?.data?.message) {
         setErrors({ submit: error.response.data.message });
+      } else if (error.message.includes('Network Error') || error.message.includes('CORS')) {
+        setErrors({ submit: 'Network connection failed. Please check your internet connection and try again.' });
       } else {
         setErrors({ submit: error.message || 'Payment failed. Please try again.' });
       }
@@ -207,6 +213,9 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
                     src="/logos/libpaysit.png" 
                     alt="LibPay" 
                     className="w-full h-full object-contain"
+                    onError={(e) => {
+                      e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iOCIgZmlsbD0iIzM1NjZGRiIvPgo8dGV4dCB4PSIzMiIgeT0iMzUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5MaWJQYXk8L3RleHQ+Cjwvc3ZnPg==";
+                    }}
                   />
                 </div>
                 <span className="text-sm font-medium text-blue-800">LibPay</span>
