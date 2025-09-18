@@ -10,7 +10,7 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
   const [userInfo, setUserInfo] = useState(null);
   
   // Payment amount for UPTC generation
-  const paymentAmount = currency === "USD" ? 25.00 : 4500.00; // 25 USD or ~4500 LRD
+  const paymentAmount = currency === "USD" ? 2.50 : 445.00; // 25 USD or ~4500 LRD
 
   const validateForm = () => {
     const newErrors = {};
@@ -131,6 +131,14 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
                   userInfo: userInfo
                 });
               }
+
+              // Automatically close the modal after 2 seconds
+              setTimeout(() => {
+                if (onPaymentCancel) {
+                  onPaymentCancel('Payment completed successfully');
+                }
+              }, 2000);
+              
             } else if (statusResponse.data.status === 'rejected') {
               setPaymentStatus('rejected');
               setIsProcessing(false);
@@ -410,6 +418,9 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
               </div>
               <span className="text-green-800">Payment successful! Generating UPTC...</span>
             </div>
+            <p className="text-green-600 text-sm mt-2">
+              This window will close automatically and your UPTC will be generated.
+            </p>
           </div>
         )}
         
