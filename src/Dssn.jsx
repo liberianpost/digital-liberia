@@ -119,7 +119,7 @@ export default function Dssn() {
 
     try {
       console.log('Dssn.jsx - Initiating fetch for DSSN:', cleanedDssn);
-      const response = await fetch(`https://api.digitalliberia.com/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
+      const response = await fetch(`https://libpayapp.liberianpost.com:8081/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
