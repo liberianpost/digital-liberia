@@ -206,9 +206,30 @@ const ImmigrationPayment = ({ onPaymentSuccess, onPaymentCancel, uptcData }) => 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+        {/* Updated Header Section */}
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-blue-800 mb-2">UPTC Generation Payment</h2>
-          <p className="text-gray-600">Complete payment to generate your Unique Property Token Code</p>
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center p-2">
+              <img 
+                src="/logos/libpaysit.png" 
+                alt="LibPay" 
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg=";
+                }}
+              />
+            </div>
+          </div>
+          
+          <h1 className="text-3xl font-bold text-blue-800 mb-1">LibPay</h1>
+          
+          <p className="text-sm text-gray-600 mb-2">
+            Digital Liberia Ecosystem
+          </p>
+          
+          <h2 className="text-xl font-semibold text-blue-700">
+            LibPay Payment System
+          </h2>
         </div>
         
         {/* Payment Details */}
