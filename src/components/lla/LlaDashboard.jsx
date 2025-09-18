@@ -32,7 +32,7 @@ const logos = [
   "/logos/liberia.png"
 ];
 
-// County and postal code data
+// County and postal code data (first 2 lines for each county)
 const counties = [
   "Bomi", "Bong", "Gbarpolu", "Grand Bassa", "Grand Cape Mount", 
   "Grand Gedeh", "Grand Kru", "Lofa", "Margibi", "Maryland", 
@@ -841,15 +841,7 @@ const LlaDashboard = () => {
   };
 
   // Handle UPTC Generation
-  const handleGenerateUPTC = async (e) => {
-    if (e) e.preventDefault();
-    
-    // Check if payment is completed
-    if (!paymentCompleted) {
-      setShowPaymentModal(true);
-      return;
-    }
-    
+  const handleGenerateUPTC = async () => {
     setGenerating(true);
     setGeneratedUPTC("");
     
@@ -961,6 +953,14 @@ const LlaDashboard = () => {
     ];
   };
 
+  // Handle payment success
+  const handlePaymentSuccess = (paymentDetails) => {
+    setPaymentCompleted(true);
+    setShowPaymentModal(false);
+    // Now actually generate the UPTC
+    handleGenerateUPTC();
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -1061,7 +1061,7 @@ const LlaDashboard = () => {
             </div>
             
             <div className="p-8">
-              <form onSubmit={handleGenerateUPTC} className="space-y-6">
+              <form className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">County</label>
@@ -1128,7 +1128,7 @@ const LlaDashboard = () => {
                   </div>
                 </div>
                 <button
-                  type="button" // Change from "submit" to "button"
+                  type="button"
                   onClick={() => setShowPaymentModal(true)}
                   className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg font-semibold"
                 >
@@ -1141,11 +1141,19 @@ const LlaDashboard = () => {
                   <h3 className="text-lg font-semibold text-green-800 mb-2">UPTC Generated Successfully!</h3>
                   <div className="flex items-center space-x-4">
                     <span className="text-2xl">✅</span>
-                    <div>
-                      <p className="text-green-700 font-mono break-all">{generatedUPTC}</p>
-                      <p className="text-sm text-green-600 mt-2">
-                        This UPTC code can now be used to verify the land credentials.
+                    <div className="flex-1">
+                      <p className="text-green-700 font-mono break-all bg-white p-3 rounded-lg border border-green-300">
+                        {generatedUPTC}
                       </p>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(generatedUPTC);
+                          alert("UPTC code copied to clipboard!");
+                        }}
+                        className="mt-3 px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        Copy UPTC Code
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1459,12 +1467,7 @@ const LlaDashboard = () => {
         {/* Payment Modal */}
         {showPaymentModal && (
           <ImmigrationPayment
-            onPaymentSuccess={(paymentDetails) => {
-              setPaymentCompleted(true);
-              setShowPaymentModal(false);
-              // Now actually generate the UPTC
-              handleGenerateUPTC();
-            }}
+            onPaymentSuccess={handlePaymentSuccess}
             onPaymentCancel={(reason) => {
               setShowPaymentModal(false);
               console.log('Payment cancelled:', reason);
@@ -1622,8 +1625,7 @@ const LlaDashboard = () => {
                 description: "Conduct land surveys, boundary demarcation, and mapping services"
               },
               { 
-                icon: "⚖️", 
-                label: "Dispute Resolution", 
+                icon: "⚖️", label: "Dispute Resolution", 
                 color: "from-orange-600 to-orange-700",
                 description: "Handle land disputes, mediation, and conflict resolution processes"
               },
