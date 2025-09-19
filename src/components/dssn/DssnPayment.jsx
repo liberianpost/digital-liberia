@@ -244,16 +244,16 @@ const DssnPayment = ({ onPaymentSuccess, onPaymentCancel, dssn }) => {
         <div className="bg-blue-50 rounded-xl p-4 mb-6">
           <div className="flex justify-between items-center mb-3">
             <span className="text-gray-700">Service:</span>
-            <span className="font-semibold">DSSN Verification</span>
+            <span className="font-semibold text-black">DSSN Verification</span>
           </div>
           <div className="flex justify-between items-center mb-3">
             <span className="text-gray-700">DSSN:</span>
-            <span className="font-semibold">{dssn || 'Not specified'}</span>
+            <span className="font-semibold text-black">{dssn || 'Not specified'}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-700">Amount:</span>
             <span className="text-2xl font-bold text-green-600">
-              {currency === "USD" ? "$" : "LD$"} {paymentAmount.toFixed(2)} {currency}
+              {currency === "USD" ? "$" : "LD$"} {paymentAmount.toFixed(2)} <span className="text-black">{currency}</span>
             </span>
           </div>
         </div>
@@ -272,7 +272,7 @@ const DssnPayment = ({ onPaymentSuccess, onPaymentCancel, dssn }) => {
               setUserInfo(null);
             }}
             placeholder="Enter your LibPay email or phone number"
-            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black ${
               errors.libpayIdentifier ? 'border-red-500' : 'border-gray-300'
             }`}
             disabled={isProcessing}
@@ -294,7 +294,7 @@ const DssnPayment = ({ onPaymentSuccess, onPaymentCancel, dssn }) => {
                 <p className="text-green-700 text-sm">{userInfo.email || userInfo.phone}</p>
                 {userInfo.balance !== undefined && (
                   <p className="text-green-600 text-xs">
-                    Balance: {currency === "USD" ? "$" : "LD$"}{userInfo.balance} {currency}
+                    Balance: {currency === "USD" ? "$" : "LD$"}{userInfo.balance} <span className="text-black">{currency}</span>
                   </p>
                 )}
               </div>
@@ -319,7 +319,7 @@ const DssnPayment = ({ onPaymentSuccess, onPaymentCancel, dssn }) => {
                 <div className="w-8 h-8 mx-auto mb-2 bg-green-500 rounded-full flex items-center justify-center">
                   <span className="text-white text-lg font-bold">$</span>
                 </div>
-                <span className="text-sm font-medium">USD</span>
+                <span className="text-sm font-medium text-black">USD</span>
               </div>
             </button>
             
@@ -336,7 +336,7 @@ const DssnPayment = ({ onPaymentSuccess, onPaymentCancel, dssn }) => {
                 <div className="w-8 h-8 mx-auto mb-2 bg-red-500 rounded-full flex items-center justify-center">
                   <span className="text-white text-lg font-bold">LD$</span>
                 </div>
-                <span className="text-sm font-medium">LRD</span>
+                <span className="text-sm font-medium text-black">LRD</span>
               </div>
             </button>
           </div>
