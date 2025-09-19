@@ -27,6 +27,8 @@ const backgroundImages = [
   '/backgrounds/bg5.jpg',
 ];
 
+const BASE_URL = 'https://libpayapp.liberianpost.com:8081';
+
 const sanitizeHTML = (str) => {
   if (!str) return '';
   return str
@@ -119,7 +121,7 @@ export default function Dssn() {
 
     try {
       console.log('Dssn.jsx - Initiating fetch for DSSN:', cleanedDssn);
-      const response = await fetch(`https://libpayapp.liberianpost.com:8081/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
+      const response = await fetch(`${BASE_URL}/api/get-dssn?dssn=${encodeURIComponent(cleanedDssn)}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
