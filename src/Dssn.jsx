@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import DssnPayment from '@/components/dssn/DssnPayment';
 
 const navLinks = [
   { label: 'Home', to: '/', color: 'bg-blue-500/80' },
@@ -77,6 +78,9 @@ export default function Dssn() {
   const [currentDocumentUrl, setCurrentDocumentUrl] = useState('');
   const [showDocumentModal, setShowDocumentModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(null);
+  const [paymentVerified, setPaymentVerified] = useState(false);
 
   console.log('Dssn.jsx - Rendering', { location: location.pathname, isSearching, customerData });
 
@@ -116,6 +120,27 @@ export default function Dssn() {
       return;
     }
 
+    // Show payment modal before searching
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentSuccess = (paymentDetails) => {
+    console.log('Dssn.jsx - Payment successful', paymentDetails);
+    setPaymentStatus('success');
+    setPaymentVerified(true);
+    
+    // Proceed with the search after successful payment
+    performDssnSearch();
+  };
+
+  const handlePaymentCancel = (reason) => {
+    console.log('Dssn.jsx - Payment cancelled', reason);
+    setPaymentStatus('cancelled');
+    setShowPaymentModal(false);
+  };
+
+  const performDssnSearch = async () => {
+    const cleanedDssn = dssn.trim().toUpperCase();
     setIsSearching(true);
     setError(null);
 
@@ -180,6 +205,7 @@ export default function Dssn() {
       console.log('Dssn.jsx - Fetch successful', { transformedData });
       setCustomerData(transformedData);
       setShowInfoModal(true);
+      setShowPaymentModal(false);
     } catch (err) {
       console.error('Dssn.jsx - Search error', err);
       setError({
@@ -188,6 +214,7 @@ export default function Dssn() {
         details: err.details || `DSSN: ${cleanedDssn}`,
         technical: `Status: ${err.status || 'Unknown'} | ${err.timestamp || new Date().toISOString()}`,
       });
+      setShowPaymentModal(false);
     } finally {
       setIsSearching(false);
     }
@@ -308,6 +335,16 @@ export default function Dssn() {
                 <p>
                   Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information. Enter the 15-digit alphanumeric DSSN in the field below.
                 </p>
+                {paymentVerified && (
+                  <div className="bg-green-900/40 border border-green-700/30 rounded-lg p-4 backdrop-blur-sm">
+                    <div className="flex items-center">
+                      <svg className="w-5 h-5 mr-2 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      <span className="text-green-200">Payment verified. You can now view the DSSN details.</span>
+                    </div>
+                  </div>
+                )}
                 <form onSubmit={handleSearch} className="space-y-4">
                   <div>
                     <label htmlFor="dssn" className="block text-sm font-medium mb-2">
@@ -367,6 +404,14 @@ export default function Dssn() {
           </div>
         </section>
       </main>
+
+      {showPaymentModal && (
+        <DssnPayment 
+          onPaymentSuccess={handlePaymentSuccess}
+          onPaymentCancel={handlePaymentCancel}
+          dssn={dssn.trim().toUpperCase()}
+        />
+      )}
 
       {showInfoModal && customerData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
