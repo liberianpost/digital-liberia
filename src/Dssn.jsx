@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import DssnPayment from '@/components/dssn/DssnPayment';
+import QRScanner from '@/components/dssn/QRScanner';
 
 const navLinks = [
   { label: 'Home', to: '/', color: 'bg-blue-500/80' },
@@ -81,6 +82,8 @@ export default function Dssn() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [paymentVerified, setPaymentVerified] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [scanMethod, setScanMethod] = useState('manual'); // 'manual' or 'qr'
 
   console.log('Dssn.jsx - Rendering', { location: location.pathname, isSearching, customerData });
 
@@ -107,7 +110,7 @@ export default function Dssn() {
   }, []);
 
   const handleSearch = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const cleanedDssn = dssn.trim().toUpperCase();
 
     if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
@@ -244,6 +247,45 @@ export default function Dssn() {
     document.body.removeChild(link);
   };
 
+  // QR Scanner Functions
+  const handleQRScan = (scannedData) => {
+    console.log('Dssn.jsx - QR code scanned:', scannedData);
+    
+    // Validate the scanned data as a DSSN
+    const cleanedDssn = scannedData.trim().toUpperCase();
+    
+    if (!/^[A-Za-z0-9]{15}$/.test(cleanedDssn)) {
+      setError({
+        title: 'Invalid QR Code',
+        message: 'Scanned QR code does not contain a valid DSSN',
+        details: `Scanned: ${scannedData}`,
+      });
+      setShowQRScanner(false);
+      return;
+    }
+    
+    // Set the DSSN and close scanner
+    setDssn(cleanedDssn);
+    setShowQRScanner(false);
+    setScanMethod('qr');
+    
+    // Show success message
+    setError(null);
+  };
+
+  const openQRScanner = () => {
+    setShowQRScanner(true);
+    setError(null);
+  };
+
+  const closeQRScanner = () => {
+    setShowQRScanner(false);
+  };
+
+  const handleVerifyScannedDSSN = () => {
+    handleSearch();
+  };
+
   return (
     <div className="relative min-h-screen w-full bg-gray-900 text-white font-inter overflow-x-hidden">
       <div className="fixed inset-0 bg-gradient-to-br from-blue-900/90 to-indigo-900/90 -z-50" />
@@ -333,8 +375,45 @@ export default function Dssn() {
               </h2>
               <div className="text-white/90 relative space-y-6">
                 <p>
-                  Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information. Enter the 15-digit alphanumeric DSSN in the field below.
+                  Verify a Digital Social Security Number (DSSN) to check its validity and view basic public information. 
+                  Enter the 15-digit alphanumeric DSSN manually or scan a QR code.
                 </p>
+                
+                {/* Scan Method Selection */}
+                <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                  <button
+                    onClick={() => setScanMethod('manual')}
+                    className={`flex-1 py-3 px-4 rounded-lg border transition-all ${
+                      scanMethod === 'manual'
+                        ? 'bg-blue-600/80 border-blue-400/30 shadow-lg'
+                        : 'bg-indigo-800/40 border-indigo-700/30 hover:bg-indigo-700/40'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Manual Entry
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={openQRScanner}
+                    className={`flex-1 py-3 px-4 rounded-lg border transition-all ${
+                      scanMethod === 'qr'
+                        ? 'bg-green-600/80 border-green-400/30 shadow-lg'
+                        : 'bg-indigo-800/40 border-indigo-700/30 hover:bg-indigo-700/40'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                      </svg>
+                      Scan QR Code
+                    </div>
+                  </button>
+                </div>
+
                 {paymentVerified && (
                   <div className="bg-green-900/40 border border-green-700/30 rounded-lg p-4 backdrop-blur-sm">
                     <div className="flex items-center">
@@ -345,44 +424,69 @@ export default function Dssn() {
                     </div>
                   </div>
                 )}
-                <form onSubmit={handleSearch} className="space-y-4">
-                  <div>
-                    <label htmlFor="dssn" className="block text-sm font-medium mb-2">
-                      Enter DSSN to Verify:
-                    </label>
-                    <input
-                      id="dssn"
-                      value={dssn}
-                      onChange={(e) => setDssn(e.target.value)}
-                      className="w-full bg-indigo-900/40 border border-indigo-700/30 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 backdrop-blur-sm text-white placeholder-gray-400"
-                      placeholder="e.g. LIB123456789ABCD"
-                      required
-                      pattern="[A-Za-z0-9]{15}"
-                      title="15-character alphanumeric DSSN"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={isSearching}
-                    className={`flex items-center justify-center px-6 py-3 rounded-lg border transition-all ${
-                      isSearching
-                        ? 'bg-blue-700/50 border-blue-600/30 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-blue-500/80 to-indigo-600/80 border-blue-400/30 hover:from-blue-600/80 hover:to-indigo-700/80 hover:shadow-lg'
-                    }`}
-                  >
-                    {isSearching ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                
+                {/* Manual Input Form */}
+                {scanMethod === 'manual' && (
+                  <form onSubmit={handleSearch} className="space-y-4">
+                    <div>
+                      <label htmlFor="dssn" className="block text-sm font-medium mb-2">
+                        Enter DSSN to Verify:
+                      </label>
+                      <input
+                        id="dssn"
+                        value={dssn}
+                        onChange={(e) => setDssn(e.target.value)}
+                        className="w-full bg-indigo-900/40 border border-indigo-700/30 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 backdrop-blur-sm text-white placeholder-gray-400"
+                        placeholder="e.g. LIB123456789ABCD"
+                        required
+                        pattern="[A-Za-z0-9]{15}"
+                        title="15-character alphanumeric DSSN"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isSearching}
+                      className={`flex items-center justify-center px-6 py-3 rounded-lg border transition-all ${
+                        isSearching
+                          ? 'bg-blue-700/50 border-blue-600/30 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-blue-500/80 to-indigo-600/80 border-blue-400/30 hover:from-blue-600/80 hover:to-indigo-700/80 hover:shadow-lg'
+                      }`}
+                    >
+                      {isSearching ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Searching...
+                        </>
+                      ) : (
+                        'Search DSSN'
+                      )}
+                    </button>
+                  </form>
+                )}
+                
+                {/* QR Scan Status */}
+                {scanMethod === 'qr' && dssn && (
+                  <div className="bg-blue-900/40 border border-blue-700/30 rounded-lg p-4 backdrop-blur-sm">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <svg className="w-5 h-5 mr-2 text-blue-300" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
-                        Searching...
-                      </>
-                    ) : (
-                      'Search'
-                    )}
-                  </button>
-                </form>
+                        <span className="text-blue-200">DSSN scanned: {dssn}</span>
+                      </div>
+                      <button
+                        onClick={handleVerifyScannedDSSN}
+                        className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white transition-colors"
+                      >
+                        Verify Now
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {error && (
                   <div className="bg-red-900/40 border border-red-700/30 rounded-lg p-4 backdrop-blur-sm">
                     <div className="flex justify-between items-start">
@@ -404,6 +508,14 @@ export default function Dssn() {
           </div>
         </section>
       </main>
+
+      {/* QR Scanner Modal */}
+      {showQRScanner && (
+        <QRScanner 
+          onScan={handleQRScan}
+          onClose={closeQRScanner}
+        />
+      )}
 
       {showPaymentModal && (
         <DssnPayment 
