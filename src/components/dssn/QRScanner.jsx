@@ -9,6 +9,7 @@ const QRScanner = ({ onScan, onClose }) => {
   const [qrScanner, setQrScanner] = useState(null);
   const [error, setError] = useState(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     let scanner = null;
@@ -16,17 +17,28 @@ const QRScanner = ({ onScan, onClose }) => {
 
     const initializeScanner = async () => {
       try {
+        if (!isMounted) return;
+        
         setIsInitializing(true);
         setError(null);
 
-        // Wait a bit to ensure the video element is rendered
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Add a small delay to ensure DOM is fully rendered
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-        // Check if video element exists
+        // Check if video element exists and is in DOM
         if (!videoRef.current) {
-          throw new Error('Video element not found. Please try again.');
+          console.error('Video ref is null');
+          throw new Error('Video element not available. Please try again.');
         }
 
+        // Additional check to see if video element is connected to DOM
+        if (!videoRef.current.isConnected) {
+          console.error('Video element not connected to DOM');
+          throw new Error('Video element not ready. Please try again.');
+        }
+
+        console.log('Initializing QR scanner...');
+        
         // Dynamically import qr-scanner
         const QrScannerModule = await import('qr-scanner');
         const QrScanner = QrScannerModule.default;
@@ -35,6 +47,7 @@ const QRScanner = ({ onScan, onClose }) => {
         let cameras = [];
         try {
           cameras = await QrScanner.listCameras();
+          console.log('Available cameras:', cameras.length);
           if (isMounted) setAvailableCameras(cameras);
         } catch (camError) {
           console.warn('Could not list cameras:', camError);
@@ -46,6 +59,7 @@ const QRScanner = ({ onScan, onClose }) => {
         }
 
         // Initialize scanner with basic configuration
+        console.log('Creating scanner instance...');
         scanner = new QrScanner(
           videoRef.current,
           (result) => {
@@ -60,31 +74,33 @@ const QRScanner = ({ onScan, onClose }) => {
             highlightScanRegion: true,
             highlightCodeOutline: true,
             maxScansPerSecond: 2,
-            // Don't set preferredCamera initially to avoid issues
+            // Use simpler configuration
+            preferredCamera: cameras.length > 0 ? cameras[0].id : 'environment',
           }
         );
 
-        if (isMounted) setQrScanner(scanner);
+        if (isMounted) {
+          setQrScanner(scanner);
+        }
 
         // Start the scanner
+        console.log('Starting scanner...');
+        await scanner.start();
+        
+        if (!isMounted) return;
+        
+        console.log('Scanner started successfully');
+        setIsScanning(true);
+        setHasCamera(true);
+        
+        // Now try to get cameras again after starting
         try {
-          await scanner.start();
-          if (!isMounted) return;
-          setIsScanning(true);
-          setHasCamera(true);
-          
-          // Now try to get cameras again after starting
-          try {
-            const updatedCameras = await QrScanner.listCameras();
-            if (updatedCameras.length > 0 && isMounted) {
-              setAvailableCameras(updatedCameras);
-            }
-          } catch (e) {
-            console.warn('Could not refresh camera list:', e);
+          const updatedCameras = await QrScanner.listCameras();
+          if (updatedCameras.length > 0 && isMounted) {
+            setAvailableCameras(updatedCameras);
           }
-        } catch (startError) {
-          console.error('Failed to start scanner:', startError);
-          throw new Error(`Cannot start camera: ${startError.message}`);
+        } catch (e) {
+          console.warn('Could not refresh camera list:', e);
         }
 
       } catch (error) {
@@ -92,27 +108,31 @@ const QRScanner = ({ onScan, onClose }) => {
         if (isMounted) {
           setHasCamera(false);
           setError(error.message || 'Failed to initialize camera');
+          setRetryCount(prev => prev + 1);
         }
       } finally {
-        if (isMounted) setIsInitializing(false);
+        if (isMounted) {
+          setIsInitializing(false);
+        }
       }
     };
 
-    // Small delay to ensure DOM is ready
+    // Start initialization with a small delay
     const timer = setTimeout(() => {
       initializeScanner();
-    }, 300);
+    }, 100);
 
     // Cleanup function
     return () => {
       isMounted = false;
       clearTimeout(timer);
       if (scanner) {
+        console.log('Cleaning up scanner...');
         scanner.stop().catch(console.error);
         scanner.destroy().catch(console.error);
       }
     };
-  }, [onScan]);
+  }, [onScan, retryCount]);
 
   const switchCamera = async () => {
     if (!qrScanner || availableCameras.length < 2) return;
@@ -153,64 +173,18 @@ const QRScanner = ({ onScan, onClose }) => {
     setHasCamera(true);
     setIsInitializing(true);
     
-    // Small delay to allow state updates and DOM rendering
-    setTimeout(async () => {
-      if (qrScanner) {
-        try {
-          await qrScanner.start();
-          setIsScanning(true);
-          setHasCamera(true);
-        } catch (error) {
-          console.error('Error restarting camera:', error);
-          setError('Cannot access camera. Please check permissions.');
-          setHasCamera(false);
-        } finally {
-          setIsInitializing(false);
+    // Force re-render of video element by toggling visibility briefly
+    if (videoRef.current) {
+      videoRef.current.style.visibility = 'hidden';
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.style.visibility = 'visible';
         }
-      } else {
-        // Force re-initialization by reloading the component
-        setIsInitializing(true);
-        setError(null);
-        setHasCamera(true);
-        
-        // Re-import and re-initialize
-        try {
-          const QrScannerModule = await import('qr-scanner');
-          const QrScanner = QrScannerModule.default;
-          
-          if (!videoRef.current) {
-            throw new Error('Video element still not available');
-          }
+      }, 100);
+    }
 
-          const scanner = new QrScanner(
-            videoRef.current,
-            (result) => {
-              if (result?.data) {
-                onScan(result.data);
-                scanner.stop();
-                setIsScanning(false);
-              }
-            },
-            {
-              highlightScanRegion: true,
-              highlightCodeOutline: true,
-              maxScansPerSecond: 2,
-            }
-          );
-
-          setQrScanner(scanner);
-          await scanner.start();
-          setIsScanning(true);
-          setHasCamera(true);
-        } catch (error) {
-          console.error('Error re-initializing scanner:', error);
-          setError(error.message || 'Failed to initialize camera');
-          setHasCamera(false);
-        } finally {
-          setIsInitializing(false);
-        }
-      }
-    }, 200);
+    // Trigger re-initialization by updating retryCount
+    setRetryCount(prev => prev + 1);
   };
 
   const getCameraName = (cameraId) => {
@@ -221,6 +195,30 @@ const QRScanner = ({ onScan, onClose }) => {
     if (label.includes('back') || label.includes('rear')) return 'Back Camera';
     if (label.includes('front')) return 'Front Camera';
     return 'Camera';
+  };
+
+  // Simple fallback to basic camera access if QR scanner continues to fail
+  const useBasicCameraAccess = async () => {
+    try {
+      setError(null);
+      setIsInitializing(true);
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } 
+      });
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        setHasCamera(true);
+        setIsScanning(true);
+      }
+    } catch (error) {
+      console.error('Basic camera access failed:', error);
+      setError('Cannot access camera. Please check permissions.');
+      setHasCamera(false);
+    } finally {
+      setIsInitializing(false);
+    }
   };
 
   return (
@@ -249,13 +247,23 @@ const QRScanner = ({ onScan, onClose }) => {
                 </svg>
                 <span className="text-red-200">{error}</span>
               </div>
+              {retryCount > 2 && (
+                <div className="mt-2">
+                  <button
+                    onClick={useBasicCameraAccess}
+                    className="text-blue-300 hover:text-blue-100 text-sm underline"
+                  >
+                    Try basic camera access instead
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
           {isInitializing && (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
-              <p className="text-gray-300">Initializing camera...</p>
+              <p className="text-gray-300">Initializing camera... {retryCount > 0 && `(Attempt ${retryCount + 1})`}</p>
             </div>
           )}
 
@@ -273,6 +281,14 @@ const QRScanner = ({ onScan, onClose }) => {
                 >
                   Retry Camera
                 </button>
+                {retryCount > 1 && (
+                  <button
+                    onClick={useBasicCameraAccess}
+                    className="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white transition-colors block mx-auto"
+                  >
+                    Try Basic Camera
+                  </button>
+                )}
                 <button
                   onClick={onClose}
                   className="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white transition-colors block mx-auto"
@@ -283,13 +299,14 @@ const QRScanner = ({ onScan, onClose }) => {
             </div>
           ) : hasCamera && !isInitializing ? (
             <>
-              {/* Scanner View - This is where the video element renders */}
+              {/* Scanner View */}
               <div className="relative bg-black rounded-lg overflow-hidden mb-4">
                 <video 
                   ref={videoRef} 
                   className="w-full h-64 md:h-96 object-cover"
                   playsInline
                   muted
+                  autoPlay
                 />
                 
                 {/* Scanner Overlay */}
