@@ -1,34 +1,37 @@
 import React, { useState, useRef, useEffect } from 'react';
-import QrScanner from 'qr-scanner';
 
 const QRScanner = ({ onScan, onClose }) => {
   const videoRef = useRef(null);
   const [hasCamera, setHasCamera] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
-  const [currentCamera, setCurrentCamera] = useState('user'); // 'user' for front, 'environment' for back
+  const [currentCamera, setCurrentCamera] = useState('user');
   const [availableCameras, setAvailableCameras] = useState([]);
   const [qrScanner, setQrScanner] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const initializeScanner = async () => {
       try {
+        // Dynamically import qr-scanner to avoid SSR issues
+        const QrScanner = (await import('qr-scanner')).default;
+        
         // Check if cameras are available
         const cameras = await QrScanner.listCameras();
         setAvailableCameras(cameras);
         
         if (cameras.length === 0) {
           setHasCamera(false);
+          setError('No cameras found on this device');
           return;
         }
 
-        // Check if back camera is available
+        // Find back camera or use first available
         const backCamera = cameras.find(cam => 
           cam.label.toLowerCase().includes('back') || 
           cam.id.toLowerCase().includes('back') ||
           cam.label.toLowerCase().includes('rear')
         );
 
-        // Start with back camera if available, otherwise use first camera
         const initialCamera = backCamera || cameras[0];
         setCurrentCamera(initialCamera.id);
 
@@ -39,6 +42,9 @@ const QRScanner = ({ onScan, onClose }) => {
             console.log('QR Code scanned:', result);
             if (result && result.data) {
               onScan(result.data);
+              // Stop scanning after successful scan
+              scanner.stop();
+              setIsScanning(false);
             }
           },
           {
@@ -46,16 +52,20 @@ const QRScanner = ({ onScan, onClose }) => {
             highlightScanRegion: true,
             highlightCodeOutline: true,
             returnDetailedScanResult: true,
+            maxScansPerSecond: 2, // Reduce scanning frequency
           }
         );
 
         setQrScanner(scanner);
+        
+        // Start scanning
         await scanner.start();
         setIsScanning(true);
 
       } catch (error) {
         console.error('Error initializing QR scanner:', error);
         setHasCamera(false);
+        setError(`Camera error: ${error.message}`);
       }
     };
 
@@ -63,7 +73,7 @@ const QRScanner = ({ onScan, onClose }) => {
 
     return () => {
       if (qrScanner) {
-        qrScanner.destroy();
+        qrScanner.destroy().catch(console.error);
       }
     };
   }, [onScan]);
@@ -80,6 +90,7 @@ const QRScanner = ({ onScan, onClose }) => {
       await qrScanner.setCamera(nextCamera.id);
     } catch (error) {
       console.error('Error switching camera:', error);
+      setError('Failed to switch camera');
     }
   };
 
@@ -93,9 +104,27 @@ const QRScanner = ({ onScan, onClose }) => {
       } else {
         await qrScanner.start();
         setIsScanning(true);
+        setError(null);
       }
     } catch (error) {
       console.error('Error toggling scanner:', error);
+      setError('Failed to control camera');
+    }
+  };
+
+  const retryCamera = async () => {
+    setError(null);
+    setHasCamera(true);
+    
+    if (qrScanner) {
+      try {
+        await qrScanner.start();
+        setIsScanning(true);
+      } catch (error) {
+        console.error('Error restarting camera:', error);
+        setError('Cannot access camera. Please check permissions.');
+        setHasCamera(false);
+      }
     }
   };
 
@@ -127,13 +156,38 @@ const QRScanner = ({ onScan, onClose }) => {
             </button>
           </div>
 
+          {error && (
+            <div className="mb-4 p-4 bg-red-900/40 border border-red-700/30 rounded-lg">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 mr-2 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span className="text-red-200">{error}</span>
+              </div>
+            </div>
+          )}
+
           {!hasCamera ? (
             <div className="text-center py-8">
               <div className="text-red-400 text-6xl mb-4">📷</div>
               <h4 className="text-xl font-semibold text-white mb-2">Camera Not Available</h4>
-              <p className="text-gray-300">
-                No camera found or camera access denied. Please check your device permissions.
+              <p className="text-gray-300 mb-4">
+                {error || 'No camera found or camera access denied. Please check your device permissions.'}
               </p>
+              <div className="space-y-3">
+                <button
+                  onClick={retryCamera}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors"
+                >
+                  Retry Camera
+                </button>
+                <button
+                  onClick={onClose}
+                  className="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white transition-colors block mx-auto"
+                >
+                  Close Scanner
+                </button>
+              </div>
             </div>
           ) : (
             <>
@@ -143,6 +197,7 @@ const QRScanner = ({ onScan, onClose }) => {
                   ref={videoRef} 
                   className="w-full h-64 md:h-96 object-cover"
                   playsInline
+                  muted
                 />
                 
                 {/* Scanner Overlay */}
@@ -155,13 +210,15 @@ const QRScanner = ({ onScan, onClose }) => {
                     <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-green-400"></div>
                     
                     {/* Scanning animation */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-green-400 animate-pulse"></div>
+                    {isScanning && (
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-green-400 animate-pulse"></div>
+                    )}
                   </div>
                 </div>
 
                 {/* Camera info */}
                 <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                  {getCameraName(currentCamera)}
+                  {getCameraName(currentCamera)} {isScanning ? '• Scanning' : '• Paused'}
                 </div>
               </div>
 
@@ -202,7 +259,7 @@ const QRScanner = ({ onScan, onClose }) => {
               <div className="mt-4 text-center text-sm text-gray-300">
                 <p>Point your camera at a DSSN QR code to scan automatically</p>
                 <p className="text-xs text-gray-400 mt-1">
-                  The scanner works with both front and back cameras
+                  Make sure to allow camera permissions in your browser
                 </p>
               </div>
             </>
