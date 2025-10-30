@@ -10,6 +10,9 @@ const QRScanner = ({ onScan, onClose }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let scanner = null;
+    let isMounted = true;
+
     const initializeScanner = async () => {
       try {
         // Dynamically import qr-scanner to avoid SSR issues
@@ -17,6 +20,8 @@ const QRScanner = ({ onScan, onClose }) => {
         
         // Check if cameras are available
         const cameras = await QrScanner.listCameras();
+        if (!isMounted) return;
+        
         setAvailableCameras(cameras);
         
         if (cameras.length === 0) {
@@ -36,7 +41,7 @@ const QRScanner = ({ onScan, onClose }) => {
         setCurrentCamera(initialCamera.id);
 
         // Initialize QR Scanner
-        const scanner = new QrScanner(
+        scanner = new QrScanner(
           videoRef.current,
           (result) => {
             console.log('QR Code scanned:', result);
@@ -60,10 +65,12 @@ const QRScanner = ({ onScan, onClose }) => {
         
         // Start scanning
         await scanner.start();
+        if (!isMounted) return;
         setIsScanning(true);
 
       } catch (error) {
         console.error('Error initializing QR scanner:', error);
+        if (!isMounted) return;
         setHasCamera(false);
         setError(`Camera error: ${error.message}`);
       }
@@ -72,8 +79,9 @@ const QRScanner = ({ onScan, onClose }) => {
     initializeScanner();
 
     return () => {
-      if (qrScanner) {
-        qrScanner.destroy().catch(console.error);
+      isMounted = false;
+      if (scanner) {
+        scanner.destroy().catch(console.error);
       }
     };
   }, [onScan]);
@@ -125,6 +133,9 @@ const QRScanner = ({ onScan, onClose }) => {
         setError('Cannot access camera. Please check permissions.');
         setHasCamera(false);
       }
+    } else {
+      // If qrScanner is null, reload the component
+      window.location.reload();
     }
   };
 
