@@ -5,182 +5,195 @@ const QRScanner = ({ onScan, onClose }) => {
   const [hasCamera, setHasCamera] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState(null);
-  const [isInitializing, setIsInitializing] = useState(true);
-  const [scanner, setScanner] = useState(null);
+  const [isInitializing, setIsInitializing] = useState(false);
+  const [cameraStream, setCameraStream] = useState(null);
 
-  useEffect(() => {
-    let currentScanner = null;
-    let isMounted = true;
-
-    const initializeScanner = async () => {
-      try {
-        if (!isMounted) return;
-        
-        setIsInitializing(true);
-        setError(null);
-
-        console.log('Starting QR scanner initialization...');
-
-        // Check if we're in a browser environment
-        if (typeof window === 'undefined') {
-          throw new Error('Not in browser environment');
-        }
-
-        // Check for camera support
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          throw new Error('Camera not supported in this browser');
-        }
-
-        // Wait for video element to be available
-        if (!videoRef.current) {
-          throw new Error('Video element not ready');
-        }
-
-        // Test basic camera access first
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { 
-              facingMode: 'environment',
-              width: { ideal: 1280 },
-              height: { ideal: 720 }
-            } 
-          });
-          
-          // Stop the test stream
-          stream.getTracks().forEach(track => track.stop());
-        } catch (camError) {
-          throw new Error(`Camera access denied: ${camError.message}`);
-        }
-
-        // Now load QR scanner
-        console.log('Loading QR scanner library...');
-        const QrScannerModule = await import('qr-scanner');
-        const QrScanner = QrScannerModule.default;
-        
-        // Initialize the scanner
-        console.log('Creating QR scanner instance...');
-        currentScanner = new QrScanner(
-          videoRef.current,
-          (result) => {
-            console.log('QR code detected:', result);
-            if (result?.data) {
-              onScan(result.data);
-              if (currentScanner) {
-                currentScanner.stop();
-                setIsScanning(false);
-              }
-            }
-          },
-          {
-            highlightScanRegion: true,
-            highlightCodeOutline: true,
-            maxScansPerSecond: 1,
-            returnDetailedScanResult: true,
-          }
-        );
-
-        if (!isMounted) {
-          currentScanner.destroy();
-          return;
-        }
-
-        setScanner(currentScanner);
-
-        // Start scanning
-        console.log('Starting QR scanner...');
-        await currentScanner.start();
-        
-        if (!isMounted) return;
-        
-        console.log('QR scanner started successfully');
-        setIsScanning(true);
-        setHasCamera(true);
-        setError(null);
-
-      } catch (error) {
-        console.error('QR Scanner initialization failed:', error);
-        if (isMounted) {
-          setError(error.message || 'Failed to initialize camera scanner');
-          setHasCamera(false);
-        }
-      } finally {
-        if (isMounted) {
-          setIsInitializing(false);
-        }
-      }
-    };
-
-    // Start initialization with a delay to ensure DOM is ready
-    const timer = setTimeout(() => {
-      initializeScanner();
-    }, 100);
-
-    // Cleanup function
-    return () => {
-      isMounted = false;
-      clearTimeout(timer);
-      if (currentScanner) {
-        console.log('Cleaning up QR scanner...');
-        currentScanner.stop().catch(() => {});
-        currentScanner.destroy().catch(() => {});
-      }
-    };
-  }, [onScan]);
-
-  const retryCamera = async () => {
-    setError(null);
-    setHasCamera(true);
-    setIsInitializing(true);
-    
-    // Force re-initialization by reloading the component
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
-  };
-
-  const useSimpleCamera = async () => {
+  // Simple camera access without QR scanner
+  const initializeSimpleCamera = async () => {
     try {
-      setError(null);
       setIsInitializing(true);
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
-      });
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        setHasCamera(true);
-        setIsScanning(true);
-        setIsInitializing(false);
-        
-        // For simple camera mode, we can't scan QR codes but at least show camera
-        setError('Camera active but QR scanning unavailable. Please use manual entry.');
+      setError(null);
+
+      // Check if browser supports camera
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera not supported in this browser');
       }
+
+      // Wait a bit for DOM to be ready
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      if (!videoRef.current) {
+        throw new Error('Camera view not ready. Please close and try again.');
+      }
+
+      console.log('Requesting camera access...');
+      
+      // Try to get camera stream
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      });
+
+      console.log('Camera access granted, setting up video...');
+      
+      // Set the stream to video element
+      videoRef.current.srcObject = stream;
+      videoRef.current.playsInline = true;
+      videoRef.current.muted = true;
+      
+      // Wait for video to be ready
+      await new Promise((resolve, reject) => {
+        if (videoRef.current) {
+          videoRef.current.onloadedmetadata = () => {
+            console.log('Video metadata loaded');
+            resolve();
+          };
+          videoRef.current.onerror = reject;
+          
+          // Fallback timeout
+          setTimeout(resolve, 1000);
+        } else {
+          reject(new Error('Video element disappeared'));
+        }
+      });
+
+      // Play the video
+      await videoRef.current.play();
+      
+      setCameraStream(stream);
+      setHasCamera(true);
+      setIsScanning(true);
+      setError(null);
+      
+      console.log('Camera started successfully');
+
     } catch (error) {
-      console.error('Simple camera access failed:', error);
-      setError('Cannot access camera. Please check permissions.');
+      console.error('Camera initialization failed:', error);
+      let errorMessage = 'Camera access failed: ';
+      
+      if (error.name === 'NotAllowedError') {
+        errorMessage += 'Permission denied. Please allow camera access in your browser settings.';
+      } else if (error.name === 'NotFoundError') {
+        errorMessage += 'No camera found on this device.';
+      } else if (error.name === 'NotSupportedError') {
+        errorMessage += 'Camera not supported in this browser.';
+      } else if (error.name === 'NotReadableError') {
+        errorMessage += 'Camera is already in use by another application.';
+      } else {
+        errorMessage += error.message;
+      }
+      
+      setError(errorMessage);
       setHasCamera(false);
+    } finally {
       setIsInitializing(false);
     }
   };
 
-  const stopScanner = () => {
-    if (scanner) {
-      scanner.stop().catch(console.error);
-      setIsScanning(false);
+  // Initialize QR Scanner with camera
+  const initializeQRScanner = async () => {
+    try {
+      setIsInitializing(true);
+      setError(null);
+
+      // First get basic camera access
+      await initializeSimpleCamera();
+      
+      if (!hasCamera) return;
+
+      console.log('Loading QR scanner...');
+      
+      // Dynamically import QR scanner
+      const QrScannerModule = await import('qr-scanner');
+      const QrScanner = QrScannerModule.default;
+      
+      // Create QR scanner instance
+      const scanner = new QrScanner(
+        videoRef.current,
+        (result) => {
+          console.log('QR code scanned:', result);
+          if (result?.data) {
+            onScan(result.data);
+            stopScanner();
+          }
+        },
+        {
+          highlightScanRegion: true,
+          highlightCodeOutline: true,
+          maxScansPerSecond: 2,
+        }
+      );
+
+      // Start QR scanning
+      await scanner.start();
+      console.log('QR scanner started');
+      
+      // Store scanner for cleanup
+      setScanner(scanner);
+
+    } catch (error) {
+      console.error('QR scanner failed:', error);
+      setError('QR scanning unavailable, but camera is active. You can still use manual entry.');
+      // Don't set hasCamera to false since basic camera works
+    } finally {
+      setIsInitializing(false);
     }
   };
 
+  const [scanner, setScanner] = useState(null);
+
+  // Stop scanner and cleanup
+  const stopScanner = () => {
+    if (scanner) {
+      scanner.stop().catch(console.error);
+      scanner.destroy().catch(console.error);
+      setScanner(null);
+    }
+    
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+    
+    setIsScanning(false);
+  };
+
+  // Start scanner
   const startScanner = async () => {
     if (scanner) {
-      try {
-        await scanner.start();
-        setIsScanning(true);
-        setError(null);
-      } catch (error) {
-        setError('Failed to start scanner: ' + error.message);
-      }
+      await scanner.start();
+      setIsScanning(true);
     }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopScanner();
+    };
+  }, []);
+
+  // Initialize when component mounts
+  useEffect(() => {
+    initializeQRScanner();
+  }, []);
+
+  const retryScanner = () => {
+    stopScanner();
+    setError(null);
+    setHasCamera(true);
+    initializeQRScanner();
+  };
+
+  const retrySimpleCamera = () => {
+    stopScanner();
+    setError(null);
+    setHasCamera(true);
+    initializeSimpleCamera();
   };
 
   return (
@@ -193,7 +206,7 @@ const QRScanner = ({ onScan, onClose }) => {
             </h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-white transition-colors p-2"
+              className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -202,30 +215,47 @@ const QRScanner = ({ onScan, onClose }) => {
           </div>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-900/40 border border-red-700/30 rounded-lg">
-              <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            <div className="mb-4 p-4 bg-yellow-900/40 border border-yellow-700/30 rounded-lg">
+              <div className="flex items-start">
+                <svg className="w-5 h-5 mr-2 text-yellow-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
-                <span className="text-red-200">{error}</span>
+                <div>
+                  <span className="text-yellow-200">{error}</span>
+                  {error.includes('QR scanning unavailable') && (
+                    <div className="mt-2">
+                      <button
+                        onClick={retryScanner}
+                        className="text-blue-300 hover:text-blue-100 text-sm underline mr-4"
+                      >
+                        Retry QR Scanner
+                      </button>
+                      <button
+                        onClick={onClose}
+                        className="text-green-300 hover:text-green-100 text-sm underline"
+                      >
+                        Use Manual Entry
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
 
-          {isInitializing ? (
+          {isInitializing && (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-400 mx-auto mb-4"></div>
-              <h4 className="text-lg font-semibold text-white mb-2">Initializing Scanner</h4>
+              <h4 className="text-lg font-semibold text-white mb-2">Setting Up Camera</h4>
               <p className="text-gray-300 text-sm">
-                Setting up camera and QR scanner...
-              </p>
-              <p className="text-gray-400 text-xs mt-2">
-                Please allow camera permissions if prompted
+                Please allow camera permissions if prompted...
               </p>
             </div>
-          ) : hasCamera ? (
+          )}
+
+          {!isInitializing && hasCamera && (
             <>
-              {/* Scanner View */}
+              {/* Camera View */}
               <div className="relative bg-black rounded-lg overflow-hidden mb-4">
                 <video 
                   ref={videoRef}
@@ -253,72 +283,93 @@ const QRScanner = ({ onScan, onClose }) => {
 
                 {/* Status indicator */}
                 <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                  {isScanning ? '🟢 Scanning' : '🟡 Ready'}
+                  {scanner ? 'QR Scanner Active' : 'Camera Only'}
                 </div>
               </div>
 
               {/* Controls */}
               <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4">
+                {scanner && (
+                  <button
+                    onClick={isScanning ? stopScanner : startScanner}
+                    className={`flex items-center justify-center px-6 py-3 rounded-lg text-white transition-colors font-medium ${
+                      isScanning 
+                        ? 'bg-red-600 hover:bg-red-700' 
+                        : 'bg-green-600 hover:bg-green-700'
+                    }`}
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      {isScanning ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      )}
+                    </svg>
+                    {isScanning ? 'Stop Scanning' : 'Start Scanning'}
+                  </button>
+                )}
                 <button
-                  onClick={isScanning ? stopScanner : startScanner}
-                  className={`flex items-center justify-center px-6 py-3 rounded-lg text-white transition-colors font-medium ${
-                    isScanning 
-                      ? 'bg-red-600 hover:bg-red-700' 
-                      : 'bg-green-600 hover:bg-green-700'
-                  }`}
+                  onClick={retryScanner}
+                  className="flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors font-medium"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    {isScanning ? (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    ) : (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    )}
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
-                  {isScanning ? 'Stop Scanning' : 'Start Scanning'}
+                  Reinitialize Scanner
                 </button>
               </div>
 
               {/* Instructions */}
               <div className="text-center text-sm text-gray-300">
-                <p className="font-medium">How to scan:</p>
-                <ol className="list-decimal list-inside text-left mt-2 space-y-1 text-xs">
-                  <li>Point camera at the QR code</li>
-                  <li>Ensure good lighting</li>
-                  <li>Hold steady until scanned</li>
-                </ol>
+                <p className="font-medium">
+                  {scanner 
+                    ? 'Point camera at QR code to scan automatically' 
+                    : 'Camera active - QR scanning unavailable. Please use manual entry.'
+                  }
+                </p>
+                {!scanner && (
+                  <button
+                    onClick={retryScanner}
+                    className="mt-2 text-blue-300 hover:text-blue-100 underline text-xs"
+                  >
+                    Try to enable QR scanning again
+                  </button>
+                )}
               </div>
             </>
-          ) : (
+          )}
+
+          {!isInitializing && !hasCamera && (
             <div className="text-center py-8">
               <div className="text-red-400 text-6xl mb-4">📷</div>
-              <h4 className="text-xl font-semibold text-white mb-2">Camera Unavailable</h4>
+              <h4 className="text-xl font-semibold text-white mb-2">Camera Access Required</h4>
               <p className="text-gray-300 mb-6">
-                Unable to access camera. This could be due to:
+                To use the QR scanner, we need access to your camera.
               </p>
-              <ul className="text-gray-400 text-sm text-left mb-6 space-y-2">
-                <li>• Camera permissions denied</li>
-                <li>• No camera available</li>
-                <li>• Browser compatibility issue</li>
-                <li>• QR scanner library failed to load</li>
-              </ul>
+              
+              <div className="bg-gray-800/50 rounded-lg p-4 mb-6 text-left">
+                <p className="text-gray-300 font-medium mb-2">Troubleshooting steps:</p>
+                <ul className="text-gray-400 text-sm space-y-1">
+                  <li>• Check if your device has a camera</li>
+                  <li>• Allow camera permissions when prompted</li>
+                  <li>• Ensure no other app is using the camera</li>
+                  <li>• Try using Chrome or Firefox browser</li>
+                  <li>• Check if camera is blocked in browser settings</li>
+                </ul>
+              </div>
+
               <div className="space-y-3">
                 <button
-                  onClick={retryCamera}
+                  onClick={retrySimpleCamera}
                   className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors font-medium"
                 >
-                  Retry Full Scanner
-                </button>
-                <button
-                  onClick={useSimpleCamera}
-                  className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg text-white transition-colors font-medium"
-                >
-                  Try Basic Camera Only
+                  Try Camera Again
                 </button>
                 <button
                   onClick={onClose}
                   className="w-full px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg text-white transition-colors font-medium"
                 >
-                  Close Scanner
+                  Use Manual Entry Instead
                 </button>
               </div>
             </div>
