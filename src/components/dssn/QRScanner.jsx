@@ -7,189 +7,138 @@ const QRScanner = ({ onScan, onClose }) => {
   const [isInitializing, setIsInitializing] = useState(true);
   const [cameraReady, setCameraReady] = useState(false);
 
-  // Use a state to force re-render when video element should be ready
-  const [videoKey, setVideoKey] = useState(0);
+  // Use a direct DOM reference instead of React ref
+  const getVideoElement = () => {
+    // Try multiple ways to get the video element
+    if (videoRef.current) return videoRef.current;
+    
+    const videoElement = document.getElementById('qr-scanner-video');
+    if (videoElement) return videoElement;
+    
+    return document.querySelector('video');
+  };
 
-  // Initialize camera with proper timing
-  useEffect(() => {
+  // Simple camera initialization without complex timing
+  const initializeCamera = async () => {
     let stream = null;
-    let isMounted = true;
+    
+    try {
+      console.log('Starting camera initialization...');
+      setError(null);
+      setIsInitializing(true);
 
-    const initializeCamera = async () => {
-      try {
-        if (!isMounted) return;
-        
-        setIsInitializing(true);
-        setError(null);
-        setCameraReady(false);
-
-        console.log('Step 1: Checking browser support...');
-
-        // Check browser support
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          throw new Error('Camera not supported in this browser. Please use Chrome, Firefox, or Edge.');
-        }
-
-        console.log('Step 2: Waiting for DOM...');
-        
-        // Wait for DOM to be completely ready
-        await new Promise(resolve => {
-          if (document.readyState === 'complete') {
-            resolve();
-          } else {
-            window.addEventListener('load', resolve);
-            setTimeout(resolve, 1000); // Fallback
-          }
-        });
-
-        // Additional delay to ensure React has rendered everything
-        await new Promise(resolve => setTimeout(resolve, 300));
-
-        console.log('Step 3: Checking video element...');
-        
-        // Force re-render of video element
-        setVideoKey(prev => prev + 1);
-        
-        // Wait a bit more for the new video element to be in DOM
-        await new Promise(resolve => setTimeout(resolve, 200));
-
-        if (!videoRef.current) {
-          console.error('Video ref is still null after re-render');
-          throw new Error('Camera view not available. Please close and reopen the scanner.');
-        }
-
-        console.log('Step 4: Requesting camera permission...');
-
-        // Request camera access
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: 'environment',
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
-        });
-
-        console.log('Step 5: Setting up video element...');
-
-        // Set video source
-        videoRef.current.srcObject = stream;
-        videoRef.current.playsInline = true;
-        videoRef.current.muted = true;
-        videoRef.current.setAttribute('playsinline', 'true');
-
-        console.log('Step 6: Waiting for video to be ready...');
-
-        // Wait for video to be ready with better error handling
-        await new Promise((resolve, reject) => {
-          const video = videoRef.current;
-          if (!video) {
-            reject(new Error('Video element lost'));
-            return;
-          }
-
-          const onReady = () => {
-            video.removeEventListener('loadeddata', onReady);
-            video.removeEventListener('error', onError);
-            resolve();
-          };
-
-          const onError = () => {
-            video.removeEventListener('loadeddata', onReady);
-            video.removeEventListener('error', onError);
-            reject(new Error('Video failed to load'));
-          };
-
-          if (video.readyState >= 3) { // HAVE_FUTURE_DATA
-            resolve();
-          } else {
-            video.addEventListener('loadeddata', onReady);
-            video.addEventListener('error', onError);
-            // Fallback timeout
-            setTimeout(() => {
-              if (video.readyState >= 1) { // HAVE_METADATA
-                resolve();
-              } else {
-                reject(new Error('Video timeout'));
-              }
-            }, 3000);
-          }
-        });
-
-        console.log('Step 7: Starting video playback...');
-
-        // Play video
-        try {
-          await videoRef.current.play();
-        } catch (playError) {
-          console.warn('Video play failed, but continuing:', playError);
-          // Continue even if play fails
-        }
-
-        if (!isMounted) return;
-
-        console.log('Step 8: Camera setup complete');
-        
-        setCameraReady(true);
-        setHasCamera(true);
-        setError(null);
-
-        // Now try to initialize QR scanner
-        initializeQRScanner(stream);
-
-      } catch (error) {
-        console.error('Camera initialization failed:', error);
-        if (!isMounted) return;
-
-        let errorMessage = 'Camera setup failed: ';
-        
-        if (error.name === 'NotAllowedError') {
-          errorMessage = 'Camera permission denied. Please allow camera access in your browser settings.';
-        } else if (error.name === 'NotFoundError') {
-          errorMessage = 'No camera found on this device. Please check if your device has a camera.';
-        } else if (error.name === 'NotSupportedError') {
-          errorMessage = 'Camera not supported in this browser. Please use Chrome, Firefox, or Safari.';
-        } else if (error.name === 'NotReadableError') {
-          errorMessage = 'Camera is busy. Please close other apps that might be using the camera.';
-        } else if (error.message.includes('Video element')) {
-          errorMessage = 'Camera view failed to load. Please try again.';
-        } else {
-          errorMessage += error.message;
-        }
-        
-        setError(errorMessage);
-        setHasCamera(false);
-        setCameraReady(false);
-        
-        // Clean up stream if we got one
-        if (stream) {
-          stream.getTracks().forEach(track => track.stop());
-        }
-      } finally {
-        if (isMounted) {
-          setIsInitializing(false);
-        }
+      // Check browser support
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('Camera not supported in this browser. Please use Chrome, Firefox, or Safari.');
       }
-    };
 
-    // Start initialization
-    const timer = setTimeout(() => {
-      initializeCamera();
-    }, 500); // Longer initial delay
+      // Get camera access first
+      console.log('Requesting camera access...');
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      });
 
-    return () => {
-      isMounted = false;
-      clearTimeout(timer);
+      console.log('Camera access granted, setting up video...');
+
+      // Wait a bit for React to render
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Get video element using our function
+      const videoElement = getVideoElement();
+      
+      if (!videoElement) {
+        console.error('No video element found');
+        throw new Error('Camera view not available. Please refresh the page and try again.');
+      }
+
+      console.log('Video element found:', videoElement);
+
+      // Set up video element
+      videoElement.srcObject = stream;
+      videoElement.playsInline = true;
+      videoElement.muted = true;
+      videoElement.setAttribute('playsinline', 'true');
+
+      // Wait for video to load
+      await new Promise((resolve, reject) => {
+        const onLoaded = () => {
+          videoElement.removeEventListener('loadeddata', onLoaded);
+          videoElement.removeEventListener('error', onError);
+          resolve();
+        };
+
+        const onError = (e) => {
+          videoElement.removeEventListener('loadeddata', onLoaded);
+          videoElement.removeEventListener('error', onError);
+          reject(new Error('Video failed to load: ' + e.message));
+        };
+
+        if (videoElement.readyState >= 3) {
+          resolve();
+        } else {
+          videoElement.addEventListener('loadeddata', onLoaded);
+          videoElement.addEventListener('error', onError);
+          setTimeout(() => {
+            if (videoElement.readyState >= 1) {
+              resolve();
+            } else {
+              reject(new Error('Video loading timeout'));
+            }
+          }, 3000);
+        }
+      });
+
+      // Try to play the video
+      try {
+        await videoElement.play();
+        console.log('Video playback started');
+      } catch (playError) {
+        console.warn('Video play failed, continuing anyway:', playError);
+      }
+
+      // Success!
+      setHasCamera(true);
+      setCameraReady(true);
+      setError(null);
+
+      // Now try QR scanner
+      initializeQRScanner(stream, videoElement);
+
+    } catch (err) {
+      console.error('Camera initialization failed:', err);
+      
+      // Clean up stream if it exists
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
-      if (window.currentScanner) {
-        window.currentScanner.destroy().catch(console.error);
-        window.currentScanner = null;
-      }
-    };
-  }, []);
 
-  const initializeQRScanner = async (stream) => {
+      let errorMessage = 'Camera setup failed: ';
+      
+      if (err.name === 'NotAllowedError') {
+        errorMessage = 'Camera permission denied. Please allow camera access and try again.';
+      } else if (err.name === 'NotFoundError') {
+        errorMessage = 'No camera found on this device.';
+      } else if (err.name === 'NotSupportedError') {
+        errorMessage = 'Camera not supported in this browser.';
+      } else if (err.name === 'NotReadableError') {
+        errorMessage = 'Camera is busy. Close other apps using camera.';
+      } else {
+        errorMessage += err.message;
+      }
+      
+      setError(errorMessage);
+      setHasCamera(false);
+      setCameraReady(false);
+    } finally {
+      setIsInitializing(false);
+    }
+  };
+
+  const initializeQRScanner = async (stream, videoElement) => {
     try {
       console.log('Initializing QR scanner...');
       
@@ -197,7 +146,7 @@ const QRScanner = ({ onScan, onClose }) => {
       const QrScanner = QrScannerModule.default;
 
       const scanner = new QrScanner(
-        videoRef.current,
+        videoElement,
         (result) => {
           console.log('QR code scanned:', result);
           if (result?.data) {
@@ -215,31 +164,45 @@ const QRScanner = ({ onScan, onClose }) => {
       await scanner.start();
       console.log('QR scanner started successfully');
       
+      // Store scanner for cleanup
       window.currentScanner = scanner;
 
     } catch (qrError) {
-      console.warn('QR scanner failed:', qrError);
-      // Don't show error for QR scanner failure, just use camera
+      console.warn('QR scanner failed, but camera works:', qrError);
+      // Don't show error - camera still works
     }
   };
 
-  const retryCamera = async () => {
+  // Initialize on mount
+  useEffect(() => {
+    initializeCamera();
+
+    return () => {
+      // Cleanup
+      const videoElement = getVideoElement();
+      if (videoElement?.srcObject) {
+        videoElement.srcObject.getTracks().forEach(track => track.stop());
+      }
+      if (window.currentScanner) {
+        window.currentScanner.destroy().catch(() => {});
+        window.currentScanner = null;
+      }
+    };
+  }, []);
+
+  const retryCamera = () => {
     setError(null);
     setIsInitializing(true);
-    setCameraReady(false);
-    
-    // Force complete re-initialization
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
+    initializeCamera();
   };
 
   const closeScanner = () => {
-    if (videoRef.current?.srcObject) {
-      videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+    const videoElement = getVideoElement();
+    if (videoElement?.srcObject) {
+      videoElement.srcObject.getTracks().forEach(track => track.stop());
     }
     if (window.currentScanner) {
-      window.currentScanner.destroy().catch(console.error);
+      window.currentScanner.destroy().catch(() => {});
       window.currentScanner = null;
     }
     onClose();
@@ -274,13 +237,13 @@ const QRScanner = ({ onScan, onClose }) => {
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
                       onClick={retryCamera}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors font-medium"
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white transition-colors"
                     >
                       Try Again
                     </button>
                     <button
                       onClick={closeScanner}
-                      className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white transition-colors font-medium"
+                      className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded text-white transition-colors"
                     >
                       Use Manual Entry
                     </button>
@@ -295,19 +258,17 @@ const QRScanner = ({ onScan, onClose }) => {
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-400 mx-auto mb-4"></div>
               <h4 className="text-lg font-semibold text-white mb-2">Setting Up Camera</h4>
               <p className="text-gray-300 text-sm">
-                Initializing camera... Please wait.
-              </p>
-              <p className="text-gray-400 text-xs mt-2">
-                You may be asked for camera permissions
+                Please allow camera permissions when prompted...
               </p>
             </div>
           )}
 
           {!isInitializing && hasCamera && cameraReady && (
             <>
+              {/* Video element with both ref and id for reliable access */}
               <div className="relative bg-black rounded-lg overflow-hidden mb-4">
                 <video 
-                  key={videoKey}
+                  id="qr-scanner-video"
                   ref={videoRef}
                   className="w-full h-64 md:h-96 object-cover bg-black"
                   playsInline
@@ -351,25 +312,17 @@ const QRScanner = ({ onScan, onClose }) => {
 
           {!isInitializing && !hasCamera && !error && (
             <div className="text-center py-8">
-              <div className="text-gray-400 text-6xl mb-4">❓</div>
-              <h4 className="text-xl font-semibold text-white mb-2">Camera Status Unknown</h4>
+              <div className="text-gray-400 text-6xl mb-4">📷</div>
+              <h4 className="text-xl font-semibold text-white mb-2">Camera Setup</h4>
               <p className="text-gray-300 mb-6">
-                Unable to determine camera status. Please try again.
+                Ready to initialize camera...
               </p>
-              <div className="space-y-3">
-                <button
-                  onClick={retryCamera}
-                  className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors font-medium"
-                >
-                  Try Again
-                </button>
-                <button
-                  onClick={closeScanner}
-                  className="w-full px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg text-white transition-colors font-medium"
-                >
-                  Use Manual Entry
-                </button>
-              </div>
+              <button
+                onClick={retryCamera}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors font-medium"
+              >
+                Start Camera
+              </button>
             </div>
           )}
         </div>
