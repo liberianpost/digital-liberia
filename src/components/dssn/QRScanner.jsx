@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 const QRScanner = ({ onScan, onClose }) => {
   const videoRef = useRef(null);
@@ -8,9 +8,16 @@ const QRScanner = ({ onScan, onClose }) => {
   const [isInitializing, setIsInitializing] = useState(true);
   const [stream, setStream] = useState(null);
   const [cameraReady, setCameraReady] = useState(false);
+  const initializationAttempted = useRef(false);
 
-  // Enhanced camera initialization with better error handling
-  const initializeCamera = async () => {
+  // Enhanced camera initialization with better timing
+  const initializeCamera = useCallback(async () => {
+    // Prevent multiple simultaneous initializations
+    if (initializationAttempted.current) {
+      return;
+    }
+    
+    initializationAttempted.current = true;
     let currentStream = null;
     
     try {
@@ -19,60 +26,88 @@ const QRScanner = ({ onScan, onClose }) => {
       setCameraReady(false);
       console.log('🔍 Starting camera initialization...');
 
-      // Check browser support more thoroughly
+      // Check browser support
       if (!navigator.mediaDevices?.getUserMedia) {
         throw new Error('Camera not supported in this browser. Please use Chrome, Firefox, or Safari.');
       }
 
-      // Check if video element exists early
+      // Wait a bit longer for DOM to be ready and refs to be set
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Check if video element exists with more detailed logging
       if (!videoRef.current) {
-        console.error('❌ Video ref is null - component may not be mounted');
+        console.error('❌ Video ref is null - component not fully mounted');
+        console.log('❌ Video ref details:', {
+          videoRef,
+          current: videoRef.current,
+          containerRef: videoContainerRef.current
+        });
         throw new Error('Camera view not ready. Please try again.');
       }
 
       const video = videoRef.current;
+      console.log('✅ Video element found:', video);
       
       // Clear any previous stream
       video.srcObject = null;
 
-      // Request camera access with fallback options
+      // Request camera access with better error handling
       console.log('📷 Requesting camera access...');
+      
+      const constraints = {
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      };
+
+      // Try environment camera first, then user camera
       try {
         currentStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: 'environment',
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
+          ...constraints,
+          video: { ...constraints.video, facingMode: 'environment' }
         });
-      } catch (streamError) {
-        console.warn('⚠️ Environment camera failed, trying user camera:', streamError);
-        // Fallback to user camera
+        console.log('✅ Environment camera selected');
+      } catch (envError) {
+        console.warn('⚠️ Environment camera failed, trying user camera:', envError);
         currentStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: 'user',
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
+          ...constraints,
+          video: { ...constraints.video, facingMode: 'user' }
         });
+        console.log('✅ User camera selected');
+      }
+
+      if (!currentStream) {
+        throw new Error('Could not access any camera');
       }
 
       setStream(currentStream);
-      console.log('✅ Camera access granted');
+      console.log('✅ Camera stream obtained');
 
-      // Set video source immediately
-      video.srcObject = currentStream;
-      video.playsInline = true;
-      video.muted = true;
-      video.setAttribute('playsinline', 'true');
-      video.setAttribute('autoplay', 'true');
+      // Set video source with error handling
+      try {
+        video.srcObject = currentStream;
+        video.playsInline = true;
+        video.muted = true;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('autoplay', 'true');
+        console.log('✅ Video source set');
+      } catch (srcError) {
+        console.error('❌ Error setting video source:', srcError);
+        throw new Error('Failed to setup video element');
+      }
 
-      // Wait for video to be ready with better state checking
+      // Wait for video to be ready with comprehensive event handling
       await new Promise((resolve, reject) => {
-        let timeoutId;
-        
+        const cleanup = () => {
+          video.removeEventListener('loadedmetadata', onLoaded);
+          video.removeEventListener('canplay', onCanPlay);
+          video.removeEventListener('error', onError);
+          clearTimeout(timeoutId);
+        };
+
         const onLoaded = () => {
-          console.log('✅ Video loaded successfully');
+          console.log('✅ Video metadata loaded');
           cleanup();
           resolve();
         };
@@ -84,58 +119,38 @@ const QRScanner = ({ onScan, onClose }) => {
         };
 
         const onError = (e) => {
-          console.error('❌ Video error:', e);
+          console.error('❌ Video error event:', e);
           cleanup();
-          reject(new Error('Video failed to load'));
+          reject(new Error('Video element error: ' + e.message));
         };
 
-        const checkVideoState = () => {
-          if (video.readyState >= 4) {
-            console.log('✅ Video ready state:', video.readyState);
-            cleanup();
-            resolve();
-            return;
-          }
-          
-          if (video.videoWidth > 0 && video.videoHeight > 0) {
-            console.log('✅ Video has dimensions:', video.videoWidth, 'x', video.videoHeight);
-            cleanup();
-            resolve();
-            return;
-          }
-        };
+        // Check if already ready
+        if (video.readyState >= 3) {
+          console.log('✅ Video already ready, state:', video.readyState);
+          cleanup();
+          resolve();
+          return;
+        }
 
-        const cleanup = () => {
-          video.removeEventListener('loadeddata', onLoaded);
-          video.removeEventListener('canplay', onCanPlay);
-          video.removeEventListener('error', onError);
-          clearTimeout(timeoutId);
-          clearInterval(intervalId);
-        };
-
-        // Set up event listeners
-        video.addEventListener('loadeddata', onLoaded);
+        video.addEventListener('loadedmetadata', onLoaded);
         video.addEventListener('canplay', onCanPlay);
         video.addEventListener('error', onError);
 
-        // Check video state periodically
-        const intervalId = setInterval(checkVideoState, 100);
-
-        // Timeout after 5 seconds
-        timeoutId = setTimeout(() => {
+        const timeoutId = setTimeout(() => {
+          // Check current state before rejecting
           if (video.readyState >= 2) {
-            console.log('✅ Video ready after timeout');
+            console.log('✅ Video ready after timeout, state:', video.readyState);
             cleanup();
             resolve();
           } else {
-            console.error('❌ Video loading timeout');
+            console.error('❌ Video loading timeout, state:', video.readyState);
             cleanup();
-            reject(new Error('Camera initialization timeout'));
+            reject(new Error('Camera initialization timeout - video not ready'));
           }
-        }, 5000);
+        }, 8000); // Increased timeout
       });
 
-      // Try to play video with better error handling
+      // Try to play video
       try {
         await video.play();
         console.log('▶️ Video playback started');
@@ -144,33 +159,42 @@ const QRScanner = ({ onScan, onClose }) => {
         // Continue anyway - autoplay might still work
       }
 
-      // Final verification with multiple checks
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const isVideoActive = 
-        video.readyState >= 4 && 
-        video.videoWidth > 0 && 
-        video.videoHeight > 0 &&
-        video.srcObject === currentStream;
-
-      if (isVideoActive) {
-        console.log('✅ Camera feed is fully active:', {
-          width: video.videoWidth,
-          height: video.videoHeight,
-          readyState: video.readyState
-        });
+      // Final verification with multiple attempts
+      let verificationPassed = false;
+      for (let i = 0; i < 5; i++) {
+        await new Promise(resolve => setTimeout(resolve, 300));
         
+        const isActive = 
+          video.readyState >= 4 && 
+          video.videoWidth > 0 && 
+          video.videoHeight > 0 &&
+          video.srcObject === currentStream;
+
+        if (isActive) {
+          console.log('✅ Camera verification passed on attempt', i + 1, {
+            width: video.videoWidth,
+            height: video.videoHeight,
+            readyState: video.readyState
+          });
+          verificationPassed = true;
+          break;
+        } else {
+          console.log('🔄 Camera verification attempt', i + 1, 'failed:', {
+            readyState: video.readyState,
+            width: video.videoWidth,
+            height: video.videoHeight,
+            hasStream: !!video.srcObject
+          });
+        }
+      }
+
+      if (verificationPassed) {
         setHasCamera(true);
         setCameraReady(true);
         setError(null);
+        console.log('🎉 Camera setup completed successfully');
       } else {
-        console.warn('⚠️ Video verification failed:', {
-          readyState: video.readyState,
-          width: video.videoWidth,
-          height: video.videoHeight,
-          hasStream: !!video.srcObject
-        });
-        throw new Error('Camera feed not active after initialization');
+        throw new Error('Camera feed not active after multiple attempts');
       }
 
     } catch (err) {
@@ -180,11 +204,11 @@ const QRScanner = ({ onScan, onClose }) => {
       if (currentStream) {
         currentStream.getTracks().forEach(track => {
           track.stop();
-          console.log('🛑 Stopped track:', track.kind);
+          console.log('🛑 Stopped track:', track.kind, track.label);
         });
       }
 
-      let errorMessage = 'Camera setup failed: ';
+      let errorMessage = err.message || 'Camera setup failed';
       
       if (err.name === 'NotAllowedError') {
         errorMessage = 'Camera permission denied. Please allow camera access and refresh the page.';
@@ -196,8 +220,6 @@ const QRScanner = ({ onScan, onClose }) => {
         errorMessage = 'Camera is busy. Please close other apps using the camera.';
       } else if (err.message.includes('not ready')) {
         errorMessage = 'Camera view not ready. Please try again.';
-      } else {
-        errorMessage += err.message;
       }
       
       setError(errorMessage);
@@ -205,10 +227,11 @@ const QRScanner = ({ onScan, onClose }) => {
       setCameraReady(false);
     } finally {
       setIsInitializing(false);
+      initializationAttempted.current = false;
     }
-  };
+  }, []);
 
-  // Enhanced capture and scan with camera readiness check
+  // Capture and scan QR code
   const captureAndScan = async () => {
     if (!videoRef.current || !cameraReady) {
       setError('Camera not ready. Please wait for camera initialization or try again.');
@@ -220,8 +243,8 @@ const QRScanner = ({ onScan, onClose }) => {
       
       const video = videoRef.current;
       
-      // Enhanced camera activity check
-      if (video.videoWidth === 0 || video.videoHeight === 0 || video.readyState < 4) {
+      // Check camera activity
+      if (video.videoWidth === 0 || video.videoHeight === 0) {
         throw new Error('Camera not active. Please reinitialize camera.');
       }
 
@@ -276,30 +299,34 @@ const QRScanner = ({ onScan, onClose }) => {
     return 'BarcodeDetector' in window;
   };
 
-  // Enhanced useEffect with proper cleanup
+  // Enhanced useEffect with proper timing
   useEffect(() => {
-    // Small delay to ensure component is fully mounted
+    console.log('🚀 QRScanner mounted, starting initialization...');
+    
+    // Use a longer delay to ensure DOM is fully ready
     const initTimer = setTimeout(() => {
       initializeCamera();
-    }, 100);
+    }, 500);
 
     return () => {
+      console.log('🧹 QRScanner unmounting, cleaning up...');
       clearTimeout(initTimer);
-      // Enhanced cleanup
+      
       if (stream) {
-        console.log('🧹 Cleaning up camera stream...');
+        console.log('🛑 Stopping all stream tracks...');
         stream.getTracks().forEach(track => {
           track.stop();
-          console.log('🛑 Stopped track on unmount:', track.kind);
+          console.log('✅ Stopped track:', track.kind);
         });
       }
+      
       if (videoRef.current) {
         videoRef.current.srcObject = null;
       }
     };
-  }, []);
+  }, [initializeCamera]);
 
-  const retryCamera = () => {
+  const retryCamera = async () => {
     console.log('🔄 Retrying camera initialization...');
     
     // Enhanced cleanup
@@ -320,10 +347,10 @@ const QRScanner = ({ onScan, onClose }) => {
     setCameraReady(false);
     setIsInitializing(true);
     
-    // Slightly longer delay to ensure cleanup is complete
-    setTimeout(() => {
-      initializeCamera();
-    }, 800);
+    // Wait for cleanup to complete
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    initializeCamera();
   };
 
   const closeScanner = () => {
@@ -392,51 +419,62 @@ const QRScanner = ({ onScan, onClose }) => {
             </div>
           )}
 
-          {!isInitializing && hasCamera && (
-            <>
-              {/* Video container */}
-              <div 
-                ref={videoContainerRef}
-                className="relative bg-black rounded-lg overflow-hidden mb-4 border-2 border-green-400 min-h-[16rem] md:min-h-[24rem] flex items-center justify-center"
-              >
-                <video 
-                  ref={videoRef}
-                  className="w-full h-full object-cover"
-                  playsInline
-                  muted
-                  autoPlay
-                />
-                
-                {/* Scanner overlay */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="border-2 border-white rounded-lg w-48 h-48 md:w-64 md:h-64 relative">
-                    <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-white"></div>
-                    <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-white"></div>
-                    <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-white"></div>
-                    <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-white"></div>
-                  </div>
-                </div>
-
-                <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                  {cameraReady ? 'Live Camera Feed' : 'Initializing...'}
+          {/* Video container - ALWAYS RENDER THIS */}
+          <div 
+            ref={videoContainerRef}
+            className={`relative bg-black rounded-lg overflow-hidden mb-4 min-h-[16rem] md:min-h-[24rem] flex items-center justify-center ${
+              hasCamera && cameraReady ? 'border-2 border-green-400' : 'border-2 border-gray-600'
+            }`}
+          >
+            {/* Video element - ALWAYS RENDER THIS */}
+            <video 
+              ref={videoRef}
+              className="w-full h-full object-cover"
+              playsInline
+              muted
+              autoPlay
+            />
+            
+            {/* Scanner overlay - only show when camera is ready */}
+            {hasCamera && cameraReady && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="border-2 border-white rounded-lg w-48 h-48 md:w-64 md:h-64 relative">
+                  <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-white"></div>
+                  <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-white"></div>
+                  <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-white"></div>
+                  <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-white"></div>
                 </div>
               </div>
+            )}
 
+            {/* Status indicator */}
+            <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+              {isInitializing ? 'Initializing...' : 
+               hasCamera && cameraReady ? 'Live Camera Feed' : 
+               'Camera Offline'}
+            </div>
+
+            {/* Fallback content when camera is not ready */}
+            {!isInitializing && !hasCamera && (
+              <div className="text-center text-white p-4">
+                <div className="text-4xl mb-2">📷</div>
+                <p className="text-sm">Camera not available</p>
+              </div>
+            )}
+          </div>
+
+          {!isInitializing && hasCamera && cameraReady && (
+            <>
               <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4">
                 {supportsNativeQR() ? (
                   <button
                     onClick={captureAndScan}
-                    disabled={!cameraReady}
-                    className={`flex items-center justify-center px-6 py-3 rounded-lg text-white transition-colors font-medium ${
-                      cameraReady 
-                        ? 'bg-green-600 hover:bg-green-700' 
-                        : 'bg-gray-600 cursor-not-allowed'
-                    }`}
+                    className="flex items-center justify-center px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg text-white transition-colors font-medium"
                   >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                     </svg>
-                    {cameraReady ? 'Scan QR Code' : 'Camera Loading...'}
+                    Scan QR Code
                   </button>
                 ) : (
                   <div className="text-center w-full py-3">
@@ -472,8 +510,7 @@ const QRScanner = ({ onScan, onClose }) => {
           )}
 
           {!isInitializing && !hasCamera && (
-            <div className="text-center py-8">
-              <div className="text-red-400 text-6xl mb-4">📷</div>
+            <div className="text-center py-4">
               <h4 className="text-xl font-semibold text-white mb-2">Camera Unavailable</h4>
               <p className="text-gray-300 mb-6">
                 {error || 'Unable to access camera. You can still verify DSSN manually.'}
