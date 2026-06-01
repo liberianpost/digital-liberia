@@ -12,7 +12,6 @@ const partners = [
   "/logos/liberianpost.png",
   "/logos/digital.png",
   "/logos/libmusic.png",
-  "/logos/libmusic.png",
   "/logos/libconnectsit.png",
   "/logos/libpaysit.png",
   "/logos/seal of liberia.png",
@@ -46,8 +45,8 @@ export default function Home() {
       {/* Pure Dark Background */}
       <div className="fixed inset-0 bg-black z-0"></div>
       
-      {/* Rotating Background Icons - BEHIND everything (z-0) */}
-      <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-30">
+      {/* Rotating Background Icons - BEHIND everything (z-0) - More visible */}
+      <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-60">
         <div className="relative w-96 h-96 md:w-[450px] md:h-[450px]">
           {partners.map((logo, index) => (
             <div
@@ -58,11 +57,11 @@ export default function Home() {
                   : "opacity-0 scale-75"
               }`}
             >
-              <div className="w-full h-full rounded-3xl bg-white/5 backdrop-blur-sm flex items-center justify-center p-10 border border-white/5">
+              <div className="w-full h-full rounded-3xl bg-white/10 backdrop-blur-sm flex items-center justify-center p-10 border border-white/10">
                 <img
                   src={logo}
                   alt={`Partner ${index}`}
-                  className="w-full h-full object-contain opacity-50"
+                  className="w-full h-full object-contain opacity-70"
                 />
               </div>
             </div>
@@ -70,8 +69,8 @@ export default function Home() {
         </div>
       </div>
       
-      {/* Subtle Gradient Overlay for depth */}
-      <div className="fixed inset-0 bg-gradient-to-br from-black via-black/95 to-black/90 z-0"></div>
+      {/* Lighter Gradient Overlay for depth - REDUCED DARKNESS */}
+      <div className="fixed inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/70 z-0"></div>
       
       {/* Premium Animated Background Elements - Blue theme (subtle) */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
@@ -83,7 +82,7 @@ export default function Home() {
 
       {/* Premium Navigation - Blue theme */}
       <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 ${
-        isScrolled ? 'bg-black/95 backdrop-blur-2xl border-b border-blue-500/20 shadow-2xl' : 'bg-transparent'
+        isScrolled ? 'bg-black/80 backdrop-blur-2xl border-b border-blue-500/20 shadow-2xl' : 'bg-transparent'
       }`}>
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between py-4">
@@ -187,7 +186,7 @@ export default function Home() {
       </section>
 
       {/* Ecosystem - Premium Grid with Icons */}
-      <section className="relative py-28 px-4 bg-black/30 z-10">
+      <section className="relative py-28 px-4 bg-black/20 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-4">
@@ -248,7 +247,7 @@ export default function Home() {
       </section>
 
       {/* Vision & Mission - Premium Quotes */}
-      <section className="relative py-28 px-4 bg-black/30 z-10">
+      <section className="relative py-28 px-4 bg-black/20 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
             {[
@@ -320,7 +319,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="relative py-10 px-4 border-t border-white/10 bg-black/30 z-10">
+      <footer className="relative py-10 px-4 border-t border-white/10 bg-black/20 z-10">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-white/40 text-xs">© {new Date().getFullYear()} Digital Liberia Inc. All rights reserved.</p>
           <p className="text-blue-400/40 text-xs mt-2">Building Africa's Digital Future</p>
