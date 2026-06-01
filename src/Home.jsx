@@ -57,8 +57,12 @@ export default function Home() {
         <div className="absolute top-1/3 -left-48 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px]"></div>
         <div className="absolute bottom-1/3 -right-48 w-96 h-96 bg-amber-500/10 rounded-full blur-[100px]"></div>
         
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" xmlns="http://www.w3.org/2000/svg"%3E%3Cdefs%3E%3Cpattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse"%3E%3Cpath d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="1"/%3E%3C/pattern%3E%3C/defs%3E%3Crect width="100%25" height="100%25" fill="url(%23grid)"/%3E%3C/svg%3E')] opacity-30"></div>
+        {/* Subtle grid pattern - FIXED VERSION */}
+        <div className="absolute inset-0 opacity-30" 
+             style={{ 
+               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='grid' width='60' height='60' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 60 0 L 0 0 0 60' fill='none' stroke='rgba(255,255,255,0.02)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grid)'/%3E%3C/svg%3E")` 
+             }}>
+        </div>
       </div>
 
       {/* Premium Navigation */}
@@ -107,7 +111,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-8">
-              <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-amber-500/20 to-emerald-500/20 border border-amber-500/30 backdrop-blur-sm animate-pulse">
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-amber-500/20 to-emerald-500/20 border border-amber-500/30 backdrop-blur-sm">
                 <span className="text-amber-400 text-sm font-medium tracking-wide">✦ NATIONAL INFRASTRUCTURE ✦</span>
               </div>
               <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold leading-[1.1] tracking-tighter">
@@ -354,11 +358,6 @@ export default function Home() {
         }
         .animate-marquee:hover {
           animation-play-state: paused;
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
         }
       `}</style>
     </div>
