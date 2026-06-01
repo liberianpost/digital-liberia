@@ -65,11 +65,6 @@ export default function Home() {
                 src={logo}
                 alt={`Partner ${index}`}
                 className="w-full h-full object-contain"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.parentElement.style.backgroundColor = '#f0f0f0';
-                  e.target.parentElement.innerHTML = '<div class="text-gray-400 text-sm">Logo</div>';
-                }}
               />
             </div>
           ))}
@@ -155,10 +150,6 @@ export default function Home() {
                   src="/logos/digital.png"
                   alt="Digital Liberia Logo"
                   className="w-40 h-40 md:w-56 md:h-56 object-contain"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.parentElement.innerHTML = '<div class="text-gray-500 text-xl font-bold">DL</div>';
-                  }}
                 />
               </div>
             </div>
@@ -283,7 +274,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Partner Logos - Premium Marquee with VISIBLE LOGOS */}
+      {/* Partner Logos - Premium Marquee with DARK BACKGROUNDS for visibility */}
       <section className="relative py-20 px-4 overflow-hidden z-10">
         <div className="text-center mb-12">
           <p className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-sm uppercase tracking-wider font-bold mb-2">Trusted By</p>
@@ -291,20 +282,12 @@ export default function Home() {
         </div>
         <div className="flex animate-marquee space-x-20 whitespace-nowrap">
           {[...partners, ...partners].map((logo, idx) => (
-            <div key={idx} className="inline-flex items-center justify-center w-44 h-44 rounded-2xl p-5 transition-all hover:scale-110 bg-gray-100 shadow-md border border-gray-200">
+            <div key={idx} className="inline-flex items-center justify-center w-44 h-44 rounded-2xl p-5 transition-all hover:scale-110 bg-gradient-to-br from-gray-800 to-gray-900 shadow-xl border border-gray-700">
               <img 
                 src={logo} 
                 alt={`Partner ${idx}`} 
-                className="max-w-full max-h-full object-contain"
+                className="max-w-full max-h-full object-contain brightness-0 invert"
                 style={{ display: 'block' }}
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.parentElement.style.backgroundColor = '#e5e7eb';
-                  const fallback = document.createElement('div');
-                  fallback.className = 'text-gray-500 text-xs font-semibold text-center';
-                  fallback.innerText = 'Logo';
-                  e.target.parentElement.appendChild(fallback);
-                }}
               />
             </div>
           ))}
