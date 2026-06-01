@@ -40,29 +40,43 @@ export default function Home() {
     return () => clearInterval(heartbeatInterval);
   }, []);
 
+  // Rotating background images (no heartbeat)
   useEffect(() => {
     const interval = setInterval(() => {
       setActivePartner(prev => (prev + 1) % partners.length);
-    }, 800);
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="relative min-h-screen w-full bg-gradient-to-br from-[#0a0a0f] via-[#0f0f1a] to-[#0a0a0f] text-white overflow-x-hidden">
       
+      {/* Rotating Background Images - Full Page */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        {partners.map((logo, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ${
+              index === activePartner ? "opacity-20 scale-100" : "opacity-0 scale-110"
+            }`}
+          >
+            <img
+              src={logo}
+              alt={`Background ${index}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ))}
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-black/70"></div>
+      </div>
+      
       {/* Premium Animated Background Elements - Blue theme */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[1000px] h-[1000px] bg-gradient-to-r from-blue-500/20 via-cyan-500/10 to-transparent rounded-full blur-[150px] animate-pulse"></div>
         <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-gradient-to-l from-blue-600/15 to-transparent rounded-full blur-[120px] animate-pulse delay-1000"></div>
         <div className="absolute top-1/3 -left-48 w-96 h-96 bg-cyan-500/10 rounded-full blur-[100px]"></div>
         <div className="absolute bottom-1/3 -right-48 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px]"></div>
-        
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 opacity-30" 
-             style={{ 
-               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='grid' width='60' height='60' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 60 0 L 0 0 0 60' fill='none' stroke='rgba(255,255,255,0.02)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grid)'/%3E%3C/svg%3E")` 
-             }}>
-        </div>
       </div>
 
       {/* Premium Navigation - Blue theme */}
@@ -106,8 +120,8 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section - Premium */}
-      <section className="relative min-h-screen flex items-center pt-32 pb-20 px-4">
+      {/* Hero Section - With Static Company Logo */}
+      <section className="relative min-h-screen flex items-center pt-32 pb-20 px-4 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-8">
@@ -134,34 +148,20 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Hero Image Container - WHITE BACKGROUND for logos - REDUCED SIZE (half) */}
-            <div className={`relative h-48 md:h-64 bg-white rounded-3xl shadow-2xl transition-all duration-600 overflow-hidden group ${
-              isHeartbeating ? 'scale-105 shadow-2xl shadow-blue-500/20' : 'scale-100'
-            }`} style={{ transition: 'all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)' }}>
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                {partners.map((logo, index) => (
-                  <div
-                    key={index}
-                    className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${
-                      index === activePartner ? "opacity-100 scale-100" : "opacity-0 scale-90"
-                    }`}
-                  >
-                    <img
-                      src={logo}
-                      alt={`Partner ${index}`}
-                      className="max-w-full max-h-full object-contain p-4"
-                    />
-                  </div>
-                ))}
-              </div>
+            {/* Static Company Logo Container - NO HEARTBEAT, NO CHANGING */}
+            <div className="relative h-48 md:h-64 bg-white rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center">
+              <img
+                src="/logos/digital.png"
+                alt="Digital Liberia Logo"
+                className="w-32 h-32 md:w-48 md:h-48 object-contain"
+              />
             </div>
           </div>
         </div>
       </section>
 
       {/* Company Overview - Premium Cards */}
-      <section className="py-28 px-4">
+      <section className="relative py-28 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-4">
@@ -198,7 +198,7 @@ export default function Home() {
       </section>
 
       {/* Ecosystem - Premium Grid with Icons */}
-      <section className="py-28 px-4 bg-gradient-to-b from-white/5 to-transparent">
+      <section className="relative py-28 px-4 bg-gradient-to-b from-white/5 to-transparent z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-4">
@@ -238,7 +238,7 @@ export default function Home() {
       </section>
 
       {/* Problem & Solution - Split Premium */}
-      <section className="py-28 px-4">
+      <section className="relative py-28 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
             <div className={`group relative bg-gradient-to-br from-red-500/10 to-rose-500/5 backdrop-blur-xl rounded-2xl p-8 border border-red-500/20 transition-all duration-600 hover:border-blue-500/40 ${
@@ -265,7 +265,7 @@ export default function Home() {
       </section>
 
       {/* Vision & Mission - Premium Quotes */}
-      <section className="py-28 px-4 bg-gradient-to-t from-white/5 to-transparent">
+      <section className="relative py-28 px-4 bg-gradient-to-t from-white/5 to-transparent z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
             {[
@@ -290,7 +290,7 @@ export default function Home() {
       </section>
 
       {/* Partner Logos - Premium Marquee with WHITE BACKGROUND */}
-      <section className="py-20 px-4 overflow-hidden">
+      <section className="relative py-20 px-4 overflow-hidden z-10">
         <div className="text-center mb-10">
           <p className="text-blue-400 text-xs uppercase tracking-wider font-semibold mb-2">Trusted By</p>
           <p className="text-white/40 text-sm">Ecosystem Partners</p>
@@ -305,7 +305,7 @@ export default function Home() {
       </section>
 
       {/* Contact - Premium Glass */}
-      <section className="py-28 px-4">
+      <section className="relative py-28 px-4 z-10">
         <div className="max-w-4xl mx-auto">
           <div className={`group relative bg-gradient-to-br from-blue-500/10 via-white/5 to-cyan-500/10 backdrop-blur-xl rounded-2xl p-10 md:p-12 text-center border border-white/10 transition-all duration-600 ${
             isHeartbeating ? 'scale-105 border-blue-500/40 shadow-2xl shadow-blue-500/10' : 'scale-100'
@@ -341,7 +341,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-10 px-4 border-t border-white/10 bg-gradient-to-t from-black/50 to-transparent">
+      <footer className="relative py-10 px-4 border-t border-white/10 bg-gradient-to-t from-black/50 to-transparent z-10">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-white/30 text-xs">© {new Date().getFullYear()} Digital Liberia Inc. All rights reserved.</p>
           <p className="text-blue-500/30 text-xs mt-2">Building Africa's Digital Future</p>
