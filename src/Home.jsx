@@ -274,15 +274,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Partner Logos - Premium Marquee with TRANSPARENT ICON BACKGROUNDS & LARGER SIZE */}
+      {/* Partner Logos - Premium Marquee with TRANSPARENT ICON BACKGROUNDS & EVEN LARGER SIZE */}
       <section className="relative py-20 px-4 overflow-hidden z-10">
         <div className="text-center mb-12">
           <p className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-sm uppercase tracking-wider font-bold mb-2">Trusted By</p>
           <p className="text-gray-500 text-lg">Ecosystem Partners</p>
         </div>
-        <div className="flex animate-marquee space-x-16 whitespace-nowrap">
+        <div className="flex animate-marquee space-x-20 whitespace-nowrap">
           {[...partners, ...partners].map((logo, idx) => (
-            <div key={idx} className="inline-flex items-center justify-center w-36 h-36 rounded-2xl p-4 transition-all hover:scale-110 bg-white/5 backdrop-blur-sm border border-white/10">
+            <div key={idx} className="inline-flex items-center justify-center w-44 h-44 rounded-2xl p-5 transition-all hover:scale-110 bg-white/5 backdrop-blur-sm border border-white/10">
               <img 
                 src={logo} 
                 alt={`Partner ${idx}`} 
@@ -345,7 +345,7 @@ export default function Home() {
           100% { transform: translateX(-50%); }
         }
         .animate-marquee {
-          animation: marquee 30s linear infinite;
+          animation: marquee 35s linear infinite;
           display: flex;
         }
         .animate-marquee:hover {
