@@ -42,9 +42,16 @@ export default function Home() {
   return (
     <div className="relative min-h-screen w-full bg-white overflow-x-hidden">
       
+      {/* Animated Background Particles */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-red-500/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-red-500/3 rounded-full blur-3xl animate-pulse delay-2000"></div>
+      </div>
+      
       {/* Rotating Background Icons - Pure images on white background */}
-      <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-30">
-        <div className="relative w-96 h-96 md:w-[450px] md:h-[450px]">
+      <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-20">
+        <div className="relative w-96 h-96 md:w-[500px] md:h-[500px]">
           {partners.map((logo, index) => (
             <div
               key={index}
@@ -64,43 +71,42 @@ export default function Home() {
         </div>
       </div>
       
-      {/* Subtle Red & Blue Gradient Overlay for depth - Liberian colors */}
-      <div className="fixed inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-blue-500/5 z-0"></div>
+      {/* Subtle Red & Blue Gradient Overlay for depth */}
+      <div className="fixed inset-0 bg-gradient-to-br from-red-500/3 via-transparent to-blue-500/3 z-0"></div>
 
-      {/* Premium Navigation - White with Red & Blue accents */}
+      {/* Premium Navigation */}
       <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 ${
-        isScrolled ? 'bg-white/95 backdrop-blur-2xl border-b border-red-500/20 shadow-sm' : 'bg-white/80 backdrop-blur-sm'
+        isScrolled ? 'bg-white/98 backdrop-blur-2xl border-b border-red-500/10 shadow-xl' : 'bg-white/90 backdrop-blur-md'
       }`}>
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between py-4">
             <Link to="/" className="mb-4 md:mb-0 group">
               <div className="flex items-center space-x-3">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-red-500/20 rounded-lg blur-lg group-hover:blur-xl transition-all"></div>
-                  <div className="relative w-10 h-10 bg-white rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform shadow-md border border-gray-200">
-                    <img src="/logos/digital.png" alt="Digital Liberia" className="w-8 h-8 object-contain" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-500/30 to-blue-500/30 rounded-2xl blur-xl group-hover:blur-2xl transition-all"></div>
+                  <div className="relative w-12 h-12 bg-gradient-to-br from-red-500 to-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
+                    <img src="/logos/digital.png" alt="Digital Liberia" className="w-8 h-8 object-contain brightness-0 invert" />
                   </div>
                 </div>
-                <span className="text-red-600 font-bold text-xl tracking-tight">Digital<span className="text-blue-600">Liberia</span></span>
+                <span className="text-gray-900 font-bold text-2xl tracking-tight">Digital<span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">Liberia</span></span>
               </div>
             </Link>
 
-            <nav className="flex flex-wrap justify-center gap-1 md:gap-2">
+            <nav className="flex flex-wrap justify-center gap-2 md:gap-3">
               {navLinks.map(link => (
                 <Link 
                   key={link.to} 
                   to={link.to}
-                  className={`relative px-5 py-2 text-sm font-medium transition-all duration-300 rounded-lg overflow-hidden group ${
+                  className={`relative px-5 py-2.5 text-sm font-semibold transition-all duration-300 rounded-xl overflow-hidden group ${
                     location.pathname === link.to 
-                      ? 'text-blue-600' 
-                      : 'text-gray-600 hover:text-red-600'
+                      ? 'text-white bg-gradient-to-r from-red-600 to-blue-600 shadow-lg' 
+                      : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
                   <span className="relative z-10">{link.label}</span>
-                  {location.pathname === link.to && (
-                    <span className="absolute inset-0 bg-red-500/10 rounded-lg border border-red-500/30"></span>
+                  {location.pathname !== link.to && (
+                    <span className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/5 to-blue-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500"></span>
                   )}
-                  <span className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/10 to-red-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500"></span>
                 </Link>
               ))}
             </nav>
@@ -108,48 +114,60 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section - White background, Red & Blue text - Liberian colors */}
+      {/* Hero Section - World-Class Design */}
       <section className="relative min-h-screen flex items-center pt-32 pb-20 px-4 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-8">
-              <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-red-500/10 to-blue-500/10 border border-red-500/20">
-                <span className="text-red-600 text-sm font-medium tracking-wide">✦ LIBERIAN NATIONAL INFRASTRUCTURE ✦</span>
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-red-500/10 to-blue-500/10 border border-red-500/20 backdrop-blur-sm">
+                <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-sm font-bold tracking-wide">✦ LIBERIAN NATIONAL INFRASTRUCTURE ✦</span>
               </div>
-              <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold leading-[1.1] tracking-tighter">
-                <span className="text-red-600">Building</span>
-                <span className="block bg-gradient-to-r from-red-600 via-blue-600 to-red-600 bg-clip-text text-transparent">
+              <h1 className="text-7xl md:text-9xl lg:text-9xl font-bold leading-[1.1] tracking-tighter">
+                <span className="bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">Building</span>
+                <span className="block bg-gradient-to-r from-red-600 via-blue-600 to-red-600 bg-clip-text text-transparent animate-gradient">
                   Liberia's Future
                 </span>
               </h1>
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-lg">
+              <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-lg">
                 Digital Liberia Inc. is a Liberian technology and digital infrastructure company established with the purpose of designing, building, operating, and scaling a national digital ecosystem.
               </p>
+              <div className="flex flex-wrap gap-5 pt-4">
+                <Link to="/ecosystem" className="group relative px-8 py-4 bg-gradient-to-r from-red-600 to-blue-600 rounded-xl font-bold text-white shadow-xl shadow-red-500/25 hover:shadow-2xl hover:shadow-red-500/40 transition-all transform hover:scale-105 overflow-hidden">
+                  <span className="relative z-10">Explore Ecosystem →</span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-red-700 to-blue-700 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
+                </Link>
+                <Link to="/business-model" className="px-8 py-4 border-2 border-gray-300 rounded-xl font-bold text-gray-700 hover:border-red-500 hover:text-red-600 transition-all backdrop-blur-sm">
+                  Learn More
+                </Link>
+              </div>
             </div>
             
-            {/* Static Company Logo Container - Glass effect with Liberian colors */}
-            <div className="relative h-48 md:h-64 bg-gradient-to-br from-red-500/5 to-blue-500/5 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden flex items-center justify-center border border-red-200">
-              <img
-                src="/logos/digital.png"
-                alt="Digital Liberia Logo"
-                className="w-32 h-32 md:w-48 md:h-48 object-contain"
-              />
+            {/* Glassmorphism Logo Container */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-blue-500/20 rounded-3xl blur-2xl animate-pulse"></div>
+              <div className="relative h-64 md:h-80 bg-white/10 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center border border-white/20">
+                <img
+                  src="/logos/digital.png"
+                  alt="Digital Liberia Logo"
+                  className="w-40 h-40 md:w-56 md:h-56 object-contain"
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Company Overview - Glass cards with Liberian accents */}
+      {/* Company Overview - Premium Glass Cards */}
       <section className="relative py-28 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 mb-4">
-              <span className="text-red-600 text-xs font-medium">CORE INFRASTRUCTURE</span>
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-red-500/10 to-blue-500/10 border border-red-500/20 mb-4">
+              <span className="text-red-600 text-xs font-bold tracking-wider">CORE INFRASTRUCTURE</span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
+            <h2 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               National Digital Infrastructure
             </h2>
-            <div className="w-20 h-0.5 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mt-6"></div>
+            <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mt-6 rounded-full"></div>
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
@@ -157,75 +175,75 @@ export default function Home() {
               "Digital Liberia is being developed as more than a software company. It is structured as a long-term national infrastructure platform designed to become a core part of Liberia's digital economy.",
               "The company combines digital public infrastructure, secure payments, digital identity systems, e-government services, commerce, logistics, financial technology, healthcare access, land management, data infrastructure, and business enablement into one connected digital environment."
             ].map((text, idx) => (
-              <div key={idx} className="group relative bg-gradient-to-br from-red-500/5 to-blue-500/5 backdrop-blur-xl rounded-2xl p-8 border border-gray-200 transition-all duration-300 hover:border-red-500/30 hover:shadow-xl hover:shadow-red-500/10 hover:scale-105">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/5 to-transparent rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
-                <p className="text-gray-700 leading-relaxed relative z-10">{text}</p>
+              <div key={idx} className="group relative bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-xl rounded-2xl p-8 border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:scale-105 hover:border-red-500/30">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/5 to-blue-500/5 rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
+                <p className="text-gray-700 leading-relaxed relative z-10 text-lg">{text}</p>
               </div>
             ))}
           </div>
           
-          <div className="mt-8 group relative bg-gradient-to-r from-red-500/5 via-white/5 to-blue-500/5 backdrop-blur-xl rounded-2xl p-10 border border-gray-200 transition-all duration-300 hover:border-red-500/40 hover:scale-[1.02]">
-            <p className="text-gray-700 leading-relaxed text-center text-lg">
+          <div className="mt-8 group relative bg-gradient-to-r from-red-500/5 via-white/90 to-blue-500/5 backdrop-blur-xl rounded-2xl p-10 border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:scale-[1.02] hover:border-red-500/30">
+            <p className="text-gray-700 leading-relaxed text-center text-xl">
               At the center of this strategy is the vision to build a unified ecosystem where citizens can access services, make payments, verify identity, conduct business, receive public services, access marketplaces, and interact digitally through one trusted platform.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Ecosystem - Premium Grid with Icons - Liberian colors */}
-      <section className="relative py-28 px-4 bg-gradient-to-br from-red-50/30 to-blue-50/30 z-10">
+      {/* Ecosystem - Premium Grid - NON-CLICKABLE */}
+      <section className="relative py-28 px-4 bg-gradient-to-br from-red-50/50 to-blue-50/50 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 mb-4">
-              <span className="text-red-600 text-xs font-medium">PILLARS OF PROGRESS</span>
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-red-500/10 to-blue-500/10 border border-red-500/20 mb-4">
+              <span className="text-red-600 text-xs font-bold tracking-wider">PILLARS OF PROGRESS</span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900">Ecosystem Components</h2>
-            <div className="w-20 h-0.5 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mt-6"></div>
-            <p className="text-gray-500 mt-6 max-w-2xl mx-auto">Integrated solutions powering Liberia's digital transformation</p>
+            <h2 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              Ecosystem Components
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mt-6 rounded-full"></div>
+            <p className="text-gray-500 mt-6 max-w-2xl mx-auto text-lg">Integrated solutions powering Liberia's digital transformation</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { title: "National Database Management", description: "Secure, centralized national data backbone enabling real-time analytics and access control across all government ministries.", link: "/system", icon: "🏛️", gradient: "from-red-500/20 to-red-600/10" },
-              { title: "Digital Identity (DSSN)", description: "Unique, immutable identifier assigned to every individual - your gateway to services, recognition, and inclusion.", link: "/digital-liberia", icon: "🆔", gradient: "from-blue-500/20 to-blue-600/10" },
-              { title: "LibPay", description: "Fast, reliable, and secure payment gateway for all financial transactions across Liberia.", link: "/libpay", icon: "💳", gradient: "from-red-500/20 to-red-600/10" },
-              { title: "E-Government Services", description: "Streamlined digital access to government services, reducing friction and improving delivery.", link: "/system", icon: "🏢", gradient: "from-blue-500/20 to-blue-600/10" },
-              { title: "Commerce & Logistics", description: "Integrated marketplace and logistics infrastructure enabling business growth.", link: "/liberian-post", icon: "📦", gradient: "from-red-500/20 to-red-600/10" },
-              { title: "Healthcare & Education", description: "Digital platforms improving access to healthcare records and educational tracking.", link: "/digital-liberia", icon: "🏥", gradient: "from-blue-500/20 to-blue-600/10" }
+              { title: "National Database Management", description: "Secure, centralized national data backbone enabling real-time analytics and access control across all government ministries.", icon: "🏛️", gradient: "from-red-500/10 to-red-600/5" },
+              { title: "Digital Identity (DSSN)", description: "Unique, immutable identifier assigned to every individual - your gateway to services, recognition, and inclusion.", icon: "🆔", gradient: "from-blue-500/10 to-blue-600/5" },
+              { title: "LibPay", description: "Fast, reliable, and secure payment gateway for all financial transactions across Liberia.", icon: "💳", gradient: "from-red-500/10 to-red-600/5" },
+              { title: "E-Government Services", description: "Streamlined digital access to government services, reducing friction and improving delivery.", icon: "🏢", gradient: "from-blue-500/10 to-blue-600/5" },
+              { title: "Commerce & Logistics", description: "Integrated marketplace and logistics infrastructure enabling business growth.", icon: "📦", gradient: "from-red-500/10 to-red-600/5" },
+              { title: "Healthcare & Education", description: "Digital platforms improving access to healthcare records and educational tracking.", icon: "🏥", gradient: "from-blue-500/10 to-blue-600/5" }
             ].map((pillar, idx) => (
-              <Link key={idx} to={pillar.link} className="group">
-                <div className={`relative bg-gradient-to-br ${pillar.gradient} backdrop-blur-xl rounded-xl p-6 border border-gray-200 hover:border-red-500/40 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-xl hover:shadow-red-500/10 overflow-hidden bg-white`}>
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-red-500/5 to-transparent rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
-                  <div className="relative z-10">
-                    <div className="w-14 h-14 bg-gradient-to-br from-red-500/10 to-blue-500/10 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform border border-gray-200">
-                      <div className="text-3xl">{pillar.icon}</div>
-                    </div>
-                    <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-red-600 transition-colors">{pillar.title}</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{pillar.description}</p>
+              <div key={idx} className="group relative bg-gradient-to-br from-white to-white/90 backdrop-blur-xl rounded-2xl p-8 border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:scale-105 hover:border-red-500/30 cursor-default">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-red-500/5 to-blue-500/5 rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
+                <div className="relative z-10">
+                  <div className="w-16 h-16 bg-gradient-to-br from-red-500/10 to-blue-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <div className="text-4xl">{pillar.icon}</div>
                   </div>
+                  <h3 className="text-2xl font-bold mb-4 text-gray-900 group-hover:text-red-600 transition-colors">{pillar.title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{pillar.description}</p>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Problem & Solution - Split Premium with Liberian colors */}
+      {/* Problem & Solution - Premium Split */}
       <section className="relative py-28 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="group relative bg-gradient-to-br from-red-500/5 to-transparent backdrop-blur-xl rounded-2xl p-8 border border-gray-200 transition-all duration-300 hover:border-red-500/40 hover:scale-105">
-              <div className="text-4xl mb-4">⚡</div>
-              <h3 className="text-2xl font-bold mb-4 tracking-tight text-red-600">The Challenge</h3>
-              <p className="text-gray-600 leading-relaxed">
+            <div className="group relative bg-gradient-to-br from-red-500/5 to-transparent backdrop-blur-xl rounded-2xl p-10 border border-red-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/20 hover:scale-105 hover:border-red-500/30">
+              <div className="text-5xl mb-4">⚡</div>
+              <h3 className="text-3xl font-bold mb-4 tracking-tight bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">The Challenge</h3>
+              <p className="text-gray-600 leading-relaxed text-lg">
                 Fragmented, paper-based records and weak identification systems have impacted government service delivery, electoral credibility, healthcare access, educational tracking, and national security.
               </p>
             </div>
             
-            <div className="group relative bg-gradient-to-br from-blue-500/5 to-transparent backdrop-blur-xl rounded-2xl p-8 border border-gray-200 transition-all duration-300 hover:border-blue-500/40 hover:scale-105">
-              <div className="text-4xl mb-4">✨</div>
-              <h3 className="text-2xl font-bold mb-4 tracking-tight text-blue-600">The Solution</h3>
-              <p className="text-gray-600 leading-relaxed">
+            <div className="group relative bg-gradient-to-br from-blue-500/5 to-transparent backdrop-blur-xl rounded-2xl p-10 border border-blue-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 hover:scale-105 hover:border-blue-500/30">
+              <div className="text-5xl mb-4">✨</div>
+              <h3 className="text-3xl font-bold mb-4 tracking-tight bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">The Solution</h3>
+              <p className="text-gray-600 leading-relaxed text-lg">
                 Digital Liberia solves structural gaps in access, service delivery, trust, efficiency, and inclusion across both public and private sectors.
               </p>
             </div>
@@ -233,7 +251,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Vision & Mission - Premium Quotes with Liberian colors */}
+      {/* Vision & Mission - Premium Quotes */}
       <section className="relative py-28 px-4 bg-gradient-to-br from-red-50/30 to-blue-50/30 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
@@ -241,14 +259,14 @@ export default function Home() {
               { quote: "To become the digital backbone of Liberia—empowering people and the economy.", label: "Vision", icon: "🎯", color: "red" },
               { quote: "Deliver a secure platform for transparent governance and accessible services while generating sustainable long-term returns.", label: "Mission", icon: "🚀", color: "blue" }
             ].map((item, idx) => (
-              <div key={idx} className={`group relative bg-gradient-to-br from-${item.color}-500/5 to-transparent backdrop-blur-xl rounded-2xl p-10 border border-gray-200 transition-all duration-300 hover:border-${item.color}-500/30 hover:scale-105 text-center`}>
-                <div className="text-5xl mb-4">{item.icon}</div>
-                <div className={`text-5xl mb-6 text-${item.color}-500/30`}>"</div>
-                <p className="text-gray-700 text-xl italic leading-relaxed mb-6">
+              <div key={idx} className={`group relative bg-gradient-to-br from-${item.color}-500/5 to-transparent backdrop-blur-xl rounded-2xl p-10 border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-${item.color}-500/20 hover:scale-105 text-center`}>
+                <div className="text-6xl mb-4">{item.icon}</div>
+                <div className="text-6xl mb-6 text-gray-300">"</div>
+                <p className="text-gray-700 text-2xl italic leading-relaxed mb-8">
                   {item.quote}
                 </p>
-                <div className="inline-flex px-4 py-1 rounded-full bg-gradient-to-r from-red-500/20 to-blue-500/20 border border-red-500/30">
-                  <span className={`text-${item.color}-600 text-xs font-semibold tracking-wider`}>{item.label}</span>
+                <div className="inline-flex px-6 py-2 rounded-full bg-gradient-to-r from-red-500/10 to-blue-500/10 border border-red-500/20">
+                  <span className={`text-${item.color}-600 text-sm font-bold tracking-wider`}>{item.label}</span>
                 </div>
               </div>
             ))}
@@ -258,58 +276,61 @@ export default function Home() {
 
       {/* Partner Logos - Premium Marquee */}
       <section className="relative py-20 px-4 overflow-hidden z-10">
-        <div className="text-center mb-10">
-          <p className="text-red-600 text-xs uppercase tracking-wider font-semibold mb-2">Trusted By</p>
-          <p className="text-gray-500 text-sm">Ecosystem Partners</p>
+        <div className="text-center mb-12">
+          <p className="text-red-600 text-sm uppercase tracking-wider font-bold mb-2">Trusted By</p>
+          <p className="text-gray-500 text-lg">Ecosystem Partners</p>
         </div>
-        <div className="flex animate-marquee space-x-12 whitespace-nowrap">
+        <div className="flex animate-marquee space-x-16 whitespace-nowrap">
           {[...partners, ...partners].map((logo, idx) => (
-            <div key={idx} className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-red-500/5 to-blue-500/5 backdrop-blur-sm rounded-xl p-4 shadow-sm hover:shadow-md transition-all hover:scale-110 border border-gray-200">
+            <div key={idx} className="inline-flex items-center justify-center w-28 h-28 bg-gradient-to-br from-red-500/5 to-blue-500/5 backdrop-blur-sm rounded-2xl p-5 shadow-md hover:shadow-xl transition-all hover:scale-110 border border-gray-100">
               <img src={logo} alt={`Partner ${idx}`} className="max-w-full max-h-full object-contain" />
             </div>
           ))}
         </div>
       </section>
 
-      {/* Contact - Premium Glass with Liberian colors */}
+      {/* Contact - Premium Glass */}
       <section className="relative py-28 px-4 z-10">
         <div className="max-w-4xl mx-auto">
-          <div className="group relative bg-gradient-to-br from-red-500/5 via-white/5 to-blue-500/5 backdrop-blur-xl rounded-2xl p-10 md:p-12 text-center border border-gray-200 transition-all duration-300 hover:border-red-500/40 hover:scale-105 hover:shadow-xl hover:shadow-red-500/10">
-            <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-blue-500/5 rounded-2xl"></div>
+          <div className="group relative bg-gradient-to-br from-red-500/5 via-white/90 to-blue-500/5 backdrop-blur-xl rounded-3xl p-12 text-center border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/20 hover:scale-105">
+            <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-blue-500/5 rounded-3xl"></div>
             <div className="relative">
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-3 text-gray-900">Let's Connect</h2>
-              <div className="w-16 h-0.5 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mb-8"></div>
+              <h2 className="text-5xl md:text-6xl font-bold tracking-tight mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Let's Connect</h2>
+              <div className="w-20 h-1 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mb-10 rounded-full"></div>
               
-              <div className="flex flex-col md:flex-row justify-center gap-8">
+              <div className="flex flex-col md:flex-row justify-center gap-12">
                 <div className="space-y-4">
-                  <a href="mailto:info@digitalliberia.com" className="flex items-center justify-center space-x-2 text-gray-600 hover:text-red-600 transition-colors group">
-                    <span className="text-sm group-hover:translate-x-1 transition-transform">✉️</span>
-                    <span className="text-sm">info@digitalliberia.com</span>
+                  <a href="mailto:info@digitalliberia.com" className="flex items-center justify-center space-x-3 text-gray-600 hover:text-red-600 transition-colors group text-lg">
+                    <span className="text-2xl group-hover:translate-x-1 transition-transform">✉️</span>
+                    <span>info@digitalliberia.com</span>
                   </a>
-                  <a href="https://wa.me/231888001077" className="flex items-center justify-center space-x-2 text-gray-600 hover:text-red-600 transition-colors group">
-                    <span className="text-sm group-hover:translate-x-1 transition-transform">📱</span>
-                    <span className="text-sm">WhatsApp: +231 888 001 077</span>
+                  <a href="https://wa.me/231888001077" className="flex items-center justify-center space-x-3 text-gray-600 hover:text-red-600 transition-colors group text-lg">
+                    <span className="text-2xl group-hover:translate-x-1 transition-transform">📱</span>
+                    <span>WhatsApp: +231 888 001 077</span>
                   </a>
                 </div>
                 <div className="space-y-4">
-                  <a href="tel:+231775055817" className="flex items-center justify-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors group">
-                    <span className="text-sm group-hover:translate-x-1 transition-transform">📞</span>
-                    <span className="text-sm">Call: +231 775 055 817</span>
+                  <a href="tel:+231775055817" className="flex items-center justify-center space-x-3 text-gray-600 hover:text-blue-600 transition-colors group text-lg">
+                    <span className="text-2xl group-hover:translate-x-1 transition-transform">📞</span>
+                    <span>Call: +231 775 055 817</span>
                   </a>
                 </div>
               </div>
               
-              <p className="text-gray-400 text-xs mt-10">Monday - Friday, 8:00 AM - 5:00 PM GMT</p>
+              <p className="text-gray-400 mt-12">Monday - Friday, 8:00 AM - 5:00 PM GMT</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer with Liberian colors */}
-      <footer className="relative py-10 px-4 border-t border-gray-200 bg-gradient-to-r from-red-50/50 to-blue-50/50 z-10">
+      {/* Footer */}
+      <footer className="relative py-12 px-4 border-t border-gray-100 bg-gradient-to-r from-red-50/30 to-blue-50/30 z-10">
         <div className="max-w-7xl mx-auto text-center">
-          <p className="text-gray-400 text-xs">© {new Date().getFullYear()} Digital Liberia Inc. All rights reserved.</p>
-          <p className="text-red-500/60 text-xs mt-2">Building Africa's Digital Future 🇱🇷</p>
+          <p className="text-gray-400">© {new Date().getFullYear()} Digital Liberia Inc. All rights reserved.</p>
+          <p className="text-red-500/50 mt-2 flex items-center justify-center gap-2">
+            <span>Building Africa's Digital Future</span>
+            <span className="text-xl">🇱🇷</span>
+          </p>
         </div>
       </footer>
 
@@ -324,6 +345,15 @@ export default function Home() {
         }
         .animate-marquee:hover {
           animation-play-state: paused;
+        }
+        
+        @keyframes gradient {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        .animate-gradient {
+          background-size: 200% auto;
+          animation: gradient 3s ease infinite;
         }
       `}</style>
     </div>
