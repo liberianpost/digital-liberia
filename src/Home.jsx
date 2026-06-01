@@ -88,7 +88,7 @@ export default function Home() {
                     <img src="/logos/digital.png" alt="Digital Liberia" className="w-8 h-8 object-contain brightness-0 invert" />
                   </div>
                 </div>
-                <span className="text-gray-900 font-bold text-2xl tracking-tight">Digital<span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">Liberia</span></span>
+                <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent font-bold text-2xl tracking-tight">DigitalLiberia</span>
               </div>
             </Link>
 
@@ -162,9 +162,9 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-red-500/10 to-blue-500/10 border border-red-500/20 mb-4">
-              <span className="text-red-600 text-xs font-bold tracking-wider">CORE INFRASTRUCTURE</span>
+              <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-xs font-bold tracking-wider">CORE INFRASTRUCTURE</span>
             </div>
-            <h2 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+            <h2 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-red-600 via-blue-600 to-red-600 bg-clip-text text-transparent">
               National Digital Infrastructure
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mt-6 rounded-full"></div>
@@ -191,13 +191,13 @@ export default function Home() {
       </section>
 
       {/* Ecosystem - Premium Grid - NON-CLICKABLE */}
-      <section className="relative py-28 px-4 bg-gradient-to-br from-red-50/50 to-blue-50/50 z-10">
+      <section className="relative py-28 px-4 bg-gradient-to-br from-red-50/30 to-blue-50/30 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-red-500/10 to-blue-500/10 border border-red-500/20 mb-4">
-              <span className="text-red-600 text-xs font-bold tracking-wider">PILLARS OF PROGRESS</span>
+              <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-xs font-bold tracking-wider">PILLARS OF PROGRESS</span>
             </div>
-            <h2 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+            <h2 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-red-600 via-blue-600 to-red-600 bg-clip-text text-transparent">
               Ecosystem Components
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mt-6 rounded-full"></div>
@@ -219,7 +219,7 @@ export default function Home() {
                   <div className="w-16 h-16 bg-gradient-to-br from-red-500/10 to-blue-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <div className="text-4xl">{pillar.icon}</div>
                   </div>
-                  <h3 className="text-2xl font-bold mb-4 text-gray-900 group-hover:text-red-600 transition-colors">{pillar.title}</h3>
+                  <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent group-hover:from-red-500 group-hover:to-blue-500 transition-all">{pillar.title}</h3>
                   <p className="text-gray-600 leading-relaxed">{pillar.description}</p>
                 </div>
               </div>
@@ -266,7 +266,7 @@ export default function Home() {
                   {item.quote}
                 </p>
                 <div className="inline-flex px-6 py-2 rounded-full bg-gradient-to-r from-red-500/10 to-blue-500/10 border border-red-500/20">
-                  <span className={`text-${item.color}-600 text-sm font-bold tracking-wider`}>{item.label}</span>
+                  <span className={`bg-gradient-to-r from-${item.color}-600 to-${item.color}-700 bg-clip-text text-transparent text-sm font-bold tracking-wider`}>{item.label}</span>
                 </div>
               </div>
             ))}
@@ -277,7 +277,7 @@ export default function Home() {
       {/* Partner Logos - Premium Marquee */}
       <section className="relative py-20 px-4 overflow-hidden z-10">
         <div className="text-center mb-12">
-          <p className="text-red-600 text-sm uppercase tracking-wider font-bold mb-2">Trusted By</p>
+          <p className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-sm uppercase tracking-wider font-bold mb-2">Trusted By</p>
           <p className="text-gray-500 text-lg">Ecosystem Partners</p>
         </div>
         <div className="flex animate-marquee space-x-16 whitespace-nowrap">
@@ -295,7 +295,7 @@ export default function Home() {
           <div className="group relative bg-gradient-to-br from-red-500/5 via-white/90 to-blue-500/5 backdrop-blur-xl rounded-3xl p-12 text-center border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/20 hover:scale-105">
             <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-blue-500/5 rounded-3xl"></div>
             <div className="relative">
-              <h2 className="text-5xl md:text-6xl font-bold tracking-tight mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Let's Connect</h2>
+              <h2 className="text-5xl md:text-6xl font-bold tracking-tight mb-4 bg-gradient-to-r from-red-600 via-blue-600 to-red-600 bg-clip-text text-transparent">Let's Connect</h2>
               <div className="w-20 h-1 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mb-10 rounded-full"></div>
               
               <div className="flex flex-col md:flex-row justify-center gap-12">
@@ -327,7 +327,7 @@ export default function Home() {
       <footer className="relative py-12 px-4 border-t border-gray-100 bg-gradient-to-r from-red-50/30 to-blue-50/30 z-10">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-gray-400">© {new Date().getFullYear()} Digital Liberia Inc. All rights reserved.</p>
-          <p className="text-red-500/50 mt-2 flex items-center justify-center gap-2">
+          <p className="bg-gradient-to-r from-red-500/50 to-blue-500/50 bg-clip-text text-transparent mt-2 flex items-center justify-center gap-2">
             <span>Building Africa's Digital Future</span>
             <span className="text-xl">🇱🇷</span>
           </p>
