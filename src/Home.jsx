@@ -42,28 +42,32 @@ export default function Home() {
   return (
     <div className="relative min-h-screen w-full text-white overflow-x-hidden">
       
+      {/* Base Dark Background - Always visible */}
+      <div className="fixed inset-0 bg-black z-0"></div>
+      
       {/* Rotating Background Images - Sharper and Darker */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         {partners.map((logo, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-all duration-1000 ${
-              index === activePartner ? "opacity-100 scale-100" : "opacity-0 scale-110"
+              index === activePartner ? "opacity-40 scale-100" : "opacity-0 scale-110"
             }`}
             style={{
               backgroundImage: `url(${logo})`,
               backgroundSize: 'contain',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              filter: 'contrast(1.2) brightness(0.85) saturate(1.1)',
+              filter: 'contrast(1.3) brightness(0.7) saturate(1.2)',
             }}
           ></div>
         ))}
-        {/* Much darker gradient overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0f]/98 via-[#0f0f1a]/95 to-[#0a0a0f]/98"></div>
       </div>
       
-      {/* Premium Animated Background Elements - Blue theme (no heartbeat pulse) */}
+      {/* Dark Gradient Overlay for text readability */}
+      <div className="fixed inset-0 bg-gradient-to-br from-black via-black/95 to-black/90 z-0"></div>
+      
+      {/* Premium Animated Background Elements - Blue theme (subtle) */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[1000px] h-[1000px] bg-gradient-to-r from-blue-500/8 via-cyan-500/3 to-transparent rounded-full blur-[150px]"></div>
         <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-gradient-to-l from-blue-600/5 to-transparent rounded-full blur-[120px]"></div>
@@ -73,7 +77,7 @@ export default function Home() {
 
       {/* Premium Navigation - Blue theme */}
       <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 ${
-        isScrolled ? 'bg-[#0a0a0f]/95 backdrop-blur-2xl border-b border-blue-500/20 shadow-2xl' : 'bg-transparent'
+        isScrolled ? 'bg-black/95 backdrop-blur-2xl border-b border-blue-500/20 shadow-2xl' : 'bg-transparent'
       }`}>
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between py-4">
@@ -112,7 +116,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section - With Static Company Logo (Buttons Removed) */}
+      {/* Hero Section - With Static Company Logo */}
       <section className="relative min-h-screen flex items-center pt-32 pb-20 px-4 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -143,7 +147,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Company Overview - Premium Cards (no heartbeat) */}
+      {/* Company Overview - Premium Cards */}
       <section className="relative py-28 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
