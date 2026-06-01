@@ -55,20 +55,20 @@ export default function Home() {
               backgroundSize: 'contain',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              filter: 'contrast(1.1) brightness(0.9)',
+              filter: 'contrast(1.2) brightness(0.85) saturate(1.1)',
             }}
           ></div>
         ))}
-        {/* Darker gradient overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0f]/95 via-[#0f0f1a]/90 to-[#0a0a0f]/95"></div>
+        {/* Much darker gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0f]/98 via-[#0f0f1a]/95 to-[#0a0a0f]/98"></div>
       </div>
       
       {/* Premium Animated Background Elements - Blue theme (no heartbeat pulse) */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[1000px] h-[1000px] bg-gradient-to-r from-blue-500/10 via-cyan-500/5 to-transparent rounded-full blur-[150px]"></div>
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[1000px] h-[1000px] bg-gradient-to-r from-blue-500/8 via-cyan-500/3 to-transparent rounded-full blur-[150px]"></div>
         <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-gradient-to-l from-blue-600/5 to-transparent rounded-full blur-[120px]"></div>
-        <div className="absolute top-1/3 -left-48 w-96 h-96 bg-cyan-500/5 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-1/3 -right-48 w-96 h-96 bg-blue-500/5 rounded-full blur-[100px]"></div>
+        <div className="absolute top-1/3 -left-48 w-96 h-96 bg-cyan-500/3 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-1/3 -right-48 w-96 h-96 bg-blue-500/3 rounded-full blur-[100px]"></div>
       </div>
 
       {/* Premium Navigation - Blue theme */}
@@ -81,7 +81,7 @@ export default function Home() {
               <div className="flex items-center space-x-3">
                 <div className="relative">
                   <div className="absolute inset-0 bg-white/20 rounded-lg blur-lg group-hover:blur-xl transition-all"></div>
-                  <div className="relative w-10 h-10 bg-white rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
+                  <div className="relative w-10 h-10 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
                     <img src="/logos/digital.png" alt="Digital Liberia" className="w-8 h-8 object-contain" />
                   </div>
                 </div>
@@ -131,8 +131,8 @@ export default function Home() {
               </p>
             </div>
             
-            {/* Static Company Logo Container */}
-            <div className="relative h-48 md:h-64 bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center">
+            {/* Static Company Logo Container - TRANSPARENT */}
+            <div className="relative h-48 md:h-64 bg-white/5 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center border border-white/10">
               <img
                 src="/logos/digital.png"
                 alt="Digital Liberia Logo"
@@ -260,7 +260,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Partner Logos - Premium Marquee with WHITE BACKGROUND */}
+      {/* Partner Logos - Premium Marquee with TRANSPARENT BACKGROUND */}
       <section className="relative py-20 px-4 overflow-hidden z-10">
         <div className="text-center mb-10">
           <p className="text-blue-400 text-xs uppercase tracking-wider font-semibold mb-2">Trusted By</p>
@@ -268,7 +268,7 @@ export default function Home() {
         </div>
         <div className="flex animate-marquee space-x-12 whitespace-nowrap">
           {[...partners, ...partners].map((logo, idx) => (
-            <div key={idx} className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-all hover:scale-110">
+            <div key={idx} className="inline-flex items-center justify-center w-24 h-24 bg-white/5 backdrop-blur-sm rounded-xl p-4 shadow-md hover:shadow-lg transition-all hover:scale-110 border border-white/10">
               <img src={logo} alt={`Partner ${idx}`} className="max-w-full max-h-full object-contain" />
             </div>
           ))}
