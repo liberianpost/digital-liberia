@@ -31,7 +31,7 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Rotating background images - 6 seconds, no heartbeat
+  // Rotating background icon images - 6 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setActivePartner(prev => (prev + 1) % partners.length);
@@ -42,31 +42,11 @@ export default function Home() {
   return (
     <div className="relative min-h-screen w-full text-white overflow-x-hidden">
       
-      {/* Base Dark Background - Always visible */}
+      {/* Pure Dark Background */}
       <div className="fixed inset-0 bg-black z-0"></div>
       
-      {/* Rotating Background Images - With WHITE BACKGROUND for visibility */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        {partners.map((logo, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-all duration-1000 ${
-              index === activePartner ? "opacity-100 scale-100" : "opacity-0 scale-110"
-            }`}
-            style={{
-              backgroundImage: `url(${logo})`,
-              backgroundSize: 'contain',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              backgroundColor: 'white',
-              backgroundBlendMode: 'normal',
-            }}
-          ></div>
-        ))}
-      </div>
-      
-      {/* Dark Gradient Overlay for text readability - Lighter to show images */}
-      <div className="fixed inset-0 bg-gradient-to-br from-black/80 via-black/70 to-black/75 z-0"></div>
+      {/* Subtle Gradient Overlay for depth */}
+      <div className="fixed inset-0 bg-gradient-to-br from-black via-black/95 to-black/90 z-0"></div>
       
       {/* Premium Animated Background Elements - Blue theme (subtle) */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
@@ -74,6 +54,31 @@ export default function Home() {
         <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-gradient-to-l from-blue-600/5 to-transparent rounded-full blur-[120px]"></div>
         <div className="absolute top-1/3 -left-48 w-96 h-96 bg-cyan-500/3 rounded-full blur-[100px]"></div>
         <div className="absolute bottom-1/3 -right-48 w-96 h-96 bg-blue-500/3 rounded-full blur-[100px]"></div>
+      </div>
+
+      {/* Floating Changing Icons with White Backgrounds - UNIQUE DESIGN */}
+      <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center">
+        <div className="relative w-80 h-80 md:w-96 md:h-96">
+          {partners.map((logo, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-all duration-1000 ${
+                index === activePartner 
+                  ? "opacity-100 scale-100 rotate-0" 
+                  : "opacity-0 scale-75 rotate-12"
+              }`}
+            >
+              {/* White circular background container */}
+              <div className="w-full h-full rounded-3xl bg-white/95 backdrop-blur-sm shadow-2xl flex items-center justify-center p-8 border border-white/20">
+                <img
+                  src={logo}
+                  alt={`Partner ${index}`}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Premium Navigation - Blue theme */}
