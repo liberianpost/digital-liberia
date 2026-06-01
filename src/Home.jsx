@@ -42,7 +42,7 @@ export default function Home() {
   return (
     <div className="relative min-h-screen w-full text-white overflow-x-hidden">
       
-      {/* Rotating Background Images - Full Page with CONTAIN size (reduced) */}
+      {/* Rotating Background Images - Sharper and Darker */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         {partners.map((logo, index) => (
           <div
@@ -55,19 +55,20 @@ export default function Home() {
               backgroundSize: 'contain',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
+              filter: 'contrast(1.1) brightness(0.9)',
             }}
           ></div>
         ))}
-        {/* Gradient overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0f]/85 via-[#0f0f1a]/80 to-[#0a0a0f]/90"></div>
+        {/* Darker gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0f]/95 via-[#0f0f1a]/90 to-[#0a0a0f]/95"></div>
       </div>
       
       {/* Premium Animated Background Elements - Blue theme (no heartbeat pulse) */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[1000px] h-[1000px] bg-gradient-to-r from-blue-500/15 via-cyan-500/10 to-transparent rounded-full blur-[150px]"></div>
-        <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-gradient-to-l from-blue-600/10 to-transparent rounded-full blur-[120px]"></div>
-        <div className="absolute top-1/3 -left-48 w-96 h-96 bg-cyan-500/10 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-1/3 -right-48 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px]"></div>
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[1000px] h-[1000px] bg-gradient-to-r from-blue-500/10 via-cyan-500/5 to-transparent rounded-full blur-[150px]"></div>
+        <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-gradient-to-l from-blue-600/5 to-transparent rounded-full blur-[120px]"></div>
+        <div className="absolute top-1/3 -left-48 w-96 h-96 bg-cyan-500/5 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-1/3 -right-48 w-96 h-96 bg-blue-500/5 rounded-full blur-[100px]"></div>
       </div>
 
       {/* Premium Navigation - Blue theme */}
@@ -111,7 +112,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section - With Static Company Logo */}
+      {/* Hero Section - With Static Company Logo (Buttons Removed) */}
       <section className="relative min-h-screen flex items-center pt-32 pb-20 px-4 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -128,15 +129,6 @@ export default function Home() {
               <p className="text-base md:text-lg text-white/80 leading-relaxed max-w-lg">
                 Digital Liberia Inc. is a Liberian technology and digital infrastructure company established with the purpose of designing, building, operating, and scaling a national digital ecosystem.
               </p>
-              <div className="flex flex-wrap gap-5 pt-4">
-                <Link to="/ecosystem" className="group relative px-8 py-3.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg font-semibold text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all transform hover:scale-105 overflow-hidden">
-                  <span className="relative z-10">Explore Ecosystem →</span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
-                </Link>
-                <Link to="/business-model" className="px-8 py-3.5 border border-white/20 rounded-lg font-semibold text-white hover:bg-white/10 transition-all backdrop-blur-sm hover:border-blue-500/50">
-                  Learn More
-                </Link>
-              </div>
             </div>
             
             {/* Static Company Logo Container */}
@@ -318,7 +310,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="relative py-10 px-4 border-t border-white/10 bg-black/30 z-10">
+      <footer className="relative py-10 px-4 border-t border-white/10 bg-black/50 z-10">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-white/40 text-xs">© {new Date().getFullYear()} Digital Liberia Inc. All rights reserved.</p>
           <p className="text-blue-400/40 text-xs mt-2">Building Africa's Digital Future</p>
