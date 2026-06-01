@@ -134,8 +134,8 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Hero Image Container - WHITE BACKGROUND for logos */}
-            <div className={`relative h-96 md:h-[500px] bg-white rounded-3xl shadow-2xl transition-all duration-600 overflow-hidden group ${
+            {/* Hero Image Container - WHITE BACKGROUND for logos - REDUCED SIZE (half) */}
+            <div className={`relative h-48 md:h-64 bg-white rounded-3xl shadow-2xl transition-all duration-600 overflow-hidden group ${
               isHeartbeating ? 'scale-105 shadow-2xl shadow-blue-500/20' : 'scale-100'
             }`} style={{ transition: 'all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)' }}>
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
@@ -150,7 +150,7 @@ export default function Home() {
                     <img
                       src={logo}
                       alt={`Partner ${index}`}
-                      className="max-w-full max-h-full object-contain p-8"
+                      className="max-w-full max-h-full object-contain p-4"
                     />
                   </div>
                 ))}
@@ -289,7 +289,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Partner Logos - Premium Marquee */}
+      {/* Partner Logos - Premium Marquee with WHITE BACKGROUND */}
       <section className="py-20 px-4 overflow-hidden">
         <div className="text-center mb-10">
           <p className="text-blue-400 text-xs uppercase tracking-wider font-semibold mb-2">Trusted By</p>
@@ -297,8 +297,8 @@ export default function Home() {
         </div>
         <div className="flex animate-marquee space-x-12 whitespace-nowrap">
           {[...partners, ...partners].map((logo, idx) => (
-            <div key={idx} className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-white/5 to-white/2 backdrop-blur-lg rounded-xl p-4 border border-white/10 hover:border-blue-500/30 transition-all hover:scale-110">
-              <img src={logo} alt={`Partner ${idx}`} className="max-w-full max-h-full object-contain opacity-70 hover:opacity-100 transition-opacity" />
+            <div key={idx} className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-all hover:scale-110">
+              <img src={logo} alt={`Partner ${idx}`} className="max-w-full max-h-full object-contain" />
             </div>
           ))}
         </div>
