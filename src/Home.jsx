@@ -45,7 +45,7 @@ export default function Home() {
       {/* Pure Dark Background */}
       <div className="fixed inset-0 bg-black z-0"></div>
       
-      {/* Rotating Background Icons - BEHIND everything (z-0) - More visible */}
+      {/* Rotating Background Icons - NO BACKGROUND, JUST PURE IMAGES */}
       <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-60">
         <div className="relative w-96 h-96 md:w-[450px] md:h-[450px]">
           {partners.map((logo, index) => (
@@ -57,13 +57,11 @@ export default function Home() {
                   : "opacity-0 scale-75"
               }`}
             >
-              <div className="w-full h-full rounded-3xl bg-white/10 backdrop-blur-sm flex items-center justify-center p-10 border border-white/10">
-                <img
-                  src={logo}
-                  alt={`Partner ${index}`}
-                  className="w-full h-full object-contain opacity-70"
-                />
-              </div>
+              <img
+                src={logo}
+                alt={`Partner ${index}`}
+                className="w-full h-full object-contain opacity-70"
+              />
             </div>
           ))}
         </div>
