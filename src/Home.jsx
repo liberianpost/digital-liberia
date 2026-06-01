@@ -56,9 +56,9 @@ export default function Home() {
         <div className="absolute bottom-1/3 -right-48 w-96 h-96 bg-blue-500/3 rounded-full blur-[100px]"></div>
       </div>
 
-      {/* Floating Changing Icons with White Backgrounds - UNIQUE DESIGN */}
+      {/* Floating Changing Icons with White Backgrounds - LARGER SIZE */}
       <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center">
-        <div className="relative w-80 h-80 md:w-96 md:h-96">
+        <div className="relative w-96 h-96 md:w-[450px] md:h-[450px]">
           {partners.map((logo, index) => (
             <div
               key={index}
@@ -68,8 +68,8 @@ export default function Home() {
                   : "opacity-0 scale-75 rotate-12"
               }`}
             >
-              {/* White circular background container */}
-              <div className="w-full h-full rounded-3xl bg-white/95 backdrop-blur-sm shadow-2xl flex items-center justify-center p-8 border border-white/20">
+              {/* White circular background container - LARGER */}
+              <div className="w-full h-full rounded-3xl bg-white/95 backdrop-blur-sm shadow-2xl flex items-center justify-center p-10 border border-white/20">
                 <img
                   src={logo}
                   alt={`Partner ${index}`}
@@ -141,8 +141,8 @@ export default function Home() {
               </p>
             </div>
             
-            {/* Static Company Logo Container - Glass effect */}
-            <div className="relative h-48 md:h-64 bg-white/10 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center border border-white/20">
+            {/* Static Company Logo Container - REDUCED bg-white/5 */}
+            <div className="relative h-48 md:h-64 bg-white/5 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center border border-white/10">
               <img
                 src="/logos/digital.png"
                 alt="Digital Liberia Logo"
@@ -153,7 +153,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Company Overview - Premium Cards */}
+      {/* Company Overview - Premium Cards - REDUCED bg-white/5 */}
       <section className="relative py-28 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -171,14 +171,14 @@ export default function Home() {
               "Digital Liberia is being developed as more than a software company. It is structured as a long-term national infrastructure platform designed to become a core part of Liberia's digital economy.",
               "The company combines digital public infrastructure, secure payments, digital identity systems, e-government services, commerce, logistics, financial technology, healthcare access, land management, data infrastructure, and business enablement into one connected digital environment."
             ].map((text, idx) => (
-              <div key={idx} className="group relative bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/10 transition-all duration-300 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10 hover:scale-105">
+              <div key={idx} className="group relative bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 transition-all duration-300 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10 hover:scale-105">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/5 to-transparent rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
                 <p className="text-white/90 leading-relaxed relative z-10">{text}</p>
               </div>
             ))}
           </div>
           
-          <div className="mt-8 group relative bg-white/10 backdrop-blur-xl rounded-2xl p-10 border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:scale-[1.02]">
+          <div className="mt-8 group relative bg-white/5 backdrop-blur-xl rounded-2xl p-10 border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:scale-[1.02]">
             <p className="text-white/90 leading-relaxed text-center text-lg">
               At the center of this strategy is the vision to build a unified ecosystem where citizens can access services, make payments, verify identity, conduct business, receive public services, access marketplaces, and interact digitally through one trusted platform.
             </p>
@@ -186,8 +186,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Ecosystem - Premium Grid with Icons */}
-      <section className="relative py-28 px-4 bg-white/5 z-10">
+      {/* Ecosystem - Premium Grid with Icons - REDUCED bg-white/5 */}
+      <section className="relative py-28 px-4 bg-black/30 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-4">
@@ -211,7 +211,7 @@ export default function Home() {
                 <div className={`relative bg-gradient-to-br ${pillar.gradient} backdrop-blur-xl rounded-xl p-6 border border-white/10 hover:border-blue-500/40 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/10 overflow-hidden`}>
                   <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/5 to-transparent rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
                   <div className="relative z-10">
-                    <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform border border-white/10">
+                    <div className="w-14 h-14 bg-white/5 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform border border-white/10">
                       <div className="text-3xl">{pillar.icon}</div>
                     </div>
                     <h3 className="text-xl font-bold mb-3 text-white group-hover:text-blue-400 transition-colors">{pillar.title}</h3>
@@ -224,11 +224,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Problem & Solution - Split Premium */}
+      {/* Problem & Solution - Split Premium - REDUCED bg-white/5 */}
       <section className="relative py-28 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="group relative bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:scale-105">
+            <div className="group relative bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:scale-105">
               <div className="text-4xl mb-4">⚡</div>
               <h3 className="text-2xl font-bold mb-4 tracking-tight text-white">The Challenge</h3>
               <p className="text-white/70 leading-relaxed">
@@ -236,7 +236,7 @@ export default function Home() {
               </p>
             </div>
             
-            <div className="group relative bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:scale-105">
+            <div className="group relative bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:scale-105">
               <div className="text-4xl mb-4">✨</div>
               <h3 className="text-2xl font-bold mb-4 tracking-tight text-white">The Solution</h3>
               <p className="text-white/70 leading-relaxed">
@@ -247,15 +247,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Vision & Mission - Premium Quotes */}
-      <section className="relative py-28 px-4 bg-white/5 z-10">
+      {/* Vision & Mission - Premium Quotes - REDUCED bg-white/5 */}
+      <section className="relative py-28 px-4 bg-black/30 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
             {[
               { quote: "To become the digital backbone of Liberia—empowering people and the economy.", label: "Vision", icon: "🎯" },
               { quote: "Deliver a secure platform for transparent governance and accessible services while generating sustainable long-term returns.", label: "Mission", icon: "🚀" }
             ].map((item, idx) => (
-              <div key={idx} className="group relative bg-white/10 backdrop-blur-xl rounded-2xl p-10 border border-white/10 transition-all duration-300 hover:border-blue-500/30 hover:scale-105 text-center">
+              <div key={idx} className="group relative bg-white/5 backdrop-blur-xl rounded-2xl p-10 border border-white/10 transition-all duration-300 hover:border-blue-500/30 hover:scale-105 text-center">
                 <div className="text-5xl mb-4">{item.icon}</div>
                 <div className="text-5xl mb-6 text-blue-500/30">"</div>
                 <p className="text-white/80 text-xl italic leading-relaxed mb-6">
@@ -270,7 +270,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Partner Logos - Premium Marquee with GLASS BACKGROUND */}
+      {/* Partner Logos - Premium Marquee - REDUCED bg-white/5 */}
       <section className="relative py-20 px-4 overflow-hidden z-10">
         <div className="text-center mb-10">
           <p className="text-blue-400 text-xs uppercase tracking-wider font-semibold mb-2">Trusted By</p>
@@ -278,17 +278,17 @@ export default function Home() {
         </div>
         <div className="flex animate-marquee space-x-12 whitespace-nowrap">
           {[...partners, ...partners].map((logo, idx) => (
-            <div key={idx} className="inline-flex items-center justify-center w-24 h-24 bg-white/10 backdrop-blur-sm rounded-xl p-4 shadow-md hover:shadow-lg transition-all hover:scale-110 border border-white/20">
+            <div key={idx} className="inline-flex items-center justify-center w-24 h-24 bg-white/5 backdrop-blur-sm rounded-xl p-4 shadow-md hover:shadow-lg transition-all hover:scale-110 border border-white/10">
               <img src={logo} alt={`Partner ${idx}`} className="max-w-full max-h-full object-contain" />
             </div>
           ))}
         </div>
       </section>
 
-      {/* Contact - Premium Glass */}
+      {/* Contact - Premium Glass - REDUCED bg-white/5 */}
       <section className="relative py-28 px-4 z-10">
         <div className="max-w-4xl mx-auto">
-          <div className="group relative bg-white/10 backdrop-blur-xl rounded-2xl p-10 md:p-12 text-center border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/10">
+          <div className="group relative bg-white/5 backdrop-blur-xl rounded-2xl p-10 md:p-12 text-center border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/10">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-cyan-500/5 rounded-2xl"></div>
             <div className="relative">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-3 text-white">Let's Connect</h2>
@@ -320,7 +320,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="relative py-10 px-4 border-t border-white/10 bg-black/50 z-10">
+      <footer className="relative py-10 px-4 border-t border-white/10 bg-black/30 z-10">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-white/40 text-xs">© {new Date().getFullYear()} Digital Liberia Inc. All rights reserved.</p>
           <p className="text-blue-400/40 text-xs mt-2">Building Africa's Digital Future</p>
