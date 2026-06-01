@@ -45,27 +45,28 @@ export default function Home() {
       {/* Base Dark Background - Always visible */}
       <div className="fixed inset-0 bg-black z-0"></div>
       
-      {/* Rotating Background Images - Sharper and Darker */}
+      {/* Rotating Background Images - With WHITE BACKGROUND for visibility */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         {partners.map((logo, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-all duration-1000 ${
-              index === activePartner ? "opacity-40 scale-100" : "opacity-0 scale-110"
+              index === activePartner ? "opacity-100 scale-100" : "opacity-0 scale-110"
             }`}
             style={{
               backgroundImage: `url(${logo})`,
               backgroundSize: 'contain',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              filter: 'contrast(1.3) brightness(0.7) saturate(1.2)',
+              backgroundColor: 'white',
+              backgroundBlendMode: 'normal',
             }}
           ></div>
         ))}
       </div>
       
-      {/* Dark Gradient Overlay for text readability */}
-      <div className="fixed inset-0 bg-gradient-to-br from-black via-black/95 to-black/90 z-0"></div>
+      {/* Dark Gradient Overlay for text readability - Lighter to show images */}
+      <div className="fixed inset-0 bg-gradient-to-br from-black/80 via-black/70 to-black/75 z-0"></div>
       
       {/* Premium Animated Background Elements - Blue theme (subtle) */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
@@ -84,8 +85,8 @@ export default function Home() {
             <Link to="/" className="mb-4 md:mb-0 group">
               <div className="flex items-center space-x-3">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-white/20 rounded-lg blur-lg group-hover:blur-xl transition-all"></div>
-                  <div className="relative w-10 h-10 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
+                  <div className="absolute inset-0 bg-white/30 rounded-lg blur-lg group-hover:blur-xl transition-all"></div>
+                  <div className="relative w-10 h-10 bg-white rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
                     <img src="/logos/digital.png" alt="Digital Liberia" className="w-8 h-8 object-contain" />
                   </div>
                 </div>
@@ -135,8 +136,8 @@ export default function Home() {
               </p>
             </div>
             
-            {/* Static Company Logo Container - TRANSPARENT */}
-            <div className="relative h-48 md:h-64 bg-white/5 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center border border-white/10">
+            {/* Static Company Logo Container - Glass effect */}
+            <div className="relative h-48 md:h-64 bg-white/10 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center border border-white/20">
               <img
                 src="/logos/digital.png"
                 alt="Digital Liberia Logo"
@@ -264,7 +265,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Partner Logos - Premium Marquee with TRANSPARENT BACKGROUND */}
+      {/* Partner Logos - Premium Marquee with GLASS BACKGROUND */}
       <section className="relative py-20 px-4 overflow-hidden z-10">
         <div className="text-center mb-10">
           <p className="text-blue-400 text-xs uppercase tracking-wider font-semibold mb-2">Trusted By</p>
@@ -272,7 +273,7 @@ export default function Home() {
         </div>
         <div className="flex animate-marquee space-x-12 whitespace-nowrap">
           {[...partners, ...partners].map((logo, idx) => (
-            <div key={idx} className="inline-flex items-center justify-center w-24 h-24 bg-white/5 backdrop-blur-sm rounded-xl p-4 shadow-md hover:shadow-lg transition-all hover:scale-110 border border-white/10">
+            <div key={idx} className="inline-flex items-center justify-center w-24 h-24 bg-white/10 backdrop-blur-sm rounded-xl p-4 shadow-md hover:shadow-lg transition-all hover:scale-110 border border-white/20">
               <img src={logo} alt={`Partner ${idx}`} className="max-w-full max-h-full object-contain" />
             </div>
           ))}
