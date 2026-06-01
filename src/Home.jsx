@@ -12,6 +12,7 @@ const partners = [
   "/logos/liberianpost.png",
   "/logos/digital.png",
   "/logos/libmusic.png",
+  "/logos/libmusic.png",
   "/logos/libconnectsit.png",
   "/logos/libpaysit.png",
   "/logos/seal of liberia.png",
@@ -45,6 +46,30 @@ export default function Home() {
       {/* Pure Dark Background */}
       <div className="fixed inset-0 bg-black z-0"></div>
       
+      {/* Rotating Background Icons - BEHIND everything (z-0) */}
+      <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-30">
+        <div className="relative w-96 h-96 md:w-[450px] md:h-[450px]">
+          {partners.map((logo, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-all duration-1000 ${
+                index === activePartner 
+                  ? "opacity-100 scale-100" 
+                  : "opacity-0 scale-75"
+              }`}
+            >
+              <div className="w-full h-full rounded-3xl bg-white/5 backdrop-blur-sm flex items-center justify-center p-10 border border-white/5">
+                <img
+                  src={logo}
+                  alt={`Partner ${index}`}
+                  className="w-full h-full object-contain opacity-50"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      
       {/* Subtle Gradient Overlay for depth */}
       <div className="fixed inset-0 bg-gradient-to-br from-black via-black/95 to-black/90 z-0"></div>
       
@@ -54,31 +79,6 @@ export default function Home() {
         <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-gradient-to-l from-blue-600/5 to-transparent rounded-full blur-[120px]"></div>
         <div className="absolute top-1/3 -left-48 w-96 h-96 bg-cyan-500/3 rounded-full blur-[100px]"></div>
         <div className="absolute bottom-1/3 -right-48 w-96 h-96 bg-blue-500/3 rounded-full blur-[100px]"></div>
-      </div>
-
-      {/* Floating Changing Icons with White Backgrounds - LARGER SIZE */}
-      <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center">
-        <div className="relative w-96 h-96 md:w-[450px] md:h-[450px]">
-          {partners.map((logo, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 transition-all duration-1000 ${
-                index === activePartner 
-                  ? "opacity-100 scale-100 rotate-0" 
-                  : "opacity-0 scale-75 rotate-12"
-              }`}
-            >
-              {/* White circular background container - LARGER */}
-              <div className="w-full h-full rounded-3xl bg-white/95 backdrop-blur-sm shadow-2xl flex items-center justify-center p-10 border border-white/20">
-                <img
-                  src={logo}
-                  alt={`Partner ${index}`}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* Premium Navigation - Blue theme */}
@@ -141,7 +141,7 @@ export default function Home() {
               </p>
             </div>
             
-            {/* Static Company Logo Container - REDUCED bg-white/5 */}
+            {/* Static Company Logo Container */}
             <div className="relative h-48 md:h-64 bg-white/5 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center border border-white/10">
               <img
                 src="/logos/digital.png"
@@ -153,7 +153,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Company Overview - Premium Cards - REDUCED bg-white/5 */}
+      {/* Company Overview - Premium Cards */}
       <section className="relative py-28 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -186,7 +186,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Ecosystem - Premium Grid with Icons - REDUCED bg-white/5 */}
+      {/* Ecosystem - Premium Grid with Icons */}
       <section className="relative py-28 px-4 bg-black/30 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -224,7 +224,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Problem & Solution - Split Premium - REDUCED bg-white/5 */}
+      {/* Problem & Solution - Split Premium */}
       <section className="relative py-28 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
@@ -247,7 +247,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Vision & Mission - Premium Quotes - REDUCED bg-white/5 */}
+      {/* Vision & Mission - Premium Quotes */}
       <section className="relative py-28 px-4 bg-black/30 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
@@ -270,7 +270,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Partner Logos - Premium Marquee - REDUCED bg-white/5 */}
+      {/* Partner Logos - Premium Marquee */}
       <section className="relative py-20 px-4 overflow-hidden z-10">
         <div className="text-center mb-10">
           <p className="text-blue-400 text-xs uppercase tracking-wider font-semibold mb-2">Trusted By</p>
@@ -285,7 +285,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contact - Premium Glass - REDUCED bg-white/5 */}
+      {/* Contact - Premium Glass */}
       <section className="relative py-28 px-4 z-10">
         <div className="max-w-4xl mx-auto">
           <div className="group relative bg-white/5 backdrop-blur-xl rounded-2xl p-10 md:p-12 text-center border border-white/10 transition-all duration-300 hover:border-blue-500/40 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/10">
