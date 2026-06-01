@@ -274,7 +274,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Partner Logos - Premium Marquee */}
+      {/* Partner Logos - Premium Marquee with TRANSPARENT IMAGES */}
       <section className="relative py-20 px-4 overflow-hidden z-10">
         <div className="text-center mb-12">
           <p className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-sm uppercase tracking-wider font-bold mb-2">Trusted By</p>
@@ -282,8 +282,13 @@ export default function Home() {
         </div>
         <div className="flex animate-marquee space-x-16 whitespace-nowrap">
           {[...partners, ...partners].map((logo, idx) => (
-            <div key={idx} className="inline-flex items-center justify-center w-28 h-28 bg-gradient-to-br from-red-500/5 to-blue-500/5 backdrop-blur-sm rounded-2xl p-5 shadow-md hover:shadow-xl transition-all hover:scale-110 border border-gray-100">
-              <img src={logo} alt={`Partner ${idx}`} className="max-w-full max-h-full object-contain" />
+            <div key={idx} className="inline-flex items-center justify-center w-28 h-28 bg-transparent rounded-2xl p-5 transition-all hover:scale-110">
+              <img 
+                src={logo} 
+                alt={`Partner ${idx}`} 
+                className="max-w-full max-h-full object-contain"
+                style={{ filter: 'none', opacity: 0.7 }}
+              />
             </div>
           ))}
         </div>
