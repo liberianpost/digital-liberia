@@ -22,7 +22,7 @@ const leadershipTeam = [
     name: "Izetta Jones Howe",
     title: "Co-Chairperson of the Board",
     icon: null,
-    image: "/logos/IJ photo.jpg",
+    image: "/logos/Izetta.jpg",
     gradient: "from-blue-500/20 to-blue-600/10",
     highlights: [
       "Trailblazing legal and student leader: First female President of the Federation of African Law Students and President of the Law Students Association at the Louis Arthur Grimes School of Law, recognized for transformational leadership and advocacy.",
