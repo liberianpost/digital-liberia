@@ -155,16 +155,16 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Partner Logos Bar - Below Navigation, Sticky */}
-        <div className="border-b border-gray-100 bg-white/80 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-4 py-2">
-            <div className="flex items-center justify-between gap-4 overflow-x-auto scrollbar-hide">
-              {partners.map((logo, idx) => (
-                <div key={idx} className="flex-shrink-0">
+        {/* Moving Partner Logos Bar - Below Navigation, Sticky, Same as Bottom Marquee */}
+        <div className="border-b border-gray-100 bg-white/80 backdrop-blur-sm overflow-hidden">
+          <div className="py-3">
+            <div className="flex animate-marquee-top space-x-16 whitespace-nowrap">
+              {[...partners, ...partners].map((logo, idx) => (
+                <div key={idx} className="inline-flex items-center justify-center w-12 h-12 transition-all hover:scale-110">
                   <img 
                     src={logo} 
                     alt={`Partner ${idx}`}
-                    className="h-8 md:h-10 w-auto object-contain opacity-60 hover:opacity-100 transition-opacity"
+                    className="w-full h-full object-contain"
                   />
                 </div>
               ))}
@@ -174,7 +174,7 @@ export default function Home() {
       </div>
 
       {/* Hero Section - World-Class Design */}
-      <section className="relative min-h-screen flex items-center pt-48 md:pt-52 pb-20 px-4 z-10">
+      <section className="relative min-h-screen flex items-center pt-56 md:pt-60 pb-20 px-4 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-8">
@@ -333,6 +333,26 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Moving Partner Logos - Bottom Marquee (ORIGINAL - KEPT AS IS) */}
+      <section className="relative py-12 md:py-16 px-4 overflow-hidden z-10">
+        <div className="text-center mb-8 md:mb-10">
+          <p className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-xs md:text-sm uppercase tracking-wider font-bold mb-2">Trusted By</p>
+          <p className="text-gray-500 text-sm md:text-base">Ecosystem Partners</p>
+        </div>
+        <div className="flex animate-marquee-bottom space-x-12 md:space-x-20 whitespace-nowrap">
+          {[...partners, ...partners].map((logo, idx) => (
+            <div key={idx} className="inline-flex items-center justify-center w-40 h-40 md:w-56 md:h-56 transition-all hover:scale-110">
+              <img 
+                src={logo} 
+                alt={`Partner ${idx}`}
+                className="w-full h-full object-contain"
+                loading="eager"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Contact - Premium Glass */}
       <section className="relative py-20 md:py-28 px-4 z-10">
         <div className="max-w-4xl mx-auto">
@@ -379,6 +399,27 @@ export default function Home() {
       </footer>
 
       <style jsx global>{`
+        @keyframes marquee-top {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes marquee-bottom {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee-top {
+          animation: marquee-top 25s linear infinite;
+          display: flex;
+        }
+        .animate-marquee-bottom {
+          animation: marquee-bottom 35s linear infinite;
+          display: flex;
+        }
+        .animate-marquee-top:hover,
+        .animate-marquee-bottom:hover {
+          animation-play-state: paused;
+        }
+        
         @keyframes gradient {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
