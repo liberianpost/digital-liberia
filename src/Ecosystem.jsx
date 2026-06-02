@@ -6,7 +6,6 @@ const ecosystemData = [
     category: "Digital Public Infrastructure",
     icon: "🏛️",
     description: "Secure government services delivered digitally to citizens.",
-    status: "Live",
     services: [
       "Digital citizen service access",
       "Permits and registration systems",
@@ -18,7 +17,6 @@ const ecosystemData = [
     category: "FinTech & Digital Payments",
     icon: "💳",
     description: "Secure financial infrastructure for seamless digital transactions.",
-    status: "Live",
     services: [
       "Wallet services",
       "Peer-to-peer transfers",
@@ -30,7 +28,6 @@ const ecosystemData = [
     category: "LibPay Payment Platform",
     icon: "🔒",
     description: "Digital Liberia's secure and scalable payment engine.",
-    status: "Live",
     services: [
       "Consumer payments",
       "Merchant payments",
@@ -42,7 +39,6 @@ const ecosystemData = [
     category: "National Identity & Database",
     icon: "🆔",
     description: "Secure identity verification and citizen record management.",
-    status: "Live",
     services: [
       "DSSN - Digital Social Security Number",
       "NDMS - National Database System",
@@ -54,7 +50,6 @@ const ecosystemData = [
     category: "Merchant & Business Services",
     icon: "🏪",
     description: "Digital tools helping SMEs grow their business online.",
-    status: "Live",
     services: [
       "Digital storefronts",
       "Payment acceptance",
@@ -66,7 +61,6 @@ const ecosystemData = [
     category: "E-Commerce Marketplace",
     icon: "🛒",
     description: "Centralized platform for Liberian businesses to sell online.",
-    status: "Coming Soon",
     services: [
       "Product listings",
       "Secure checkout",
@@ -78,7 +72,6 @@ const ecosystemData = [
     category: "Logistics & Delivery",
     icon: "📦",
     description: "Integrated digital logistics for goods movement.",
-    status: "Coming Soon",
     services: [
       "Digital dispatch",
       "Order fulfillment",
@@ -90,7 +83,6 @@ const ecosystemData = [
     category: "Digital Land Management",
     icon: "🏞️",
     description: "Secure land documentation and property management.",
-    status: "Coming Soon",
     services: [
       "Secure land documentation",
       "Digital property records",
@@ -102,7 +94,6 @@ const ecosystemData = [
     category: "Real Estate Integration",
     icon: "🏠",
     description: "Technology for property listing and secure transactions.",
-    status: "Coming Soon",
     services: [
       "Property listings",
       "Digital documentation",
@@ -114,7 +105,6 @@ const ecosystemData = [
     category: "Social Networking Platform",
     icon: "👥",
     description: "Liberian-centered social and community platform.",
-    status: "Coming Soon",
     services: [
       "Community forums",
       "User profiles",
@@ -126,7 +116,6 @@ const ecosystemData = [
     category: "Music & Entertainment",
     icon: "🎵",
     description: "Streaming and content monetization for local artists.",
-    status: "Coming Soon",
     services: [
       "Music streaming",
       "Artist profiles",
@@ -138,7 +127,6 @@ const ecosystemData = [
     category: "Digital Health / Telemedicine",
     icon: "🏥",
     description: "Remote healthcare access and digital medical records.",
-    status: "Coming Soon",
     services: [
       "Remote consultations",
       "Digital medical records",
@@ -150,7 +138,6 @@ const ecosystemData = [
     category: "AgriTech Platforms",
     icon: "🌾",
     description: "Digital market access for agricultural producers.",
-    status: "Coming Soon",
     services: [
       "Market access platforms",
       "Buyer connections",
@@ -162,7 +149,6 @@ const ecosystemData = [
     category: "Data Analytics & Open Data",
     icon: "📊",
     description: "Insight generation and responsible data systems.",
-    status: "Coming Soon",
     services: [
       "Business intelligence",
       "Data visualization",
@@ -174,7 +160,6 @@ const ecosystemData = [
     category: "Cybersecurity & Resilience",
     icon: "🛡️",
     description: "Protecting systems, transactions, and user data.",
-    status: "Coming Soon",
     services: [
       "Threat detection",
       "Data encryption",
@@ -186,7 +171,6 @@ const ecosystemData = [
     category: "Startup & Tech Ecosystem",
     icon: "🚀",
     description: "Supporting local entrepreneurship and digital talent.",
-    status: "Coming Soon",
     services: [
       "Startup incubation",
       "Developer tools",
@@ -310,13 +294,13 @@ export default function Ecosystem() {
         </div>
       </div>
 
-      {/* Hero Section */}
+      {/* Hero Section - Reduced text size */}
       <section className="relative pt-36 md:pt-48 pb-12 px-4 z-10">
         <div className="max-w-7xl mx-auto text-center">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-red-500/10 to-blue-500/10 border border-red-500/20 backdrop-blur-sm mb-6">
-            <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-sm font-bold tracking-wide">✦ OUR ECOSYSTEM ✦</span>
+            <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-sm font-bold tracking-wide">✦ ECOSYSTEM ✦</span>
           </div>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.1] tracking-tighter mb-6">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tighter mb-6">
             <span className="bg-gradient-to-r from-red-600 via-blue-600 to-red-600 bg-clip-text text-transparent animate-gradient">
               Digital Infrastructure
             </span>
@@ -324,39 +308,50 @@ export default function Ecosystem() {
               For Liberia
             </span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-            An integrated portfolio of digital infrastructure products transforming Liberia's digital economy.
+          <p className="text-base md:text-lg text-gray-500 leading-relaxed max-w-3xl mx-auto">
+            An integrated portfolio transforming Liberia's digital economy.
           </p>
         </div>
       </section>
 
-      {/* Stats Summary */}
+      {/* Stats Summary - Transparent icons */}
       <section className="relative py-8 px-4 z-10">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div className="p-4">
-              <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">16+</div>
-              <div className="text-gray-500 text-xs md:text-sm">Products</div>
-            </div>
-            <div className="p-4">
-              <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">4</div>
-              <div className="text-gray-500 text-xs md:text-sm">Live Now</div>
-            </div>
-            <div className="p-4">
-              <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">12</div>
-              <div className="text-gray-500 text-xs md:text-sm">Coming Soon</div>
-            </div>
-            <div className="p-4">
-              <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">15</div>
-              <div className="text-gray-500 text-xs md:text-sm">Counties</div>
-            </div>
+            {[
+              { number: "16+", label: "Products", icon: "🚀" },
+              { number: "4", label: "Live Now", icon: "⚡" },
+              { number: "12", label: "Coming Soon", icon: "🔄" },
+              { number: "15", label: "Counties", icon: "🗺️" }
+            ].map((stat, idx) => (
+              <div key={idx} className="p-4 group hover:scale-105 transition-transform duration-300">
+                <div className="text-3xl md:text-4xl mb-2 opacity-70 group-hover:opacity-100 transition-opacity">{stat.icon}</div>
+                <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">{stat.number}</div>
+                <div className="text-gray-500 text-xs md:text-sm font-medium mt-1">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Ecosystem Cards Grid - Optimized */}
+      {/* National Digital Infrastructure - Reduced text size */}
+      <section className="relative py-12 md:py-16 px-4 z-10">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+            National Digital Infrastructure
+          </h2>
+          <div className="w-16 h-0.5 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mt-4 rounded-full"></div>
+        </div>
+      </section>
+
+      {/* Ecosystem Cards Grid - Reduced icon sizes, no badges, transparent backgrounds */}
       <section className="relative py-12 md:py-20 px-4 z-10">
         <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h3 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+              Ecosystem Components
+            </h3>
+          </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {ecosystemData.map((item, index) => (
               <div 
@@ -366,33 +361,26 @@ export default function Ecosystem() {
               >
                 <div className="absolute top-0 right-0 w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-red-500/5 to-blue-500/5 rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-4 md:mb-6">
-                    <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-red-500/10 to-blue-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <div className="text-3xl md:text-4xl">{item.icon}</div>
+                  <div className="flex items-center justify-start mb-4 md:mb-6">
+                    <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="text-2xl md:text-3xl opacity-80 group-hover:opacity-100 transition-opacity">{item.icon}</div>
                     </div>
-                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                      item.status === "Live" 
-                        ? "bg-green-100 text-green-700" 
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}>
-                      {item.status}
-                    </span>
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+                  <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-800 group-hover:text-red-600 transition-colors">
                     {item.category}
                   </h3>
-                  <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-4">
+                  <p className="text-gray-500 text-sm md:text-base leading-relaxed mb-4">
                     {item.description}
                   </p>
                   
-                  {/* Expandable Services List - Reduced to 4 key services */}
+                  {/* Expandable Services List */}
                   <div className={`overflow-hidden transition-all duration-500 ${expandedCard === index ? 'max-h-96' : 'max-h-0'}`}>
                     <div className="pt-4 border-t border-gray-100 mt-2">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-3">Key Services:</h4>
+                      <h4 className="text-xs font-semibold text-gray-500 mb-3">Key Services:</h4>
                       <ul className="space-y-2">
                         {item.services.map((service, idx) => (
-                          <li key={idx} className="text-gray-600 text-sm flex items-start gap-2">
-                            <span className="text-red-500 mt-1">▹</span>
+                          <li key={idx} className="text-gray-500 text-xs flex items-start gap-2">
+                            <span className="text-red-400 mt-1">▹</span>
                             <span>{service}</span>
                           </li>
                         ))}
@@ -413,6 +401,57 @@ export default function Ecosystem() {
         </div>
       </section>
 
+      {/* Trusted By - Reduced logo sizes */}
+      <section className="relative py-12 md:py-16 px-4 overflow-hidden z-10">
+        <div className="text-center mb-8">
+          <p className="text-red-600 text-xs uppercase tracking-wider font-bold mb-2">Trusted By</p>
+          <p className="text-gray-500 text-sm">Ecosystem Partners</p>
+        </div>
+        <div className="overflow-x-auto scrollbar-hide">
+          <div className="flex animate-marquee-bottom gap-8 md:gap-12 whitespace-nowrap min-w-max">
+            {[...partners, ...partners, ...partners].map((logo, idx) => (
+              <div key={idx} className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 transition-all hover:scale-110 flex-shrink-0 opacity-70 hover:opacity-100">
+                <img 
+                  src={logo} 
+                  alt={`Partner ${idx}`}
+                  className="w-full h-full object-contain"
+                  loading="eager"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Let's Connect - Transparent icons, bold text, enhanced contrast */}
+      <section className="relative py-16 md:py-20 px-4 z-10">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+              Let's Connect
+            </h2>
+            <div className="w-12 h-0.5 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mb-8 rounded-full"></div>
+            
+            <div className="flex flex-col md:flex-row justify-center gap-6 md:gap-10">
+              <a href="mailto:info@digitalliberia.com" className="flex items-center justify-center gap-3 text-gray-700 hover:text-red-600 transition-all duration-300 group">
+                <span className="text-2xl opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">✉️</span>
+                <span className="text-base md:text-lg font-semibold">info@digitalliberia.com</span>
+              </a>
+              <a href="https://wa.me/231888001077" className="flex items-center justify-center gap-3 text-gray-700 hover:text-red-600 transition-all duration-300 group">
+                <span className="text-2xl opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">📱</span>
+                <span className="text-base md:text-lg font-semibold">WhatsApp: +231 888 001 077</span>
+              </a>
+              <a href="tel:+231775055817" className="flex items-center justify-center gap-3 text-gray-700 hover:text-blue-600 transition-all duration-300 group">
+                <span className="text-2xl opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">📞</span>
+                <span className="text-base md:text-lg font-semibold">Call: +231 775 055 817</span>
+              </a>
+            </div>
+            
+            <p className="text-gray-400 text-xs mt-8">Monday - Friday, 8:00 AM - 5:00 PM GMT</p>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="relative py-8 md:py-12 px-4 border-t border-gray-100 bg-gradient-to-r from-red-50/30 to-blue-50/30 z-10">
         <div className="max-w-7xl mx-auto text-center">
@@ -429,11 +468,20 @@ export default function Ecosystem() {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
+        @keyframes marquee-bottom {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
         .animate-marquee-top {
           animation: marquee-top 20s linear infinite;
           display: flex;
         }
-        .animate-marquee-top:hover {
+        .animate-marquee-bottom {
+          animation: marquee-bottom 25s linear infinite;
+          display: flex;
+        }
+        .animate-marquee-top:hover,
+        .animate-marquee-bottom:hover {
           animation-play-state: paused;
         }
         
