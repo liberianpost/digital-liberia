@@ -50,15 +50,15 @@ export default function Home() {
   return (
     <div className="relative min-h-screen w-full bg-black overflow-x-hidden">
       
-      {/* Animated Background Particles - Enhanced visibility on dark */}
+      {/* Animated Background Particles - Enhanced visibility */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-red-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-red-500/8 rounded-full blur-3xl animate-pulse delay-2000"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-red-500/15 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-red-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
       </div>
       
-      {/* Rotating Background Icons - More visible on dark background */}
-      <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-30">
+      {/* Rotating Background Icons - Natural colors, reduced opacity overlay */}
+      <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-40">
         <div className="relative w-96 h-96 md:w-[500px] md:h-[500px]">
           {partners.map((logo, index) => (
             <div
@@ -72,38 +72,38 @@ export default function Home() {
               <img
                 src={logo}
                 alt={`Partner ${index}`}
-                className="w-full h-full object-contain brightness-0 invert opacity-80"
+                className="w-full h-full object-contain"
               />
             </div>
           ))}
         </div>
       </div>
       
-      {/* Dark Gradient Overlay for depth */}
-      <div className="fixed inset-0 bg-gradient-to-br from-black/95 via-black/90 to-black/95 z-0"></div>
+      {/* Lighter Gradient Overlay for better visibility */}
+      <div className="fixed inset-0 bg-gradient-to-br from-black/85 via-black/80 to-black/85 z-0"></div>
 
-      {/* Sticky Header Container - Dark theme */}
+      {/* Sticky Header Container */}
       <div className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 ${
-        isScrolled ? 'bg-black/95 backdrop-blur-2xl shadow-xl border-b border-red-500/20' : 'bg-black/80 backdrop-blur-md border-b border-red-500/10'
+        isScrolled ? 'bg-black/90 backdrop-blur-2xl shadow-xl border-b border-red-500/20' : 'bg-black/70 backdrop-blur-md border-b border-red-500/10'
       }`}>
         
         {/* Premium Navigation */}
         <header className="border-b border-red-500/10">
           <div className="max-w-7xl mx-auto px-4 md:px-8">
             <div className="flex items-center justify-between py-4">
-              <Link to="/" className="group" onClick={handleLinkClick}>
+              <Link to="/" className="mb-4 md:mb-0 group" onClick={handleLinkClick}>
                 <div className="flex items-center space-x-3">
                   <div className="relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-red-500/30 to-blue-500/30 rounded-2xl blur-xl group-hover:blur-2xl transition-all"></div>
                     <div className="relative w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-red-500 to-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
-                      <img src="/logos/digital.png" alt="Digital Liberia" className="w-7 h-7 md:w-8 md:h-8 object-contain brightness-0 invert" />
+                      <img src="/logos/digital.png" alt="Digital Liberia" className="w-7 h-7 md:w-8 md:h-8 object-contain" />
                     </div>
                   </div>
                   <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent font-bold text-xl md:text-2xl tracking-tight">DigitalLiberia</span>
                 </div>
               </Link>
 
-              {/* Desktop Navigation - Light text on dark */}
+              {/* Desktop Navigation */}
               <nav className="hidden md:flex flex-wrap justify-center gap-2 md:gap-3">
                 {navLinks.map(link => (
                   <Link 
@@ -137,7 +137,7 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Mobile Navigation Menu - Dark theme */}
+        {/* Mobile Navigation Menu */}
         <div className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="px-4 py-4 space-y-2 bg-black/95 backdrop-blur-md border-b border-red-500/10">
             {navLinks.map(link => (
@@ -157,8 +157,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Moving Partner Logos Bar */}
-        <div className="border-b border-white/10 bg-black/50 backdrop-blur-sm overflow-hidden">
+        {/* Moving Partner Logos Bar - Natural colors */}
+        <div className="border-b border-white/10 bg-black/30 backdrop-blur-sm overflow-hidden">
           <div className="py-2 md:py-3 overflow-x-auto scrollbar-hide">
             <div className="flex animate-marquee-top gap-8 md:gap-16 whitespace-nowrap min-w-max px-4">
               {[...partners, ...partners].map((logo, idx) => (
@@ -166,7 +166,7 @@ export default function Home() {
                   <img 
                     src={logo} 
                     alt={`Partner ${idx}`}
-                    className="w-full h-full object-contain brightness-0 invert opacity-80"
+                    className="w-full h-full object-contain"
                   />
                 </div>
               ))}
@@ -175,7 +175,7 @@ export default function Home() {
         </div>
 
         {/* Moving Text Bar - "The Future is Now" */}
-        <div className="border-b border-red-500/20 bg-gradient-to-r from-red-500/10 to-blue-500/10 overflow-hidden">
+        <div className="border-b border-red-500/20 bg-gradient-to-r from-red-500/15 to-blue-500/15 overflow-hidden">
           <div className="py-2 md:py-2.5 overflow-hidden">
             <div className="flex animate-marquee-text whitespace-nowrap">
               {[...Array(3)].map((_, i) => (
@@ -188,7 +188,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Hero Section - Reduced text size, white text */}
+      {/* Hero Section */}
       <section className="relative min-h-screen flex items-center pt-[180px] md:pt-72 pb-20 px-4 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -216,14 +216,14 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Glassmorphism Logo Container */}
+            {/* Glassmorphism Logo Container - Natural color */}
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-blue-500/20 rounded-3xl blur-2xl animate-pulse"></div>
               <div className="relative h-56 md:h-80 bg-white/5 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center border border-white/10">
                 <img
                   src="/logos/digital.png"
                   alt="Digital Liberia Logo"
-                  className="w-32 h-32 md:w-56 md:h-56 object-contain opacity-90 brightness-0 invert"
+                  className="w-32 h-32 md:w-56 md:h-56 object-contain"
                 />
               </div>
             </div>
@@ -231,7 +231,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats Section - White text */}
+      {/* Stats Section */}
       <section className="relative py-16 md:py-20 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
@@ -252,7 +252,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* National Digital Infrastructure - White text */}
+      {/* National Digital Infrastructure */}
       <section className="relative py-16 md:py-20 px-4 z-10">
         <div className="max-w-6xl mx-auto text-center">
           <div className="inline-flex items-center px-3 py-1 rounded-full bg-red-500/20 border border-red-500/30 mb-4">
@@ -265,7 +265,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Company Overview Cards - Dark glass cards with white text */}
+      {/* Company Overview Cards */}
       <section className="relative py-4 md:py-8 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
@@ -282,7 +282,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Ecosystem Components - White text, transparent icons */}
+      {/* Ecosystem Components */}
       <section className="relative py-20 md:py-28 px-4 bg-gradient-to-br from-red-500/5 to-blue-500/5 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 md:mb-16">
@@ -319,7 +319,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Problem & Solution - White text */}
+      {/* Problem & Solution */}
       <section className="relative py-20 md:py-28 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
@@ -342,7 +342,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Vision & Mission - White text */}
+      {/* Vision & Mission */}
       <section className="relative py-20 md:py-28 px-4 bg-gradient-to-br from-red-500/5 to-blue-500/5 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
@@ -365,7 +365,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trusted By - Reduced logo sizes, white text */}
+      {/* Trusted By - Natural logo colors */}
       <section className="relative py-12 md:py-16 px-4 overflow-hidden z-10">
         <div className="text-center mb-8">
           <p className="bg-gradient-to-r from-red-400 to-blue-400 bg-clip-text text-transparent text-xs uppercase tracking-wider font-bold mb-2">Trusted By</p>
@@ -374,11 +374,11 @@ export default function Home() {
         <div className="overflow-x-auto scrollbar-hide">
           <div className="flex animate-marquee-bottom gap-8 md:gap-12 whitespace-nowrap min-w-max">
             {[...partners, ...partners, ...partners].map((logo, idx) => (
-              <div key={idx} className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 transition-all hover:scale-110 flex-shrink-0 opacity-70 hover:opacity-100">
+              <div key={idx} className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 transition-all hover:scale-110 flex-shrink-0 opacity-80 hover:opacity-100">
                 <img 
                   src={logo} 
                   alt={`Partner ${idx}`}
-                  className="w-full h-full object-contain brightness-0 invert"
+                  className="w-full h-full object-contain"
                   loading="eager"
                 />
               </div>
@@ -387,7 +387,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Let's Connect - White text, transparent icons */}
+      {/* Let's Connect */}
       <section className="relative py-16 md:py-20 px-4 z-10">
         <div className="max-w-3xl mx-auto">
           <div className="text-center">
@@ -416,7 +416,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer - Dark theme */}
+      {/* Footer */}
       <footer className="relative py-8 md:py-12 px-4 border-t border-white/10 bg-gradient-to-r from-red-500/10 to-blue-500/10 z-10">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-white/40 text-xs md:text-sm">© {new Date().getFullYear()} Digital Liberia Inc. All rights reserved.</p>
