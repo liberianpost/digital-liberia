@@ -317,19 +317,23 @@ export default function Ecosystem() {
         </div>
       </section>
 
-      {/* Stats Summary - Changed "Live Now" to "24/7" */}
+      {/* Stats Summary - Products, Live (no number), 24/7, Counties */}
       <section className="relative py-8 px-4 z-10">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             {[
               { number: "16+", label: "Products", icon: "🚀" },
-              { number: "4", label: "24/7", icon: "⚡" },
-              { number: "12", label: "Coming Soon", icon: "🔄" },
+              { label: "Live", icon: "⚡" },
+              { label: "24/7", icon: "🕒" },
               { number: "15", label: "Counties", icon: "🗺️" }
             ].map((stat, idx) => (
               <div key={idx} className="p-4 group hover:scale-105 transition-transform duration-300">
                 <div className="text-3xl md:text-4xl mb-2 opacity-70 group-hover:opacity-100 transition-opacity">{stat.icon}</div>
-                <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-400 to-blue-400 bg-clip-text text-transparent">{stat.number}</div>
+                {stat.number ? (
+                  <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-400 to-blue-400 bg-clip-text text-transparent">{stat.number}</div>
+                ) : (
+                  <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-red-400 to-blue-400 bg-clip-text text-transparent">●</div>
+                )}
                 <div className="text-white/60 text-xs md:text-sm font-medium mt-1">{stat.label}</div>
               </div>
             ))}
