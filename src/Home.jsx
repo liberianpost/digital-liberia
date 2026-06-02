@@ -155,12 +155,12 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Moving Partner Logos Bar - Below Navigation, Sticky, Same as Bottom Marquee */}
+        {/* Moving Partner Logos Bar - Below Navigation, Sticky - FIXED FOR MOBILE */}
         <div className="border-b border-gray-100 bg-white/80 backdrop-blur-sm overflow-hidden">
-          <div className="py-3">
-            <div className="flex animate-marquee-top space-x-16 whitespace-nowrap">
+          <div className="py-2 md:py-3 overflow-x-auto scrollbar-hide">
+            <div className="flex animate-marquee-top gap-8 md:gap-16 whitespace-nowrap min-w-max px-4">
               {[...partners, ...partners].map((logo, idx) => (
-                <div key={idx} className="inline-flex items-center justify-center w-12 h-12 transition-all hover:scale-110">
+                <div key={idx} className="inline-flex items-center justify-center w-8 h-8 md:w-12 md:h-12 transition-all hover:scale-110 flex-shrink-0">
                   <img 
                     src={logo} 
                     alt={`Partner ${idx}`}
@@ -174,7 +174,7 @@ export default function Home() {
       </div>
 
       {/* Hero Section - World-Class Design */}
-      <section className="relative min-h-screen flex items-center pt-56 md:pt-60 pb-20 px-4 z-10">
+      <section className="relative min-h-screen flex items-center pt-[140px] md:pt-60 pb-20 px-4 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-8">
@@ -333,23 +333,25 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Moving Partner Logos - Bottom Marquee (ORIGINAL - KEPT AS IS) */}
+      {/* Moving Partner Logos - Bottom Marquee (ORIGINAL - VISIBLE ON ALL DEVICES) */}
       <section className="relative py-12 md:py-16 px-4 overflow-hidden z-10">
         <div className="text-center mb-8 md:mb-10">
           <p className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-xs md:text-sm uppercase tracking-wider font-bold mb-2">Trusted By</p>
           <p className="text-gray-500 text-sm md:text-base">Ecosystem Partners</p>
         </div>
-        <div className="flex animate-marquee-bottom space-x-12 md:space-x-20 whitespace-nowrap">
-          {[...partners, ...partners].map((logo, idx) => (
-            <div key={idx} className="inline-flex items-center justify-center w-40 h-40 md:w-56 md:h-56 transition-all hover:scale-110">
-              <img 
-                src={logo} 
-                alt={`Partner ${idx}`}
-                className="w-full h-full object-contain"
-                loading="eager"
-              />
-            </div>
-          ))}
+        <div className="overflow-x-auto scrollbar-hide">
+          <div className="flex animate-marquee-bottom gap-8 md:gap-12 lg:gap-20 whitespace-nowrap min-w-max">
+            {[...partners, ...partners, ...partners].map((logo, idx) => (
+              <div key={idx} className="inline-flex items-center justify-center w-24 h-24 md:w-40 md:h-40 lg:w-56 lg:h-56 transition-all hover:scale-110 flex-shrink-0">
+                <img 
+                  src={logo} 
+                  alt={`Partner ${idx}`}
+                  className="w-full h-full object-contain"
+                  loading="eager"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -408,11 +410,11 @@ export default function Home() {
           100% { transform: translateX(-50%); }
         }
         .animate-marquee-top {
-          animation: marquee-top 25s linear infinite;
+          animation: marquee-top 20s linear infinite;
           display: flex;
         }
         .animate-marquee-bottom {
-          animation: marquee-bottom 35s linear infinite;
+          animation: marquee-bottom 30s linear infinite;
           display: flex;
         }
         .animate-marquee-top:hover,
