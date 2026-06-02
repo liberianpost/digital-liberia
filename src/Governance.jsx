@@ -6,6 +6,7 @@ const leadershipTeam = [
     name: "Sullivan T. Doeblah",
     title: "Chairman of the Board",
     icon: "👨‍💼",
+    image: null,
     gradient: "from-red-500/20 to-red-600/10",
     responsibilities: [
       "Board coordination and leadership alignment",
@@ -20,8 +21,14 @@ const leadershipTeam = [
   {
     name: "Izetta Jones Howe",
     title: "Co-Chairperson of the Board",
-    icon: "👩‍💼",
+    icon: null,
+    image: "/logos/IJ photo.jpeg",
     gradient: "from-blue-500/20 to-blue-600/10",
+    highlights: [
+      "Trailblazing legal and student leader: First female President of the Federation of African Law Students and President of the Law Students Association at the Louis Arthur Grimes School of Law, recognized for transformational leadership and advocacy.",
+      "Experienced executive and business leader: CEO of Fidelity Holdings Inc. and Special Project Coordinator at NASSCORP, with expertise in project management, strategic planning, procurement, public financial management, and investment portfolio management.",
+      "Highly qualified and internationally recognized professional: Holds an M.Sc. in Project Management (Distinction) from Coventry University, with multiple professional certifications from Liberia, the U.S., Germany, and the UK, and is an alumnus of the International Visitor Leadership Program."
+    ],
     responsibilities: [
       "Co-leading board execution strategy",
       "Strengthening institutional partnerships",
@@ -35,8 +42,14 @@ const leadershipTeam = [
   {
     name: "Emmanuel Paygar Jr.",
     title: "Founder & Chief Executive Officer (CEO)",
-    icon: "🚀",
+    icon: null,
+    image: "/logos/B61B5444-5CDE-48BA-A14D-3F08DD2DDF8F.JPG",
     gradient: "from-red-500/20 to-blue-600/10",
+    highlights: [
+      "FinTech Entrepreneur & Founder: Founder and owner of Solid, focused on building innovative financial technology solutions that advance digital payments, financial access, and technology-driven economic growth.",
+      "Full-Stack Software Developer & Systems Builder: Experienced software developer with expertise across frontend development, backend engineering, cloud infrastructure, and scalable system architecture, with hands-on experience building end-to-end digital platforms and products.",
+      "Investor & Financial Markets Trader: Active investor and trader in the financial markets with experience in market analysis, capital allocation, risk management, and identifying growth opportunities across global financial assets."
+    ],
     responsibilities: [
       "Overall vision and strategic direction",
       "Product ecosystem development",
@@ -52,6 +65,7 @@ const leadershipTeam = [
     name: "Winston B. Borbor Jr.",
     title: "Chief Operating Officer (COO)",
     icon: "⚙️",
+    image: null,
     gradient: "from-blue-500/20 to-blue-600/10",
     responsibilities: [
       "Daily operational execution",
@@ -67,8 +81,14 @@ const leadershipTeam = [
   {
     name: "Adolphus D. Dopoh",
     title: "Chief Technology Officer (CTO)",
-    icon: "💻",
+    icon: null,
+    image: "/logos/WhatsApp Image 2025-09-22 at 12.54.32.jpeg",
     gradient: "from-red-500/20 to-red-600/10",
+    highlights: [
+      "Telecommunications and Technology Leader: Experienced technology and telecommunications professional with leadership in core network engineering, IT infrastructure, cybersecurity, systems security, and digital transformation, currently serving with the Liberia Telecommunication Corporation.",
+      "Highly qualified multidisciplinary professional: Holds advanced academic and technical qualifications in law, business administration, computer science engineering, IT infrastructure, cybersecurity, procurement, and supply chain management, with specialized training across Liberia and India.",
+      "Strategic leader, researcher, and educator: Proven experience across executive leadership, academia, consulting, and institutional management, with published research in technology, telecommunications, supply chain systems, and sustainable development, alongside leadership roles in higher education and national organizations."
+    ],
     responsibilities: [
       "Platform architecture and system design",
       "Backend and frontend engineering oversight",
@@ -271,15 +291,40 @@ export default function Governance() {
               >
                 <div className="absolute top-0 right-0 w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-red-500/5 to-blue-500/5 rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
                 <div className="relative z-10">
-                  <div className={`w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br ${member.gradient} rounded-2xl flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform`}>
-                    <div className="text-3xl md:text-4xl">{member.icon}</div>
+                  {/* Image or Icon Container */}
+                  <div className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-4 md:mb-6 rounded-2xl overflow-hidden bg-gradient-to-br from-red-500/10 to-blue-500/10 flex items-center justify-center group-hover:scale-105 transition-transform border-2 border-white shadow-xl">
+                    {member.image ? (
+                      <img 
+                        src={member.image} 
+                        alt={member.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-5xl md:text-6xl">{member.icon}</div>
+                    )}
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-1 text-gray-900">{member.name}</h3>
-                  <p className="text-red-600 text-sm md:text-base font-semibold mb-4">{member.title}</p>
+                  <h3 className="text-xl md:text-2xl font-bold mb-1 text-gray-900 text-center">{member.name}</h3>
+                  <p className="text-red-600 text-sm md:text-base font-semibold mb-4 text-center">{member.title}</p>
                   
-                  {/* Expandable Responsibilities List */}
-                  <div className={`overflow-hidden transition-all duration-500 ${expandedCard === index ? 'max-h-96' : 'max-h-0'}`}>
+                  {/* Expandable Content */}
+                  <div className={`overflow-hidden transition-all duration-500 ${expandedCard === index ? 'max-h-[600px]' : 'max-h-0'}`}>
                     <div className="pt-4 border-t border-gray-100 mt-2">
+                      {/* Highlights Section (for members with highlights) */}
+                      {member.highlights && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-3">Professional Highlights:</h4>
+                          <ul className="space-y-2">
+                            {member.highlights.map((highlight, idx) => (
+                              <li key={idx} className="text-gray-600 text-sm flex items-start gap-2">
+                                <span className="text-blue-500 mt-1">✦</span>
+                                <span>{highlight}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {/* Responsibilities Section */}
                       <h4 className="text-sm font-semibold text-gray-700 mb-3">Key Responsibilities:</h4>
                       <ul className="space-y-2">
                         {member.responsibilities.map((resp, idx) => (
@@ -289,6 +334,8 @@ export default function Governance() {
                           </li>
                         ))}
                       </ul>
+                      
+                      {/* Note Section */}
                       {member.note && (
                         <div className="mt-4 p-3 bg-gradient-to-r from-red-50 to-blue-50 rounded-lg border border-red-100">
                           <p className="text-gray-700 text-xs italic">📌 {member.note}</p>
