@@ -18,6 +18,8 @@ const partners = [
   "/logos/liberia.png"
 ];
 
+const movingText = "✦ THE FUTURE IS NOW ✦ TRANSFORMING LIBERIA'S DIGITAL ECONOMY ✦ BUILDING TOMORROW TODAY ✦";
+
 export default function Home() {
   const location = useLocation();
   const [activePartner, setActivePartner] = useState(0);
@@ -171,23 +173,36 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Moving Text Bar - "The Future is Now" */}
+        <div className="border-b border-red-500/10 bg-gradient-to-r from-red-50/50 to-blue-50/50 overflow-hidden">
+          <div className="py-2 md:py-2.5 overflow-hidden">
+            <div className="flex animate-marquee-text whitespace-nowrap">
+              {[...Array(3)].map((_, i) => (
+                <span key={i} className="text-xs md:text-sm font-semibold tracking-wider text-gray-700 mx-8">
+                  {movingText}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-[140px] md:pt-60 pb-20 px-4 z-10">
+      {/* Hero Section - Reduced text size */}
+      <section className="relative min-h-screen flex items-center pt-[180px] md:pt-72 pb-20 px-4 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-8">
               <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-red-500/10 to-blue-500/10 border border-red-500/20 backdrop-blur-sm">
-                <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-sm font-bold tracking-wide">✦ LIBERIAN NATIONAL INFRASTRUCTURE ✦</span>
+                <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-xs md:text-sm font-bold tracking-wide">✦ LIBERIAN NATIONAL INFRASTRUCTURE ✦</span>
               </div>
-              <h1 className="text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold leading-[1.1] tracking-tighter">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.1] tracking-tighter">
                 <span className="bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">Building</span>
                 <span className="block bg-gradient-to-r from-red-600 via-blue-600 to-red-600 bg-clip-text text-transparent animate-gradient">
                   Liberia's Future
                 </span>
               </h1>
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-lg">
+              <p className="text-base md:text-lg text-gray-500 leading-relaxed max-w-lg">
                 Digital Liberia Inc. is a Liberian technology and digital infrastructure company established with the purpose of designing, building, operating, and scaling a national digital ecosystem.
               </p>
               <div className="flex flex-wrap gap-4 pt-4">
@@ -201,14 +216,14 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Glassmorphism Logo Container */}
+            {/* Glassmorphism Logo Container - Transparent */}
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-blue-500/20 rounded-3xl blur-2xl animate-pulse"></div>
-              <div className="relative h-56 md:h-80 bg-white/10 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center border border-white/20">
+              <div className="relative h-56 md:h-80 bg-white/5 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center border border-white/20">
                 <img
                   src="/logos/digital.png"
                   alt="Digital Liberia Logo"
-                  className="w-32 h-32 md:w-56 md:h-56 object-contain"
+                  className="w-32 h-32 md:w-56 md:h-56 object-contain opacity-90"
                 />
               </div>
             </div>
@@ -216,7 +231,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats Section - NEW - Builds Credibility */}
+      {/* Stats Section - Transparent icons, reduced size */}
       <section className="relative py-16 md:py-20 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
@@ -226,10 +241,10 @@ export default function Home() {
               { number: "15", label: "Counties", icon: "🗺️", desc: "Nationwide coverage" },
               { number: "24/7", label: "Digital Infrastructure", icon: "⚡", desc: "Always available" }
             ].map((stat, idx) => (
-              <div key={idx} className="group relative bg-gradient-to-br from-white to-white/90 backdrop-blur-xl rounded-2xl p-6 border border-gray-100 shadow-lg transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:scale-105 text-center">
-                <div className="text-4xl mb-3">{stat.icon}</div>
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">{stat.number}</div>
-                <div className="text-gray-800 font-semibold text-sm mt-2">{stat.label}</div>
+              <div key={idx} className="group text-center hover:scale-105 transition-all duration-300">
+                <div className="text-3xl md:text-4xl mb-2 opacity-70 group-hover:opacity-100 transition-opacity">{stat.icon}</div>
+                <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">{stat.number}</div>
+                <div className="text-gray-700 font-semibold text-xs md:text-sm mt-2">{stat.label}</div>
                 <div className="text-gray-400 text-xs mt-1">{stat.desc}</div>
               </div>
             ))}
@@ -237,19 +252,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Company Overview - Shortened Descriptions */}
-      <section className="relative py-20 md:py-28 px-4 z-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12 md:mb-16">
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 mb-4">
-              <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-xs font-bold tracking-wider">CORE INFRASTRUCTURE</span>
-            </div>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-red-600 via-blue-600 to-red-600 bg-clip-text text-transparent">
-              National Digital Infrastructure
-            </h2>
-            <div className="w-20 h-0.5 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mt-4 md:mt-6 rounded-full"></div>
+      {/* National Digital Infrastructure - Reduced text size */}
+      <section className="relative py-16 md:py-20 px-4 z-10">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 mb-4">
+            <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-xs font-bold tracking-wider">CORE INFRASTRUCTURE</span>
           </div>
-          
+          <h2 className="text-2xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-red-600 via-blue-600 to-red-600 bg-clip-text text-transparent">
+            National Digital Infrastructure
+          </h2>
+          <div className="w-16 h-0.5 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mt-4 rounded-full"></div>
+        </div>
+      </section>
+
+      {/* Company Overview Cards - Shortened Descriptions */}
+      <section className="relative py-4 md:py-8 px-4 z-10">
+        <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
             {[
               "A long-term national infrastructure platform becoming the core of Liberia's digital economy.",
@@ -257,59 +275,43 @@ export default function Home() {
             ].map((text, idx) => (
               <div key={idx} className="group relative bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:scale-105 hover:border-red-500/30">
                 <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-red-500/5 to-blue-500/5 rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
-                <p className="text-gray-700 leading-relaxed relative z-10 text-base md:text-lg">{text}</p>
+                <p className="text-gray-600 leading-relaxed relative z-10 text-base md:text-lg">{text}</p>
               </div>
             ))}
-          </div>
-          
-          <div className="mt-6 md:mt-8 group relative bg-gradient-to-r from-red-500/5 via-white/90 to-blue-500/5 backdrop-blur-xl rounded-2xl p-6 md:p-10 border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:scale-[1.02] hover:border-red-500/30">
-            <p className="text-gray-700 leading-relaxed text-center text-base md:text-xl">
-              One trusted platform for payments, identity, services, and digital access.
-            </p>
           </div>
         </div>
       </section>
 
-      {/* Ecosystem Pillars - Shortened Descriptions */}
+      {/* Ecosystem Components - Reduced text size, no badges, transparent icons */}
       <section className="relative py-20 md:py-28 px-4 bg-gradient-to-br from-red-50/30 to-blue-50/30 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 md:mb-16">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 mb-4">
               <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-xs font-bold tracking-wider">PILLARS OF PROGRESS</span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-red-600 via-blue-600 to-red-600 bg-clip-text text-transparent">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-red-600 via-blue-600 to-red-600 bg-clip-text text-transparent">
               Ecosystem Components
             </h2>
-            <div className="w-20 h-0.5 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mt-4 md:mt-6 rounded-full"></div>
-            <p className="text-gray-500 mt-4 md:mt-6 max-w-2xl mx-auto text-base md:text-lg">Integrated solutions powering Liberia's digital transformation</p>
+            <div className="w-16 h-0.5 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mt-4 rounded-full"></div>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {[
-              { title: "National Database", description: "Secure national data backbone with real-time analytics.", icon: "🏛️", badge: "Live" },
-              { title: "Digital Identity (DSSN)", description: "Your unique gateway to services and inclusion.", icon: "🆔", badge: "Live" },
-              { title: "LibPay", description: "Fast, secure payments for all transactions.", icon: "💳", badge: "Live" },
-              { title: "E-Government Services", description: "Streamlined digital access to government.", icon: "🏢", badge: "Coming Soon" },
-              { title: "Commerce & Logistics", description: "Integrated marketplace and delivery infrastructure.", icon: "📦", badge: "Coming Soon" },
-              { title: "Healthcare & Education", description: "Digital platforms for health and learning.", icon: "🏥", badge: "Coming Soon" }
+              { title: "National Database", description: "Secure national data backbone with real-time analytics.", icon: "🏛️" },
+              { title: "Digital Identity (DSSN)", description: "Your unique gateway to services and inclusion.", icon: "🆔" },
+              { title: "LibPay", description: "Fast, secure payments for all transactions.", icon: "💳" },
+              { title: "E-Government Services", description: "Streamlined digital access to government.", icon: "🏢" },
+              { title: "Commerce & Logistics", description: "Integrated marketplace and delivery infrastructure.", icon: "📦" },
+              { title: "Healthcare & Education", description: "Digital platforms for health and learning.", icon: "🏥" }
             ].map((pillar, idx) => (
               <div key={idx} className="group relative bg-gradient-to-br from-white to-white/90 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:scale-105 hover:border-red-500/30 cursor-default">
                 <div className="absolute top-0 right-0 w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-red-500/5 to-blue-500/5 rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-4 md:mb-6">
-                    <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-red-500/10 to-blue-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <div className="text-3xl md:text-4xl">{pillar.icon}</div>
-                    </div>
-                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                      pillar.badge === "Live" 
-                        ? "bg-green-100 text-green-700" 
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}>
-                      {pillar.badge}
-                    </span>
+                  <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform">
+                    <div className="text-2xl md:text-3xl opacity-80 group-hover:opacity-100 transition-opacity">{pillar.icon}</div>
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent group-hover:from-red-500 group-hover:to-blue-500 transition-all">{pillar.title}</h3>
-                  <p className="text-gray-600 text-sm md:text-base leading-relaxed">{pillar.description}</p>
+                  <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3 text-gray-800 group-hover:text-red-600 transition-colors">{pillar.title}</h3>
+                  <p className="text-gray-500 text-sm md:text-base leading-relaxed">{pillar.description}</p>
                 </div>
               </div>
             ))}
@@ -317,22 +319,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Problem & Solution - Shortened */}
+      {/* Problem & Solution */}
       <section className="relative py-20 md:py-28 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
             <div className="group relative bg-gradient-to-br from-red-500/5 to-transparent backdrop-blur-xl rounded-2xl p-6 md:p-10 border border-red-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/20 hover:scale-105 hover:border-red-500/30">
-              <div className="text-4xl md:text-5xl mb-4">⚡</div>
+              <div className="text-4xl md:text-5xl mb-4 opacity-80">⚡</div>
               <h3 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4 tracking-tight bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">The Challenge</h3>
-              <p className="text-gray-600 leading-relaxed text-base md:text-lg">
+              <p className="text-gray-500 leading-relaxed text-base md:text-lg">
                 Fragmented paper records and weak ID systems affecting service delivery.
               </p>
             </div>
             
             <div className="group relative bg-gradient-to-br from-blue-500/5 to-transparent backdrop-blur-xl rounded-2xl p-6 md:p-10 border border-blue-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 hover:scale-105 hover:border-blue-500/30">
-              <div className="text-4xl md:text-5xl mb-4">✨</div>
+              <div className="text-4xl md:text-5xl mb-4 opacity-80">✨</div>
               <h3 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4 tracking-tight bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">The Solution</h3>
-              <p className="text-gray-600 leading-relaxed text-base md:text-lg">
+              <p className="text-gray-500 leading-relaxed text-base md:text-lg">
                 Digital Liberia bridges gaps in access, trust, and inclusion.
               </p>
             </div>
@@ -349,7 +351,7 @@ export default function Home() {
               { quote: "Deliver secure, transparent governance while generating sustainable returns.", label: "Mission", icon: "🚀", color: "blue" }
             ].map((item, idx) => (
               <div key={idx} className={`group relative bg-gradient-to-br from-${item.color}-500/5 to-transparent backdrop-blur-xl rounded-2xl p-6 md:p-10 border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-${item.color}-500/20 hover:scale-105 text-center`}>
-                <div className="text-5xl md:text-6xl mb-4">{item.icon}</div>
+                <div className="text-5xl md:text-6xl mb-4 opacity-80">{item.icon}</div>
                 <div className="text-5xl md:text-6xl mb-4 md:mb-6 text-gray-300">"</div>
                 <p className="text-gray-700 text-xl md:text-2xl italic leading-relaxed mb-6 md:mb-8">
                   {item.quote}
@@ -363,16 +365,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Moving Partner Logos - Bottom Marquee */}
+      {/* Trusted By - Reduced logo sizes */}
       <section className="relative py-12 md:py-16 px-4 overflow-hidden z-10">
-        <div className="text-center mb-8 md:mb-10">
-          <p className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-xs md:text-sm uppercase tracking-wider font-bold mb-2">Trusted By</p>
-          <p className="text-gray-500 text-sm md:text-base">Ecosystem Partners</p>
+        <div className="text-center mb-8">
+          <p className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-xs uppercase tracking-wider font-bold mb-2">Trusted By</p>
+          <p className="text-gray-500 text-sm">Ecosystem Partners</p>
         </div>
         <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex animate-marquee-bottom gap-8 md:gap-12 lg:gap-20 whitespace-nowrap min-w-max">
+          <div className="flex animate-marquee-bottom gap-8 md:gap-12 whitespace-nowrap min-w-max">
             {[...partners, ...partners, ...partners].map((logo, idx) => (
-              <div key={idx} className="inline-flex items-center justify-center w-24 h-24 md:w-40 md:h-40 lg:w-56 lg:h-56 transition-all hover:scale-110 flex-shrink-0">
+              <div key={idx} className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 transition-all hover:scale-110 flex-shrink-0 opacity-70 hover:opacity-100">
                 <img 
                   src={logo} 
                   alt={`Partner ${idx}`}
@@ -385,36 +387,31 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section className="relative py-20 md:py-28 px-4 z-10">
-        <div className="max-w-4xl mx-auto">
-          <div className="group relative bg-gradient-to-br from-red-500/5 via-white/90 to-blue-500/5 backdrop-blur-xl rounded-2xl md:rounded-3xl p-8 md:p-12 text-center border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/20 hover:scale-105">
-            <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-blue-500/5 rounded-2xl md:rounded-3xl"></div>
-            <div className="relative">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-3 md:mb-4 bg-gradient-to-r from-red-600 via-blue-600 to-red-600 bg-clip-text text-transparent">Let's Connect</h2>
-              <div className="w-16 h-0.5 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mb-6 md:mb-10 rounded-full"></div>
-              
-              <div className="flex flex-col md:flex-row justify-center gap-6 md:gap-12">
-                <div className="space-y-3 md:space-y-4">
-                  <a href="mailto:info@digitalliberia.com" className="flex items-center justify-center space-x-2 md:space-x-3 text-gray-600 hover:text-red-600 transition-colors group text-base md:text-lg">
-                    <span className="text-xl md:text-2xl group-hover:translate-x-1 transition-transform">✉️</span>
-                    <span>info@digitalliberia.com</span>
-                  </a>
-                  <a href="https://wa.me/231888001077" className="flex items-center justify-center space-x-2 md:space-x-3 text-gray-600 hover:text-red-600 transition-colors group text-base md:text-lg">
-                    <span className="text-xl md:text-2xl group-hover:translate-x-1 transition-transform">📱</span>
-                    <span>WhatsApp: +231 888 001 077</span>
-                  </a>
-                </div>
-                <div className="space-y-3 md:space-y-4">
-                  <a href="tel:+231775055817" className="flex items-center justify-center space-x-2 md:space-x-3 text-gray-600 hover:text-blue-600 transition-colors group text-base md:text-lg">
-                    <span className="text-xl md:text-2xl group-hover:translate-x-1 transition-transform">📞</span>
-                    <span>Call: +231 775 055 817</span>
-                  </a>
-                </div>
-              </div>
-              
-              <p className="text-gray-400 text-xs md:text-sm mt-8 md:mt-12">Monday - Friday, 8:00 AM - 5:00 PM GMT</p>
+      {/* Let's Connect - Transparent icons, bold text */}
+      <section className="relative py-16 md:py-20 px-4 z-10">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+              Let's Connect
+            </h2>
+            <div className="w-12 h-0.5 bg-gradient-to-r from-red-500 to-blue-500 mx-auto mb-8 rounded-full"></div>
+            
+            <div className="flex flex-col md:flex-row justify-center gap-6 md:gap-10">
+              <a href="mailto:info@digitalliberia.com" className="flex items-center justify-center gap-3 text-gray-700 hover:text-red-600 transition-all duration-300 group">
+                <span className="text-2xl opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">✉️</span>
+                <span className="text-base md:text-lg font-semibold">info@digitalliberia.com</span>
+              </a>
+              <a href="https://wa.me/231888001077" className="flex items-center justify-center gap-3 text-gray-700 hover:text-red-600 transition-all duration-300 group">
+                <span className="text-2xl opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">📱</span>
+                <span className="text-base md:text-lg font-semibold">WhatsApp: +231 888 001 077</span>
+              </a>
+              <a href="tel:+231775055817" className="flex items-center justify-center gap-3 text-gray-700 hover:text-blue-600 transition-all duration-300 group">
+                <span className="text-2xl opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">📞</span>
+                <span className="text-base md:text-lg font-semibold">Call: +231 775 055 817</span>
+              </a>
             </div>
+            
+            <p className="text-gray-400 text-xs mt-8">Monday - Friday, 8:00 AM - 5:00 PM GMT</p>
           </div>
         </div>
       </section>
@@ -439,16 +436,25 @@ export default function Home() {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
+        @keyframes marquee-text {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
         .animate-marquee-top {
           animation: marquee-top 20s linear infinite;
           display: flex;
         }
         .animate-marquee-bottom {
-          animation: marquee-bottom 30s linear infinite;
+          animation: marquee-bottom 25s linear infinite;
+          display: flex;
+        }
+        .animate-marquee-text {
+          animation: marquee-text 25s linear infinite;
           display: flex;
         }
         .animate-marquee-top:hover,
-        .animate-marquee-bottom:hover {
+        .animate-marquee-bottom:hover,
+        .animate-marquee-text:hover {
           animation-play-state: paused;
         }
         
