@@ -155,7 +155,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Moving Partner Logos Bar - Below Navigation, Sticky - FIXED FOR MOBILE */}
+        {/* Moving Partner Logos Bar */}
         <div className="border-b border-gray-100 bg-white/80 backdrop-blur-sm overflow-hidden">
           <div className="py-2 md:py-3 overflow-x-auto scrollbar-hide">
             <div className="flex animate-marquee-top gap-8 md:gap-16 whitespace-nowrap min-w-max px-4">
@@ -173,7 +173,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Hero Section - World-Class Design */}
+      {/* Hero Section */}
       <section className="relative min-h-screen flex items-center pt-[140px] md:pt-60 pb-20 px-4 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -216,7 +216,28 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Company Overview - Premium Glass Cards */}
+      {/* Stats Section - NEW - Builds Credibility */}
+      <section className="relative py-16 md:py-20 px-4 z-10">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+            {[
+              { number: "16+", label: "Digital Products", icon: "🚀", desc: "Across the ecosystem" },
+              { number: "5", label: "Executive Leaders", icon: "👥", desc: "Driving innovation" },
+              { number: "15", label: "Counties", icon: "🗺️", desc: "Nationwide coverage" },
+              { number: "24/7", label: "Digital Infrastructure", icon: "⚡", desc: "Always available" }
+            ].map((stat, idx) => (
+              <div key={idx} className="group relative bg-gradient-to-br from-white to-white/90 backdrop-blur-xl rounded-2xl p-6 border border-gray-100 shadow-lg transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:scale-105 text-center">
+                <div className="text-4xl mb-3">{stat.icon}</div>
+                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">{stat.number}</div>
+                <div className="text-gray-800 font-semibold text-sm mt-2">{stat.label}</div>
+                <div className="text-gray-400 text-xs mt-1">{stat.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Company Overview - Shortened Descriptions */}
       <section className="relative py-20 md:py-28 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12 md:mb-16">
@@ -231,8 +252,8 @@ export default function Home() {
           
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
             {[
-              "Digital Liberia is being developed as more than a software company. It is structured as a long-term national infrastructure platform designed to become a core part of Liberia's digital economy.",
-              "The company combines digital public infrastructure, secure payments, digital identity systems, e-government services, commerce, logistics, financial technology, healthcare access, land management, data infrastructure, and business enablement into one connected digital environment."
+              "A long-term national infrastructure platform becoming the core of Liberia's digital economy.",
+              "Unified digital ecosystem combining payments, identity, government services, commerce, and more."
             ].map((text, idx) => (
               <div key={idx} className="group relative bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:scale-105 hover:border-red-500/30">
                 <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-red-500/5 to-blue-500/5 rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
@@ -243,13 +264,13 @@ export default function Home() {
           
           <div className="mt-6 md:mt-8 group relative bg-gradient-to-r from-red-500/5 via-white/90 to-blue-500/5 backdrop-blur-xl rounded-2xl p-6 md:p-10 border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:scale-[1.02] hover:border-red-500/30">
             <p className="text-gray-700 leading-relaxed text-center text-base md:text-xl">
-              At the center of this strategy is the vision to build a unified ecosystem where citizens can access services, make payments, verify identity, conduct business, receive public services, access marketplaces, and interact digitally through one trusted platform.
+              One trusted platform for payments, identity, services, and digital access.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Ecosystem - Premium Grid - NON-CLICKABLE */}
+      {/* Ecosystem Pillars - Shortened Descriptions */}
       <section className="relative py-20 md:py-28 px-4 bg-gradient-to-br from-red-50/30 to-blue-50/30 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 md:mb-16">
@@ -265,20 +286,29 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {[
-              { title: "National Database Management", description: "Secure, centralized national data backbone enabling real-time analytics and access control across all government ministries.", icon: "🏛️", gradient: "from-red-500/20 to-red-600/10" },
-              { title: "Digital Identity (DSSN)", description: "Unique, immutable identifier assigned to every individual - your gateway to services, recognition, and inclusion.", icon: "🆔", gradient: "from-blue-500/20 to-blue-600/10" },
-              { title: "LibPay", description: "Fast, reliable, and secure payment gateway for all financial transactions across Liberia.", icon: "💳", gradient: "from-red-500/20 to-red-600/10" },
-              { title: "E-Government Services", description: "Streamlined digital access to government services, reducing friction and improving delivery.", icon: "🏢", gradient: "from-blue-500/20 to-blue-600/10" },
-              { title: "Commerce & Logistics", description: "Integrated marketplace and logistics infrastructure enabling business growth.", icon: "📦", gradient: "from-red-500/20 to-red-600/10" },
-              { title: "Healthcare & Education", description: "Digital platforms improving access to healthcare records and educational tracking.", icon: "🏥", gradient: "from-blue-500/20 to-blue-600/10" }
+              { title: "National Database", description: "Secure national data backbone with real-time analytics.", icon: "🏛️", badge: "Live" },
+              { title: "Digital Identity (DSSN)", description: "Your unique gateway to services and inclusion.", icon: "🆔", badge: "Live" },
+              { title: "LibPay", description: "Fast, secure payments for all transactions.", icon: "💳", badge: "Live" },
+              { title: "E-Government Services", description: "Streamlined digital access to government.", icon: "🏢", badge: "Coming Soon" },
+              { title: "Commerce & Logistics", description: "Integrated marketplace and delivery infrastructure.", icon: "📦", badge: "Coming Soon" },
+              { title: "Healthcare & Education", description: "Digital platforms for health and learning.", icon: "🏥", badge: "Coming Soon" }
             ].map((pillar, idx) => (
               <div key={idx} className="group relative bg-gradient-to-br from-white to-white/90 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:scale-105 hover:border-red-500/30 cursor-default">
                 <div className="absolute top-0 right-0 w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-red-500/5 to-blue-500/5 rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
                 <div className="relative z-10">
-                  <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-red-500/10 to-blue-500/10 rounded-2xl flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform">
-                    <div className="text-3xl md:text-4xl">{pillar.icon}</div>
+                  <div className="flex items-center justify-between mb-4 md:mb-6">
+                    <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-red-500/10 to-blue-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="text-3xl md:text-4xl">{pillar.icon}</div>
+                    </div>
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                      pillar.badge === "Live" 
+                        ? "bg-green-100 text-green-700" 
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}>
+                      {pillar.badge}
+                    </span>
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent group-hover:from-red-500 group-hover:to-blue-500 transition-all">{pillar.title}</h3>
+                  <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent group-hover:from-red-500 group-hover:to-blue-500 transition-all">{pillar.title}</h3>
                   <p className="text-gray-600 text-sm md:text-base leading-relaxed">{pillar.description}</p>
                 </div>
               </div>
@@ -287,7 +317,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Problem & Solution - Split Premium */}
+      {/* Problem & Solution - Shortened */}
       <section className="relative py-20 md:py-28 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
@@ -295,7 +325,7 @@ export default function Home() {
               <div className="text-4xl md:text-5xl mb-4">⚡</div>
               <h3 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4 tracking-tight bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">The Challenge</h3>
               <p className="text-gray-600 leading-relaxed text-base md:text-lg">
-                Fragmented, paper-based records and weak identification systems have impacted government service delivery, electoral credibility, healthcare access, educational tracking, and national security.
+                Fragmented paper records and weak ID systems affecting service delivery.
               </p>
             </div>
             
@@ -303,20 +333,20 @@ export default function Home() {
               <div className="text-4xl md:text-5xl mb-4">✨</div>
               <h3 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4 tracking-tight bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">The Solution</h3>
               <p className="text-gray-600 leading-relaxed text-base md:text-lg">
-                Digital Liberia solves structural gaps in access, service delivery, trust, efficiency, and inclusion across both public and private sectors.
+                Digital Liberia bridges gaps in access, trust, and inclusion.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Vision & Mission - Premium Quotes */}
+      {/* Vision & Mission */}
       <section className="relative py-20 md:py-28 px-4 bg-gradient-to-br from-red-50/30 to-blue-50/30 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
             {[
               { quote: "To become the digital backbone of Liberia—empowering people and the economy.", label: "Vision", icon: "🎯", color: "red" },
-              { quote: "Deliver a secure platform for transparent governance and accessible services while generating sustainable long-term returns.", label: "Mission", icon: "🚀", color: "blue" }
+              { quote: "Deliver secure, transparent governance while generating sustainable returns.", label: "Mission", icon: "🚀", color: "blue" }
             ].map((item, idx) => (
               <div key={idx} className={`group relative bg-gradient-to-br from-${item.color}-500/5 to-transparent backdrop-blur-xl rounded-2xl p-6 md:p-10 border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-${item.color}-500/20 hover:scale-105 text-center`}>
                 <div className="text-5xl md:text-6xl mb-4">{item.icon}</div>
@@ -333,7 +363,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Moving Partner Logos - Bottom Marquee (ORIGINAL - VISIBLE ON ALL DEVICES) */}
+      {/* Moving Partner Logos - Bottom Marquee */}
       <section className="relative py-12 md:py-16 px-4 overflow-hidden z-10">
         <div className="text-center mb-8 md:mb-10">
           <p className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-xs md:text-sm uppercase tracking-wider font-bold mb-2">Trusted By</p>
@@ -355,7 +385,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contact - Premium Glass */}
+      {/* Contact Section */}
       <section className="relative py-20 md:py-28 px-4 z-10">
         <div className="max-w-4xl mx-auto">
           <div className="group relative bg-gradient-to-br from-red-500/5 via-white/90 to-blue-500/5 backdrop-blur-xl rounded-2xl md:rounded-3xl p-8 md:p-12 text-center border border-gray-100 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/20 hover:scale-105">
@@ -431,7 +461,6 @@ export default function Home() {
           animation: gradient 3s ease infinite;
         }
         
-        /* Hide scrollbar for partner logos */
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
