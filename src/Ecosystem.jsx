@@ -3,209 +3,195 @@ import { Link } from "react-router-dom";
 
 const ecosystemData = [
   {
-    category: "Digital Public Infrastructure / E-Government Services",
+    category: "Digital Public Infrastructure",
     icon: "🏛️",
-    description: "Technology systems enabling government services to be delivered digitally to citizens through secure online platforms.",
+    description: "Secure government services delivered digitally to citizens.",
+    status: "Live",
     services: [
       "Digital citizen service access",
       "Permits and registration systems",
       "Digital public records",
-      "Service request platforms",
-      "Digital government transactions",
-      "Secure citizen verification systems"
+      "Service request platforms"
     ]
   },
   {
-    category: "FinTech / Digital Payments / Mobile Money",
+    category: "FinTech & Digital Payments",
     icon: "💳",
-    description: "Secure financial infrastructure enabling seamless digital transactions across Liberia.",
+    description: "Secure financial infrastructure for seamless digital transactions.",
+    status: "Live",
     services: [
       "Wallet services",
       "Peer-to-peer transfers",
       "Merchant payments",
-      "Mobile money integration",
-      "Digital checkout",
-      "Business payment acceptance",
-      "Transaction processing",
-      "Settlement systems"
+      "Mobile money integration"
     ]
   },
   {
-    category: "LibPay Secure Payment Platform",
+    category: "LibPay Payment Platform",
     icon: "🔒",
-    description: "LibPay serves as Digital Liberia's payment engine, designed to provide secure and scalable digital payments.",
+    description: "Digital Liberia's secure and scalable payment engine.",
+    status: "Live",
     services: [
       "Consumer payments",
       "Merchant payments",
       "Online commerce",
-      "Institutional payments",
-      "Business integrations",
-      "Future government payment processing"
+      "Institutional payments"
     ]
   },
   {
-    category: "National Identity & Database Management Systems",
+    category: "National Identity & Database",
     icon: "🆔",
-    description: "Secure identity verification, citizen record management, and digital authentication capabilities.",
+    description: "Secure identity verification and citizen record management.",
+    status: "Live",
     services: [
-      "DSSN - Digital Social Security Number infrastructure",
-      "NDMS - National Database Management System",
+      "DSSN - Digital Social Security Number",
+      "NDMS - National Database System",
       "Secure identity verification",
-      "Citizen record management",
-      "Digital authentication capabilities"
+      "Citizen record management"
     ]
   },
   {
-    category: "Merchant & Business Services Portals",
+    category: "Merchant & Business Services",
     icon: "🏪",
-    description: "Digital tools supporting merchants and SMEs to grow their business online.",
+    description: "Digital tools helping SMEs grow their business online.",
+    status: "Live",
     services: [
       "Digital storefronts",
       "Payment acceptance",
       "Inventory support",
-      "Reporting dashboards",
-      "Transaction records",
-      "Business integrations"
+      "Reporting dashboards"
     ]
   },
   {
     category: "E-Commerce Marketplace",
     icon: "🛒",
-    description: "A centralized commerce platform enabling Liberian businesses to sell products and services digitally.",
+    description: "Centralized platform for Liberian businesses to sell online.",
+    status: "Coming Soon",
     services: [
       "Product listings",
       "Secure checkout",
       "Seller dashboards",
-      "Customer reviews",
-      "Order management",
-      "Digital marketing tools"
+      "Order management"
     ]
   },
   {
-    category: "Logistics & Delivery Infrastructure",
+    category: "Logistics & Delivery",
     icon: "📦",
-    description: "Supporting the movement of goods through integrated digital logistics systems.",
+    description: "Integrated digital logistics for goods movement.",
+    status: "Coming Soon",
     services: [
       "Digital dispatch",
       "Order fulfillment",
       "Courier tracking",
-      "Customer delivery management",
-      "Merchant logistics integration"
+      "Delivery management"
     ]
   },
   {
-    category: "Digital Land Management & Security Systems",
+    category: "Digital Land Management",
     icon: "🏞️",
-    description: "Secure land documentation, digital records, mapping, registration, and property management infrastructure.",
+    description: "Secure land documentation and property management.",
+    status: "Coming Soon",
     services: [
       "Secure land documentation",
       "Digital property records",
-      "Land mapping systems",
-      "Property registration",
-      "Title management"
+      "Land mapping",
+      "Property registration"
     ]
   },
   {
-    category: "Real Estate Digital Integration",
+    category: "Real Estate Integration",
     icon: "🏠",
-    description: "Technology for property listing, management, documentation, and secure real estate transactions.",
+    description: "Technology for property listing and secure transactions.",
+    status: "Coming Soon",
     services: [
       "Property listings",
       "Digital documentation",
       "Secure transactions",
-      "Property management",
-      "Real estate analytics"
+      "Property management"
     ]
   },
   {
     category: "Social Networking Platform",
     icon: "👥",
-    description: "A Liberian-centered social interaction and digital community platform integrated within the ecosystem.",
+    description: "Liberian-centered social and community platform.",
+    status: "Coming Soon",
     services: [
       "Community forums",
       "User profiles",
       "Content sharing",
-      "Messaging system",
-      "Group discussions",
-      "Event planning"
+      "Messaging system"
     ]
   },
   {
-    category: "Music & Entertainment Streaming Services",
+    category: "Music & Entertainment",
     icon: "🎵",
-    description: "Digital distribution infrastructure for entertainment, artists, streaming, and local content monetization.",
+    description: "Streaming and content monetization for local artists.",
+    status: "Coming Soon",
     services: [
       "Music streaming",
       "Artist profiles",
       "Content monetization",
-      "Playlist creation",
-      "Local content promotion",
-      "Royalty management"
+      "Playlist creation"
     ]
   },
   {
     category: "Digital Health / Telemedicine",
     icon: "🏥",
-    description: "Technology-driven healthcare access including remote consultations and digital medical access.",
+    description: "Remote healthcare access and digital medical records.",
+    status: "Coming Soon",
     services: [
       "Remote consultations",
       "Digital medical records",
-      "Healthcare service coordination",
-      "Appointment scheduling",
-      "Prescription management",
-      "Health analytics"
+      "Healthcare coordination",
+      "Appointment scheduling"
     ]
   },
   {
-    category: "AgriTech & Rural Product Market Platforms",
+    category: "AgriTech Platforms",
     icon: "🌾",
-    description: "Supporting agricultural producers with digital access to markets, buyers, and distribution opportunities.",
+    description: "Digital market access for agricultural producers.",
+    status: "Coming Soon",
     services: [
       "Market access platforms",
       "Buyer connections",
       "Pricing information",
-      "Distribution logistics",
-      "Farmer support tools",
-      "Crop tracking"
+      "Distribution logistics"
     ]
   },
   {
-    category: "Data Analytics & Open Data Infrastructure",
+    category: "Data Analytics & Open Data",
     icon: "📊",
-    description: "Supporting insight generation, analytics, and responsible digital data systems.",
+    description: "Insight generation and responsible data systems.",
+    status: "Coming Soon",
     services: [
       "Business intelligence",
       "Data visualization",
       "Open data portals",
-      "Analytics dashboards",
-      "Reporting tools",
-      "Data governance"
+      "Analytics dashboards"
     ]
   },
   {
-    category: "Cybersecurity & Digital Resilience",
+    category: "Cybersecurity & Resilience",
     icon: "🛡️",
-    description: "Secure infrastructure protecting systems, transactions, users, and institutional integrations.",
+    description: "Protecting systems, transactions, and user data.",
+    status: "Coming Soon",
     services: [
       "Threat detection",
       "Data encryption",
       "Security monitoring",
-      "Incident response",
-      "Compliance management",
-      "Risk assessment"
+      "Incident response"
     ]
   },
   {
-    category: "Technology Ecosystem & Startup Support",
+    category: "Startup & Tech Ecosystem",
     icon: "🚀",
-    description: "Building long-term innovation capacity by supporting local entrepreneurship, startups, developers, and digital talent.",
+    description: "Supporting local entrepreneurship and digital talent.",
+    status: "Coming Soon",
     services: [
       "Startup incubation",
       "Developer tools",
       "Tech training programs",
-      "Innovation grants",
-      "Mentorship network",
-      "API documentation"
+      "Innovation grants"
     ]
   }
 ];
@@ -339,12 +325,36 @@ export default function Ecosystem() {
             </span>
           </h1>
           <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-            Digital Liberia is building an integrated portfolio of digital infrastructure products and services designed to transform the nation's digital economy.
+            An integrated portfolio of digital infrastructure products transforming Liberia's digital economy.
           </p>
         </div>
       </section>
 
-      {/* Ecosystem Cards Grid */}
+      {/* Stats Summary */}
+      <section className="relative py-8 px-4 z-10">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div className="p-4">
+              <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">16+</div>
+              <div className="text-gray-500 text-xs md:text-sm">Products</div>
+            </div>
+            <div className="p-4">
+              <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">4</div>
+              <div className="text-gray-500 text-xs md:text-sm">Live Now</div>
+            </div>
+            <div className="p-4">
+              <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">12</div>
+              <div className="text-gray-500 text-xs md:text-sm">Coming Soon</div>
+            </div>
+            <div className="p-4">
+              <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">15</div>
+              <div className="text-gray-500 text-xs md:text-sm">Counties</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Ecosystem Cards Grid - Optimized */}
       <section className="relative py-12 md:py-20 px-4 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -356,8 +366,17 @@ export default function Ecosystem() {
               >
                 <div className="absolute top-0 right-0 w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-red-500/5 to-blue-500/5 rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
                 <div className="relative z-10">
-                  <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-red-500/10 to-blue-500/10 rounded-2xl flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform">
-                    <div className="text-3xl md:text-4xl">{item.icon}</div>
+                  <div className="flex items-center justify-between mb-4 md:mb-6">
+                    <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-red-500/10 to-blue-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="text-3xl md:text-4xl">{item.icon}</div>
+                    </div>
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                      item.status === "Live" 
+                        ? "bg-green-100 text-green-700" 
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}>
+                      {item.status}
+                    </span>
                   </div>
                   <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
                     {item.category}
@@ -366,7 +385,7 @@ export default function Ecosystem() {
                     {item.description}
                   </p>
                   
-                  {/* Expandable Services List */}
+                  {/* Expandable Services List - Reduced to 4 key services */}
                   <div className={`overflow-hidden transition-all duration-500 ${expandedCard === index ? 'max-h-96' : 'max-h-0'}`}>
                     <div className="pt-4 border-t border-gray-100 mt-2">
                       <h4 className="text-sm font-semibold text-gray-700 mb-3">Key Services:</h4>
