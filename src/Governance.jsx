@@ -306,8 +306,8 @@ export default function Governance() {
                   <h3 className="text-xl md:text-2xl font-bold mb-1 text-gray-900 text-center">{member.name}</h3>
                   <p className="text-red-600 text-sm md:text-base font-semibold mb-4 text-center">{member.title}</p>
                   
-                  {/* Expandable Content */}
-                  <div className={`overflow-hidden transition-all duration-500 ${expandedCard === index ? 'max-h-[600px]' : 'max-h-0'}`}>
+                  {/* Expandable Content - Increased max-height to show all content */}
+                  <div className={`overflow-hidden transition-all duration-500 ${expandedCard === index ? 'max-h-[800px]' : 'max-h-0'}`}>
                     <div className="pt-4 border-t border-gray-100 mt-2">
                       {/* Highlights Section (for members with highlights) */}
                       {member.highlights && (
@@ -316,7 +316,7 @@ export default function Governance() {
                           <ul className="space-y-2">
                             {member.highlights.map((highlight, idx) => (
                               <li key={idx} className="text-gray-600 text-sm flex items-start gap-2">
-                                <span className="text-blue-500 mt-1">✦</span>
+                                <span className="text-blue-500 mt-1 flex-shrink-0">✦</span>
                                 <span>{highlight}</span>
                               </li>
                             ))}
@@ -329,7 +329,7 @@ export default function Governance() {
                       <ul className="space-y-2">
                         {member.responsibilities.map((resp, idx) => (
                           <li key={idx} className="text-gray-600 text-sm flex items-start gap-2">
-                            <span className="text-red-500 mt-1">▹</span>
+                            <span className="text-red-500 mt-1 flex-shrink-0">▹</span>
                             <span>{resp}</span>
                           </li>
                         ))}
