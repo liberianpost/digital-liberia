@@ -273,7 +273,7 @@ export default function Governance() {
         </div>
       </section>
 
-      {/* Leadership Team Grid - Increased card sizes */}
+      {/* Leadership Team Grid - Increased max-height for expanded content */}
       <section className="relative py-12 md:py-20 px-4 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 md:mb-16">
@@ -310,14 +310,14 @@ export default function Governance() {
                   <h3 className="text-xl md:text-2xl font-bold mb-2 text-white text-center">{member.name}</h3>
                   <p className="text-red-400 text-base md:text-lg font-semibold mb-5 text-center">{member.title}</p>
                   
-                  {/* Expandable Content */}
-                  <div className={`overflow-hidden transition-all duration-500 ${expandedCard === index ? 'max-h-[800px]' : 'max-h-0'}`}>
+                  {/* Expandable Content - Increased max-height to show all content */}
+                  <div className={`overflow-y-auto transition-all duration-500 ${expandedCard === index ? 'max-h-[1200px]' : 'max-h-0'}`}>
                     <div className="pt-5 border-t border-white/10 mt-2">
                       {/* Highlights Section (for members with highlights) */}
                       {member.highlights && (
                         <div className="mb-5">
                           <h4 className="text-sm font-semibold text-white/60 mb-3">Professional Highlights:</h4>
-                          <ul className="space-y-2">
+                          <ul className="space-y-3">
                             {member.highlights.map((highlight, idx) => (
                               <li key={idx} className="text-white/50 text-sm flex items-start gap-2">
                                 <span className="text-blue-400 mt-1 flex-shrink-0">✦</span>
@@ -330,7 +330,7 @@ export default function Governance() {
                       
                       {/* Responsibilities Section */}
                       <h4 className="text-sm font-semibold text-white/60 mb-3">Key Responsibilities:</h4>
-                      <ul className="space-y-2">
+                      <ul className="space-y-3">
                         {member.responsibilities.map((resp, idx) => (
                           <li key={idx} className="text-white/50 text-sm flex items-start gap-2">
                             <span className="text-red-400 mt-1 flex-shrink-0">▹</span>
