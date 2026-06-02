@@ -273,7 +273,7 @@ export default function Governance() {
         </div>
       </section>
 
-      {/* Leadership Team Grid */}
+      {/* Leadership Team Grid - Increased card sizes */}
       <section className="relative py-12 md:py-20 px-4 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 md:mb-16">
@@ -286,17 +286,17 @@ export default function Governance() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
             {leadershipTeam.map((member, index) => (
               <div 
                 key={index} 
-                className="group relative bg-white/5 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:scale-105 hover:border-red-500/30 cursor-pointer"
+                className="group relative bg-white/5 backdrop-blur-xl rounded-2xl p-8 md:p-10 border border-white/10 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:scale-105 hover:border-red-500/30 cursor-pointer"
                 onClick={() => setExpandedCard(expandedCard === index ? null : index)}
               >
                 <div className="absolute top-0 right-0 w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-red-500/10 to-blue-500/10 rounded-full blur-2xl group-hover:opacity-100 opacity-0 transition-opacity"></div>
                 <div className="relative z-10">
-                  {/* Image or Icon Container */}
-                  <div className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-4 md:mb-6 rounded-2xl overflow-hidden bg-gradient-to-br from-red-500/10 to-blue-500/10 flex items-center justify-center group-hover:scale-105 transition-transform border-2 border-white/20 shadow-xl">
+                  {/* Image or Icon Container - Slightly larger */}
+                  <div className="w-36 h-36 md:w-44 md:h-44 mx-auto mb-5 md:mb-7 rounded-2xl overflow-hidden bg-gradient-to-br from-red-500/10 to-blue-500/10 flex items-center justify-center group-hover:scale-105 transition-transform border-2 border-white/20 shadow-xl">
                     {member.image ? (
                       <img 
                         src={member.image} 
@@ -307,21 +307,21 @@ export default function Governance() {
                       <div className="text-5xl md:text-6xl opacity-80">{member.icon}</div>
                     )}
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-1 text-white text-center">{member.name}</h3>
-                  <p className="text-red-400 text-sm md:text-base font-semibold mb-4 text-center">{member.title}</p>
+                  <h3 className="text-xl md:text-2xl font-bold mb-2 text-white text-center">{member.name}</h3>
+                  <p className="text-red-400 text-base md:text-lg font-semibold mb-5 text-center">{member.title}</p>
                   
                   {/* Expandable Content */}
                   <div className={`overflow-hidden transition-all duration-500 ${expandedCard === index ? 'max-h-[800px]' : 'max-h-0'}`}>
-                    <div className="pt-4 border-t border-white/10 mt-2">
+                    <div className="pt-5 border-t border-white/10 mt-2">
                       {/* Highlights Section (for members with highlights) */}
                       {member.highlights && (
-                        <div className="mb-4">
+                        <div className="mb-5">
                           <h4 className="text-sm font-semibold text-white/60 mb-3">Professional Highlights:</h4>
                           <ul className="space-y-2">
                             {member.highlights.map((highlight, idx) => (
                               <li key={idx} className="text-white/50 text-sm flex items-start gap-2">
                                 <span className="text-blue-400 mt-1 flex-shrink-0">✦</span>
-                                <span>{highlight}</span>
+                                <span className="leading-relaxed">{highlight}</span>
                               </li>
                             ))}
                           </ul>
@@ -334,22 +334,22 @@ export default function Governance() {
                         {member.responsibilities.map((resp, idx) => (
                           <li key={idx} className="text-white/50 text-sm flex items-start gap-2">
                             <span className="text-red-400 mt-1 flex-shrink-0">▹</span>
-                            <span>{resp}</span>
+                            <span className="leading-relaxed">{resp}</span>
                           </li>
                         ))}
                       </ul>
                       
                       {/* Note Section */}
                       {member.note && (
-                        <div className="mt-4 p-3 bg-gradient-to-r from-red-500/10 to-blue-500/10 rounded-lg border border-red-500/20">
-                          <p className="text-white/60 text-xs italic">📌 {member.note}</p>
+                        <div className="mt-5 p-3 bg-gradient-to-r from-red-500/10 to-blue-500/10 rounded-lg border border-red-500/20">
+                          <p className="text-white/60 text-xs italic leading-relaxed">📌 {member.note}</p>
                         </div>
                       )}
                     </div>
                   </div>
                   
                   {/* Expand/Collapse Indicator */}
-                  <div className="mt-4 text-center">
+                  <div className="mt-5 text-center">
                     <span className="text-xs text-white/30 group-hover:text-red-400 transition-colors">
                       {expandedCard === index ? '▲ Click to collapse' : '▼ Click to expand'}
                     </span>
