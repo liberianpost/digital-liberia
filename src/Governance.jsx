@@ -5,8 +5,8 @@ const leadershipTeam = [
   {
     name: "Sullivan T. Doeblah",
     title: "Chairman of the Board",
-    icon: "👨‍💼",
-    image: null,
+    icon: null,
+    image: "/logos/PHOTO-2025-11-28-16-48-33.png",
     gradient: "from-red-500/20 to-red-600/10",
     responsibilities: [
       "Board coordination and leadership alignment",
