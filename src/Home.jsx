@@ -274,15 +274,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Partner Logos - Premium Marquee with TRANSPARENT BACKGROUNDS - FORCE IMAGES TO SHOW */}
+      {/* Partner Logos - Pure Logos Only, No Icons, LARGER SIZE */}
       <section className="relative py-20 px-4 overflow-hidden z-10">
         <div className="text-center mb-12">
           <p className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-sm uppercase tracking-wider font-bold mb-2">Trusted By</p>
           <p className="text-gray-500 text-lg">Ecosystem Partners</p>
         </div>
-        <div className="flex animate-marquee space-x-20 whitespace-nowrap">
+        <div className="flex animate-marquee space-x-16 whitespace-nowrap">
           {[...partners, ...partners].map((logo, idx) => (
-            <div key={idx} className="inline-flex items-center justify-center w-44 h-44 rounded-2xl p-5 transition-all hover:scale-110 bg-white shadow-lg border border-gray-200">
+            <div key={idx} className="inline-flex items-center justify-center w-56 h-56 transition-all hover:scale-110">
               <img 
                 src={logo} 
                 alt={`Partner ${idx}`}
