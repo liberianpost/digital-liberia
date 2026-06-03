@@ -8,6 +8,12 @@ const leadershipTeam = [
     icon: null,
     image: "/logos/PHOTO-2025-11-28-16-48-33.png",
     gradient: "from-red-500/20 to-red-600/10",
+    highlights: [
+      "Technology Entrepreneur & Organizational Builder: Founder of Technical Solutions Liberia (TSL), Inc., Founder of the Environmental & Conserve Health Organization (ECHO), and Co-Founder of Ducor Tech Haven, with demonstrated success in building and leading organizations that leverage technology, innovation, and strategic partnerships to drive sustainable impact.",
+      "ICT & Digital Transformation Leader: Accomplished technology professional with extensive experience in network infrastructure, systems administration, IT operations, technical leadership, and digital transformation initiatives across Liberia’s corporate and telecommunications sectors.",
+      "Strategic Innovator in Governance & Public Sector Modernization: Passionate advocate for digital governance, automation, and data-driven solutions, with experience supporting initiatives that strengthen institutional efficiency, improve service delivery, enhance transparency, and modernize public-sector operations.",
+      "Community Impact & Sustainability Champion: Recognized for leadership in environmental stewardship, civic engagement, and community development, combining technology, stakeholder collaboration, and social innovation to advance sustainable development and long-term resilience within Liberia and the broader region."
+    ],
     responsibilities: [
       "Board coordination and leadership alignment",
       "Strategic oversight of infrastructure development",
