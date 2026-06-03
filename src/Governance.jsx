@@ -10,7 +10,7 @@ const leadershipTeam = [
     gradient: "from-red-500/20 to-red-600/10",
     highlights: [
       "Technology Entrepreneur & Organizational Builder: Founder of Technical Solutions Liberia (TSL), Inc., Founder of the Environmental & Conserve Health Organization (ECHO), and Co-Founder of Ducor Tech Haven, with demonstrated success in building and leading organizations that leverage technology, innovation, and strategic partnerships to drive sustainable impact.",
-      "ICT & Digital Transformation Leader: Accomplished technology professional with extensive experience in network infrastructure, systems administration, IT operations, technical leadership, and digital transformation initiatives across Liberia’s corporate and telecommunications sectors.",
+      "ICT & Digital Transformation Leader: Accomplished technology professional with extensive experience in network infrastructure, systems administration, IT operations, technical leadership, and digital transformation initiatives across Liberia's corporate and telecommunications sectors.",
       "Strategic Innovator in Governance & Public Sector Modernization: Passionate advocate for digital governance, automation, and data-driven solutions, with experience supporting initiatives that strengthen institutional efficiency, improve service delivery, enhance transparency, and modernize public-sector operations.",
       "Community Impact & Sustainability Champion: Recognized for leadership in environmental stewardship, civic engagement, and community development, combining technology, stakeholder collaboration, and social innovation to advance sustainable development and long-term resilience within Liberia and the broader region."
     ],
@@ -55,6 +55,7 @@ const leadershipTeam = [
     highlights: [
       "FinTech Entrepreneur & Founder: Founder and owner of Solid, focused on building innovative financial technology solutions that advance digital payments, financial access, and technology-driven economic growth.",
       "Full-Stack Software Developer & Systems Builder: Experienced software developer with expertise across frontend development, backend engineering, cloud infrastructure, and scalable system architecture, with hands-on experience building end-to-end digital platforms and products.",
+      "Data Analytics & Data Architecture: Skilled in analyzing and interpreting data from both relational and non-relational database environments, utilizing technologies such as MySQL, PostgreSQL, SQL Server, MongoDB, and Redis to drive data-informed decision-making, business intelligence, product development, risk assessment, and organizational growth.",
       "Investor & Financial Markets Trader: Active investor and trader in the financial markets with experience in market analysis, capital allocation, risk management, and identifying growth opportunities across global financial assets."
     ],
     responsibilities: [
