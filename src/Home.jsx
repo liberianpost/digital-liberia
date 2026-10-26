@@ -19,23 +19,23 @@ const featureCards = [
     tag: "LibPay",
     title: "Payments, Reimagined",
     text: "LibPay enables person-to-person, business-to-business, and customer-to-business transactions — connecting merchants, customers, and financial institutions across every relevant payment channel.",
-    cta: "See LibPay",
-    to: "/ecosystem",
+    cta: "What We Do",
+    to: "/what-we-do",
   },
   {
     image: "/logos/tomato.jpeg",
-    tag: "One Ecosystem",
+    tag: "Connected Economy",
     title: "Multiple Solutions. One Connected Economy.",
     text: "One ecosystem. Multiple solutions. A connected digital economy built to move Liberia forward — from identity to commerce to government services.",
-    cta: "Explore Ecosystem",
-    to: "/ecosystem",
+    cta: "What We Do",
+    to: "/what-we-do",
   },
   {
     image: "/logos/inventory.jpeg",
     tag: "The Challenge",
     title: "Breaking Free From Fragmentation",
     text: "Cash-dependent transactions, manual inventory, fragmented records, disconnected systems, and barriers to digitization hold Liberia back. Digital Liberia removes them.",
-    cta: "How We Solve It",
+    cta: "Why We're Different",
     to: "/what-makes-us-different",
   },
 ];
@@ -106,17 +106,17 @@ export default function Home() {
 
             <div className="flex flex-wrap gap-4 pt-2">
               <Link
-                to="/ecosystem"
+                to="/what-we-do"
                 className="group relative px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-red-600 to-blue-600 rounded-xl font-bold text-white shadow-lg shadow-red-500/25 hover:shadow-2xl hover:shadow-red-500/40 transition-all transform hover:scale-105 overflow-hidden text-sm md:text-base"
               >
-                <span className="relative z-10">Explore Ecosystem →</span>
+                <span className="relative z-10">What We Do →</span>
                 <span className="absolute inset-0 bg-gradient-to-r from-red-700 to-blue-700 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
               </Link>
               <Link
-                to="/investors"
+                to="/who-we-are"
                 className="px-6 py-3 md:px-8 md:py-4 border-2 border-white/20 rounded-xl font-bold text-white hover:border-red-500 hover:text-red-400 transition-all backdrop-blur-sm text-sm md:text-base"
               >
-                Partner With Us
+                Who We Are
               </Link>
             </div>
           </div>
@@ -208,10 +208,10 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
-                  to="/investors/why-partner"
+                  to="/what-we-do"
                   className="px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-red-600 to-blue-600 rounded-xl font-bold text-white shadow-lg shadow-red-500/25 hover:shadow-2xl hover:scale-105 transition-all text-sm md:text-base"
                 >
-                  Become a Partner
+                  See What We Do
                 </Link>
                 <Link
                   to="/who-we-are"
