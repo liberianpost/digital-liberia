@@ -56,17 +56,15 @@ function debugLazy(importFn, name) {
 // ====================
 // Core Website Pages
 // ====================
-const Ecosystem = debugLazy(() => import("./Ecosystem"), "Ecosystem");
-const BusinessModel = debugLazy(() => import("./BusinessModel"), "BusinessModel");
 const Governance = debugLazy(() => import("./Governance"), "Governance");
 
 // ====================
-// Who We Are
+// Pages (in src/pages/)
 // ====================
-const WhoWeAre = debugLazy(() => import("./WhoWeAre"), "WhoWeAre");
-const WhatWeDo = debugLazy(() => import("./WhatWeDo"), "WhatWeDo");
+const WhoWeAre = debugLazy(() => import("./pages/WhoWeAre"), "WhoWeAre");
+const WhatWeDo = debugLazy(() => import("./pages/WhatWeDo"), "WhatWeDo");
 const WhatMakesUsDifferent = debugLazy(
-  () => import("./WhatMakesUsDifferent"),
+  () => import("./pages/WhatMakesUsDifferent"),
   "WhatMakesUsDifferent"
 );
 
@@ -81,18 +79,41 @@ const AppRoutes = () => {
       {/* Main Website Routes */}
       {/* ==================== */}
       <Route path="/" element={<Home />} />
-      <Route path="/ecosystem" element={<SuspenseWrapper><Ecosystem /></SuspenseWrapper>} />
-      <Route path="/business-model" element={<SuspenseWrapper><BusinessModel /></SuspenseWrapper>} />
-      <Route path="/governance" element={<SuspenseWrapper><Governance /></SuspenseWrapper>} />
+      <Route
+        path="/governance"
+        element={
+          <SuspenseWrapper>
+            <Governance />
+          </SuspenseWrapper>
+        }
+      />
 
       {/* ==================== */}
       {/* Who We Are */}
       {/* ==================== */}
-      <Route path="/who-we-are" element={<SuspenseWrapper><WhoWeAre /></SuspenseWrapper>} />
-      <Route path="/what-we-do" element={<SuspenseWrapper><WhatWeDo /></SuspenseWrapper>} />
+      <Route
+        path="/who-we-are"
+        element={
+          <SuspenseWrapper>
+            <WhoWeAre />
+          </SuspenseWrapper>
+        }
+      />
+      <Route
+        path="/what-we-do"
+        element={
+          <SuspenseWrapper>
+            <WhatWeDo />
+          </SuspenseWrapper>
+        }
+      />
       <Route
         path="/what-makes-us-different"
-        element={<SuspenseWrapper><WhatMakesUsDifferent /></SuspenseWrapper>}
+        element={
+          <SuspenseWrapper>
+            <WhatMakesUsDifferent />
+          </SuspenseWrapper>
+        }
       />
 
       {/* ==================== */}
