@@ -54,12 +54,12 @@ function debugLazy(importFn, name) {
 }
 
 // ====================
-// Core Website Pages
+// Core Website Pages (in src/)
 // ====================
 const Governance = debugLazy(() => import("./Governance"), "Governance");
 
 // ====================
-// Pages (in src/pages/)
+// Who We Are (in src/pages/)
 // ====================
 const WhoWeAre = debugLazy(() => import("./pages/WhoWeAre"), "WhoWeAre");
 const WhatWeDo = debugLazy(() => import("./pages/WhatWeDo"), "WhatWeDo");
@@ -67,6 +67,17 @@ const WhatMakesUsDifferent = debugLazy(
   () => import("./pages/WhatMakesUsDifferent"),
   "WhatMakesUsDifferent"
 );
+
+// ====================
+// Our Mission (in src/pages/)
+// ====================
+const OurMission = debugLazy(() => import("./pages/OurMission"), "OurMission");
+const OurVision = debugLazy(() => import("./pages/OurVision"), "OurVision");
+const OurPhilosophy = debugLazy(
+  () => import("./pages/OurPhilosophy"),
+  "OurPhilosophy"
+);
+const WhoWeServe = debugLazy(() => import("./pages/WhoWeServe"), "WhoWeServe");
 
 const SuspenseWrapper = ({ children }) => (
   <Suspense fallback={<LoadingFallback />}>{children}</Suspense>
@@ -112,6 +123,42 @@ const AppRoutes = () => {
         element={
           <SuspenseWrapper>
             <WhatMakesUsDifferent />
+          </SuspenseWrapper>
+        }
+      />
+
+      {/* ==================== */}
+      {/* Our Mission */}
+      {/* ==================== */}
+      <Route
+        path="/our-mission"
+        element={
+          <SuspenseWrapper>
+            <OurMission />
+          </SuspenseWrapper>
+        }
+      />
+      <Route
+        path="/our-vision"
+        element={
+          <SuspenseWrapper>
+            <OurVision />
+          </SuspenseWrapper>
+        }
+      />
+      <Route
+        path="/our-philosophy"
+        element={
+          <SuspenseWrapper>
+            <OurPhilosophy />
+          </SuspenseWrapper>
+        }
+      />
+      <Route
+        path="/who-we-serve"
+        element={
+          <SuspenseWrapper>
+            <WhoWeServe />
           </SuspenseWrapper>
         }
       />
