@@ -60,6 +60,16 @@ const Ecosystem = debugLazy(() => import("./Ecosystem"), "Ecosystem");
 const BusinessModel = debugLazy(() => import("./BusinessModel"), "BusinessModel");
 const Governance = debugLazy(() => import("./Governance"), "Governance");
 
+// ====================
+// Who We Are
+// ====================
+const WhoWeAre = debugLazy(() => import("./WhoWeAre"), "WhoWeAre");
+const WhatWeDo = debugLazy(() => import("./WhatWeDo"), "WhatWeDo");
+const WhatMakesUsDifferent = debugLazy(
+  () => import("./WhatMakesUsDifferent"),
+  "WhatMakesUsDifferent"
+);
+
 const SuspenseWrapper = ({ children }) => (
   <Suspense fallback={<LoadingFallback />}>{children}</Suspense>
 );
@@ -74,6 +84,16 @@ const AppRoutes = () => {
       <Route path="/ecosystem" element={<SuspenseWrapper><Ecosystem /></SuspenseWrapper>} />
       <Route path="/business-model" element={<SuspenseWrapper><BusinessModel /></SuspenseWrapper>} />
       <Route path="/governance" element={<SuspenseWrapper><Governance /></SuspenseWrapper>} />
+
+      {/* ==================== */}
+      {/* Who We Are */}
+      {/* ==================== */}
+      <Route path="/who-we-are" element={<SuspenseWrapper><WhoWeAre /></SuspenseWrapper>} />
+      <Route path="/what-we-do" element={<SuspenseWrapper><WhatWeDo /></SuspenseWrapper>} />
+      <Route
+        path="/what-makes-us-different"
+        element={<SuspenseWrapper><WhatMakesUsDifferent /></SuspenseWrapper>}
+      />
 
       {/* ==================== */}
       {/* Fallback Routes */}
