@@ -87,31 +87,35 @@ export default function Navbar() {
     <div
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
         isScrolled
-          ? "bg-black/90 backdrop-blur-2xl shadow-xl border-b border-red-500/20"
-          : "bg-black/70 backdrop-blur-md border-b border-red-500/10"
+          ? "bg-black/90 backdrop-blur-2xl shadow-xl border-b border-brand-gold/40"
+          : "bg-black/70 backdrop-blur-md border-b border-brand-gold/25"
       }`}
     >
-      <header className="border-b border-red-500/10" ref={navRef}>
+      <header className="border-b border-brand-gold/20" ref={navRef}>
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between py-4">
+            {/* Logo — gold ring + glow */}
             <Link to="/" className="group" onClick={handleLinkClick}>
               <div className="flex items-center space-x-3">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-500/30 to-blue-500/30 rounded-2xl blur-xl group-hover:blur-2xl transition-all"></div>
-                  <div className="relative w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-red-500 to-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
+                  <div className="absolute inset-0 bg-gradient-to-r from-brand-red/40 via-brand-gold/40 to-brand-blue/40 rounded-2xl blur-xl group-hover:blur-2xl transition-all"></div>
+                  <div className="relative w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-brand-red via-brand-red to-brand-blue rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg ring-2 ring-brand-gold/60 group-hover:ring-brand-gold group-hover:shadow-gold-glow">
                     <img
                       src="/logos/digital.png"
                       alt="Digital Liberia"
                       className="w-7 h-7 md:w-8 md:h-8 object-contain"
                     />
+                    {/* gold star dot */}
+                    <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-brand-gold shadow-gold-glow ring-2 ring-black"></span>
                   </div>
                 </div>
-                <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent font-bold text-xl md:text-2xl tracking-tight">
+                <span className="bg-gradient-to-r from-brand-red via-brand-gold to-brand-blue bg-clip-text text-transparent font-bold text-xl md:text-2xl tracking-tight">
                   DigitalLiberia
                 </span>
               </div>
             </Link>
 
+            {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-1">
               {navLinks.map((link) => (
                 <div key={link.label} className="relative group">
@@ -120,14 +124,18 @@ export default function Navbar() {
                     onClick={handleLinkClick}
                     className={`px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 flex items-center gap-1 whitespace-nowrap ${
                       isActive(link)
-                        ? "text-white bg-gradient-to-r from-red-600 to-blue-600 shadow-lg"
-                        : "text-white/70 hover:text-white hover:bg-white/5"
+                        ? "text-white bg-gradient-to-r from-brand-red to-brand-blue ring-2 ring-brand-gold shadow-gold-glow"
+                        : "text-white/70 hover:text-white hover:bg-white/5 hover:ring-1 hover:ring-brand-gold/40"
                     }`}
                   >
                     {link.label}
                     {link.dropdown && (
                       <svg
-                        className="w-3 h-3 opacity-70"
+                        className={`w-3 h-3 transition-colors ${
+                          isActive(link)
+                            ? "text-brand-gold"
+                            : "opacity-70 group-hover:text-brand-gold group-hover:opacity-100"
+                        }`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -144,16 +152,16 @@ export default function Navbar() {
 
                   {link.dropdown && (
                     <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                      <div className="bg-black/95 backdrop-blur-2xl border border-white/10 rounded-xl shadow-2xl py-2 min-w-[280px]">
+                      <div className="bg-black/95 backdrop-blur-2xl border border-brand-gold/30 rounded-xl shadow-2xl shadow-brand-gold/10 py-2 min-w-[280px]">
                         {link.dropdown.map((d) => (
                           <Link
                             key={d.to}
                             to={d.to}
                             onClick={handleLinkClick}
-                            className={`block px-4 py-2.5 text-sm transition-colors ${
+                            className={`block px-4 py-2.5 text-sm transition-colors border-l-2 ${
                               location.pathname === d.to
-                                ? "text-white bg-gradient-to-r from-red-500/20 to-blue-500/20"
-                                : "text-white/70 hover:text-white hover:bg-gradient-to-r hover:from-red-500/20 hover:to-blue-500/20"
+                                ? "text-brand-gold bg-gradient-to-r from-brand-gold/15 to-brand-blue/10 border-brand-gold"
+                                : "text-white/70 hover:text-brand-gold hover:bg-gradient-to-r hover:from-brand-gold/10 hover:to-brand-blue/10 border-transparent hover:border-brand-gold/60"
                             }`}
                           >
                             {d.label}
@@ -166,24 +174,29 @@ export default function Navbar() {
               ))}
             </nav>
 
+            {/* Mobile toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden flex flex-col space-y-1.5 p-2 rounded-lg hover:bg-white/10 transition-colors z-50"
+              className="md:hidden flex flex-col space-y-1.5 p-2 rounded-lg hover:bg-brand-gold/10 transition-colors z-50"
               aria-label="Toggle menu"
             >
               <span
-                className={`w-6 h-0.5 bg-white transition-all duration-300 ${
-                  isMobileMenuOpen ? "rotate-45 translate-y-2" : ""
+                className={`w-6 h-0.5 transition-all duration-300 ${
+                  isMobileMenuOpen
+                    ? "rotate-45 translate-y-2 bg-brand-gold"
+                    : "bg-white"
                 }`}
               ></span>
               <span
-                className={`w-6 h-0.5 bg-white transition-all duration-300 ${
-                  isMobileMenuOpen ? "opacity-0" : ""
+                className={`w-6 h-0.5 transition-all duration-300 ${
+                  isMobileMenuOpen ? "opacity-0 bg-brand-gold" : "bg-white"
                 }`}
               ></span>
               <span
-                className={`w-6 h-0.5 bg-white transition-all duration-300 ${
-                  isMobileMenuOpen ? "-rotate-45 -translate-y-2" : ""
+                className={`w-6 h-0.5 transition-all duration-300 ${
+                  isMobileMenuOpen
+                    ? "-rotate-45 -translate-y-2 bg-brand-gold"
+                    : "bg-white"
                 }`}
               ></span>
             </button>
@@ -191,12 +204,13 @@ export default function Navbar() {
         </div>
       </header>
 
+      {/* Mobile nav */}
       <div
         className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${
           isMobileMenuOpen ? "max-h-[80vh] opacity-100 overflow-y-auto" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="px-4 py-4 space-y-1 bg-black/95 backdrop-blur-md border-b border-red-500/10">
+        <div className="px-4 py-4 space-y-1 bg-black/95 backdrop-blur-md border-b border-brand-gold/30">
           {navLinks.map((link) => (
             <div key={link.label}>
               <div className="flex items-center justify-between">
@@ -205,7 +219,7 @@ export default function Navbar() {
                   onClick={handleLinkClick}
                   className={`flex-1 px-4 py-3 text-base font-semibold rounded-xl transition-all ${
                     isActive(link)
-                      ? "text-white bg-gradient-to-r from-red-600 to-blue-600 shadow-lg"
+                      ? "text-white bg-gradient-to-r from-brand-red to-brand-blue ring-2 ring-brand-gold shadow-gold-glow"
                       : "text-white/70 hover:text-white hover:bg-white/10"
                   }`}
                 >
@@ -216,7 +230,7 @@ export default function Navbar() {
                     onClick={() =>
                       setOpenDropdown(openDropdown === link.label ? null : link.label)
                     }
-                    className="p-3 text-white/60 hover:text-white"
+                    className="p-3 text-brand-gold/70 hover:text-brand-gold"
                     aria-label="Expand"
                   >
                     <svg
@@ -238,13 +252,17 @@ export default function Navbar() {
                 )}
               </div>
               {link.dropdown && openDropdown === link.label && (
-                <div className="ml-4 mt-1 space-y-1 border-l border-white/10 pl-3">
+                <div className="ml-4 mt-1 space-y-1 border-l-2 border-brand-gold/40 pl-3">
                   {link.dropdown.map((d) => (
                     <Link
                       key={d.to}
                       to={d.to}
                       onClick={handleLinkClick}
-                      className="block px-3 py-2 text-sm text-white/60 hover:text-white rounded-lg hover:bg-white/5"
+                      className={`block px-3 py-2 text-sm rounded-lg transition-colors ${
+                        location.pathname === d.to
+                          ? "text-brand-gold bg-brand-gold/10"
+                          : "text-white/60 hover:text-brand-gold hover:bg-brand-gold/5"
+                      }`}
                     >
                       {d.label}
                     </Link>
@@ -256,13 +274,14 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className="border-b border-white/10 bg-black/30 backdrop-blur-sm overflow-hidden">
+      {/* Partner marquee — gold hairline */}
+      <div className="border-b border-brand-gold/20 bg-black/30 backdrop-blur-sm overflow-hidden">
         <div className="py-2 md:py-3 overflow-x-auto scrollbar-hide">
           <div className="flex animate-marquee-top gap-8 md:gap-16 whitespace-nowrap min-w-max px-4">
             {[...partners, ...partners].map((logo, idx) => (
               <div
                 key={idx}
-                className="inline-flex items-center justify-center w-8 h-8 md:w-12 md:h-12 transition-all hover:scale-110 flex-shrink-0"
+                className="inline-flex items-center justify-center w-8 h-8 md:w-12 md:h-12 transition-all hover:scale-110 hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.6)] flex-shrink-0"
               >
                 <img
                   src={logo}
