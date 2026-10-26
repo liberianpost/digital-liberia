@@ -79,6 +79,31 @@ const OurPhilosophy = debugLazy(
 );
 const WhoWeServe = debugLazy(() => import("./pages/WhoWeServe"), "WhoWeServe");
 
+// ====================
+// Investors & Strategic Partners
+// ====================
+const Investors = debugLazy(() => import("./pages/Investors"), "Investors");
+const TheOpportunity = debugLazy(
+  () => import("./pages/investors/TheOpportunity"),
+  "TheOpportunity"
+);
+const WhatWeHaveBuilt = debugLazy(
+  () => import("./pages/investors/WhatWeHaveBuilt"),
+  "WhatWeHaveBuilt"
+);
+const InvestorBusinessModel = debugLazy(
+  () => import("./pages/investors/InvestorBusinessModel"),
+  "InvestorBusinessModel"
+);
+const WhyPartner = debugLazy(
+  () => import("./pages/investors/WhyPartner"),
+  "WhyPartner"
+);
+const InvestmentPriorities = debugLazy(
+  () => import("./pages/investors/InvestmentPriorities"),
+  "InvestmentPriorities"
+);
+
 const SuspenseWrapper = ({ children }) => (
   <Suspense fallback={<LoadingFallback />}>{children}</Suspense>
 );
@@ -159,6 +184,58 @@ const AppRoutes = () => {
         element={
           <SuspenseWrapper>
             <WhoWeServe />
+          </SuspenseWrapper>
+        }
+      />
+
+      {/* ==================== */}
+      {/* Investors & Strategic Partners */}
+      {/* ==================== */}
+      <Route
+        path="/investors"
+        element={
+          <SuspenseWrapper>
+            <Investors />
+          </SuspenseWrapper>
+        }
+      />
+      <Route
+        path="/investors/opportunity"
+        element={
+          <SuspenseWrapper>
+            <TheOpportunity />
+          </SuspenseWrapper>
+        }
+      />
+      <Route
+        path="/investors/what-we-have-built"
+        element={
+          <SuspenseWrapper>
+            <WhatWeHaveBuilt />
+          </SuspenseWrapper>
+        }
+      />
+      <Route
+        path="/investors/business-model"
+        element={
+          <SuspenseWrapper>
+            <InvestorBusinessModel />
+          </SuspenseWrapper>
+        }
+      />
+      <Route
+        path="/investors/why-partner"
+        element={
+          <SuspenseWrapper>
+            <WhyPartner />
+          </SuspenseWrapper>
+        }
+      />
+      <Route
+        path="/investors/investment-priorities"
+        element={
+          <SuspenseWrapper>
+            <InvestmentPriorities />
           </SuspenseWrapper>
         }
       />
