@@ -59,13 +59,11 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu whenever the route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setOpenDropdown(null);
   }, [location.pathname]);
 
-  // Close desktop dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (navRef.current && !navRef.current.contains(e.target)) {
@@ -93,11 +91,9 @@ export default function Navbar() {
           : "bg-black/70 backdrop-blur-md border-b border-red-500/10"
       }`}
     >
-      {/* Top nav row */}
       <header className="border-b border-red-500/10" ref={navRef}>
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between py-4">
-            {/* Logo */}
             <Link to="/" className="group" onClick={handleLinkClick}>
               <div className="flex items-center space-x-3">
                 <div className="relative">
@@ -116,7 +112,6 @@ export default function Navbar() {
               </div>
             </Link>
 
-            {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-1">
               {navLinks.map((link) => (
                 <div key={link.label} className="relative group">
@@ -171,7 +166,6 @@ export default function Navbar() {
               ))}
             </nav>
 
-            {/* Mobile toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden flex flex-col space-y-1.5 p-2 rounded-lg hover:bg-white/10 transition-colors z-50"
@@ -197,7 +191,6 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* Mobile nav */}
       <div
         className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${
           isMobileMenuOpen ? "max-h-[80vh] opacity-100 overflow-y-auto" : "max-h-0 opacity-0"
@@ -263,7 +256,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Moving partner logos bar */}
       <div className="border-b border-white/10 bg-black/30 backdrop-blur-sm overflow-hidden">
         <div className="py-2 md:py-3 overflow-x-auto scrollbar-hide">
           <div className="flex animate-marquee-top gap-8 md:gap-16 whitespace-nowrap min-w-max px-4">
